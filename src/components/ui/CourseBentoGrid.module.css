@@ -1,0 +1,814 @@
+/* ═══════════════════════════════════════════════
+   CourseBentoGrid — Pixel-Art Bento Dashboard
+   ═══════════════════════════════════════════════ */
+
+/* ── Container ── */
+.bentoContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  background: #0a0e1a;
+  padding: 32px 24px 64px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Subtle grid-dot background */
+.bentoContainer::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(124, 58, 237, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ── */
+.header {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.1rem;
+  color: #c084fc;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 20px rgba(192, 132, 252, 0.6);
+  margin: 0;
+}
+
+.headerSubtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.7);
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 0;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.metaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  background: rgba(30, 10, 60, 0.6);
+  color: #e0d0ff;
+}
+
+/* ── Grid ── */
+.grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* ── Course Card ── */
+.card {
+  position: relative;
+  background: #f8fafc;
+  border: 4px solid #0f172a;
+  border-radius: 0;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  /* Pixel-art cut corners */
+  clip-path: polygon(
+    4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), 
+    calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px
+  );
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.6);
+}
+
+.card:active {
+  transform: translateY(2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* ── Locked Card Overlay ── */
+.cardLocked {
+  pointer-events: none;
+}
+
+.cardLocked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 2, 15, 0.8);
+  z-index: 5;
+  image-rendering: pixelated;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0,0,0,0.3) 25%,
+    transparent 25%,
+    transparent 75%,
+    rgba(0,0,0,0.3) 75%,
+    rgba(0,0,0,0.3)
+  );
+  background-size: 8px 8px;
+}
+
+.lockIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  z-index: 6;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+  animation: lockPulse 2s ease-in-out infinite;
+}
+
+@keyframes lockPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* ── Top Half: Illustration ── */
+.cardIllustration {
+  height: 160px;
+  background: #0f172a;
+  position: relative;
+  border-bottom: 4px solid #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.illustrationBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.illustrationOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.1) 100%);
+  z-index: 1;
+}
+
+.bigIconWrap {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+  animation: floatItem 3s ease-in-out infinite;
+}
+
+.bigIconWrap img {
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+@keyframes floatItem {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.floatingBadges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 3;
+}
+
+.matchBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  background: #0f172a;
+  border: 2px solid #3b82f6;
+  color: #60a5fa;
+  letter-spacing: 0.03em;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.difficultyBadge {
+  display: inline-flex;
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.diffBeginner {
+  background: #0f172a;
+  border: 2px solid #22c55e;
+  color: #4ade80;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.diffIntermediate {
+  background: #0f172a;
+  border: 2px solid #eab308;
+  color: #fde047;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.diffAdvanced {
+  background: #0f172a;
+  border: 2px solid #ef4444;
+  color: #fca5a5;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+/* ── Bottom Half: Text Content ── */
+.cardTextContent {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #f0f4f8; /* Matches light card background */
+}
+
+.cardTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #1d4ed8; /* Strong blue */
+  line-height: 1.6;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+}
+
+.cardDesc {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.85rem;
+  color: #334155; /* Slate 700 */
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+/* Removed categoryTag css since it's removed from JSX */
+
+/* ── Progress Bar ── */
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 14px;
+  background: #cbd5e1;
+  border: 3px solid #0f172a;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+.progressFill {
+  height: 100%;
+  background: #3b82f6;
+  position: relative;
+  transition: width 0.3s steps(10);
+  border-right: 2px solid #1d4ed8;
+}
+
+.progressLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: #475569;
+}
+
+/* Pixel segments effect on progress bar */
+.progressTrack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 10%,
+    rgba(0,0,0,0.5) 10%,
+    rgba(0,0,0,0.5) 11%
+  );
+  pointer-events: none;
+}
+
+/* Animated shine on progress */
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progressLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.36rem;
+  color: rgba(226, 232, 240, 0.6);
+  white-space: nowrap;
+  min-width: 52px;
+  text-align: right;
+}
+
+/* ── Loading State ── */
+.loadingContainer {
+  position: fixed;
+  inset: 0;
+  background: #0a0e1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 100;
+}
+
+.loadingTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: #c084fc;
+  letter-spacing: 0.1em;
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { text-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
+  50%      { text-shadow: 0 0 25px rgba(192, 132, 252, 0.8), 0 0 50px rgba(124, 58, 237, 0.3); }
+}
+
+.loadingBar {
+  width: 240px;
+  height: 8px;
+  background: #1a2235;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.loadingBarFill {
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, #5b21b6, #7c3aed, #2dd4bf);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 999px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.loadingSubtext {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: #475569;
+}
+
+/* ── Back button (shown when inside course map) ── */
+.backBtn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(30, 27, 75, 0.9);
+  border: 2px solid #8b5cf6;
+  border-radius: 10px;
+  color: #c4b5fd;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+}
+
+.backBtn:hover {
+  background: rgba(60, 40, 120, 0.95);
+  border-color: #a78bfa;
+  transform: translateY(-1px);
+}
+
+.backBtn:active {
+  transform: translateY(1px);
+}
+
+/* ── Scanlines overlay for retro effect ── */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Coming Soon — Card Treatment
+   ═══════════════════════════════════════════════ */
+
+.cardComingSoon {
+  cursor: pointer;
+}
+
+/* Desaturated + dimmed content */
+.cardComingSoon .cardIconWrap,
+.cardComingSoon .cardTitle,
+.cardComingSoon .cardDesc,
+.cardComingSoon .categoryTag,
+.cardComingSoon .progressRow {
+  filter: saturate(0.35) brightness(0.75);
+}
+
+.cardComingSoon:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+/* Ribbon */
+.comingSoonRibbon {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #f59e0b;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+  border: 2px solid #fff;
+}
+
+.comingSoonRibbon span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════
+   Coming Soon — Popup Modal
+   ═══════════════════════════════════════════════ */
+
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(5, 2, 15, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: popupFadeIn 0.25s ease-out both;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popupCard {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  background: #1e103c;
+  border: 4px solid #7c3aed;
+  border-radius: 0;
+  padding: 40px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  box-shadow:
+    inset -4px -4px 0 rgba(0, 0, 0, 0.5),
+    12px 12px 0 rgba(0, 0, 0, 0.8);
+  animation: popupSlideUp 0.35s steps(8) both;
+}
+
+@keyframes popupSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Accent glow on popup border */
+.popupCard::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 4px dashed rgba(124, 58, 237, 0.5);
+  z-index: -1;
+  animation: borderRotate 10s linear infinite;
+}
+
+@keyframes borderRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.popupIconWrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 0;
+  background: #78350f;
+  border: 4px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.4);
+  animation: popupIconBounce 1.5s steps(4) infinite;
+}
+
+@keyframes popupIconBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.popupEmoji {
+  font-size: 2.2rem;
+}
+
+.popupTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  color: #f59e0b;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+  margin: 0;
+}
+
+.popupCourseName {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #c084fc;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.popupMessage {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: rgba(226, 232, 240, 0.7);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 340px;
+}
+
+.popupBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #451a03;
+  border: 2px solid #f59e0b;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  color: #fcd34d;
+  letter-spacing: 0.06em;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.popupBadgeDot {
+  width: 8px;
+  height: 8px;
+  background: #f59e0b;
+  animation: dotPulse 1.2s steps(2) infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+.popupBtn {
+  margin-top: 8px;
+  padding: 16px 32px;
+  background: #5b21b6;
+  border: 4px solid #a855f7;
+  border-radius: 0;
+  color: #f0e8ff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.1s;
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.3), 4px 4px 0 rgba(0, 0, 0, 0.6);
+}
+
+.popupBtn:hover {
+  background: #6d28d9;
+  transform: translateY(-2px);
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.3), 6px 6px 0 rgba(0, 0, 0, 0.6);
+}
+
+.popupBtn:active {
+  transform: translateY(2px);
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.3), 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════
+   Pagination
+   ═══════════════════════════════════════════════ */
+
+.paginationWrapper {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 32px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.paginationScrollArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 300px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  /* hide scrollbar but allow scrolling */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.paginationScrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.pageNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #1e103c;
+  border: 2px solid #a855f7;
+  border-radius: 0;
+  color: #c084fc;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.pageNavBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #4c1d95;
+  background: #120b29;
+  color: #4c1d95;
+  box-shadow: none;
+}
+
+.pageNavBtn:not(:disabled):hover {
+  background: #4c1d95;
+  transform: translateY(-2px);
+  color: #f0e8ff;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8);
+}
+
+.pageNavBtn:not(:disabled):active {
+  transform: translateY(1px);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #120b29;
+  border: 2px solid #4c1d95;
+  border-radius: 0;
+  color: #a78bfa;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.pageBtn:hover {
+  border-color: #7c3aed;
+  background: #1e103c;
+  color: #f0e8ff;
+  transform: translateY(-2px);
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8);
+}
+
+.pageBtnActive {
+  background: #5b21b6;
+  border-color: #c084fc;
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3), 4px 4px 0 rgba(0,0,0,0.8);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .bentoContainer {
+    padding: 20px 16px 48px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .headerTitle {
+    font-size: 0.8rem;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .popupCard {
+    padding: 32px 24px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .headerTitle {
+    font-size: 0.65rem;
+  }
+
+  .cardTitle {
+    font-size: 0.6rem;
+  }
+
+  .popupTitle {
+    font-size: 0.6rem;
+  }
+}
+

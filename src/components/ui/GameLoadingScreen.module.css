@@ -1,0 +1,332 @@
+/* ═══════════════════════════════════════════════
+   GameLoadingScreen — Chic Gamer / Cyberpunk Vibe
+   ═══════════════════════════════════════════════ */
+
+.loaderRoot {
+  position: fixed;
+  inset: 0;
+  background: #050508;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* ── Dynamic Background Glows ── */
+.bgGlow1, .bgGlow2, .bgGlow3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
+}
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  background: rgba(124, 58, 237, 0.2);
+  top: -100px;
+  left: -200px;
+  animation: pulseGlow 8s ease-in-out infinite alternate;
+}
+.bgGlow2 {
+  width: 400px;
+  height: 400px;
+  background: rgba(0, 240, 255, 0.15);
+  bottom: -100px;
+  right: -100px;
+  animation: pulseGlow 6s ease-in-out infinite alternate-reverse;
+}
+.bgGlow3 {
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 0, 60, 0.1);
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulseGlow 10s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.8) translate(0, 0); opacity: 0.3; }
+  100% { transform: scale(1.2) translate(20px, -20px); opacity: 0.6; }
+}
+
+/* ── Cyber Grid ── */
+.cyberGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(3);
+  transform-origin: center top;
+  z-index: 1;
+  pointer-events: none;
+  animation: gridMove 20s linear infinite;
+  mask-image: linear-gradient(to bottom, transparent, black 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 40%, transparent 100%);
+}
+
+@keyframes gridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 40px; }
+}
+
+/* ── Starfield / Particles ── */
+.starfield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  animation: starTwinkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+  opacity: 0;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50%      { opacity: var(--brightness); transform: scale(1); }
+}
+
+/* ── Abstract Shards (Chic Vibe) ── */
+.shardsContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.shard {
+  position: absolute;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(4px);
+  animation: floatShard 10s ease-in-out infinite;
+}
+
+.shard1 { width: 120px; height: 120px; top: 15%; left: 15%; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); transform: rotate(15deg); animation-delay: 0s; }
+.shard2 { width: 80px; height: 80px; bottom: 25%; right: 20%; clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); transform: rotate(-25deg); animation-delay: 2s; }
+.shard3 { width: 60px; height: 60px; top: 30%; right: 10%; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); transform: rotate(45deg); animation-delay: 4s; }
+
+@keyframes floatShard {
+  0%, 100% { transform: translateY(0) rotate(15deg); }
+  50% { transform: translateY(-30px) rotate(25deg); }
+}
+
+/* ── Center Content ── */
+.centerContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 20px;
+}
+
+/* ── Sleek Logo ── */
+.logoArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.logoGlitchWrapper {
+  position: relative;
+}
+
+.logoIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: rgba(10, 10, 15, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: logoHover 4s ease-in-out infinite;
+}
+
+@keyframes logoHover {
+  0%, 100% { transform: translateY(0); box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.1); }
+  50% { transform: translateY(-10px); box-shadow: 0 0 50px rgba(0, 240, 255, 0.4), inset 0 0 30px rgba(0, 240, 255, 0.2); }
+}
+
+.logoLetter {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #fff, #00f0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(0,240,255,0.5));
+}
+
+.logoText {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.8rem;
+  letter-spacing: 0.3em;
+  color: #fff;
+  text-transform: uppercase;
+  margin: 0;
+  position: relative;
+  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* ── Status Text ── */
+.statusText {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #00f0ff;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: pulseText 2s infinite alternate;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+}
+
+@keyframes pulseText {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* ── High-tech Progress Bar ── */
+.progressContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progressOuter {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.progressInner {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #7c3aed, #00f0ff);
+  position: relative;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+}
+
+.progressGlow {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 20px 10px rgba(0, 240, 255, 0.6);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.progressDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  color: #8b9bb4;
+  letter-spacing: 0.1em;
+}
+
+.progressPercent {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+/* ── Glassmorphic Tip Box ── */
+.tipWrapper {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.tipBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.tipBox:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.tipIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(124, 58, 237, 0.2);
+  border-radius: 10px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.tipText {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 5px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .logoText {
+    font-size: 1.4rem;
+  }
+  .logoIcon {
+    width: 56px;
+    height: 56px;
+  }
+  .logoLetter {
+    font-size: 2rem;
+  }
+  .tipBox {
+    padding: 12px 16px;
+  }
+  .tipText {
+    font-size: 0.75rem;
+  }
+}

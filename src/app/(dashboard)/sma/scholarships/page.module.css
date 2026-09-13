@@ -1,0 +1,141 @@
+/* ══════════════════════════════════════════
+   SCHOLARSHIP HUB (NEON CYBERPUNK)
+   ══════════════════════════════════════════ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.header {
+  margin-bottom: 8px;
+}
+
+.title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.1rem;
+  color: #38bdf8;
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  margin: 0 0 12px 0;
+}
+
+.subtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Scholarship Grid ── */
+.scholarshipGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 16px;
+}
+
+.cardTitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e0f2fe;
+  margin: 0 0 6px 0;
+}
+
+.cardProvider {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.9rem;
+  color: #7dd3fc;
+  margin: 0;
+}
+
+.matchBadge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: #fff;
+  background: rgba(16, 185, 129, 0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2);
+  white-space: nowrap;
+}
+
+.detailList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detailIcon {
+  font-size: 1.1rem;
+}
+
+.detailText {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.btnAction {
+  margin-top: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  padding: 14px 20px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+}
+
+.btnAction:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.btnAction:active {
+  transform: translateY(2px);
+}

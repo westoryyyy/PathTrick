@@ -1,0 +1,121 @@
+/* ══════════════════════════════════════════
+   PREFERENCES STEP (RETRO PIXEL)
+   ══════════════════════════════════════════ */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Section ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sectionTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 0 #3b261b;
+}
+
+.optBadge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #fbbf24;
+  background: #78350f;
+  border: 2px solid #b45309;
+  padding: 4px 8px;
+  letter-spacing: 0.06em;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.5);
+}
+
+.sectionHint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: rgba(240,232,255,0.7);
+  margin: 0;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+/* ── Chip Grid ── */
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  
+  /* Wooden Panel Styles */
+  background: #bc8f65;
+  border: 2px solid #5a3a29;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    2px 2px 0px 0px rgba(0,0,0,0.5);
+    
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  text-shadow: 1px 1px 0 #3b261b;
+  
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.chip:hover {
+  background: #cba37b;
+  border-color: #6a4734;
+  color: #fff;
+}
+
+.chip:active {
+  transform: translate(1px, 1px);
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    1px 1px 0px 0px rgba(0,0,0,0.5);
+}
+
+.chipSelected {
+  background: #d4a373 !important;
+  border-color: #f59e0b !important;
+  color: #fff !important;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    0 0 0 2px rgba(245,158,11,0.6) !important;
+  transform: translate(1px, 1px);
+}
+
+.chipIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .chipGrid { gap: 8px; }
+  .chip {
+    padding: 8px 10px;
+    font-size: 0.5rem;
+  }
+}

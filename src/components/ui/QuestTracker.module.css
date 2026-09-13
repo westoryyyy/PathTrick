@@ -1,0 +1,219 @@
+/* ═══════════════════════════════════════
+   Quest Tracker — Edgy Cyberpunk RPG
+═══════════════════════════════════════ */
+
+.tracker {
+  position: absolute;
+  top: 106px;   /* sits perfectly below the grouped HUD container */
+  right: 16px;
+  width: 220px;
+  background: linear-gradient(145deg,
+    rgba(6, 3, 18, 0.97) 0%,
+    rgba(18, 6, 40, 0.95) 100%
+  );
+  /* Clipped corner matching stats card style */
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  border: 1.5px solid rgba(168, 85, 247, 0.35);
+  padding: 12px 14px;
+  z-index: 50;
+  animation: slideInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  box-shadow:
+    0 0 0 1px rgba(168, 85, 247, 0.15),
+    0 0 24px rgba(100, 0, 200, 0.2),
+    0 8px 32px rgba(0,0,0,0.7);
+  /* Animated left accent line */
+  border-left: 2px solid #a855f7;
+}
+
+.tracker::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 14px; height: 14px;
+  background: rgba(168, 85, 247, 0.5);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.headerIcon {
+  font-size: 0.9rem;
+  filter: drop-shadow(0 0 6px rgba(168,85,247,0.7));
+}
+
+.headerTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: #c084fc;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(192,132,252,0.7);
+  flex: 1;
+}
+
+.progressPct {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: #f5c842;
+  text-shadow: 0 0 6px rgba(245,200,60,0.7);
+}
+
+/* Main progress bar */
+.mainBarWrap {
+  position: relative;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.mainBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4c1d95, #7c3aed, #a855f7, #e879f9);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+  box-shadow: 0 0 10px rgba(192,132,252,0.8);
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.mainBarLabel {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: rgba(240,232,255,0.6);
+  pointer-events: none;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.4), transparent);
+  margin: 8px 0;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 4px;
+}
+
+.sectionTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: rgba(192,132,252,0.6);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* Quest row */
+.questRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 0;
+  margin-bottom: 4px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: background 0.2s;
+}
+
+.questRow.active {
+  background: rgba(168, 85, 247, 0.12);
+  border-left: 2px solid #a855f7;
+}
+
+.questRow.active:hover {
+  background: rgba(168, 85, 247, 0.2);
+}
+
+.questRow.locked {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Clickable rows */
+.clickable {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.clickable:hover {
+  transform: scale(1.02);
+}
+
+.clickable.active:hover {
+  background: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 8px rgba(168,85,247,0.3);
+}
+
+.clickable.locked:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.questIcon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.questInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.questName {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.32rem;
+  color: #f0e8ff;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.questXp {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.28rem;
+  color: #f5c842;
+  margin-top: 2px;
+  text-shadow: 0 0 6px rgba(245,200,60,0.5);
+}
+
+.questStatus {
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+/* Completed count */
+.completedRow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: rgba(45, 212, 191, 0.7);
+  text-align: center;
+  letter-spacing: 0.08em;
+}

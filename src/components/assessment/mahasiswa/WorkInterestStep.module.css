@@ -1,0 +1,197 @@
+/* ══════════════════════════════════════════
+   WORK INTEREST STEP
+   ══════════════════════════════════════════ */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Section ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #f0e8ff;
+  margin: 0;
+  letter-spacing: 0.06em;
+}
+
+.editHint {
+  font-size: 0.86rem;
+  color: rgba(240,232,255,0.3);
+}
+
+.sectionHint {
+  font-size: 0.96rem;
+  color: rgba(240,232,255,0.45);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Skill Tags (editable) ── */
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skillTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.94rem;
+  color: #c084fc;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.25);
+  padding: 5px 10px;
+  transition: all 0.2s;
+}
+
+.skillTag:hover {
+  border-color: rgba(168,85,247,0.5);
+  background: rgba(168,85,247,0.15);
+}
+
+.skillRemove {
+  background: none;
+  border: none;
+  color: rgba(240,232,255,0.3);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.skillRemove:hover { color: #ef4444; }
+
+/* ── Industry Grid ── */
+.industryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.industryCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: #bc8f65;
+  border: 2px solid #5a3a29;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    2px 2px 0px 0px rgba(0,0,0,0.5);
+  cursor: pointer;
+  font: inherit;
+  color: #fff;
+  position: relative;
+  transition: all 0.1s;
+}
+
+.industryCard:hover {
+  background: #cba37b;
+  border-color: #6a4734;
+  transform: translate(-1px, -1px);
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    3px 3px 0px 0px rgba(0,0,0,0.5);
+}
+
+.industrySelected {
+  background: #d4a373 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    0 0 0 2px rgba(245,158,11,0.6) !important;
+  transform: translate(-1px, -1px);
+}
+
+.industryIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.industryLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+  text-align: center;
+  line-height: 1.4;
+  text-shadow: 1px 1px 0 #3b261b;
+}
+
+.industrySelected .industryLabel {
+  color: #fff;
+}
+
+.industryCheck {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--ind-color);
+  animation: checkPop 0.25s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes checkPop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* ── Work Type Chips ── */
+.typeChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.typeChip {
+  padding: 10px 16px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #fff;
+  text-shadow: 1px 1px 0 #3b261b;
+  background: #bc8f65;
+  border: 2px solid #5a3a29;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    2px 2px 0px 0px rgba(0,0,0,0.5);
+  cursor: pointer;
+  font: inherit;
+  transition: all 0.1s;
+}
+
+.typeChip:hover {
+  background: #cba37b;
+  border-color: #6a4734;
+}
+
+.typeChipSelected {
+  background: #d4a373 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.3),
+    0 0 0 2px rgba(245,158,11,0.6) !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .industryGrid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .industryCard { padding: 12px 8px; }
+}

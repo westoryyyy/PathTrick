@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════
+   PATHTRICK HUD — Edgy Cyberpunk RPG
+═══════════════════════════════════════ */
+
+/* ── Top-right HUD Container ── */
+.hudContainer {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 50;
+}
+
+/* ── Player Card (Inside Container) ── */
+.playerCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  /* Clipped corner — edgy hexagonal feel */
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  background: linear-gradient(135deg,
+    rgba(8, 4, 22, 0.97) 0%,
+    rgba(20, 8, 45, 0.95) 60%,
+    rgba(8, 4, 22, 0.97) 100%
+  );
+  padding: 12px 20px 12px 12px;
+  animation: slideInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Neon edge glow */
+  box-shadow:
+    0 0 0 1px rgba(168, 85, 247, 0.6),
+    0 0 20px rgba(168, 85, 247, 0.25),
+    inset 0 0 40px rgba(100, 0, 200, 0.08);
+}
+
+/* Animated top-border accent line */
+.playerCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #a855f7, #c084fc, #7c3aed, transparent);
+  animation: scanSlide 3s linear infinite;
+}
+
+/* Corner cut accent */
+.playerCard::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 14px; height: 14px;
+  background: #a855f7;
+  clip-path: polygon(0 0, 100% 100%, 100% 0);
+  opacity: 0.8;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-32px) skewX(-2deg); }
+  to   { opacity: 1; transform: translateX(0) skewX(0); }
+}
+
+@keyframes scanSlide {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Avatar */
+.avatar {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, #1a0050, #5b21b6, #7c3aed);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(124, 58, 237, 0.3);
+}
+
+.avatarImg {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+}
+
+.levelBadge {
+  position: absolute;
+  bottom: -6px;
+  right: -12px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+  color: #0a0400;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  padding: 3px 7px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
+  letter-spacing: 0.08em;
+}
+
+/* Info */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 120px;
+}
+
+.playerName {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  color: #f0e8ff;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.9), 0 0 20px rgba(168, 85, 247, 0.5);
+}
+
+.xpRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xpLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  color: #9d8ec0;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+
+/* XP bar — the ones inside .playerCard */
+.xpBarWrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  overflow: hidden;
+}
+
+.xpBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4c1d95, #7c3aed, #a855f7, #c084fc);
+  background-size: 200% 100%;
+  animation: xpShimmer 2s linear infinite;
+  box-shadow: 0 0 8px rgba(192, 132, 252, 0.8);
+}
+
+@keyframes xpShimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ═══════════════════════════════════════
+   Stats Card (Inside Container)
+═══════════════════════════════════════ */
+.statsCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  background: linear-gradient(135deg,
+    rgba(8, 4, 22, 0.97) 0%,
+    rgba(20, 8, 45, 0.95) 60%,
+    rgba(8, 4, 22, 0.97) 100%
+  );
+  padding: 12px 22px;
+  animation: slideInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  box-shadow:
+    0 0 0 1px rgba(245, 200, 60, 0.5),
+    0 0 20px rgba(245, 200, 60, 0.15),
+    inset 0 0 40px rgba(200, 140, 0, 0.05);
+}
+
+.statsCard::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f5c842, #fde68a, #f59e0b, transparent);
+  animation: scanSlide 3s linear infinite reverse;
+}
+
+.statsCard::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 14px; height: 14px;
+  background: #f5c842;
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  opacity: 0.7;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(32px) skewX(2deg); }
+  to   { opacity: 1; transform: translateX(0) skewX(0); }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 8px rgba(245, 200, 60, 0.8));
+  animation: floatIcon 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes floatIcon {
+  from { transform: translateY(0); filter: drop-shadow(0 0 6px rgba(245,200,60,0.6)); }
+  to   { transform: translateY(-3px); filter: drop-shadow(0 0 14px rgba(245,200,60,1)); }
+}
+
+.statIconImg {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(245, 200, 60, 0.8));
+  animation: floatIcon 2.5s ease-in-out infinite alternate;
+}
+
+.statValue {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.78rem;
+  color: #f5c842;
+  line-height: 1.2;
+  text-shadow: 0 0 10px rgba(245, 200, 60, 0.8), 0 0 20px rgba(245, 200, 60, 0.4);
+}
+
+.statLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: #9d8ec0;
+  letter-spacing: 0.12em;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+.statDivider {
+  width: 1px;
+  height: 38px;
+  background: linear-gradient(to bottom,
+    transparent,
+    rgba(168, 85, 247, 0.6) 30%,
+    rgba(245, 200, 60, 0.6) 70%,
+    transparent
+  );
+}
+
+/* ═══════════════════════════════════════
+   Controls Hint (bottom-center)
+═══════════════════════════════════════ */
+.controlsHint {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(6, 3, 18, 0.9);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  /* Parallelogram edges */
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  padding: 8px 28px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.36rem;
+  color: rgba(192, 132, 252, 0.8);
+  letter-spacing: 0.1em;
+  z-index: 50;
+  animation: fadeUp 0.6s ease 0.3s both;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.15),
+    0 4px 24px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+/* Flicker scan line on controls bar */
+.controlsHint::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(168, 85, 247, 0.03) 2px,
+    rgba(168, 85, 247, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+.controlHintKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(192, 132, 252, 0.5);
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+  padding: 3px 7px;
+  color: #e879f9;
+  font-size: 0.34rem;
+  text-shadow: 0 0 6px rgba(232, 121, 249, 0.8);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.dot {
+  color: rgba(168, 85, 247, 0.5);
+  font-size: 0.7rem;
+}
+
+/* ═══════════════════════════════════════
+   Nearby Node Toast
+═══════════════════════════════════════ */
+.nearbyToast {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(4, 30, 28, 0.95);
+  border: 1.5px solid rgba(45, 212, 191, 0.5);
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  padding: 10px 28px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: #2dd4bf;
+  z-index: 50;
+  pointer-events: none;
+  animation: nearbyPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 191, 0.2),
+    0 0 24px rgba(45, 212, 191, 0.25),
+    0 4px 20px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(45, 212, 191, 0.7);
+}
+
+@keyframes nearbyPop {
+  from { opacity: 0; transform: translateX(-50%) scale(0.8) skewX(-4deg); }
+  to   { opacity: 1; transform: translateX(-50%) scale(1) skewX(0); }
+}
+
+.nearbyIcon {
+  font-size: 1rem;
+  animation: pulse 0.7s ease infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); filter: drop-shadow(0 0 4px rgba(45,212,191,0.5)); }
+  to   { transform: scale(1.3); filter: drop-shadow(0 0 10px rgba(45,212,191,1)); }
+}

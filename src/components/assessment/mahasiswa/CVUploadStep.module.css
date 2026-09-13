@@ -1,0 +1,461 @@
+/* ══════════════════════════════════════════
+   CV UPLOAD STEP (RETRO PIXEL)
+   ══════════════════════════════════════════ */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* ═══════ DROP ZONE ═══════ */
+.dropZone {
+  position: relative;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #bc8f65;
+  border: 4px dashed #5a3a29;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 16px rgba(0,0,0,0.3),
+    4px 4px 0px 0px rgba(0,0,0,0.5);
+}
+
+.dropZone:hover {
+  background: #cba37b;
+  border-color: #6a4734;
+}
+
+.dropZoneDragOver {
+  background: #d4a373 !important;
+  border-color: #f59e0b !important;
+  border-style: solid !important;
+  box-shadow: 
+    inset 0 0 16px rgba(0,0,0,0.4),
+    6px 6px 0px 0px rgba(0,0,0,0.5),
+    inset 0 0 20px rgba(245,158,11,0.5) !important;
+  transform: scale(1.02);
+}
+
+.dropZoneDone {
+  border-style: solid;
+  border-color: #059669;
+  background: #064e3b;
+  cursor: default;
+  min-height: auto;
+}
+
+.dropZoneError {
+  border-color: #dc2626 !important;
+  background: #7f1d1d !important;
+}
+
+/* ═══════ IDLE ═══════ */
+.idleContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 24px;
+}
+
+.uploadIcon {
+  font-size: 4.5rem;
+  animation: iconFloat 3s ease-in-out infinite;
+  filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.5));
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.uploadTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 0 #3b261b;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.uploadHint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #fff;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 #3b261b;
+}
+
+.uploadFormats {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-shadow: 1px 1px 0 #3b261b;
+}
+
+/* ═══════ PROCESSING (UPLOAD + EXTRACT) ═══════ */
+.processingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 24px;
+}
+
+.uploadingIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadingSpinner {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: 4px solid #4c1d95;
+  border-top-color: #a855f7;
+  border-radius: 0; /* Blocky for retro */
+  animation: spin 0.8s steps(4) infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.processingTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: #a855f7;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.processingFile {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: rgba(240,232,255,0.7);
+  margin: 0;
+}
+
+/* Progress bar */
+.progressBarWrap {
+  width: 250px;
+  height: 16px; /* Thicker for retro */
+  background: #1e1b4b;
+  border: 4px solid #4c1d95;
+  box-shadow: inset 4px 4px 0 rgba(0,0,0,0.4);
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: #a855f7;
+  transition: width 0.5s steps(10); /* Stepped animation */
+}
+
+/* ═══════ SCANNER (EXTRACTING) ═══════ */
+.scannerWrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e1b4b;
+  border: 4px solid #4c1d95;
+}
+
+.scannerIcon {
+  font-size: 3.2rem;
+  z-index: 1;
+}
+
+.scanLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #2dd4bf;
+  box-shadow: 0 0 16px #2dd4bf;
+  animation: scanMove 1.5s steps(10) infinite;
+}
+@keyframes scanMove {
+  0%, 100% { top: 0; }
+  50%      { top: 100%; }
+}
+
+.extractingDots {
+  display: flex;
+  gap: 6px;
+}
+
+.extractDot {
+  width: 10px;
+  height: 10px;
+  background: #7c3aed;
+  border: 2px solid #fff;
+  animation: dotBounce 0.6s steps(2) infinite;
+}
+.extractDot:nth-child(2) { animation-delay: 0.2s; }
+.extractDot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50%      { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ═══════ DONE ═══════ */
+.doneContent {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  width: 100%;
+}
+
+.doneHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.doneIcon { font-size: 3rem; flex-shrink: 0; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5)); }
+
+.doneTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-shadow: 1px 1px 0 #3b261b;
+  line-height: 1.6;
+}
+
+.doneFile {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: rgba(240,232,255,0.7);
+  margin: 0;
+  margin-top: 8px;
+}
+
+.retryBtn {
+  margin-left: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #fff;
+  background: #b91c1c;
+  border: 2px solid #f87171;
+  padding: 8px 12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.retryBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Extracted data sections */
+.extractedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 4px dashed rgba(255,255,255,0.1);
+}
+
+.extractedLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-shadow: 1px 1px 0 #3b261b;
+}
+
+/* Skill tags */
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skillTag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #fff;
+  background: #4c1d95;
+  border: 2px solid #a855f7;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  padding: 6px 10px;
+  animation: tagIn 0.35s steps(4) both;
+}
+@keyframes tagIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Experience list */
+.expList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.expList li {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: rgba(240,232,255,0.9);
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.8;
+  animation: tagIn 0.35s steps(4) both;
+}
+.expList li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: #34d399;
+}
+
+.eduText {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: rgba(240,232,255,0.9);
+  margin: 0;
+  line-height: 1.8;
+}
+
+/* ═══════ ERROR ═══════ */
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 24px;
+}
+
+.errorIcon { font-size: 4.5rem; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.5)); }
+
+.errorTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: #f87171;
+  margin: 0;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+  text-align: center;
+}
+
+.errorHint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: rgba(240,232,255,0.7);
+  margin: 0;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.retryBtnLarge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  padding: 12px 24px;
+  background: #991b1b;
+  border: 4px solid #ef4444;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: transform 0.1s;
+}
+.retryBtnLarge:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+/* ═══════ PORTFOLIO SECTION ═══════ */
+.portfolioSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.portfolioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.portfolioLabel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.optBadge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #fbbf24;
+  background: #78350f;
+  border: 2px solid #b45309;
+  padding: 4px 8px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.portfolioZone {
+  padding: 16px 20px;
+  background: #bc8f65;
+  border: 4px dashed #5a3a29;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  text-align: center;
+}
+.portfolioZone:hover {
+  background: #cba37b;
+  border-color: #6a4734;
+}
+
+.portfolioHint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: rgba(240,232,255,0.6);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.portfolioFile {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #34d399;
+  margin: 0;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+/* ═══════ Responsive ═══════ */
+@media (max-width: 640px) {
+  .dropZone { min-height: 220px; }
+  .idleContent { padding: 28px 16px; }
+  .uploadIcon { font-size: 2.2rem; }
+  .doneContent { padding: 14px; }
+}

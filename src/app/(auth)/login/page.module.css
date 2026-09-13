@@ -1,0 +1,401 @@
+/* ════════════════════════════
+   LOGIN PAGE – Pixel-art RPG theme
+════════════════════════════ */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  background-color: #0b1437; /* Fallback */
+}
+
+/* ── Dynamic Background ── */
+.pageBg {
+  position: absolute;
+  inset: -2%;
+  background-image: url('/px-hero-island.jpg');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  animation: bgPan 40s ease-in-out infinite alternate;
+}
+
+.pageOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(10, 15, 30, 0.4) 100%);
+  z-index: 1;
+}
+
+@keyframes bgPan {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.1) translate(-2%, 2%); }
+}
+
+
+
+/* ── Back Button (Image Asset) ── */
+.logoBtn {
+  position: fixed;
+  top: 40px;
+  left: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-decoration: none;
+  transition: transform 0.1s;
+  cursor: pointer;
+}
+
+.logoBtn:hover {
+  transform: scale(1.05);
+}
+
+.logoBtn:active {
+  transform: scale(0.95);
+}
+
+
+
+/* ── Container ── */
+.container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Logo ── */
+.logo { 
+  text-align: center; 
+  margin-bottom: 24px;
+  transform: translateY(40px);
+  z-index: 2;
+  position: relative;
+}
+
+/* ── Card (Image Asset Style) ── */
+.card {
+  width: 100%;
+  max-width: 540px;
+  min-height: 480px;
+  background-color: transparent;
+  background-image: url('/Login Card.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Increase padding to push content inside the thick drawn borders */
+  padding: 85px 85px 85px 85px; 
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4));
+}
+
+.title {
+  font-family: var(--font-pixel), 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: #3e2723;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  text-shadow: none;
+}
+
+.subtitle {
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 0.9rem;
+  color: #5d4037;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* ── Social buttons ── */
+.socialButtons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.socialBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 2px solid #a67c52;
+  border-radius: 8px;
+  background: #fcf3e3;
+  cursor: pointer;
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 1rem;
+  color: #3e2723;
+  font-weight: 600;
+  box-shadow: 0 3px 0 #a67c52;
+  text-transform: none;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+}
+
+.socialBtn:hover:not(:disabled) {
+  background: #fff9ef;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #a67c52;
+}
+
+.socialBtn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #a67c52;
+}
+
+.socialBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: 0 3px 0 #a67c52;
+}
+
+.socialIcon {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Divider ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: #a67c52;
+  font-size: 0.8rem;
+  font-family: var(--font-pixelify), sans-serif;
+  text-transform: uppercase;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: #a67c52;
+}
+
+/* ── Input fields ── */
+.emailForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  display: none;
+}
+
+.inputField {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #8b5a2b;
+  border-radius: 8px;
+  background: #e6ccab;
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 0.95rem;
+  color: #3e2723;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.inputField:focus {
+  border-color: #5d4037;
+  background: #f1ebd8;
+}
+
+.inputField::placeholder {
+  color: #8d6e63;
+}
+
+/* ── Submit button (Golden/Wood Style) ── */
+.submitBtn {
+  width: 100%;
+  padding: 16px;
+  border: 3px solid #5d4037;
+  border-radius: 8px;
+  background: linear-gradient(to bottom, #ffd700, #daa520);
+  color: #3e2723;
+  font-family: var(--font-pixel), 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  box-shadow: 
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 6px 0 #8b5a2b, 
+    0 8px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, box-shadow 0.1s;
+  margin-top: 16px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #ffdf33, #e8b122);
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 8px 0 #8b5a2b, 
+    0 12px 16px rgba(0, 0, 0, 0.4);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: 
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+    0 0 0 #8b5a2b, 
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.submitBtn:disabled {
+  background: linear-gradient(to bottom, #d4c47b, #bfa256);
+  border-color: #8b7d6b;
+  color: #7a6e5e;
+  text-shadow: none;
+  box-shadow: 
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+    0 4px 0 #7a6e5e;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Privacy ── */
+.privacy {
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 0.75rem;
+  color: #5d4037;
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+/* ── Terms footer ── */
+.terms {
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 0.8rem;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.8;
+  margin-top: 20px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8), -1px -1px 0 rgba(0, 0, 0, 0.8), 1px -1px 0 rgba(0, 0, 0, 0.8), -1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.terms a {
+  color: #ff5252;
+  text-decoration: none;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}
+
+/* ── OTP Section ── */
+.otpSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.otpIcon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.otpInputs {
+  display: flex;
+  gap: 8px;
+}
+
+.otpInput {
+  width: 44px;
+  height: 52px;
+  background: #f9fafb;
+  border: 3px solid #d1d5db;
+  border-radius: 8px;
+  color: #1a2a3a;
+  font-family: var(--font-pixelify), sans-serif;
+  font-size: 1.2rem;
+  text-align: center;
+  outline: none;
+  box-shadow: none;
+}
+
+.otpInput:focus {
+  border-color: #DD1A21;
+  background: #fff;
+}
+
+.otpInput:not(:placeholder-shown) {
+  border-color: #22c55e;
+}
+
+.verifyingMsg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #1a2a3a;
+  font-family: var(--font-pixelify), sans-serif;
+}
+
+.resendBtn {
+  font-size: 0.8rem;
+  color: #6b7280;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-pixelify), sans-serif;
+  text-decoration: underline;
+}
+
+.resendBtn:hover {
+  color: #1a2a3a;
+}
