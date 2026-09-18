@@ -41,65 +41,113 @@ function MapContent() {
   const [nearbyNode,   setNearbyNode]   = useState<CourseNodeData | null>(null);
   const [showSBT,      setShowSBT]      = useState(false);
   const [sbtData,      setSbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
+  const [houseId,      setHouseId]      = useState<string | null>(null);
   
   // Dynamic nodes based on Module and Chapter
   const [dynamicNodes, setDynamicNodes] = useState<CourseNodeData[]>([]);
 
   useEffect(() => {
-    if (moduleId && chapterId) {
-      // Generate dynamic levels (Sub-Bab) for the selected Module -> Chapter
-      const completed = useMapStore.getState().completedDynamicNodes || [];
-      
-      const id1 = `${moduleId}-${chapterId}-1`;
-      const id2 = `${moduleId}-${chapterId}-2`;
-      const id3 = `${moduleId}-${chapterId}-3`;
-
-      const is1Completed = completed.includes(id1);
-      const is2Completed = completed.includes(id2);
-      const is3Completed = completed.includes(id3);
-
-      const levels = [
-        {
-          id: id1,
-          title: `Bab ${chapterId}: Level 1`,
-          description: 'Pengenalan konsep dasar.',
-          category: 'foundation' as const,
-          status: is1Completed ? 'completed' : 'available' as const,
-          xp: 100,
-          x: 20, // Center X
-          y: 5,  // Top
-          prerequisites: [],
-          badgeImage: '/first-step.png',
-        },
-        {
-          id: id2,
-          title: `Bab ${chapterId}: Level 2`,
-          description: 'Implementasi dan praktik.',
-          category: 'skill' as const,
-          status: is2Completed ? 'completed' : (is1Completed ? 'available' : 'locked') as const,
-          xp: 150,
-          x: 10, // Left
-          y: 11,
-          prerequisites: [id1],
-          badgeImage: '/book.png',
-        },
-        {
-          id: id3,
-          title: `Bab ${chapterId}: Level 3 (Boss)`,
-          description: 'Ujian akhir dari bab ini!',
-          category: 'milestone' as const,
-          status: is3Completed ? 'completed' : (is2Completed ? 'available' : 'locked') as const,
-          xp: 300,
-          x: 30, // Right
-          y: 18,
-          prerequisites: [id2],
-          badge: '🏆',
-          badgeImage: '/course-master.png',
+    if (chapterId) {
+      // Find the Chapter inside the Module
+      const { mockBackendData } = require('@/data/mockBackendData');
+      let targetChapter = null;
+      let targetModule = null;
+      let targetHouseId = null;
+      for (const h of mockBackendData.houses) {
+        for (const s of h.stages) {
+          if (s.chapters) {
+            const found = s.chapters.find((c: any) => c.id === chapterId);
+            if (found) {
+              targetChapter = found;
+              targetModule = s;
+              targetHouseId = h.id;
+              break;
+            }
+          }
         }
-      ];
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDynamicNodes(levels);
-      useMapStore.setState({ nodes: levels, isLoading: false }); // override store for Map Game
+        if (targetChapter) break;
+      }
+      
+      if (targetHouseId) {
+        setHouseId(targetHouseId);
+      }
+      
+      if (targetChapter) {
+        // Generate generic levels for this Chapter
+        const completedDynamicNodes = useMapStore.getState().completedDynamicNodes;
+        
+        const numLevelsMatch = targetChapter.duration ? targetChapter.duration.match(/\d+/) : null;
+        const numLevels = numLevelsMatch ? parseInt(numLevelsMatch[0]) : 6;
+        
+        const pathCoords = [
+          {x: 13, y: 23},  // Level 1: Depan Sumur (Kiri Bawah)
+          {x: 6,  y: 8},   // Level 2: Depan Rumah Biru (Kiri Atas)
+          {x: 22, y: 17},  // Level 3: Depan Rumah Hijau (Tengah)
+          {x: 21, y: 8},   // Level 4: Tangga Kemah (Tengah Atas)
+          {x: 31, y: 11},  // Level 5: Depan Rumah Kincir (Kanan Atas)
+          {x: 32, y: 24},  // Level 6 (Boss): Depan Toko (Kanan Bawah)
+          // Fallback coords if > 6 levels
+          {x: 26, y: 28},
+          {x: 10, y: 28}
+        ];
+        
+        let levels: any[] = [];
+        
+        for (let i = 1; i <= numLevels; i++) {
+          const isFirst = i === 1;
+          const isLast = i === numLevels;
+          const coords = pathCoords[(i-1) % pathCoords.length];
+          
+          let title = `Level ${i}: Materi Praktik`;
+          let badgeImage = '/book.png';
+          let category = 'skill';
+          
+          if (isFirst) {
+            title = `Level 1: Teori Dasar`;
+            badgeImage = '/first-step.png';
+            category = 'foundation';
+          } else if (isLast) {
+            title = `Level ${i}: Boss Fight`;
+            badgeImage = '/course-master.png';
+            category = 'milestone';
+          } else {
+            title = `Level ${i}: Kuis Praktik`;
+          }
+          
+          levels.push({
+            id: `${chapterId}-level-${i}`,
+            title: title,
+            description: isLast ? `Selesaikan tantangan Boss Fight!` : (isFirst ? `Pengenalan fundamental untuk ${targetChapter.name}` : `Uji pemahamanmu tentang ${targetChapter.name}`),
+            category: category,
+            status: isFirst ? 'available' : 'locked',
+            xp: isLast ? 300 : (isFirst ? 100 : 150),
+            x: coords.x,
+            y: coords.y,
+            prerequisites: isFirst ? [] : [`${chapterId}-level-${i-1}`],
+            badgeImage: badgeImage,
+          });
+        }
+        
+        // Update statuses based on completedDynamicNodes
+        levels = levels.map(level => {
+          if (completedDynamicNodes.includes(level.id)) {
+            return { ...level, status: 'completed' };
+          }
+          if (level.prerequisites.length > 0) {
+            const allPrereqsMet = level.prerequisites.every((req: string) => completedDynamicNodes.includes(req));
+            if (allPrereqsMet) {
+              return { ...level, status: 'available' };
+            }
+          }
+          return level;
+        });
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setDynamicNodes(levels as any);
+        useMapStore.setState({ nodes: levels as any, isLoading: false }); // override store for Map Game
+      } else {
+        useMapStore.setState({ isLoading: false });
+      }
     } else {
       if (role === 'SMA') {
         fetchRecommendedCourses();
@@ -110,12 +158,8 @@ function MapContent() {
   }, [moduleId, chapterId, role, fetchRecommendedCourses, fetchRoadmap]);
 
   const handleNodeSelected = useCallback((node: CourseNodeData) => {
-    if (moduleId) {
-      router.push(`/quest/${node.id}?module=${moduleId}&chapter=${chapterId}`);
-    } else {
-      router.push(`/quest/${node.id}`);
-    }
-  }, [router, moduleId, chapterId]);
+    setSelectedNode(node);
+  }, []);
 
   const handleNodeNearby = useCallback((node: CourseNodeData) => {
     setNearbyNode(node);
@@ -128,42 +172,20 @@ function MapContent() {
   const handleStartCourse = useCallback(async (node: CourseNodeData) => {
     setSelectedNode(null);
 
-    if (role === 'SMA' && !moduleId) {
-      // In Duolingo mode, we navigate to the actual learning/quiz interface.
-      router.push(`/quest/${node.id}`);
+    // Dynamic module/chapter mode or Legacy Mahasiswa mode
+    if (role === 'SMA') {
+      router.push(`/sma/learning/${node.id}`);
     } else {
-      // Dynamic module/chapter mode or Legacy Mahasiswa mode
-      await completeNode(node.id);
-      
-      // Update dynamicNodes state locally for UI reflection
-      setDynamicNodes(prev => {
-        const newNodes = prev.map(n => n.id === node.id ? { ...n, status: 'completed' as const } : n);
-        // unlock next
-        const completedIds = new Set(newNodes.filter(n => n.status === 'completed').map(n => n.id));
-        return newNodes.map(n => {
-          if (n.status === 'locked' && n.prerequisites.every(req => completedIds.has(req))) {
-            return { ...n, status: 'available' as const };
-          }
-          return n;
-        });
-      });
-      
-      if (node.category === 'milestone') {
-        setSbtData({ name: node.title, emoji: node.badge ?? '🏆', xp: node.xp, badgeImage: node.badgeImage });
-        setShowSBT(true);
-      } else {
-        // Show an in-game toast (TODO)
-        alert('Mission Completed! +XP');
-      }
+      router.push(`/mahasiswa/learning-mission/${node.id}`);
     }
-  }, [completeNode, role, router, moduleId]);
+  }, [role, router]);
 
-  if (isLoading && !moduleId) {
+  if (isLoading || (chapterId && dynamicNodes.length === 0)) {
     return <GameLoadingScreen statusText="Memuat Peta Dunia..." />;
   }
 
   // Determine which nodes to pass to QuestTracker
-  const trackerNodes = moduleId ? dynamicNodes : (currentActiveCourse ? currentActiveCourse.quests : nodes);
+  const trackerNodes = chapterId ? dynamicNodes : (currentActiveCourse ? currentActiveCourse.quests : nodes);
 
   return (
     <>
@@ -190,12 +212,18 @@ function MapContent() {
         {/* Back to Dashboard/Module Button */}
         <button
           onClick={() => {
-            if (moduleId) {
-              router.push(`/mahasiswa/learning/${moduleId}`);
-            } else if (role === 'SMA') {
-              router.push('/dashboard/sma');
+            if (role === 'SMA') {
+              if (houseId) {
+                router.push(`/house/${houseId}`);
+              } else {
+                router.push('/dashboard/sma');
+              }
             } else {
-              router.push('/mahasiswa');
+              if (moduleId) {
+                router.push(`/mahasiswa/learning/${moduleId}`);
+              } else {
+                router.push('/mahasiswa/dashboard');
+              }
             }
           }}
           style={{

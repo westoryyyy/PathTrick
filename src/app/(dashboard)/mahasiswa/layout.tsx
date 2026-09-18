@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import Image from 'next/image';
 import styles from './layout.module.css';
 
 const NAV_ITEMS = [
-  { href: '/mahasiswa', label: 'Dashboard', icon: '📊' },
+  { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/mahasiswa/learning', label: 'Learning Mission', icon: '🎯' },
   { href: '/mahasiswa/career-hub', label: 'Career Hub', icon: '💼' },
   { href: '/mahasiswa/leaderboard', label: 'Leaderboard', icon: '🏆' },
@@ -21,6 +22,19 @@ export default function MahasiswaLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { logout, connectWallet } = usePrivy();
+
+  const handleToggleTheme = () => {
+    const current = document.documentElement.dataset.theme || 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   return (
     <div className={styles.layout}>
@@ -36,7 +50,7 @@ export default function MahasiswaLayout({
 
         <nav className={styles.nav}>
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/mahasiswa');
+            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/mahasiswa/dashboard');
 
             return (
               <Link
@@ -110,11 +124,11 @@ export default function MahasiswaLayout({
                   zIndex: 100,
                   padding: '8px'
                 }}>
-                  <button onClick={() => alert('Edit Profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
-                  <button onClick={() => alert('Connect Wallet')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
-                  <button onClick={() => alert('Toggle Theme')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Toggle Theme</button>
-                  <button onClick={() => alert('Docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
-                  <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
+                  <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
+                  <button onClick={() => connectWallet()} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
+                  <button onClick={handleToggleTheme} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Toggle Theme</button>
+                  <button onClick={() => window.open('https://pathtrick.gitbook.io', '_blank')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
+                  <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
                 </div>
               )}
             </div>

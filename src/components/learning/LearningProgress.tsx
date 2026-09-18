@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { mockBackendData } from '@/data/mockBackendData';
 import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
@@ -22,7 +22,6 @@ const stageColorMap: Record<string, string> = {
 
 export default function LearningProgress() {
   const { houses, user } = mockBackendData;
-  const [expandedHouse, setExpandedHouse] = useState<string | null>(houses[0]?.id || null);
 
   const getProgressPercentage = (stages: Stage[]): number => {
     const completed = stages.filter(s => s.isCompleted).length;
@@ -61,8 +60,8 @@ export default function LearningProgress() {
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
           LEARNING PROGRESS
         </h1>
-        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-          Track your journey through the 12 Houses and master new skills.
+        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+          Jelajahi 10 House dan kuasai ilmu baru. Klik House untuk mulai petualanganmu!
         </p>
       </div>
 
@@ -73,6 +72,7 @@ export default function LearningProgress() {
           {houses.map((house: House, idx: number) => {
             const isCompleted = house.status === 'completed';
             const isLocked = house.status === 'locked';
+            const progress = getProgressPercentage(house.stages);
 
             return (
               <motion.div
@@ -87,10 +87,10 @@ export default function LearningProgress() {
                   filter: isLocked ? 'grayscale(100%)' : 'none'
                 }}
               >
-                {/* House Header */}
-                <button
-                  onClick={() => !isLocked && setExpandedHouse(expandedHouse === house.id ? null : house.id)}
-                  style={{ width: '100%', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: isLocked ? 'not-allowed' : 'pointer', background: 'transparent', border: 'none', outline: 'none' }}
+                {/* House Header Link */}
+                <a
+                  href={isLocked ? '#' : `/house/${house.id}`}
+                  style={{ width: '100%', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: isLocked ? 'not-allowed' : 'pointer', background: 'transparent', border: 'none', outline: 'none', textDecoration: 'none' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                     <div style={{ width: '56px', height: '56px', background: '#3b261b', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
@@ -113,82 +113,53 @@ export default function LearningProgress() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff' }}>
-                        {getProgressPercentage(house.stages)}%
+                        {progress}%
                       </span>
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: '#fbbf24' }}>DONE</span>
                     </div>
 
                     {!isLocked && (
-                      <motion.div
-                        animate={{ rotate: expandedHouse === house.id ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
-                        style={{ fontSize: '1.5rem', color: '#fbbf24' }}
-                      >
-                        ▼
-                      </motion.div>
+                      <div style={{ fontSize: '1.5rem', color: '#fbbf24' }}>
+                        ➔
+                      </div>
                     )}
                   </div>
-                </button>
+                </a>
 
-                {/* Status Badge */}
-                <div style={{ padding: '0 24px 24px 24px' }}>
-                  {getStatusBadge(house.status)}
-                </div>
+                {/* Info (Preview Modul & Minat Bakat) */}
+                <div style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  
+                  {/* Status & Modules count */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {getStatusBadge(house.status)}
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.stages.length} MODUL DI DALAM</span>
+                  </div>
 
-                {/* Expanded Stages List */}
-                <AnimatePresence>
-                  {expandedHouse === house.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      style={{ borderTop: '4px dashed #5a3a29', padding: '24px', background: 'rgba(0,0,0,0.1)' }}
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {house.stages.map((stage: Stage, stageIdx: number) => (
-                          <motion.div
-                            key={stage.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: stageIdx * 0.05 }}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: '16px',
-                              background: '#d4a373',
-                              border: '2px solid #5a3a29',
-                              padding: '16px',
-                              boxShadow: 'inset 0 0 8px rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.3)',
-                              opacity: stage.isCompleted ? 0.7 : 1
-                            }}
-                          >
-                            <div style={{ width: '40px', height: '40px', background: '#fff', border: '2px solid #3b261b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.2)' }}>
-                              {stageIconMap[stage.contentType || 'material']}
-                            </div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: stage.isCompleted ? '#064e3b' : '#3b261b' }}>
-                                  {stage.name}
-                                </h4>
-                                {stage.isCompleted && <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff', background: '#047857', padding: '4px 8px', border: '2px solid #064e3b' }}>LULUS</span>}
-                              </div>
-                              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#5a3a29', lineHeight: '1.6', marginTop: '8px' }}>
-                                {stage.description}
-                              </p>
-                              <div style={{ display: 'flex', gap: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f', marginTop: '8px' }}>
-                                <span>{stage.duration}</span>
-                                <span style={{ textTransform: 'uppercase', background: '#fbbf24', padding: '4px 8px', border: '1px solid #b45309' }}>
-                                  {stage.contentType}
-                                </span>
-                              </div>
-                            </div>
-                          </motion.div>
+                  {/* Skills Overview */}
+                  {house.skillsOverview && house.skillsOverview.length > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderLeft: '3px solid #059669', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#059669' }}>SKILL YANG DIASAH:</span>
+                      <ul style={{ margin: 0, paddingLeft: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#5a3a29', lineHeight: '1.8' }}>
+                        {house.skillsOverview.slice(0, 3).map((skill, i) => (
+                          <li key={i}>{skill}</li>
                         ))}
-                      </div>
-                    </motion.div>
+                      </ul>
+                    </div>
                   )}
-                </AnimatePresence>
+
+                  {/* Ideal For */}
+                  {house.idealFor && house.idealFor.length > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderLeft: '3px solid #2563eb', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#2563eb' }}>COCOK UNTUK:</span>
+                      <ul style={{ margin: 0, paddingLeft: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#5a3a29', lineHeight: '1.8' }}>
+                        {house.idealFor.slice(0, 3).map((ideal, i) => (
+                          <li key={i}>{ideal}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                </div>
               </motion.div>
             );
           })}

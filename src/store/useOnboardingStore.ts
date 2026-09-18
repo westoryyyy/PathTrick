@@ -176,10 +176,27 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
   isSubmitting: false,
   submitAssessment: async () => {
     set({ isSubmitting: true });
-    // TODO: POST to /api/assessment with role-specific payload
-    // Simulated delay for now
-    await new Promise((r) => setTimeout(r, 1500));
-    set({ isSubmitting: false });
+    const { selectedRole, smaAssessment, mahasiswaAssessment } = get();
+    try {
+      const response = await fetch('/api/assessment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: selectedRole,
+          data: selectedRole === 'sma' ? smaAssessment : {
+            skills: mahasiswaAssessment.cvExtractedData?.skills,
+            interests: mahasiswaAssessment.workInterests
+          }
+        }),
+      });
+      if (!response.ok) throw new Error('API Error');
+      const data = await response.json();
+      console.log('AI Assessment Result:', data);
+    } catch (e) {
+      console.error('Submission failed', e);
+    } finally {
+      set({ isSubmitting: false });
+    }
   },
 
   /* ── Reset ── */

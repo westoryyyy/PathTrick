@@ -1,54 +1,92 @@
 'use client';
 
 import React from 'react';
+import styles from './page.module.css';
 
 const MOCK_CERTIFICATES = [
   { id: 1, title: 'HTML Basics', issuer: 'House of Tech', date: '10 Sep 2026', type: 'SBT On-Chain' },
   { id: 2, title: 'Python Logic', issuer: 'Algorithm Core', date: '12 Sep 2026', type: 'SBT On-Chain' }
 ];
 
+import { useMapStore } from '@/store/useMapStore';
+
 export default function CertificateHubPage() {
+  const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
+
+  // Generate earned certificates dynamically based on completed Boss levels
+  const earnedCertificates = [];
+  
+  if (completedDynamicNodes.includes('module-html-css-level-6')) {
+    earnedCertificates.push({
+      id: 'html-css',
+      title: 'HTML & CSS Mastery',
+      issuer: 'House of Tech',
+      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      type: 'SBT On-Chain'
+    });
+  }
+
+  // Add more dynamic checks here for other modules as they are created
+  if (completedDynamicNodes.includes('module-javascript-level-6')) {
+    earnedCertificates.push({
+      id: 'javascript',
+      title: 'Javascript Mastery',
+      issuer: 'House of Logic',
+      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      type: 'SBT On-Chain'
+    });
+  }
+
+  const handleExplorerClick = (title: string) => {
+    alert(`[Simulasi Web3] Membuka Blockchain Explorer untuk memverifikasi keaslian Sertifikat On-Chain (SBT): ${title}...`);
+  };
+
   return (
-    <div className="flex flex-col gap-8 w-full">
+    <div className={styles.container}>
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Sertifikat (Web3 Wallet)</h2>
-        <p className="text-slate-500 font-medium">
-          View and mint your earned on-chain certificates and Soulbound Tokens here.
+      <div>
+        <h2 className={styles.headerTitle}>RELICS & TREASURES (WEB3 VAULT)</h2>
+        <p className={styles.headerDesc}>
+          Lihat dan verifikasi sertifikat On-Chain (SBT) yang berhasil kamu dapatkan setelah menaklukkan Boss Modul.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        {MOCK_CERTIFICATES.map(cert => (
-          <div key={cert.id} className="bg-white border border-slate-200/70 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-inner">
-                  🏆
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900 leading-tight">{cert.title}</h3>
-                  <p className="text-xs font-semibold text-blue-600 mt-1">{cert.issuer}</p>
+      <div className={styles.grid}>
+        {earnedCertificates.length > 0 ? (
+          earnedCertificates.map(cert => (
+            <div key={cert.id} className={styles.certCard}>
+              <div className={styles.certHeader}>
+                <div className={styles.certIcon}>🏆</div>
+                <div className={styles.certInfo}>
+                  <h3 className={styles.certTitle}>{cert.title}</h3>
+                  <p className={styles.certIssuer}>{cert.issuer}</p>
                 </div>
               </div>
               
-              <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-100">
-                <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-slate-500">Date Issued</span>
-                  <span className="text-slate-800">{cert.date}</span>
+              <div className={styles.certMeta}>
+                <div className={styles.metaRow}>
+                  <span className={styles.metaLabel}>DATE ISSUED</span>
+                  <span className={styles.metaValue}>{cert.date}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-slate-500">Asset Type</span>
-                  <span className="text-slate-800 bg-slate-100 px-2 py-0.5 rounded text-xs">{cert.type}</span>
+                <div className={styles.metaRow}>
+                  <span className={styles.metaLabel}>ASSET TYPE</span>
+                  <span className={styles.metaBadge}>{cert.type}</span>
                 </div>
               </div>
-            </div>
 
-            <button className="mt-6 w-full bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold text-xs py-3 rounded-xl border border-slate-200 hover:border-blue-200 transition-colors">
-              VIEW ON EXPLORER
-            </button>
+              <button 
+                className={styles.explorerBtn}
+                onClick={() => handleExplorerClick(cert.title)}
+              >
+                VIEW ON EXPLORER
+              </button>
+            </div>
+          ))
+        ) : (
+          <div style={{ color: '#a8a29e', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '48px', lineHeight: '1.6' }}>
+            Kamu belum mendapatkan relic apapun. <br/><br/>Kalahkan Boss Modul untuk mencetak (minting) Sertifikat pertamamu!
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

@@ -149,27 +149,32 @@ export class PlayerCharacter {
       body.velocity.normalize().scale(speed);
     }
 
-    // --- Animate: alternate between idle & walk texture to simulate stepping ---
+    // --- Animate: alternate walk angle to simulate stepping ---
     if (moving) {
       this.walkTimer += delta;
       if (this.walkTimer >= this.WALK_INTERVAL) {
         this.walkTimer = 0;
         this.walkPhase = (this.walkPhase + 1) % 2;
       }
-      // Phase 0 = show walk sprite, phase 1 = show idle sprite (creates "bob" effect)
-      const texKey = this.walkPhase === 0 ? `walk-${this.facing}` : 'idle';
+      
+      const texKey = `walk-${this.facing}`;
       if (this.sprite.texture.key !== texKey) {
         this.sprite.setTexture(texKey);
       }
 
-      // Subtle vertical bob while walking
-      this.sprite.setY(this.sprite.y); // position is handled by physics
+      // Waddle effect
+      this.sprite.setAngle(this.walkPhase === 0 ? -3 : 3);
+      
     } else {
       // Idle
       this.walkTimer = 0;
       this.walkPhase = 0;
-      if (this.sprite.texture.key !== 'idle') {
-        this.sprite.setTexture('idle');
+      this.sprite.setAngle(0);
+      
+      // Only use 'idle' texture (which faces down) if actually facing down
+      const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
+      if (this.sprite.texture.key !== texKey) {
+        this.sprite.setTexture(texKey);
       }
     }
 
@@ -214,14 +219,18 @@ export class PlayerCharacter {
           this.walkTimer = 0;
           this.walkPhase = (this.walkPhase + 1) % 2;
         }
-        const texKey = this.walkPhase === 0 ? `walk-${this.facing}` : 'idle';
+        
+        const texKey = `walk-${this.facing}`;
         if (this.sprite.texture.key !== texKey) {
           this.sprite.setTexture(texKey);
         }
+        this.sprite.setAngle(this.walkPhase === 0 ? -3 : 3);
       },
       onComplete: () => {
         this.isMoving = false;
-        this.sprite.setTexture('idle');
+        this.sprite.setAngle(0);
+        const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
+        this.sprite.setTexture(texKey);
         if (onComplete) onComplete();
       }
     });

@@ -1,5 +1,12 @@
 // ─── API CONTRACT: STRICT TYPESCRIPT INTERFACES ───
 
+export interface Chapter {
+  id: string;
+  name: string;
+  description?: string;
+  duration?: string;
+}
+
 export interface Stage {
   id: string;
   name: string;
@@ -7,6 +14,7 @@ export interface Stage {
   isCompleted: boolean;
   duration?: string;
   contentType?: 'material' | 'quiz' | 'lab' | 'project';
+  chapters?: Chapter[];
 }
 
 export interface House {
@@ -19,6 +27,8 @@ export interface House {
   houseNumber: number;
   gradient: string;
   progress?: number;
+  skillsOverview?: string[];
+  idealFor?: string[];
 }
 
 export interface CareerTrack {

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import Image from 'next/image';
 import styles from './layout.module.css';
 
@@ -11,7 +12,7 @@ const NAV_ITEMS = [
   { href: '/sma/learning', label: 'Learning Progress', icon: '🎯' },
   { href: '/sma/university', label: 'University Hub', icon: '🎓' },
   { href: '/sma/scholarships', label: 'Scholarship Hub', icon: '📜' },
-  { href: '/sma/analytics', label: 'Analytics', icon: '📈' },
+  { href: '/sma/certificate', label: 'Relics & Treasures', icon: '🏅' },
 ];
 
 export default function SMALayout({
@@ -21,6 +22,30 @@ export default function SMALayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { logout, connectWallet } = usePrivy();
+
+  const handleToggleTheme = () => {
+    const current = document.documentElement.dataset.theme || 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
+
+  const isMissionPage = pathname.startsWith('/sma/learning/') && pathname !== '/sma/learning';
+
+  if (isMissionPage) {
+    return (
+      <div className={styles.layout} style={{ display: 'block', padding: '24px', overflowY: 'auto' }}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className={styles.layout}>
@@ -60,12 +85,7 @@ export default function SMALayout({
 
 
 
-        <button 
-          onClick={() => router.push('/')}
-          className={styles.logoutBtn}
-        >
-          🚪 LOG OUT
-        </button>
+
       </aside>
 
       {/* ─── MAIN CONTENT AREA ─── */}
@@ -93,15 +113,40 @@ export default function SMALayout({
               <span className={styles.iconBadge}>1</span>
             </div>
 
-            <div className={styles.profileChip}>
-              <div className={styles.profileAvatar}>👨‍🎓</div>
-              <div className={styles.profileInfo}>
-                <span className={styles.profileName}>Tukiman</span>
-                <span className={styles.profileEmail}>D.Tukiman@gmail.com</span>
+            <div style={{ position: 'relative' }}>
+              <div className={styles.profileChip} onClick={() => setIsDropdownOpen(!isDropdownOpen)} style={{ cursor: 'pointer' }}>
+                <div className={styles.profileAvatar}>👨‍🎓</div>
+                <div className={styles.profileInfo}>
+                  <span className={styles.profileName}>Tukiman</span>
+                  <span className={styles.profileEmail}>D.Tukiman@gmail.com</span>
+                </div>
+                <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
+                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>▼</span>
+                </div>
               </div>
-              <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>🟣 0x8a..3F</span>
-              </div>
+
+              {isDropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  background: '#bc8f65',
+                  border: '2px solid #5a3a29',
+                  boxShadow: '4px 4px 0 #3b261b',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '200px',
+                  zIndex: 100,
+                  padding: '8px'
+                }}>
+                  <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
+                  <button onClick={() => connectWallet()} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
+                  <button onClick={handleToggleTheme} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Toggle Theme</button>
+                  <button onClick={() => window.open('https://pathtrick.gitbook.io', '_blank')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
+                  <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
+                </div>
+              )}
             </div>
           </div>
         </header>

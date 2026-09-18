@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePrivy } from '@privy-io/react-auth';
 import LearningProgress from '@/components/learning/LearningProgress';
 import UniversityHub from '@/components/ui/UniversityHub';
 import ScholarshipHub from '@/components/ui/ScholarshipHub';
+import RelicsAndTreasures from '@/components/ui/RelicsAndTreasures';
 import Image from 'next/image';
 import styles from './Dashboard.module.css';
 
@@ -52,6 +54,7 @@ interface Bounty {
   desc: string;
   reward: string;
   done: boolean;
+  claimed?: boolean;
 }
 
 // ─── MOCK DATA ───
@@ -85,7 +88,7 @@ const mockAiResponse: AIResponse = {
 };
 
 const INITIAL_BOUNTIES: Bounty[] = [
-  { id: 1, task: 'Taklukkan Modul HTML Basics', desc: 'Selesaikan 1 quiz di House of Tech', reward: '+150 XP', done: true },
+  { id: 1, task: 'Taklukkan Modul HTML Basics', desc: 'Selesaikan 1 quiz di House of Tech', reward: '+150 XP', done: true, claimed: false },
   { id: 2, task: 'Simulasi Penalaran Matematika', desc: 'Latihan 5 soal TPS SNBT 2026', reward: '+200 XP', done: false },
   { id: 3, task: 'Diskusi Komunitas Mahasiswa', desc: 'Bantu 1 teman di forum tanya jawab', reward: '+50 XP', done: false },
   { id: 4, task: 'Klaim SBT First House Master', desc: 'Selesaikan evaluasi tahap 4 mini project', reward: 'Free Claim', done: false },
@@ -106,23 +109,55 @@ const LEADERBOARD_MOCK = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const defaultNav = tabParam === 'learning' ? 'Learning Progress' : 'Dashboard';
   const [bounties, setBounties] = useState<Bounty[]>(INITIAL_BOUNTIES);
-  const [activeNav, setActiveNav] = useState('Dashboard');
+  const [activeNav, setActiveNav] = useState(defaultNav);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMailOpen, setIsMailOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [unreadMails, setUnreadMails] = useState([{ id: 1, sender: 'Prof. Oak', msg: 'Jangan lupa kerjakan kuis HTML!' }, { id: 2, sender: 'System', msg: 'Selamat datang di PathTrick!' }]);
+  const [unreadNotifs, setUnreadNotifs] = useState([{ id: 1, msg: 'Anda berhasil naik ke Level 12!' }]);
+  const { logout, connectWallet } = usePrivy();
+
+  const toggleMail = () => { setIsMailOpen(!isMailOpen); setIsNotifOpen(false); setIsDropdownOpen(false); };
+  const toggleNotif = () => { setIsNotifOpen(!isNotifOpen); setIsMailOpen(false); setIsDropdownOpen(false); };
+  const toggleProfile = () => { setIsDropdownOpen(!isDropdownOpen); setIsMailOpen(false); setIsNotifOpen(false); };
+
+  const handleToggleTheme = () => {
+    const current = document.documentElement.dataset.theme || 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   const toggleBounty = (id: number) => {
     setBounties(prev =>
-      prev.map(b => (b.id === id ? { ...b, done: !b.done } : b))
+      prev.map(b => {
+        if (b.id === id) {
+          if (!b.done) return { ...b, done: true, claimed: false };
+          if (b.done && !b.claimed) return { ...b, claimed: true };
+          return { ...b, done: false, claimed: false }; // cycle back for testing
+        }
+        return b;
+      })
     );
   };
 
-  const completedCount = bounties.filter(b => b.done).length;
+  const completedCount = bounties.filter(b => b.claimed).length;
 
   const NAV_ITEMS = [
     { label: 'Dashboard', icon: '📊', isDashboard: true },
     { label: 'Learning Progress', icon: '🎯' },
     { label: 'University Hub', icon: '🎓' },
     { label: 'Scholarship Hub', icon: '📜' },
-    { label: 'Analytics', icon: '📈' },
+    { label: 'Relics & Treasures', icon: '🏅' },
   ];
 
   return (
@@ -164,12 +199,6 @@ export default function Dashboard() {
             );
           })}
         </nav>
-
-
-
-        <button onClick={() => router.push('/')} className={styles.logoutBtn}>
-          🚪 LOG OUT
-        </button>
       </aside>
 
       {/* ─── MAIN CONTENT AREA ─── */}
@@ -183,18 +212,96 @@ export default function Dashboard() {
           </div>
 
           <div className={styles.headerActions}>
-            <div className={styles.iconBtn}>✉️<span className={styles.iconBadge}>2</span></div>
-            <div className={styles.iconBtn}>🔔<span className={styles.iconBadge}>1</span></div>
+            
+            {/* Mail Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <div className={styles.iconBtn} onClick={toggleMail}>
+                ✉️{unreadMails.length > 0 && <span className={styles.iconBadge}>{unreadMails.length}</span>}
+              </div>
+              {isMailOpen && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: '#bc8f65', border: '2px solid #5a3a29', boxShadow: '4px 4px 0 #3b261b', display: 'flex', flexDirection: 'column', width: '250px', zIndex: 100, padding: '8px' }}>
+                  <div style={{ padding: '8px', borderBottom: '2px dashed #5a3a29', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>INBOX</div>
+                  {unreadMails.length === 0 ? (
+                    <div style={{ padding: '12px 8px', fontSize: '0.5rem', color: '#fff', fontFamily: '"Press Start 2P"', textAlign: 'center' }}>No new mail</div>
+                  ) : (
+                    unreadMails.map((mail) => (
+                      <div 
+                        key={mail.id} 
+                        onClick={() => { setUnreadMails(prev => prev.filter(m => m.id !== mail.id)); alert(`Opened mail from ${mail.sender}`); }}
+                        style={{ padding: '12px 8px', fontSize: '0.6rem', color: '#fff', borderBottom: '1px solid rgba(0,0,0,0.1)', cursor: 'pointer' }}
+                      >
+                        <div style={{ fontFamily: '"Press Start 2P"', color: '#fbbf24', marginBottom: '4px' }}>{mail.sender}</div>
+                        <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', lineHeight: '1.4' }}>{mail.msg}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
 
-            <div className={styles.profileChip}>
-              <div className={styles.profileAvatar}>👨‍🎓</div>
-              <div className={styles.profileInfo}>
-                <span className={styles.profileName}>{mockAiResponse.user.name}</span>
-                <span className={styles.profileEmail}>{mockAiResponse.user.email}</span>
+            {/* Notification Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <div className={styles.iconBtn} onClick={toggleNotif}>
+                🔔{unreadNotifs.length > 0 && <span className={styles.iconBadge}>{unreadNotifs.length}</span>}
               </div>
-              <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>🟣 0x8a..3F</span>
+              {isNotifOpen && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: '#bc8f65', border: '2px solid #5a3a29', boxShadow: '4px 4px 0 #3b261b', display: 'flex', flexDirection: 'column', width: '250px', zIndex: 100, padding: '8px' }}>
+                  <div style={{ padding: '8px', borderBottom: '2px dashed #5a3a29', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>NOTIFICATIONS</div>
+                  {unreadNotifs.length === 0 ? (
+                    <div style={{ padding: '12px 8px', fontSize: '0.5rem', color: '#fff', fontFamily: '"Press Start 2P"', textAlign: 'center' }}>All caught up!</div>
+                  ) : (
+                    unreadNotifs.map((notif) => (
+                      <div 
+                        key={notif.id}
+                        onClick={() => { setUnreadNotifs(prev => prev.filter(n => n.id !== notif.id)); }}
+                        style={{ padding: '12px 8px', fontSize: '0.6rem', color: '#fff', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.1)' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>🏆</span>
+                          <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', lineHeight: '1.4' }}>{notif.msg}</div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Profile Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <div className={styles.profileChip} onClick={toggleProfile} style={{ cursor: 'pointer' }}>
+                <div className={styles.profileAvatar}>👨‍🎓</div>
+                <div className={styles.profileInfo}>
+                  <span className={styles.profileName}>{mockAiResponse.user.name}</span>
+                  <span className={styles.profileEmail}>{mockAiResponse.user.email}</span>
+                </div>
+                <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
+                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>▼</span>
+                </div>
               </div>
+
+              {isDropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  background: '#bc8f65',
+                  border: '2px solid #5a3a29',
+                  boxShadow: '4px 4px 0 #3b261b',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: '200px',
+                  zIndex: 100,
+                  padding: '8px'
+                }}>
+                  <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
+                  <button onClick={() => connectWallet()} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
+                  <button onClick={handleToggleTheme} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Toggle Theme</button>
+                  <button onClick={() => window.open('https://pathtrick.gitbook.io', '_blank')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
+                  <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -305,20 +412,26 @@ export default function Dashboard() {
                       {bounties.map((bounty) => (
                         <div 
                           key={bounty.id} 
-                          className={`${styles.questItem} ${bounty.done ? styles.questItemDone : ''}`}
+                          className={`${styles.questItem} ${bounty.claimed ? styles.questItemDone : ''}`}
                           onClick={() => toggleBounty(bounty.id)}
                         >
                           <div className={styles.questIcon}>
-                            {bounty.done ? '✅' : '❔'}
+                            {bounty.claimed ? '✅' : (bounty.done ? '🎁' : '❔')}
                           </div>
                           <div className={styles.questInfo}>
-                            <span className={`${styles.questTitle} ${bounty.done ? styles.questTitleDone : ''}`}>
+                            <span className={`${styles.questTitle} ${bounty.claimed ? styles.questTitleDone : ''}`}>
                               {bounty.task}
                             </span>
                             <span className={styles.questDesc}>{bounty.desc}</span>
                           </div>
-                          <span className={styles.questReward} style={bounty.done ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } : {}}>
-                            {bounty.done ? 'LULUS' : bounty.reward}
+                          <span className={styles.questReward} style={
+                            bounty.claimed 
+                              ? { background: '#a3a3a3', borderColor: '#525252', color: '#fff', opacity: 0.8 } 
+                              : (bounty.done 
+                                  ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } 
+                                  : {})
+                          }>
+                            {bounty.claimed ? 'CLAIMED' : (bounty.done ? 'CLAIM' : bounty.reward)}
                           </span>
                         </div>
                       ))}
@@ -351,6 +464,12 @@ export default function Dashboard() {
                   <div className={styles.retroCard}>
                     <div className={styles.cardHeader}>
                       <span className={styles.cardTitle}>💎 ACHIEVEMENT VAULT</span>
+                      <span 
+                        onClick={() => setActiveNav('Relics & Treasures')}
+                        style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
+                      >
+                        VIEW ALL
+                      </span>
                     </div>
                     <div className={styles.vaultGrid}>
                       {VAULT_SBTS.map((sbt) => (
@@ -374,6 +493,7 @@ export default function Dashboard() {
           {activeNav === 'Learning Progress' && <LearningProgress />}
           {activeNav === 'University Hub' && <UniversityHub />}
           {activeNav === 'Scholarship Hub' && <ScholarshipHub />}
+          {activeNav === 'Relics & Treasures' && <RelicsAndTreasures />}
         </div>
       </main>
     </div>

@@ -10,6 +10,7 @@ const MOCK_SCHOLARSHIPS = [
     deadline: '15 Okt 2026',
     coverage: 'Biaya Kuliah + Uang Saku',
     requirements: ['Leadership SBT', 'Min. Rapor 8.0'],
+    url: 'https://djarumbeasiswaplus.org/',
   },
   {
     id: 'bpi-kemdikbud',
@@ -19,6 +20,7 @@ const MOCK_SCHOLARSHIPS = [
     deadline: '30 Nov 2026',
     coverage: 'Full Funding',
     requirements: ['Prestasi Akademik', 'Esai Kontribusi'],
+    url: 'https://beasiswa.kemdikbud.go.id/',
   },
   {
     id: 'lpdp-s1',
@@ -28,6 +30,7 @@ const MOCK_SCHOLARSHIPS = [
     deadline: 'TBA 2027',
     coverage: 'Full Funding + Akomodasi',
     requirements: ['Medali Olimpiade', 'Bahasa Inggris'],
+    url: 'https://lpdp.kemenkeu.go.id/',
   }
 ];
 
@@ -106,7 +109,7 @@ export default function ScholarshipHub() {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.boxShadow = '4px 4px 0 #3b261b';
               }}
-              onClick={() => alert('Viewing detailed requirements...')}
+              onClick={() => window.open(scholarship.url, '_blank')}
             >
               VIEW DETAILS
             </button>

@@ -65,12 +65,9 @@ export class CourseNode {
       .setScale(0.35); // Adjusted scale to match player character
     this.container.add(this.iconImage);
 
-    // Extract Level text for cleaner display if it exists (e.g. "Bab 1: Level 1" -> "Level 1")
-    const titleText = this.data.title.includes('Level') 
-      ? this.data.title.split(': ')[1] || this.data.title 
-      : this.data.title;
+    const titleText = this.data.title.replace(': ', '\n');
       
-    const displayText = status === 'locked' ? `🔒 ${titleText}` : titleText;
+    const displayText = status === 'locked' ? `🔒\n${titleText}` : titleText;
 
     // Label permanently visible ABOVE node
     this.labelText = this.scene.add.text(0, -CourseNode.NODE_RADIUS - 24, displayText, {

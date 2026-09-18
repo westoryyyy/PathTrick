@@ -3,20 +3,39 @@
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './PreferencesStep.module.css';
 
-/* ── Faculty options ── */
+/* ── Faculty/Majors options (Mapped to 10 Houses) ── */
 const FACULTIES = [
-  { value: 'teknik',      label: 'Teknik',       icon: '⚙️' },
-  { value: 'kedokteran',  label: 'Kedokteran',   icon: '🩺' },
-  { value: 'hukum',       label: 'Hukum',        icon: '⚖️' },
-  { value: 'ekonomi',     label: 'Ekonomi',      icon: '📈' },
-  { value: 'sains',       label: 'Sains',        icon: '🧪' },
-  { value: 'seni',        label: 'Seni & Desain',icon: '🎭' },
-  { value: 'pendidikan',  label: 'Pendidikan',   icon: '📚' },
-  { value: 'psikologi',   label: 'Psikologi',    icon: '🧠' },
-  { value: 'komunikasi',  label: 'Komunikasi',   icon: '📡' },
-  { value: 'pertanian',   label: 'Pertanian',    icon: '🌾' },
-  { value: 'ilkom',       label: 'Ilmu Komputer',icon: '💻' },
-  { value: 'farmasi',     label: 'Farmasi',      icon: '💊' },
+  // ICT & Tech
+  { value: 'cs_it',       label: 'Ilmu Komputer & TI', icon: '💻' },
+  { value: 'data_ai',     label: 'Data Science & AI',  icon: '🤖' },
+  // Engineering & Architecture
+  { value: 'eng_civil',   label: 'Sipil & Arsitektur', icon: '🏗️' },
+  { value: 'eng_mech',    label: 'Mesin & Elektro',    icon: '⚙️' },
+  // Health & Medicine
+  { value: 'med_doctor',  label: 'Kedokteran (Umum/Gigi)', icon: '🩺' },
+  { value: 'med_nurse',   label: 'Keperawatan & Farmasi',  icon: '💊' },
+  // Business & Management
+  { value: 'biz_mgmt',    label: 'Bisnis & Manajemen', icon: '💼' },
+  { value: 'biz_acc',     label: 'Akuntansi & Keuangan', icon: '📈' },
+  // Law & Public Policy
+  { value: 'law',         label: 'Ilmu Hukum',         icon: '⚖️' },
+  { value: 'law_public',  label: 'Ilmu Politik & Publik', icon: '🏛️' },
+  // Social Sciences
+  { value: 'soc_comm',    label: 'Ilmu Komunikasi',    icon: '📡' },
+  { value: 'soc_ir',      label: 'Hubungan Internasional', icon: '🌍' },
+  { value: 'soc_psy',     label: 'Psikologi',          icon: '🧠' },
+  // Education
+  { value: 'edu_teacher', label: 'Pendidikan Guru',    icon: '🏫' },
+  { value: 'edu_tech',    label: 'Teknologi Pendidikan', icon: '📚' },
+  // Arts & Humanities
+  { value: 'arts_design', label: 'Desain & Seni Rupa', icon: '🎨' },
+  { value: 'arts_lang',   label: 'Sastra & Bahasa',    icon: '✍️' },
+  // Science & Math
+  { value: 'sci_math',    label: 'Matematika & Stat',  icon: '📐' },
+  { value: 'sci_natural', label: 'Fisika, Kimia, Biologi', icon: '🧪' },
+  // Agriculture & Environment
+  { value: 'agr_farm',    label: 'Agribisnis & Pertanian', icon: '🌾' },
+  { value: 'agr_env',     label: 'Kehutanan & Lingkungan', icon: '🌲' },
 ];
 
 /* ── Country options ── */

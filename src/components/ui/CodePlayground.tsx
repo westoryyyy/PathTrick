@@ -4,10 +4,11 @@ import styles from './CodePlayground.module.css';
 
 interface Props {
   initialCode: string;
-  language: 'html' | 'python';
+  language: 'html' | 'python' | 'javascript';
+  onChange?: (code: string) => void;
 }
 
-export default function CodePlayground({ initialCode, language }: Props) {
+export default function CodePlayground({ initialCode, language, onChange }: Props) {
   const [code, setCode] = useState(initialCode);
   const [outputHtml, setOutputHtml] = useState(language === 'html' ? initialCode : '');
   const [terminalOutput, setTerminalOutput] = useState<string>('');
@@ -15,6 +16,27 @@ export default function CodePlayground({ initialCode, language }: Props) {
   const handleRun = () => {
     if (language === 'html') {
       setOutputHtml(code);
+    } else if (language === 'javascript') {
+      try {
+        const lines = code.split('\n');
+        let out = '';
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('console.log(') && trimmed.endsWith(')')) {
+            const content = trimmed.substring(12, trimmed.length - 1);
+            let parsed = content.replace(/^["']|["']$/g, '');
+            out += parsed + '\n';
+          } else if (trimmed.startsWith('console.log(') && trimmed.endsWith(');')) {
+            const content = trimmed.substring(12, trimmed.length - 2);
+            let parsed = content.replace(/^["']|["']$/g, '');
+            out += parsed + '\n';
+          }
+        }
+        if (out === '') out = 'Process finished with exit code 0';
+        setTerminalOutput(out);
+      } catch {
+        setTerminalOutput('SyntaxError: invalid syntax');
+      }
     } else {
       // Mock Python execution
       try {
@@ -48,11 +70,14 @@ export default function CodePlayground({ initialCode, language }: Props) {
       </div>
       <div className={styles.splitView}>
         <div className={styles.editorPane}>
-          <div className={styles.paneLabel}>main.{language === 'html' ? 'html' : 'py'}</div>
+          <div className={styles.paneLabel}>main.{language === 'html' ? 'html' : language === 'javascript' ? 'js' : 'py'}</div>
           <textarea
             className={styles.textarea}
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e) => {
+              setCode(e.target.value);
+              if (onChange) onChange(e.target.value);
+            }}
             spellCheck={false}
           />
         </div>

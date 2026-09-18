@@ -1,117 +1,235 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import mockAICourses from '@/mocks/mockAICourses';
+import { mockBackendData } from '@/data/mockBackendData';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  // We use React.use() to unwrap the params promise in Next.js 15
-  use(params);
+  const { id } = use(params);
+  const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
-  // We'll treat the HOUSES array as the "courses" inside this house for now
-  const courses = mockAICourses.HOUSES.slice(0, 4); // Just show first 4 as an example
+  const house = mockBackendData.houses.find(h => h.id === id);
+
+  if (!house) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f4]">
+        <div style={{ fontFamily: '"Press Start 2P"', color: '#3b261b' }}>HOUSE NOT FOUND</div>
+      </div>
+    );
+  }
+
+  const modules = house.stages;
+  const completedCount = modules.filter(m => m.isCompleted).length;
+  const progressPercent = Math.round((completedCount / modules.length) * 100);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-24">
+    <div className="min-h-screen bg-[#c29a6e] pb-24" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* ─── Navigation Header ─── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-[#3b261b] border-b-4 border-[#291a13] px-6 py-4 flex items-center justify-between shadow-[0_4px_0_rgba(0,0,0,0.2)]">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push('/dashboard/sma')}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500 hover:text-slate-900"
+            onClick={() => router.push('/dashboard/sma?tab=learning')}
+            className="p-2 bg-[#d4a373] hover:bg-[#bc8f65] border-2 border-[#5a3a29] transition-colors text-[#3b261b] shadow-[2px_2px_0_#1a100c]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>◀ KEMBALI</span>
           </button>
-          <h1 className="text-lg font-bold text-slate-900">House of Technology</h1>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{house.icon}</span>
+            <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #000' }}>
+              {house.title}
+            </h1>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-bold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            4 Courses Available
+          <div className="px-4 py-2 bg-[#fde68a] border-2 border-[#b45309] text-[#92400e] text-xs shadow-[2px_2px_0_#b45309]" style={{ fontFamily: '"Press Start 2P"' }}>
+            {modules.length} MODUL
           </div>
         </div>
       </header>
 
       {/* ─── Hero Banner ─── */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div className="relative w-full h-[300px] md:h-[400px] rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 group">
-          <img
-            src="/mini-map-course-2.png"
-            alt="House of Technology Banner"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-          
-          <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 flex flex-col justify-end">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-bold uppercase tracking-wider mb-4 w-fit">
-              <span>💻</span> Web Dev & Algoritma
+      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="relative w-full border-4 border-[#3b261b] bg-[#3b261b] overflow-hidden shadow-[8px_8px_0_rgba(0,0,0,0.3)]">
+          <div className="p-12 flex flex-col items-center justify-center text-center gap-6">
+            
+            <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24', padding: '8px 16px', border: '2px solid #fbbf24' }}>
+              ★ HOUSE {house.houseNumber} ★
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight drop-shadow-md">
-              House of Technology
+
+            <div className="text-6xl drop-shadow-[0_4px_0_rgba(0,0,0,0.5)]">{house.icon}</div>
+            
+            <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #000' }}>
+              {house.title.replace('House of ', '').toUpperCase()}
             </h2>
-            <p className="text-lg text-slate-200 max-w-2xl font-medium drop-shadow-sm leading-relaxed">
-              Pelajari fondasi teknologi dari HTML dasar hingga Web3. Kuasai keahlian yang paling dicari oleh industri saat ini dan mulai bangun masa depanmu.
+            
+            <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373', maxWidth: '600px', lineHeight: '1.8' }}>
+              {house.description}
             </p>
+
+            <div className="w-full max-w-md mt-4">
+               <div className="flex justify-between mb-2" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#a8a29e' }}>
+                 <span>PROGRESS</span>
+                 <span className="text-[#fbbf24]">{progressPercent}%</span>
+               </div>
+               <div className="w-full h-4 bg-[#1a100c] border-2 border-[#291a13]">
+                 <div className="h-full bg-[#fbbf24]" style={{ width: `${progressPercent}%` }} />
+               </div>
+            </div>
           </div>
+        </div>
+
+        {/* ─── Info Section (Skills & Ideal For) ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {house.skillsOverview && (
+            <div className="bg-[#a87b51] border-4 border-[#3b261b] p-6 shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
+              <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b', marginBottom: '16px' }}>
+                ⚔️ SKILL YANG DIASAH
+              </h3>
+              <ul className="space-y-3">
+                {house.skillsOverview.map((skill, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-[#3b261b] mt-1 text-xs">▶</span>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff', lineHeight: '1.6', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{skill}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {house.idealFor && (
+            <div className="bg-[#a87b51] border-4 border-[#3b261b] p-6 shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
+              <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b', marginBottom: '16px' }}>
+                💡 COCOK UNTUK
+              </h3>
+              <ul className="space-y-3">
+                {house.idealFor.map((ideal, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-[#3b261b] mt-1 text-xs">▶</span>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff', lineHeight: '1.6', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{ideal}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ─── Course List ─── */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Available Courses</h3>
-          <span className="text-sm font-semibold text-slate-500">Pick your path</span>
+      {/* ─── Module List (Accordion) ─── */}
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <span className="text-[#3b261b]">⚔</span>
+          <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b' }}>PILIH MODUL</h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {courses.map((course, index) => (
-            <div
-              key={course.id}
-              onClick={() => router.push('/map')}
-              className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col sm:flex-row gap-6 items-start sm:items-center relative overflow-hidden"
-            >
-              {/* Subtle hover gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-              {/* Course Icon/Number */}
-              <div className="relative z-10 w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold shadow-inner">
-                {index + 1}
-              </div>
-
-              <div className="relative z-10 flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-                    Module {index + 1}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    2-3 Hours
-                  </span>
+        <div className="flex flex-col gap-6">
+          {modules.map((mod, index) => (
+            <div key={mod.id} className="flex flex-col">
+              {/* Module Header Button */}
+              <button
+                onClick={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)}
+                className="w-full bg-[#5a3a29] border-4 border-[#3b261b] p-0 text-left shadow-[6px_6px_0_rgba(0,0,0,0.3)] hover:translate-y-1 hover:shadow-[2px_2px_0_rgba(0,0,0,0.3)] transition-all flex items-stretch outline-none"
+              >
+                <div className="w-20 bg-[#3b261b] border-r-4 border-[#291a13] flex flex-col items-center justify-center gap-2 p-4">
+                   <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fbbf24' }}>{index + 1}</span>
+                   <span className="text-2xl">📚</span>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-                  {course.title.split(': ')[1] || course.title}
-                </h4>
-                <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">
-                  {course.shortDescription}
-                </p>
-              </div>
+                
+                <div className="flex-1 p-6 flex flex-col justify-center">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex gap-2 flex-wrap">
+                        {/* Context-based labels */}
+                        {(() => {
+                          const isTechHouse = id === 'house-ict' || id === 'house-engineering';
+                          const labels = ['MATERIAL', 'QUIZ', 'PROJECT'];
+                          if (isTechHouse) labels.push('CODE');
+                          return labels.map(label => (
+                            <span key={label} className="inline-block px-3 py-1 bg-[#8c5a3d] border-2 border-[#4a2e1d] text-[#fff]" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem' }}>
+                              {label}
+                            </span>
+                          ));
+                        })()}
+                      </div>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#a87b51' }}>
+                        {mod.chapters?.length || 0} BAB
+                      </span>
+                    </div>
+                    
+                    <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', marginBottom: '8px', lineHeight: '1.4', textShadow: '1px 1px 0 #000' }}>
+                      {mod.name.replace('Modul: ', '')}
+                    </h4>
+                    
+                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4a373', lineHeight: '1.6' }}>
+                      {mod.description}
+                    </p>
+                </div>
+                
+                <div className="w-16 flex items-center justify-center border-l-4 border-[#3b261b]">
+                  <div style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fbbf24' }}>
+                    <motion.div animate={{ rotate: expandedModule === mod.id ? 180 : 0 }}>▼</motion.div>
+                  </div>
+                </div>
+              </button>
 
-              {/* Action Button */}
-              <div className="relative z-10 sm:w-auto w-full pt-4 sm:pt-0 sm:pl-4 sm:border-l border-slate-100 flex items-center justify-end sm:justify-center shrink-0">
-                <button className="w-10 h-10 rounded-full bg-slate-50 group-hover:bg-blue-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-colors shadow-sm">
-                  <svg className="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              {/* Chapters Dropdown */}
+              <AnimatePresence>
+                {expandedModule === mod.id && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-[#8c5a3d] border-x-4 border-b-4 border-[#3b261b] p-6 flex flex-col gap-4 shadow-[6px_6px_0_rgba(0,0,0,0.3)] mb-2">
+                      <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#fff', marginBottom: '8px' }}>
+                        DAFTAR BAB (CHAPTERS):
+                      </div>
+                      
+                      {mod.chapters?.map((chapter, chapIdx) => (
+                        <div 
+                          key={chapter.id}
+                          onClick={() => router.push(`/map?chapter=${chapter.id}`)}
+                          className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] p-4 cursor-pointer hover:bg-[#d4a373] transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b' }}>{chapIdx + 1}.</span>
+                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#1a100c', lineHeight: '1.4' }}>
+                              {chapter.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29' }}>{chapter.duration}</span>
+                            <button className="px-4 py-2 bg-[#fbbf24] border-2 border-[#b45309] text-[#78350f] shadow-[2px_2px_0_#78350f] group-hover:translate-y-0.5 group-hover:shadow-[0_0_0_#78350f] transition-all" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
+                              PLAY ▶
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {(!mod.chapters || mod.chapters.length === 0) && (
+                        <div className="text-center p-4 bg-[#c29a6e] border-2 border-dashed border-[#5a3a29]">
+                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#5a3a29' }}>TIDAK ADA BAB</span>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>
+      </div>
+      
+      {/* ─── Floating Dashboard Button ─── */}
+      <div className="fixed bottom-6 right-6 z-40">
+         <button
+            onClick={() => router.push('/dashboard/sma')}
+            className="px-6 py-4 bg-[#fbbf24] border-4 border-[#b45309] text-[#78350f] shadow-[4px_4px_0_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-[2px_2px_0_rgba(0,0,0,0.5)] transition-all flex items-center gap-3"
+         >
+            <span className="text-xl">🏠</span>
+            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem' }}>DASHBOARD</span>
+         </button>
       </div>
     </div>
   );

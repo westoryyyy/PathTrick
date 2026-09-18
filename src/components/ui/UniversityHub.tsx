@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
 
 const MOCK_UNIVERSITIES = [
@@ -32,6 +33,8 @@ const MOCK_UNIVERSITIES = [
 ];
 
 export default function UniversityHub() {
+  const [selectedUni, setSelectedUni] = useState<any>(null);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       {/* Header */}
@@ -106,13 +109,96 @@ export default function UniversityHub() {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.boxShadow = '4px 4px 0 #3b261b';
               }}
-              onClick={() => alert('Viewing program syllabus and roadmap...')}
-            >
-              VIEW ROADMAP
-            </button>
-          </div>
-        ))}
+                onClick={() => setSelectedUni(uni)}
+              >
+                VIEW ROADMAP
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Modal Roadmap */}
+        <AnimatePresence>
+          {selectedUni && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 50 }}
+                style={{
+                  background: '#d4a373',
+                  border: '4px solid #5a3a29',
+                  padding: '32px',
+                  maxWidth: '600px',
+                  width: '90%',
+                  maxHeight: '80vh',
+                  overflowY: 'auto',
+                  boxShadow: '8px 8px 0 #3b261b'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px', marginBottom: '24px' }}>
+                  <div>
+                    <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b', marginBottom: '8px', lineHeight: '1.4' }}>
+                      ROADMAP: {selectedUni.major}
+                    </h2>
+                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#5a3a29' }}>
+                      {selectedUni.title}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedUni(null)}
+                    style={{ background: '#ef4444', border: '2px solid #991b1b', color: '#fff', padding: '8px', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '2px 2px 0 #7f1d1d' }}
+                  >
+                    X
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', lineHeight: '1.6' }}>
+                    Selesaikan urutan modul berikut untuk menguasai kompetensi yang diuji di seleksi masuk {selectedUni.title}.
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {[
+                      { step: 1, title: 'Matematika Dasar & Logika', desc: 'Selesaikan House of Algorithms (3 Modul)', done: true },
+                      { step: 2, title: 'Pemrograman Fundamental', desc: 'Selesaikan House of Tech (3 Modul)', done: false },
+                      { step: 3, title: 'Portofolio Akhir', desc: 'Kerjakan AI-Graded Project', done: false },
+                      { step: 4, title: 'Tryout Mandiri SIMAK/UTUL', desc: 'Simulasi ujian tulis', done: false }
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                        <div style={{ 
+                          width: '40px', height: '40px', 
+                          background: item.done ? '#047857' : '#fbbf24', 
+                          border: '2px solid #3b261b', 
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                          fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: item.done ? '#fff' : '#3b261b',
+                          boxShadow: '2px 2px 0 #3b261b'
+                        }}>
+                          {item.done ? '✓' : item.step}
+                        </div>
+                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.5)', padding: '12px', border: '2px solid #5a3a29' }}>
+                          <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', marginBottom: '8px' }}>
+                            {item.title}
+                          </h4>
+                          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29', lineHeight: '1.4' }}>
+                            {item.desc}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button 
+                    onClick={() => setSelectedUni(null)}
+                    style={{ background: '#10b981', border: '2px solid #064e3b', color: '#fff', padding: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '4px 4px 0 #064e3b', marginTop: '16px' }}
+                  >
+                    LANJUTKAN BELAJAR
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
-  );
-}
+    );
+  }

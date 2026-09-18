@@ -65,7 +65,7 @@ export default function AssessmentWizard() {
       if (role === 'sma') {
         router.push('/sma');
       } else {
-        router.push('/mahasiswa');
+        router.push('/mahasiswa/dashboard');
       }
     } else {
       nextStep();
