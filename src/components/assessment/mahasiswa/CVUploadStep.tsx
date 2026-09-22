@@ -4,6 +4,8 @@ import { useCallback, useRef, useState } from 'react';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './CVUploadStep.module.css';
 
+import { classifySkills } from '@/data/wefSkillData';
+
 const ACCEPTED_TYPES = [
   'application/pdf',
   'application/msword',
@@ -11,22 +13,17 @@ const ACCEPTED_TYPES = [
 ];
 const MAX_SIZE_MB = 10;
 
-/** Mock AI extraction — replaced by real API later */
-async function mockExtractCV(): Promise<{
-  skills: string[];
-  experience: string[];
-  education: string;
-}> {
-  // Simulate upload delay
+/** Mock AI extraction — replaced by real backend/AI Engineer API later */
+async function mockExtractCV() {
   await new Promise((r) => setTimeout(r, 1200));
-  // Simulate AI extraction delay
   await new Promise((r) => setTimeout(r, 2200));
 
   return {
-    skills: [
+    skills: classifySkills([
       'JavaScript', 'React', 'Node.js', 'Python',
       'SQL', 'Git', 'REST API', 'Figma',
-    ],
+      'Critical Thinking', 'Teamwork', 'Adaptability',
+    ]),
     experience: [
       'Frontend Developer Intern — PT Tech Indonesia (6 bulan)',
       'Freelance Web Developer — 10+ proyek',
@@ -203,11 +200,11 @@ export default function CVUploadStep() {
 
             {/* Extracted Skills */}
             <div className={styles.extractedSection}>
-              <p className={styles.extractedLabel}>🎯 Skills Terdeteksi</p>
+              <p className={styles.extractedLabel}>🎯 Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
               <div className={styles.skillTags}>
-                {mState.cvExtractedData.skills.map((skill, i) => (
+                {(mState.cvExtractedData?.skills ?? []).map((skill, i) => (
                   <span key={i} className={styles.skillTag} style={{ animationDelay: `${i * 0.08}s` }}>
-                    {skill}
+                    {skill.name} <span className={styles.skillLevel}>Lv.{skill.level}</span>
                   </span>
                 ))}
               </div>

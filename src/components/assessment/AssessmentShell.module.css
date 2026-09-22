@@ -96,7 +96,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.7rem;
   background: rgba(255,255,255,0.04);
   border: 1.5px solid rgba(124,58,237,0.2);
@@ -120,7 +120,7 @@
 }
 
 .dotLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.5);
   letter-spacing: 0.06em;
@@ -156,7 +156,7 @@
 }
 
 .stepTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 1.3rem;
   color: #fff;
   margin: 0;
@@ -166,13 +166,13 @@
 }
 
 .stepDesc {
-  font-size: 1.1rem;
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.65rem;
   color: #fbbf24;
   margin: 0;
   line-height: 1.6;
   max-width: 540px;
   margin-inline: auto;
-  font-weight: 500;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
 }
 
@@ -197,7 +197,7 @@
 }
 
 .backBtn {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.8rem;
   color: #fff;
   background: #64748b;
@@ -224,7 +224,7 @@
 }
 
 .nextBtn {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.9rem;
   padding: 14px 28px;
   color: #ffffff;

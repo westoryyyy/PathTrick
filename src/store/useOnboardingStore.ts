@@ -1,6 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
+import { GICSSectorCode } from '@/data/gicsData';
+import { ClassifiedSkill } from '@/data/wefSkillData';
 
 /* ═══════════════════════════════════════════════
    Type Definitions
@@ -28,7 +30,7 @@ export interface SMAAssessmentState {
 
 /** Data extracted by AI from the uploaded CV */
 export interface CVExtractedData {
-  skills: string[];
+  skills: ClassifiedSkill[];       // AI-extracted skills from CV/Portfolio
   experience: string[];
   education: string;
 }
@@ -41,8 +43,8 @@ export interface MahasiswaAssessmentState {
   cvExtractedData: CVExtractedData | null;
   portfolioFile: File | null;      // optional
   portfolioFileName: string;
-  workInterests: string[];         // confirmed by user
-  preferredIndustries: string[];
+  workInterests: string[];         // tipe pekerjaan: Full-time, Remote, dll
+  preferredGICS: GICSSectorCode[]; // GICS sectors (was: preferredIndustries: string[])
 }
 
 /* ═══════════════════════════════════════════════
@@ -107,7 +109,7 @@ const DEFAULT_MAHASISWA: MahasiswaAssessmentState = {
   portfolioFile: null,
   portfolioFileName: '',
   workInterests: [],
-  preferredIndustries: [],
+  preferredGICS: [],
 };
 
 /** Step counts per role */
@@ -168,7 +170,7 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
       mahasiswaAssessment: {
         ...s.mahasiswaAssessment,
         cvExtractedData: data,
-        cvExtractionStatus: data ? 'done' : 'error',
+        cvExtractionStatus: data ? 'done' : s.mahasiswaAssessment.cvExtractionStatus === 'error' ? 'idle' : s.mahasiswaAssessment.cvExtractionStatus,
       },
     })),
 
@@ -185,7 +187,8 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
           role: selectedRole,
           data: selectedRole === 'sma' ? smaAssessment : {
             skills: mahasiswaAssessment.cvExtractedData?.skills,
-            interests: mahasiswaAssessment.workInterests
+            gicsSectors: mahasiswaAssessment.preferredGICS,
+            workInterests: mahasiswaAssessment.workInterests,
           }
         }),
       });
@@ -206,7 +209,7 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
       currentStep: 0,
       totalSteps: 0,
       smaAssessment: { ...DEFAULT_SMA, riasec: { ...DEFAULT_RIASEC } },
-      mahasiswaAssessment: { ...DEFAULT_MAHASISWA },
+      mahasiswaAssessment: { ...DEFAULT_MAHASISWA, preferredGICS: [], workInterests: [] },
       isSubmitting: false,
     }),
 }));

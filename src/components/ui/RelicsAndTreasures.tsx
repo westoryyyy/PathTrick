@@ -3,32 +3,42 @@ import styles from '@/components/ui/Dashboard.module.css';
 
 import { useMapStore } from '@/store/useMapStore';
 
-export default function RelicsAndTreasures() {
+import Image from 'next/image';
+
+type Props = {
+  hideHeader?: boolean;
+  statsLabel?: string;
+};
+
+export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'RELICS UNLOCKED' }: Props = {}) {
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
   
-  const isHtmlEarned = completedDynamicNodes.includes('module-html-css-level-6');
+  const isHtmlEarned = completedDynamicNodes.includes('module-framer-bab-1-level-1') || completedDynamicNodes.includes('module-html-css-level-6');
 
   const VAULT_SBTS = [
-    { id: 1, name: 'HTML Basics', desc: 'House of Tech', earned: isHtmlEarned, icon: '🛡️' },
-    { id: 2, name: 'Python Logic', desc: 'Algorithm Core', earned: false, icon: '⚔️' },
-    { id: 3, name: 'Figma UI/UX', desc: 'Design Fundamentals', earned: false, icon: '💎' },
-    { id: 4, name: 'Data Wizard', desc: 'Data Analytics', earned: false, icon: '🔮' },
-    { id: 5, name: 'Security Master', desc: 'House of Cyber', earned: false, icon: '🔐' },
-    { id: 6, name: 'Smart Contract', desc: 'Web3 Track', earned: false, icon: '📜' },
-    { id: 7, name: 'First Milestone', desc: 'Welcome Bounty', earned: true, icon: '🎁' },
-    { id: 8, name: 'Top 10 Rank', desc: 'Weekly Leaderboard', earned: false, icon: '🏆' },
+    { id: 1, name: 'Mission Completer', desc: 'Selesai 1 Misi', earned: isHtmlEarned, icon: '/Mission Completer.png' },
+    { id: 2, name: 'Early Bird', desc: 'Login Sebelum Pagi', earned: true, icon: '/Early Bird.png' },
+    { id: 3, name: 'Streak Warrior', desc: 'Login 7 Hari', earned: false, icon: '/Streak Warrior copy.png' },
+    { id: 4, name: 'Quiz Master', desc: 'Kuis Sempurna', earned: false, icon: '/Quiz Master copy.png' },
+    { id: 5, name: 'Quick Learner', desc: 'Tamat Cepat', earned: false, icon: '/Quick Learner copy.png' },
+    { id: 6, name: 'Course Master', desc: 'Tamat 1 Course', earned: false, icon: '/course-master.png' },
+    { id: 7, name: 'Community Helper', desc: 'Bantu Teman', earned: false, icon: '/Community Helper.png' },
+    { id: 8, name: 'First Step', desc: 'Mulai Perjalanan', earned: false, icon: '/First Step.png' },
+    { id: 9, name: 'Night Owl', desc: 'Belajar Malam', earned: false, icon: '/Night Owl copy.png' },
   ];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          RELICS & TREASURES
-        </h2>
-        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-          Your collection of Soulbound Tokens (SBT) and Achievements. Complete more missions to unlock all relics!
-        </p>
-      </div>
+      {!hideHeader && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
+            RELICS & TREASURES
+          </h2>
+          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+            Your collection of Soulbound Tokens (SBT) and Achievements. Complete more missions to unlock all relics!
+          </p>
+        </div>
+      )}
 
       {/* Stats Summary */}
       <div style={{ display: 'flex', gap: '16px' }}>
@@ -36,7 +46,7 @@ export default function RelicsAndTreasures() {
           <p style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#fbbf24' }}>
             {VAULT_SBTS.filter(s => s.earned).length} / {VAULT_SBTS.length}
           </p>
-          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8', marginTop: '12px' }}>RELICS UNLOCKED</p>
+          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8', marginTop: '12px' }}>{statsLabel}</p>
         </div>
       </div>
 
@@ -60,13 +70,20 @@ export default function RelicsAndTreasures() {
           >
             <div style={{ 
               width: '64px', height: '64px', 
-              background: sbt.earned ? '#d4a373' : 'rgba(0,0,0,0.2)', 
-              border: `2px solid ${sbt.earned ? '#fff' : '#5a3a29'}`, 
+              background: 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontSize: '2rem', 
-              boxShadow: sbt.earned ? '0 0 16px rgba(251, 191, 36, 0.4)' : 'none'
+              position: 'relative'
             }}>
-              {sbt.icon}
+              <Image 
+                src={sbt.icon} 
+                alt={sbt.name} 
+                fill 
+                style={{ 
+                  objectFit: 'contain', 
+                  filter: sbt.earned ? 'drop-shadow(0 0 16px rgba(251, 191, 36, 0.4))' : 'brightness(0) invert(0.3) opacity(0.5)',
+                  transition: 'filter 0.3s'
+                }} 
+              />
             </div>
             
             <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>

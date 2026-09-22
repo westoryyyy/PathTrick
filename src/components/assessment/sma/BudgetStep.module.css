@@ -12,7 +12,7 @@
 }
 
 .hint {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.7rem;
   color: rgba(240,232,255,0.7);
   text-align: center;
@@ -84,7 +84,7 @@
 }
 
 .cardLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   letter-spacing: 0.05em;
@@ -92,14 +92,14 @@
 }
 
 .cardDesc {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: #fff;
   text-shadow: 1px 1px 0 #3b261b;
 }
 
 .checkMark {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 1.2rem;
   color: #fff; /* White checkmark looks better on wood */
   text-shadow: 1px 1px 0 #3b261b;

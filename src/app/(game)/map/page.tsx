@@ -14,7 +14,7 @@ import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
 // WorldMapGame must be client-only (Phaser uses window)
 const WorldMapGame = dynamic(() => import('@/components/game/WorldMapGame'), {
   ssr: false,
-  loading: () => <GameLoadingScreen statusText="Memuat Peta Dunia..." />,
+  loading: () => <GameLoadingScreen statusText="Memuat Komponen Game..." />,
 });
 
 // ── Mock user data — replace with Zustand/API later ──
@@ -31,6 +31,7 @@ function MapContent() {
   const searchParams = useSearchParams();
   const moduleId = searchParams.get('module');
   const chapterId = searchParams.get('chapter');
+  const roleQuery = searchParams.get('role');
 
   const {
     nodes, isLoading, fetchRoadmap, completeNode, role,
@@ -47,8 +48,21 @@ function MapContent() {
   const [dynamicNodes, setDynamicNodes] = useState<CourseNodeData[]>([]);
 
   useEffect(() => {
+    if (roleQuery === 'mahasiswa') {
+      useMapStore.setState({ role: 'MAHASISWA' });
+    }
+
     if (chapterId) {
-      // Find the Chapter inside the Module
+      if (roleQuery === 'mahasiswa' || role === 'MAHASISWA') {
+        useMapStore.setState({ activeChapterId: chapterId });
+        fetchRoadmap(chapterId).then(() => {
+          const fetchedNodes = useMapStore.getState().nodes;
+          setDynamicNodes(fetchedNodes);
+        });
+        return;
+      }
+
+      // Find the Chapter inside the Module (Legacy SMA)
       const { mockBackendData } = require('@/data/mockBackendData');
       let targetChapter = null;
       let targetModule = null;
@@ -66,6 +80,12 @@ function MapContent() {
           }
         }
         if (targetChapter) break;
+      }
+      
+      // Fallback for Mahasiswa modules
+      if (!targetChapter && moduleId && chapterId) {
+        targetChapter = { name: `Bab ${chapterId}`, duration: chapterId === '3' ? '1 Levels' : '3 Levels' };
+        useMapStore.setState({ role: 'MAHASISWA' });
       }
       
       if (targetHouseId) {
@@ -93,6 +113,8 @@ function MapContent() {
         
         let levels: any[] = [];
         
+        const baseIdPrefix = targetHouseId ? chapterId : `${moduleId}-bab-${chapterId}`;
+        
         for (let i = 1; i <= numLevels; i++) {
           const isFirst = i === 1;
           const isLast = i === numLevels;
@@ -115,7 +137,7 @@ function MapContent() {
           }
           
           levels.push({
-            id: `${chapterId}-level-${i}`,
+            id: `${baseIdPrefix}-level-${i}`,
             title: title,
             description: isLast ? `Selesaikan tantangan Boss Fight!` : (isFirst ? `Pengenalan fundamental untuk ${targetChapter.name}` : `Uji pemahamanmu tentang ${targetChapter.name}`),
             category: category,
@@ -123,7 +145,7 @@ function MapContent() {
             xp: isLast ? 300 : (isFirst ? 100 : 150),
             x: coords.x,
             y: coords.y,
-            prerequisites: isFirst ? [] : [`${chapterId}-level-${i-1}`],
+            prerequisites: isFirst ? [] : [`${baseIdPrefix}-level-${i-1}`],
             badgeImage: badgeImage,
           });
         }
@@ -144,9 +166,9 @@ function MapContent() {
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setDynamicNodes(levels as any);
-        useMapStore.setState({ nodes: levels as any, isLoading: false }); // override store for Map Game
+        useMapStore.setState({ nodes: levels as any, isLoading: false, activeChapterId: chapterId }); // override store for Map Game
       } else {
-        useMapStore.setState({ isLoading: false });
+        useMapStore.setState({ isLoading: false, activeChapterId: undefined });
       }
     } else {
       if (role === 'SMA') {
@@ -174,14 +196,14 @@ function MapContent() {
 
     // Dynamic module/chapter mode or Legacy Mahasiswa mode
     if (role === 'SMA') {
-      router.push(`/sma/learning/${node.id}`);
+      router.push(`/sma/learning-progress/${node.id}`);
     } else {
-      router.push(`/mahasiswa/learning-mission/${node.id}`);
+      router.push(`/mahasiswa/learning-mission/mission/${node.id}`);
     }
   }, [role, router]);
 
   if (isLoading || (chapterId && dynamicNodes.length === 0)) {
-    return <GameLoadingScreen statusText="Memuat Peta Dunia..." />;
+    return <GameLoadingScreen statusText="Menyiapkan Data Peta..." />;
   }
 
   // Determine which nodes to pass to QuestTracker
@@ -212,17 +234,20 @@ function MapContent() {
         {/* Back to Dashboard/Module Button */}
         <button
           onClick={() => {
-            if (role === 'SMA') {
+            const isMahasiswaFallback = moduleId && !houseId;
+            if (role === 'SMA' && !isMahasiswaFallback) {
               if (houseId) {
                 router.push(`/house/${houseId}`);
               } else {
-                router.push('/dashboard/sma');
+                router.push('/sma/dashboard');
               }
             } else {
-              if (moduleId) {
-                router.push(`/mahasiswa/learning/${moduleId}`);
+              if (houseId) {
+                router.push(`/mahasiswa/learning-mission/house/${houseId}`);
+              } else if (moduleId) {
+                router.push(`/mahasiswa/learning-mission/${moduleId}`);
               } else {
-                router.push('/mahasiswa/dashboard');
+                router.push('/mahasiswa/learning-mission');
               }
             }
           }}
@@ -237,8 +262,8 @@ function MapContent() {
             gap: '8px',
             padding: '12px 20px',
             background: '#3b261b',
-            border: '2px solid #5a3a29',
-            borderRadius: '0',
+            border: '4px solid #5a3a29',
+            borderRadius: '16px',
             color: '#fbbf24',
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '0.45rem',

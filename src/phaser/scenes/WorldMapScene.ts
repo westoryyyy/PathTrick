@@ -80,6 +80,14 @@ export class WorldMapScene extends Phaser.Scene {
     this.load.image('world-map-sma', ASSET_PATHS.MAP_MAIN);
     this.load.image('world-map-mahasiswa', ASSET_PATHS.MAP_ENGINEER);
 
+    // ── Dynamic Maps (3 to 20) ──
+    for (let i = 3; i <= 20; i++) {
+      this.load.image(`world-map-${i}`, encodeURI(`/map ${i}.png`));
+    }
+
+    // ── Custom Maps ──
+    this.load.image('world-map-kedokteran', ASSET_PATHS.MAP_KEDOKTERAN);
+
     // ── Player character sprites ──
     this.load.spritesheet('walk-down',  ASSET_PATHS.CHAR_WALK_DOWN,  { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('walk-up',    ASSET_PATHS.CHAR_WALK_UP,    { frameWidth: 128, frameHeight: 128 });
@@ -134,9 +142,22 @@ export class WorldMapScene extends Phaser.Scene {
 
     // Subscribe to Zustand store for updates
     this.unsubscribeStore = useMapStore.subscribe((state, prevState) => {
-      // Handle Role change (background switch)
-      if (state.role !== prevState.role) {
-        const textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
+      // Handle Role change or Chapter change (background switch)
+      if (state.role !== prevState.role || state.activeChapterId !== prevState.activeChapterId) {
+        let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
+        
+        // If there's an active chapter, deterministically pick a map
+        if (state.activeChapterId) {
+          if (state.activeChapterId === 'module-health-1-bab-1') {
+            textureKey = 'world-map-kedokteran';
+          } else if (state.activeChapterId.startsWith('module-engineering')) {
+            textureKey = 'world-map-mahasiswa';
+          } else {
+            const mapIndex = 6; // Default to map 6
+            textureKey = `world-map-${mapIndex}`;
+          }
+        }
+        
         this.mapImage.setTexture(textureKey);
       }
 
@@ -168,8 +189,18 @@ export class WorldMapScene extends Phaser.Scene {
      ═══════════════════════════════════════════ */
 
   private buildMap() {
-    const role = useMapStore.getState().role;
-    const textureKey = role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
+    const state = useMapStore.getState();
+    let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
+
+    if (state.activeChapterId) {
+      if (state.activeChapterId === 'module-health-1-bab-1') {
+        textureKey = 'world-map-kedokteran';
+      } else if (state.activeChapterId.startsWith('module-engineering')) {
+        textureKey = 'world-map-mahasiswa';
+      } else {
+        textureKey = 'world-map-6';
+      }
+    }
 
     this.mapImage = this.add.image(0, 0, textureKey).setOrigin(0, 0);
     this.mapImage.setDisplaySize(MAP_WIDTH_TILES * TILE_SIZE, MAP_HEIGHT_TILES * TILE_SIZE);

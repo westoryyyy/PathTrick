@@ -18,7 +18,7 @@ export default function MahasiswaDashboard() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: '"Press Start 2P"', color: '#fbbf24' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: 'var(--font-pixel)', color: '#fbbf24' }}>
         LOADING AI INSIGHTS...
       </div>
     );
@@ -29,10 +29,10 @@ export default function MahasiswaDashboard() {
       
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
+        <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
           WELCOME BACK, SCHOLAR!
         </h1>
-        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+        <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
           Your AI Career Roadmap is actively scanning for opportunities.
         </p>
       </div>
@@ -51,7 +51,7 @@ export default function MahasiswaDashboard() {
                 <span className={styles.tierName}>{careerRank} LEVEL</span>
               </div>
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                   Next Tier: Intern
                 </p>
               </div>
@@ -72,22 +72,22 @@ export default function MahasiswaDashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>📈 PROGRESSION</span>
             </div>
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '12px' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373' }}>Daily Mission</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>1/3</span>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Daily Mission</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>1/3</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '12px' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373' }}>Weekly Challenge</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>Active</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Weekly Challenge</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Active</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '12px' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373' }}>Skill Tree</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>12%</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Skill Tree</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>12%</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373' }}>Achievement Vault</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>4 Unlocked</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Achievement Vault</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>4 Unlocked</span>
               </div>
             </div>
           </div>
@@ -100,15 +100,15 @@ export default function MahasiswaDashboard() {
               <span className={styles.cardTitle}>🎯 AI JOB MATCH</span>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', justifyContent: 'space-between' }}>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+              <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                 5 suitable jobs found this week!
               </p>
               
               {targetJob && (
                 <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.4' }}>{targetJob.title}</h3>
-                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff' }}>{targetJob.company}</p>
-                  <div style={{ display: 'inline-block', background: '#047857', border: '2px solid #064e3b', color: '#fff', fontSize: '0.7rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', marginTop: '8px', width: 'fit-content', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
+                  <h3 style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.4' }}>{targetJob.title}</h3>
+                  <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#fff' }}>{targetJob.company}</p>
+                  <div style={{ display: 'inline-block', background: '#047857', border: '2px solid #064e3b', color: '#fff', fontSize: '0.7rem', fontFamily: 'var(--font-pixel)', padding: '8px 12px', marginTop: '8px', width: 'fit-content', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
                     MATCH: {targetJob.matchPercentage}%
                   </div>
                 </div>
@@ -119,7 +119,7 @@ export default function MahasiswaDashboard() {
                 marginTop: 'auto',
                 width: '100%',
                 padding: '16px',
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'var(--font-pixel)',
                 fontSize: '0.8rem',
                 color: '#3b261b',
                 background: '#fbbf24',
@@ -134,53 +134,7 @@ export default function MahasiswaDashboard() {
             </div>
           </div>
 
-          {/* ── Skill Gap Widget ── */}
-          <div className={styles.retroCard}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>⚠️ SKILL GAP</span>
-            </div>
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', justifyContent: 'space-between' }}>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                Missing skills for <span style={{ color: '#fbbf24' }}>{targetJob?.title}</span>:
-              </p>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {gapData.missing.slice(0, 3).map(skill => (
-                  <div key={skill} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '12px', border: '2px solid #b91c1c' }}>
-                    <span style={{ fontSize: '1.2rem' }}>❌</span>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#f87171', lineHeight: '1.4' }}>{skill}</span>
-                  </div>
-                ))}
-                
-                {gapData.missing.length === 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '12px', border: '2px solid #047857' }}>
-                    <span style={{ fontSize: '1.2rem' }}>✅</span>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#34d399', lineHeight: '1.4' }}>You meet all core requirements!</span>
-                  </div>
-                )}
-              </div>
 
-              {gapData.missing.length > 0 && (
-                <Link href="/mahasiswa/learning" style={{
-                  display: 'block',
-                  marginTop: 'auto',
-                  width: '100%',
-                  padding: '16px',
-                  fontFamily: '"Press Start 2P"',
-                  fontSize: '0.8rem',
-                  color: '#fff',
-                  background: '#b91c1c',
-                  border: '2px solid #7f1d1d',
-                  boxShadow: '4px 4px 0 #7f1d1d',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  textDecoration: 'none'
-                }}>
-                  TRAIN MISSING SKILLS
-                </Link>
-              )}
-            </div>
-          </div>
         </div>
 
       </div>

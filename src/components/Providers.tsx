@@ -1,7 +1,12 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
+import { WagmiProvider } from "@privy-io/wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
+import { wagmiConfig } from "@/config/wagmi";
+
+const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,9 +19,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           accentColor: "#DD1A21",
           logo: "/PathTrick.png",
         },
+        embeddedWallets: {
+          createOnLogin: "users-without-wallets",
+        },
       }}
     >
-      {children}
+      <QueryClientProvider client={queryClient}>
+        <WagmiProvider config={wagmiConfig}>
+          {children}
+        </WagmiProvider>
+      </QueryClientProvider>
     </PrivyProvider>
   );
 }

@@ -1,10 +1,25 @@
-export default function LeaderboardPlaceholder() {
+'use client';
+
+import React from 'react';
+import RelicsAndTreasures from '@/components/ui/RelicsAndTreasures';
+import OnChainCertificates from '@/components/ui/OnChainCertificates';
+
+export default function LeaderboardPage() {
   return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h1 style={{ fontFamily: '"Press Start 2P", monospace', color: '#f59e0b', fontSize: '1rem' }}>LEADERBOARD</h1>
-      <p style={{ marginTop: '20px', color: '#94a3b8' }}>
-        This module is currently under construction. Here you will see your global ranking among other Scholars.
-      </p>
+    <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Header Khusus Mahasiswa Leaderboard / Skill Badges */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
+        <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
+          SKILL BADGES & CERTIFICATES
+        </h2>
+        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+          Tunjukkan keahlianmu kepada dunia! Kumpulkan badge ini dengan menyelesaikan modul dan jadikan portofolio Web3 kamu semakin bersinar untuk memikat para rekruter dan kampus idaman.
+        </p>
+      </div>
+
+      <OnChainCertificates hideHeader={true} />
+
+      <RelicsAndTreasures hideHeader={false} statsLabel="BADGES UNLOCKED" />
     </div>
   );
 }

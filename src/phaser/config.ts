@@ -106,19 +106,19 @@ export const ASSET_PATHS = {
   OBJ_ELIXIR:            '/assets/Object/Potions/Elixir.png',
 
   // Badges
-  BADGE_FIRST_STEP:      '/assets/Object/Badges/First Step.png',
-  BADGE_QUICK_LEARNER:   '/assets/Object/Badges/Quick Learner.png',
+  BADGE_FIRST_STEP:      '/First Step.png',
+  BADGE_QUICK_LEARNER:   '/Quick Learner copy.png',
   BADGE_COURSE_MASTER:   '/course-master.png',
-  BADGE_MISSION_COMPLETE:'/mission-completer.png',
-  BADGE_STREAK_WARRIOR:  '/assets/Object/Badges/Streak Warrior.png',
-  BADGE_QUIZ_MASTER:     '/assets/Object/Badges/Quiz Master.png',
-  BADGE_EARLY_BIRD:      '/assets/Object/Badges/Early Bird.png',
-  BADGE_NIGHT_OWL:       '/assets/Object/Badges/Night Owl.png',
-  BADGE_COMMUNITY:       '/assets/Object/Badges/Community Helper.png',
+  BADGE_MISSION_COMPLETE:'/Mission Completer.png',
+  BADGE_STREAK_WARRIOR:  '/Streak Warrior copy.png',
+  BADGE_QUIZ_MASTER:     '/Quiz Master copy.png',
+  BADGE_EARLY_BIRD:      '/Early Bird.png',
+  BADGE_NIGHT_OWL:       '/Night Owl copy.png',
+  BADGE_COMMUNITY:       '/Community Helper.png',
 
   // Maps
   MAP_MAIN:              '/mini-map-course-2.png',
-  MAP_KEDOKTERAN:        '/assets/map/Kedokteran.png',
+  MAP_KEDOKTERAN:        '/Kedokteran.png',
   MAP_MINI_COURSE:       '/assets/map/Mini map course.png',
   MAP_ENGINEER:          '/engineer map.png',
 } as const;
@@ -184,7 +184,7 @@ export interface CourseNodeData {
   id: string;
   title: string;
   description: string;
-  category: 'foundation' | 'skill' | 'project' | 'milestone';
+  category: 'foundation' | 'skill' | 'project' | 'milestone' | 'bonus';
   status: 'locked' | 'available' | 'in_progress' | 'completed';
   xp: number;
   x: number; // tile x
@@ -195,6 +195,8 @@ export interface CourseNodeData {
   badgeImage?: string;
   /** AI generated recommendation shown in the NodeInfoPanel */
   aiRecommendation?: string;
+  /** Which NPC sprite to use for this node */
+  npcKey?: string;
   /** SMA specific: Link to university details */
   universityMatchId?: string;
   /** Mahasiswa specific: Link to skill gap details */

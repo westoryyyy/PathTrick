@@ -18,6 +18,143 @@ export interface MissionContentData {
 }
 
 export const MISSION_CONTENT: Record<string, MissionContentData> = {
+  // === MODUL MAHASISWA: ANALYTICAL THINKING ===
+  'module-analytical-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Analytical Thinking</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Berpikir analitis adalah kemampuan memecah masalah kompleks menjadi bagian-bagian kecil yang lebih mudah dikelola. Di level ini, kita akan mempelajari konsep <strong>First Principles Thinking</strong>, metode yang digunakan oleh inovator seperti Elon Musk untuk menyelesaikan masalah dari akarnya.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apa tujuan utama dari First Principles Thinking?",
+        options: [
+          { text: "Memecahkan masalah dengan mencari akar kebenaran yang tidak bisa diragukan lagi", isCorrect: true, feedback: "Tepat! First Principles membongkar masalah sampai ke fakta dasar." },
+          { text: "Melihat apa yang dilakukan kompetitor dan menirunya", isCorrect: false, feedback: "Itu adalah berpikir berdasarkan analogi, bukan First Principles." },
+          { text: "Memecahkan masalah dengan menebak", isCorrect: false, feedback: "Analytical thinking tidak mengandalkan tebakan." }
+        ]
+      }
+    ]
+  },
+  'module-analytical-bab-1-level-2': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Root Cause Analysis (5 Whys)</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Metode <strong>5 Whys</strong> dikembangkan oleh Sakichi Toyoda. Teknik ini mengharuskan kita bertanya "Mengapa?" sebanyak lima kali ketika menghadapi suatu masalah untuk menemukan akar masalah yang sesungguhnya, bukan sekadar menangani gejala di permukaan.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Kapan kita harus berhenti bertanya 'Mengapa' dalam metode 5 Whys?",
+        options: [
+          { text: "Ketika kita sudah menemukan akar masalah sistemik yang bisa diperbaiki", isCorrect: true, feedback: "Tepat! Tujuannya adalah perbaikan sistem." },
+          { text: "Tepat pada pertanyaan kelima, tidak boleh lebih", isCorrect: false, feedback: "Angka 5 hanya panduan, bisa kurang atau lebih." },
+          { text: "Ketika kita sudah bisa menyalahkan seseorang", isCorrect: false, feedback: "Tujuannya mencari akar masalah sistem, bukan menyalahkan individu." }
+        ]
+      }
+    ]
+  },
+  'module-analytical-bab-1-level-3': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Praktik Kasus: Data Anomali</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Bayangkan aplikasi kita tiba-tiba mengalami lonjakan error di akhir pekan. Sebagai seorang analis, langkah pertamamu bukan me-restart server, tapi melihat data log. Kita harus mencari korelasi antara waktu error dengan perubahan sistem terakhir (deploy) atau lonjakan traffic pengguna.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Tindakan analitis pertama saat terjadi lonjakan error adalah...",
+        options: [
+          { text: "Mengumpulkan data log dan menganalisis polanya", isCorrect: true, feedback: "Tepat! Kita butuh data sebelum bertindak." },
+          { text: "Langsung me-restart server", isCorrect: false, feedback: "Itu adalah solusi reaktif tanpa analisis." },
+          { text: "Menyalahkan tim developer", isCorrect: false, feedback: "Itu tidak menyelesaikan masalah teknis." }
+        ]
+      }
+    ]
+  },
+
+  'module-system-design-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar System Design</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          System design adalah proses mendefinisikan arsitektur, komponen, modul, antarmuka, dan data untuk sistem agar memenuhi persyaratan tertentu. Bayangkan kamu sedang membangun rumah: sebelum menyusun batu bata (coding), kamu butuh cetak biru (blueprint) yang memikirkan ventilasi, pondasi, dan instalasi listrik.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Mengapa System Design penting dalam pengembangan software skala besar?",
+        options: [
+          { text: "Agar sistem dapat di-scale, mudah di-maintain, dan handal", isCorrect: true, feedback: "Tepat! System design mencegah arsitektur yang rapuh saat pengguna bertambah." },
+          { text: "Untuk membuat UI yang lebih cantik", isCorrect: false, feedback: "Itu tugas UI/UX design, bukan system design." },
+          { text: "Agar bisa menggunakan bahasa pemrograman terbaru", isCorrect: false, feedback: "System design bersifat language-agnostic (tidak terikat bahasa tertentu)." }
+        ]
+      }
+    ]
+  },
+  'module-system-design-bab-1-level-2': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Client-Server Model</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Dalam model ini, <strong>Client</strong> (seperti browser di laptopmu) meminta resources atau service, dan <strong>Server</strong> (komputer di pusat data) merespons permintaan tersebut. Ini adalah fondasi dasar internet modern.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Dalam model Client-Server, siapa yang biasanya menyimpan database utama?",
+        options: [
+          { text: "Server", isCorrect: true, feedback: "Benar! Server bertugas menyimpan dan mengelola data secara terpusat." },
+          { text: "Client", isCorrect: false, feedback: "Client biasanya tidak menyimpan database utama karena alasan keamanan dan kapasitas." },
+          { text: "Keduanya menyimpan data yang sama secara permanen", isCorrect: false, feedback: "Client mungkin menyimpan cache, tapi sumber kebenaran (source of truth) ada di Server." }
+        ]
+      }
+    ]
+  },
+  'module-system-design-bab-1-level-3': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Scalability: Vertical vs Horizontal</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ketika aplikasimu tiba-tiba viral, servermu butuh tenaga ekstra. <br/>
+          <strong>Vertical Scaling (Scale Up)</strong>: Membeli CPU/RAM yang lebih kuat untuk satu server yang sama.<br/>
+          <strong>Horizontal Scaling (Scale Out)</strong>: Menambah lebih banyak server kecil untuk membagi beban (Load Balancing).
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Jika kamu menambah jumlah server dari 1 menjadi 5 untuk menangani traffic, metode apa yang kamu gunakan?",
+        options: [
+          { text: "Horizontal Scaling", isCorrect: true, feedback: "Tepat! Menambah instans server adalah Horizontal Scaling." },
+          { text: "Vertical Scaling", isCorrect: false, feedback: "Vertical scaling berarti memperbesar spesifikasi pada SATU server." },
+          { text: "Database Sharding", isCorrect: false, feedback: "Itu adalah teknik khusus untuk memecah database, bukan sekadar menambah server aplikasi." }
+        ]
+      }
+    ]
+  },
+
   // === MODUL BISNIS: AKUNTANSI ===
   'module-business-1-bab-1-level-1': {
     materials: [
@@ -488,5 +625,1303 @@ export const MISSION_CONTENT: Record<string, MissionContentData> = {
       defaultCode: "<!-- Ujian Akhir Dimulai! Ketik semuanya dari nol! -->\n",
       language: "html"
     }
-  }
+  },
+
+  'module-education-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-education-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-education-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-education-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-education-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-education-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Education 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-arts-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Arts 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-social-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Social 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-business-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Business 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-business-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Business 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-business-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Business 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-business-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Business 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-business-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Business 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-science-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Science 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-html-css-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Html Css Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-html-css-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Html Css Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-ict-security-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Ict Security Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-ict-security-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Ict Security Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-ict-ai-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Ict Ai Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-ict-ai-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Ict Ai Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-engineering-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Engineering 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-agriculture-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Agriculture 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-health-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Health 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-1-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 1 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-1-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 1 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-2-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 2 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-2-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 2 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-3-bab-1-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 3 Bab 1</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
+
+  'module-services-3-bab-2-level-1': {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <p style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#059669' }}>▶</span> <strong>Pengantar Module Services 3 Bab 2</strong>
+        </p>
+        <p style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: '1.6' }}>
+          Ini adalah materi awal untuk modul ini. Kami sedang mengembangkan kurikulum lengkap yang akan membantumu memahami konsep-konsep dasar dengan cara yang menyenangkan dan interaktif.
+        </p>
+      </div>
+    ],
+    quiz: [
+      {
+        question: "Apakah kamu siap untuk mulai belajar?",
+        options: [
+          { text: "Tentu saja, aku siap!", isCorrect: true, feedback: "Semangat yang luar biasa!" },
+          { text: "Mungkin nanti", isCorrect: false, feedback: "Ayo, jangan tunda belajarmu!" }
+        ]
+      }
+    ]
+  },
 };

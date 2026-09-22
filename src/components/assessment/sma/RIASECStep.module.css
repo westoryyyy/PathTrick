@@ -56,7 +56,7 @@
 }
 
 .cardLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   margin: 0;
@@ -65,7 +65,7 @@
 }
 
 .cardDesc {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: #fff;
   text-shadow: 1px 1px 0 #3b261b;
@@ -112,7 +112,7 @@
 }
 
 .gemLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.45rem;
   color: #fff;
   text-shadow: 1px 1px 0 #3b261b;
@@ -126,7 +126,7 @@
   position: absolute;
   top: -12px;
   right: 14px;
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.7rem;
   color: #fff;
   background: var(--dim-color);

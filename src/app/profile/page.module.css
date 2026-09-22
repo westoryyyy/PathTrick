@@ -1,37 +1,111 @@
 /* ══════════════════════════════════════════
-   EDIT PROFILE PAGE (RETRO PIXEL)
+   EDIT PROFILE PAGE (RETRO PIXEL DINKUM STYLE)
    ══════════════════════════════════════════ */
 
-.layout {
-  display: flex;
-  flex-direction: column;
+.page {
   min-height: 100dvh;
-  background-color: #3e1f0e; /* dark chocolate */
-  color: #fff;
+  display: flex;
   align-items: center;
-  padding: 48px 24px;
-  overflow-y: auto;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 32px 20px;
 }
 
-.headerContainer {
+.page::before {
+  content: '';
+  position: absolute;
+  top: -20px; left: -20px; right: -20px; bottom: -20px;
+  background-image: url('/map 18.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  z-index: 1;
+}
+
+/* ── Wooden Board Outer Container ── */
+.boardContainer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background-color: #8c5d41; /* Dark wood */
+  border: 6px solid #3b261b;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 0 0 4px #a37255,
+    inset 0 0 0 8px #704730,
+    0 24px 48px rgba(0, 0, 0, 0.7);
+  padding: 16px 16px 32px;
   width: 100%;
   max-width: 600px;
+  animation: fadeInUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* Metal corners simulation */
+.boardContainer::before,
+.boardContainer::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #94a3b8;
+  border: 3px solid #334155;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.4);
+  z-index: 2;
+}
+.boardContainer::before {
+  top: -6px; left: -6px;
+  border-radius: 4px;
+}
+.boardContainer::after {
+  bottom: -6px; right: -6px;
+  border-radius: 4px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Wooden Board Header ── */
+.boardHeader {
+  width: calc(100% + 32px);
+  margin-top: -16px;
+  padding: 16px;
+  background-color: #684530;
+  border-bottom: 6px solid #3b261b;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 24px;
+}
+
+.boardTitle {
+  font-family: var(--font-pixel), 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: #fff;
+  margin: 0;
+  text-shadow: 2px 2px 0 #3b261b;
+  letter-spacing: 2px;
 }
 
 .backBtn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  color: #fff;
-  background: #b91c1c;
-  border: 4px solid #f87171;
-  padding: 12px 16px;
+  font-size: 0.5rem;
+  color: #fbbf24;
+  background: #3b261b;
+  border: 4px solid #5a3a29;
+  border-radius: 8px;
+  padding: 10px 12px;
   cursor: pointer;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-  transition: transform 0.1s;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 2px 2px 0 rgba(0,0,0,0.8);
+  transition: all 0.1s;
   text-shadow: 2px 2px 0 #000;
   display: flex;
   align-items: center;
@@ -39,29 +113,16 @@
 }
 
 .backBtn:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+  transform: translate(2px, 2px);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 rgba(0,0,0,0.8);
 }
 
-.pageTitle {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 1.2rem;
-  color: #fbbf24;
-  text-shadow: 3px 3px 0 #3b261b;
-}
-
-.formCard {
+.boardContent {
   width: 100%;
-  max-width: 600px;
-  background: #bc8f65;
-  border: 4px solid #5a3a29;
-  padding: 32px;
-  box-shadow: inset 4px 4px 0px rgba(255,255,255,0.2), 
-              inset -4px -4px 8px rgba(0,0,0,0.3), 
-              8px 8px 0px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
+  padding: 0 16px;
 }
 
 .profileAvatarSection {
@@ -73,15 +134,21 @@
 }
 
 .avatar {
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   background: #d4a373;
-  border: 4px solid #f59e0b;
+  border: 6px solid #f59e0b;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  box-shadow: inset 0 0 16px rgba(0,0,0,0.3), 4px 4px 0 rgba(0,0,0,0.5);
+  font-size: 3.5rem;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.3), 4px 4px 0 rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+
+.avatar:hover {
+  transform: scale(1.05) rotate(5deg);
 }
 
 .changeAvatarBtn {
@@ -89,10 +156,11 @@
   font-size: 0.5rem;
   color: #fff;
   background: #3b261b;
-  border: 2px solid #5a3a29;
-  padding: 8px 12px;
+  border: 3px solid #5a3a29;
+  border-radius: 8px;
+  padding: 10px 16px;
   cursor: pointer;
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 3px 3px 0 rgba(0,0,0,0.6);
 }
 
 .changeAvatarBtn:active {
@@ -109,49 +177,75 @@
 .label {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
-  color: #fff;
-  text-shadow: 1px 1px 0 #3b261b;
+  color: #3b261b;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
 }
 
 .input {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
-  padding: 16px;
-  background: #e6c8ab;
+  padding: 18px;
+  background: #3b261b;
   border: 4px solid #5a3a29;
-  color: #3b261b;
-  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.3);
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.6);
   outline: none;
+  transition: border-color 0.2s;
 }
 
 .input::placeholder {
-  color: rgba(59, 38, 27, 0.5);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .input:focus {
-  border-color: #f59e0b;
+  border-color: #fbbf24;
+  background: #4a2e1d;
 }
 
 .saveBtn {
-  margin-top: 16px;
+  margin-top: 24px;
   font-family: 'Press Start 2P', monospace;
   font-size: 0.8rem;
-  color: #fff;
-  background: #10b981;
-  border: 4px solid #34d399;
-  padding: 16px;
+  color: #78350f;
+  background: #fbbf24;
+  border: 4px solid #b45309;
+  border-radius: 16px;
+  padding: 20px;
   cursor: pointer;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-  transition: transform 0.1s;
-  text-shadow: 2px 2px 0 #047857;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), 6px 6px 0 rgba(0,0,0,0.6);
+  transition: all 0.1s;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
   text-align: center;
 }
 
 .saveBtn:active {
   transform: translate(4px, 4px);
-  box-shadow: none;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.6);
 }
 
 .saveBtn:hover {
-  background: #059669;
+  background: #fcd34d;
+}
+
+.saveBtn:disabled {
+  background: #d4d4d8;
+  border-color: #a1a1aa;
+  color: #71717a;
+  cursor: not-allowed;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.2);
+  text-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.saveBtn.saved {
+  background: #4ade80;
+  border-color: #166534;
+  color: #064e3b;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), 6px 6px 0 rgba(0,0,0,0.6);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.saveBtn.saved:hover {
+  background: #22c55e;
 }

@@ -168,6 +168,17 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  animation: bgBreathing 20s ease-in-out infinite alternate;
+  transform-origin: right center; /* Fokus zoomnya agak ke pulau utama di kanan */
+}
+
+@keyframes bgBreathing {
+  0% {
+    transform: scale(1.0);
+  }
+  100% {
+    transform: scale(1.05);
+  }
 }
 
 /* Left-side gradient removed to achieve seamless look */
@@ -239,6 +250,19 @@
   color: #fb923c;
 }
 
+.heroTitleFloat {
+  animation: titleFloat 4s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
 .heroSubtitle {
   font-family: var(--pixel);
   font-size: 0.6rem;
@@ -292,7 +316,7 @@
 
 .scrollPixel {
   font-family: var(--pixel);
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   color: #000;
   letter-spacing: 0.08em;
 }
@@ -313,6 +337,16 @@
   50% {
     transform: translateY(4px);
   }
+}
+
+/* ════════ STATIC GIF (Atas Button) ════════ */
+.staticGifWrap {
+  margin-bottom: -15px; /* Biar kakinya nempel di atas button */
+  z-index: 10;
+}
+
+.staticGifImg {
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); /* Nambah efek bayangan biar nyatu sama pulau */
 }
 
 /* ════════════════════════════
@@ -549,7 +583,10 @@
 
 .exploreAllWrap {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .exploreAllBtn {

@@ -81,7 +81,7 @@
 }
 
 .uploadTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   margin: 0;
@@ -92,7 +92,7 @@
 }
 
 .uploadHint {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   color: #fff;
   margin: 0;
@@ -101,7 +101,7 @@
 }
 
 .uploadFormats {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: #fff;
   margin: 0;
@@ -138,7 +138,7 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .processingTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.8rem;
   color: #a855f7;
   margin: 0;
@@ -148,7 +148,7 @@
 }
 
 .processingFile {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   color: rgba(240,232,255,0.7);
   margin: 0;
@@ -239,7 +239,7 @@
 .doneIcon { font-size: 3rem; flex-shrink: 0; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5)); }
 
 .doneTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   margin: 0;
@@ -249,7 +249,7 @@
 }
 
 .doneFile {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.7);
   margin: 0;
@@ -258,7 +258,7 @@
 
 .retryBtn {
   margin-left: auto;
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   color: #fff;
   background: #b91c1c;
@@ -283,7 +283,7 @@
 }
 
 .extractedLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.7rem;
   color: #fff;
   margin: 0;
@@ -299,7 +299,7 @@
 }
 
 .skillTag {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: #fff;
   background: #4c1d95;
@@ -323,7 +323,7 @@
   gap: 10px;
 }
 .expList li {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.9);
   padding-left: 20px;
@@ -339,7 +339,7 @@
 }
 
 .eduText {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.9);
   margin: 0;
@@ -358,7 +358,7 @@
 .errorIcon { font-size: 4.5rem; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.5)); }
 
 .errorTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.9rem;
   color: #f87171;
   margin: 0;
@@ -367,7 +367,7 @@
 }
 
 .errorHint {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   color: rgba(240,232,255,0.7);
   margin: 0;
@@ -376,7 +376,7 @@
 }
 
 .retryBtnLarge {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.7rem;
   padding: 12px 24px;
   background: #991b1b;
@@ -406,7 +406,7 @@
 }
 
 .portfolioLabel {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   letter-spacing: 0.05em;
@@ -414,7 +414,7 @@
 }
 
 .optBadge {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.5rem;
   color: #fbbf24;
   background: #78350f;
@@ -437,7 +437,7 @@
 }
 
 .portfolioHint {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.6);
   margin: 0;
@@ -445,7 +445,7 @@
 }
 
 .portfolioFile {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   color: #34d399;
   margin: 0;

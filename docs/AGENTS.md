@@ -19,3 +19,26 @@ Always adhere to these specific guidelines when modifying the PathTrick landing 
 6. **Scroll Indicators**: "Scroll to explore" or similar hints must always be placed at the **bottom center** of the screen (`justify-content: center; width: 100%`) rather than the left edge, and must be large enough to be clearly legible (e.g., `0.5rem` for pixel fonts).
 7. **Asset Sizing & Spacing**: When placing pixel art assets (like feature icons or floating gems/chests) in wide sections, make sure they are scaled up proportionally (e.g., feature cards to `180px` rather than `120px`) to prevent them from looking "lost" or too small in the empty space.
 8. **Social Icons**: Always use the official pixel-art PNG assets (e.g., `icon twitter.png`, `icon discord.png`) for social buttons instead of inline SVGs or generic CSS background colors.
+
+# PathTrick Routing & Architecture Rules
+Always follow these conventions when adding or modifying pages:
+
+1. **Role-Based Routing Structure**:
+   - All dashboard pages MUST follow the pattern `src/app/(dashboard)/[role]/[page]`.
+   - Valid roles are `sma` and `mahasiswa`.
+   - Examples: `/sma/dashboard`, `/sma/learning-progress`, `/mahasiswa/learning-mission`, `/mahasiswa/career-hub`.
+
+2. **Layout Segregation**:
+   - Do NOT build monolithic components that include Sidebars and Headers (e.g., old `Dashboard.tsx`). 
+   - Sidebars and Headers are exclusively managed by the role layouts (`src/app/(dashboard)/sma/layout.tsx` and `src/app/(dashboard)/mahasiswa/layout.tsx`).
+   - Page components should ONLY render their specific content grid/area.
+
+3. **Dynamic Route Conflict Prevention**:
+   - Do NOT place multiple dynamic routes at the same level (e.g. `/[moduleId]` and `/[missionId]`).
+   - Follow the established pattern for nested views:
+     - Overview: `/mahasiswa/learning-mission`
+     - Chapter/Module selection: `/mahasiswa/learning-mission/[moduleId]`
+     - Specific Mission Node: `/mahasiswa/learning-mission/mission/[missionId]`
+
+4. **Map to Dashboard Navigation**:
+   - When redirecting back to the dashboard from the Map (`src/app/(game)/map/page.tsx`), always check the current role/module and redirect to the appropriate `[role]/[page]`.

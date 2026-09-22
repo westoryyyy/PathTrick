@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { mockBackendData } from '@/data/mockBackendData';
 import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
+import { useUserStore } from '@/store/useUserStore';
 
 const stageIconMap: Record<string, string> = {
   material: '📚',
@@ -22,6 +23,8 @@ const stageColorMap: Record<string, string> = {
 
 export default function LearningProgress() {
   const { houses, user } = mockBackendData;
+  const { totalXP, level, dailyBountyClaimed, claimDailyBounty, addXP } = useUserStore();
+  const [isClaimingBounty, setIsClaimingBounty] = useState(false);
 
   const getProgressPercentage = (stages: Stage[]): number => {
     const completed = stages.filter(s => s.isCompleted).length;
@@ -97,13 +100,10 @@ export default function LearningProgress() {
                       {house.icon}
                     </div>
                     <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>
-                        HOUSE {house.houseNumber}
-                      </span>
                       <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '1px 1px 0 #3b261b', marginTop: '4px' }}>
                         {house.title}
                       </h3>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4a373', lineHeight: '1.6', marginTop: '4px' }}>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29', lineHeight: '1.6', marginTop: '4px' }}>
                         {house.description}
                       </p>
                     </div>
@@ -240,32 +240,68 @@ export default function LearningProgress() {
               </p>
 
               <button
-                disabled={user.dailyBounty.isClaimed}
+                disabled={dailyBountyClaimed || isClaimingBounty}
+                onClick={() => {
+                  if (!dailyBountyClaimed && !isClaimingBounty) {
+                    setIsClaimingBounty(true);
+                    setTimeout(() => {
+                      addXP(user.dailyBounty.xpReward);
+                      claimDailyBounty();
+                      setIsClaimingBounty(false);
+                    }, 1200);
+                  }
+                }}
                 style={{
                   width: '100%',
                   padding: '24px',
                   fontFamily: '"Press Start 2P"',
                   fontSize: '0.8rem',
-                  color: user.dailyBounty.isClaimed ? '#a3a3a3' : '#fff',
-                  background: user.dailyBounty.isClaimed ? '#525252' : '#047857',
-                  border: `2px solid ${user.dailyBounty.isClaimed ? '#404040' : '#064e3b'}`,
-                  boxShadow: user.dailyBounty.isClaimed ? 'none' : '4px 4px 0 rgba(0,0,0,0.5)',
-                  cursor: user.dailyBounty.isClaimed ? 'not-allowed' : 'pointer',
-                  transform: user.dailyBounty.isClaimed ? 'none' : 'active:translate(2px, 2px)',
-                  marginTop: '8px'
+                  color: dailyBountyClaimed ? '#a3a3a3' : '#fff',
+                  background: dailyBountyClaimed ? '#525252' : '#047857',
+                  border: `2px solid ${dailyBountyClaimed ? '#404040' : '#064e3b'}`,
+                  boxShadow: dailyBountyClaimed ? 'none' : '4px 4px 0 rgba(0,0,0,0.5)',
+                  cursor: dailyBountyClaimed || isClaimingBounty ? 'not-allowed' : 'pointer',
+                  transform: dailyBountyClaimed ? 'none' : 'active:translate(2px, 2px)',
+                  marginTop: '8px',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                {user.dailyBounty.isClaimed ? `NEXT CLAIM AT ${user.dailyBounty.nextClaimAt}` : '🎁 CLAIM DAILY XP'}
+                {isClaimingBounty ? (
+                  <motion.span
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ repeat: Infinity, duration: 0.8 }}
+                  >
+                    CLAIMING...
+                  </motion.span>
+                ) : dailyBountyClaimed ? (
+                  `NEXT CLAIM AT ${user.dailyBounty.nextClaimAt}`
+                ) : (
+                  '🎁 CLAIM DAILY XP'
+                )}
               </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
-              <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', textAlign: 'center', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#60a5fa' }}>{user.totalXP}</p>
+              <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', textAlign: 'center', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)', position: 'relative' }}>
+                <AnimatePresence>
+                  {isClaimingBounty && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: -20, opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1 }}
+                      style={{ position: 'absolute', top: 0, left: 0, right: 0, color: '#34d399', fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}
+                    >
+                      +{user.dailyBounty.xpReward} XP!
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#60a5fa' }}>{totalXP}</p>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#d4d4d8', marginTop: '8px' }}>TOTAL XP</p>
               </div>
               <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', textAlign: 'center', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>LV {user.level}</p>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>LV {level}</p>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#d4d4d8', marginTop: '8px' }}>LEVEL</p>
               </div>
             </div>

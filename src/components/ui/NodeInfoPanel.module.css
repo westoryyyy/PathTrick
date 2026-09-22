@@ -160,9 +160,9 @@
 }
 
 .description {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  line-height: 1.8;
   color: #cbd5e1;
   margin-bottom: 24px;
 }

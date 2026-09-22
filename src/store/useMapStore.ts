@@ -68,6 +68,7 @@ interface MapState {
   isLoading: boolean;
   error: string | null;
   completedDynamicNodes: string[];
+  activeChapterId?: string;
 
   /* ── Actions ── */
   setRole: (role: 'SMA' | 'MAHASISWA') => void;
@@ -81,7 +82,7 @@ interface MapState {
   clearLastCompletedQuest: () => void;
 
   // Legacy Mahasiswa actions
-  fetchRoadmap: () => Promise<void>;
+  fetchRoadmap: (chapterId?: string) => Promise<void>;
   completeNode: (nodeId: string) => Promise<void>;
   unlockDependentNodes: (completedNodeId: string) => void;
   completeDynamicNode: (nodeId: string) => void;
@@ -414,21 +415,116 @@ const fetchAIRecommendedCoursesMock = async (): Promise<RecommendedCourse[]> => 
   });
 };
 
-const fetchAIRoadmapMock = async (role: 'SMA' | 'MAHASISWA'): Promise<CourseNodeData[]> => {
+const fetchAIRoadmapMock = async (role: 'SMA' | 'MAHASISWA', chapterId?: string): Promise<CourseNodeData[]> => {
   return new Promise((resolve) => {
-    setTimeout(() => {
-      const sourceNodes = role === 'SMA' ? COURSE_NODES_SMA : COURSE_NODES_MAHASISWA;
-      const roadmap = sourceNodes.map(node => {
-        if (node.id === 'beasiswa-hub' || node.id === 'job-match') {
-          return { ...node, aiRecommendation: 'AI Match (92%): Highly recommended based on your recent skill acquisitions.' };
+    if (role === 'MAHASISWA' && chapterId) {
+      // Generate dynamic nodes based on chapter
+      const chapterTitle = chapterId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      // Determine context based on chapterId
+      let levelContexts = [
+        { t: 'Konsep Dasar', d: 'Pelajari fundamental' },
+        { t: 'Praktik 1', d: 'Terapkan konsep dasar' },
+        { t: 'Praktik Lanjutan', d: 'Eksplorasi teknik lanjutan' },
+        { t: 'Mini Project', d: 'Uji kemampuan dengan live code' }
+      ];
+      
+      if (chapterId.includes('framer')) {
+        levelContexts = [
+          { t: 'Intro to Motion', d: 'Pahami dasar animasi Framer' },
+          { t: 'Gestures & Drag', d: 'Buat elemen interaktif' },
+          { t: 'Scroll Animations', d: 'Animasi berbasis scroll' },
+          { t: 'Layout Transitions', d: 'Transisi layout mulus' }
+        ];
+      } else if (chapterId.includes('tailwind')) {
+        levelContexts = [
+          { t: 'Utility Classes', d: 'Styling cepat dengan Tailwind' },
+          { t: 'Flexbox & Grid', d: 'Membangun layout modern' },
+          { t: 'Responsive Design', d: 'Desain mobile-first' },
+          { t: 'Custom Themes', d: 'Konfigurasi tailwind.config' }
+        ];
+      } else if (chapterId.includes('sql')) {
+        levelContexts = [
+          { t: 'SELECT & WHERE', d: 'Query dasar pengambilan data' },
+          { t: 'JOIN Operations', d: 'Menggabungkan beberapa tabel' },
+          { t: 'GROUP BY & Aggregasi', d: 'Analisis data berkelompok' },
+          { t: 'Subqueries', d: 'Query bersarang tingkat lanjut' }
+        ];
+      }
+
+      const dynamicNodes: CourseNodeData[] = [
+        {
+          id: `${chapterId}-level-1`,
+          title: `Level 1: ${levelContexts[0].t}`,
+          description: `${levelContexts[0].d} dari ${chapterTitle}.`,
+          category: 'skill',
+          status: 'available',
+          xp: 100,
+          x: 13, y: 23, // Adjusted positions for map 6
+          prerequisites: [],
+          badgeImage: ASSET_PATHS.BADGE_FIRST_STEP,
+        },
+        {
+          id: `${chapterId}-level-2`,
+          title: `Level 2: ${levelContexts[1].t}`,
+          description: `${levelContexts[1].d} untuk ${chapterTitle}.`,
+          category: 'skill',
+          status: 'locked',
+          xp: 150,
+          x: 15, y: 15,
+          prerequisites: [`${chapterId}-level-1`],
+          badgeImage: ASSET_PATHS.BADGE_QUICK_LEARNER,
+        },
+        {
+          id: `${chapterId}-level-3`,
+          title: `Level 3: ${levelContexts[2].t}`,
+          description: `${levelContexts[2].d}.`,
+          category: 'skill',
+          status: 'locked',
+          xp: 150,
+          x: 23, y: 13,
+          prerequisites: [`${chapterId}-level-2`],
+          badgeImage: ASSET_PATHS.BADGE_NIGHT_OWL,
+        },
+        {
+          id: `${chapterId}-level-4`,
+          title: `Level 4: ${levelContexts[3].t}`,
+          description: `${levelContexts[3].d}.`,
+          category: 'project',
+          status: 'locked',
+          xp: 200,
+          x: 28, y: 18,
+          prerequisites: [`${chapterId}-level-3`],
+          badgeImage: ASSET_PATHS.OBJ_SCROLL,
+        },
+        {
+          id: `${chapterId}-boss`,
+          title: `Boss Challenge`,
+          description: `Ujian akhir untuk menguasai ${chapterTitle}.`,
+          category: 'milestone',
+          status: 'locked',
+          xp: 500,
+          x: 20, y: 24, // Boss near the bottom center for map 6
+          prerequisites: [`${chapterId}-level-4`],
+          badge: '🏆',
+          badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER,
         }
-        if (node.id === 'internship-match' || node.id === 'advanced-skill') {
-          return { ...node, aiRecommendation: 'AI Match (88%): Matches your logical reasoning assessment.' };
-        }
-        return node;
-      });
-      resolve(roadmap);
-    }, 1500);
+      ];
+      resolve(dynamicNodes);
+      return;
+    }
+
+    const sourceNodes = role === 'SMA' ? COURSE_NODES_SMA : COURSE_NODES_MAHASISWA;
+    const roadmap = sourceNodes.map(node => {
+      if (node.id === 'beasiswa-hub' || node.id === 'job-match') {
+        return { ...node, aiRecommendation: 'AI Match (92%): Highly recommended based on your recent skill acquisitions.' };
+      }
+      if (node.id === 'internship-match' || node.id === 'advanced-skill') {
+        return { ...node, aiRecommendation: 'AI Match (88%): Matches your logical reasoning assessment.' };
+      }
+      return node;
+    });
+    resolve(roadmap);
   });
 };
 
@@ -564,11 +660,11 @@ export const useMapStore = create<MapState>((set, get) => ({
      Legacy Mahasiswa Actions
      ═══════════════════════════════════════════ */
 
-  fetchRoadmap: async () => {
+  fetchRoadmap: async (chapterId?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const data = await fetchAIRoadmapMock(get().role);
-      set({ nodes: data, isLoading: false });
+      const roadmap = await fetchAIRoadmapMock(get().role, chapterId);
+      set({ nodes: roadmap, isLoading: false });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch roadmap';
       set({ error: message, isLoading: false });

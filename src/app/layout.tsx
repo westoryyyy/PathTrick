@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, Inter, Pixelify_Sans } from "next/font/google";
+import { Press_Start_2P, Inter, Pixelify_Sans, VT323 } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 
@@ -22,6 +22,13 @@ const pixelifySans = Pixelify_Sans({
   variable: "--font-pixelify",
 });
 
+const vt323 = VT323({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-vt323",
+});
+
 export const metadata: Metadata = {
   title: "PathTrick — Discover Your Path, Build Your Future",
   description: "Explore, master skills, and unlock new career opportunities with PathTrick — the gamified AI-powered career roadmap platform.",
@@ -29,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable}`}>
+    <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`}>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }}>
         <Providers>{children}</Providers>
       </body>

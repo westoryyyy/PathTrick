@@ -39,7 +39,7 @@ interface ScholarshipTarget {
   matchPercentage: number;
   currentTier: string;
   officialLink: string;
-  documentChecklist: DocumentChecklistItem[];
+  aiFeedback: string;
 }
 
 interface AIResponse {
@@ -75,15 +75,10 @@ const mockAiResponse: AIResponse = {
   scholarshipTarget: {
     name: 'KIP Kuliah & Beasiswa Unggulan',
     provider: 'Pemerintah',
-    matchPercentage: 66,
-    currentTier: 'Nominee',
+    matchPercentage: 88,
+    currentTier: 'High Match',
     officialLink: '#',
-    documentChecklist: [
-      { docName: 'IELTS / TOEFL Score', isCompleted: true },
-      { docName: 'Passport', isCompleted: true },
-      { docName: 'Motivation Letter', isCompleted: false },
-      { docName: 'Letter of Recommendation', isCompleted: false },
-    ],
+    aiFeedback: 'Sangat cocok dengan profil RIASEC & kebutuhan finansialmu.',
   },
 };
 
@@ -161,341 +156,187 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className={styles.layout}>
+    <div className={styles.widgetGrid}>
       
-      {/* ─── LEFT SIDEBAR (RETRO PIXEL) ─── */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
-          <div className={styles.logo}>
-            <Image src="/PathTrick.png" alt="PathTrick" width={180} height={40} className={styles.logoImg} priority />
-          </div>
-          <span className={styles.roleBadge}>The Dreamer</span>
+      {/* Profile XP Banner */}
+      <div className={styles.retroCard} style={{ flexDirection: 'row', alignItems: 'center', gap: '24px' }}>
+        <div style={{ fontSize: '4rem', background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px' }}>
+          👨‍🎓
         </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
+              {mockAiResponse.user.name}
+            </h2>
+            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>{mockAiResponse.user.level}</span>
+          </div>
+          <div className={styles.readinessContainer}>
+            <div className={styles.readinessLabel}>
+              <span>XP PROGRESS</span>
+              <span>{mockAiResponse.user.totalXP} / 2000 XP</span>
+            </div>
+            <div className={styles.readinessBarBg} style={{ height: '32px' }}>
+              <div className={styles.readinessBarFillBlue} style={{ width: `${(mockAiResponse.user.totalXP / 2000) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <nav className={styles.nav}>
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeNav === item.label;
-
-            return (
-              <button
-                key={item.label}
-                onClick={() => {
-                  if (item.route) router.push(item.route);
-                  else setActiveNav(item.label);
-                }}
-                className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-                style={{ width: '100%', border: '2px solid #5a3a29' }}
-              >
-                <div className={styles.navIconTitle}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className={`${styles.navBadge} ${item.badge === 'Peta' ? styles.navBadgeBlue : ''}`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      {/* ─── MAIN CONTENT AREA ─── */}
-      <main className={styles.mainArea}>
+      {/* Top Row: Univ Rank & Scholarship Rank */}
+      <div className={styles.topRow}>
         
-        {/* Top Bar Header */}
-        <header className={styles.header}>
-          <div className={styles.searchBar}>
-            <span className={styles.searchTitle}>CATEGORIES</span>
-            <input type="text" placeholder="Search..." className={styles.searchInput} />
+        {/* University Rank (Combined Concept 1 & 2) */}
+        <div className={styles.retroCard}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>🎓 UNIVERSITY RANK</span>
           </div>
-
-          <div className={styles.headerActions}>
-            
-            {/* Mail Dropdown */}
-            <div style={{ position: 'relative' }}>
-              <div className={styles.iconBtn} onClick={toggleMail}>
-                ✉️{unreadMails.length > 0 && <span className={styles.iconBadge}>{unreadMails.length}</span>}
-              </div>
-              {isMailOpen && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: '#bc8f65', border: '2px solid #5a3a29', boxShadow: '4px 4px 0 #3b261b', display: 'flex', flexDirection: 'column', width: '250px', zIndex: 100, padding: '8px' }}>
-                  <div style={{ padding: '8px', borderBottom: '2px dashed #5a3a29', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>INBOX</div>
-                  {unreadMails.length === 0 ? (
-                    <div style={{ padding: '12px 8px', fontSize: '0.5rem', color: '#fff', fontFamily: '"Press Start 2P"', textAlign: 'center' }}>No new mail</div>
-                  ) : (
-                    unreadMails.map((mail) => (
-                      <div 
-                        key={mail.id} 
-                        onClick={() => { setUnreadMails(prev => prev.filter(m => m.id !== mail.id)); alert(`Opened mail from ${mail.sender}`); }}
-                        style={{ padding: '12px 8px', fontSize: '0.6rem', color: '#fff', borderBottom: '1px solid rgba(0,0,0,0.1)', cursor: 'pointer' }}
-                      >
-                        <div style={{ fontFamily: '"Press Start 2P"', color: '#fbbf24', marginBottom: '4px' }}>{mail.sender}</div>
-                        <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', lineHeight: '1.4' }}>{mail.msg}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
+          <div className={styles.rankContent}>
+            <div className={styles.tierBadge}>
+              <span className={styles.tierIcon}>🏅</span>
+              <span className={styles.tierName}>{mockAiResponse.universityTarget.targetTier}</span>
             </div>
-
-            {/* Notification Dropdown */}
-            <div style={{ position: 'relative' }}>
-              <div className={styles.iconBtn} onClick={toggleNotif}>
-                🔔{unreadNotifs.length > 0 && <span className={styles.iconBadge}>{unreadNotifs.length}</span>}
-              </div>
-              {isNotifOpen && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: '#bc8f65', border: '2px solid #5a3a29', boxShadow: '4px 4px 0 #3b261b', display: 'flex', flexDirection: 'column', width: '250px', zIndex: 100, padding: '8px' }}>
-                  <div style={{ padding: '8px', borderBottom: '2px dashed #5a3a29', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>NOTIFICATIONS</div>
-                  {unreadNotifs.length === 0 ? (
-                    <div style={{ padding: '12px 8px', fontSize: '0.5rem', color: '#fff', fontFamily: '"Press Start 2P"', textAlign: 'center' }}>All caught up!</div>
-                  ) : (
-                    unreadNotifs.map((notif) => (
-                      <div 
-                        key={notif.id}
-                        onClick={() => { setUnreadNotifs(prev => prev.filter(n => n.id !== notif.id)); }}
-                        style={{ padding: '12px 8px', fontSize: '0.6rem', color: '#fff', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.1)' }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span>🏆</span>
-                          <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', lineHeight: '1.4' }}>{notif.msg}</div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
+                Target: {mockAiResponse.universityTarget.name}
+              </p>
             </div>
-
-            {/* Profile Dropdown */}
-            <div style={{ position: 'relative' }}>
-              <div className={styles.profileChip} onClick={toggleProfile} style={{ cursor: 'pointer' }}>
-                <div className={styles.profileAvatar}>👨‍🎓</div>
-                <div className={styles.profileInfo}>
-                  <span className={styles.profileName}>{mockAiResponse.user.name}</span>
-                  <span className={styles.profileEmail}>{mockAiResponse.user.email}</span>
-                </div>
-                <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>▼</span>
-                </div>
+            <div className={styles.readinessContainer}>
+              <div className={styles.readinessLabel}>
+                <span>READINESS</span>
+                <span style={{ color: '#34d399' }}>{mockAiResponse.universityTarget.matchPercentage}% MATCH</span>
               </div>
-
-              {isDropdownOpen && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '8px',
-                  background: '#bc8f65',
-                  border: '2px solid #5a3a29',
-                  boxShadow: '4px 4px 0 #3b261b',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  minWidth: '200px',
-                  zIndex: 100,
-                  padding: '8px'
-                }}>
-                  <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
-                  <button onClick={() => connectWallet()} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
-                  <button onClick={handleToggleTheme} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Toggle Theme</button>
-                  <button onClick={() => window.open('https://pathtrick.gitbook.io', '_blank')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
-                  <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
-                </div>
-              )}
+              <div className={styles.readinessBarBg}>
+                <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.universityTarget.matchPercentage}%` }} />
+              </div>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
+                {mockAiResponse.universityTarget.aiFeedback}
+              </p>
             </div>
           </div>
-        </header>
-
-        {/* Content Area */}
-        <div className={styles.content}>
-          {activeNav === 'Dashboard' && (
-            <div className={styles.widgetGrid}>
-              
-              {/* Profile XP Banner */}
-              <div className={styles.retroCard} style={{ flexDirection: 'row', alignItems: 'center', gap: '24px' }}>
-                <div style={{ fontSize: '4rem', background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px' }}>
-                  👨‍🎓
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-                      {mockAiResponse.user.name}
-                    </h2>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>{mockAiResponse.user.level}</span>
-                  </div>
-                  <div className={styles.readinessContainer}>
-                    <div className={styles.readinessLabel}>
-                      <span>XP PROGRESS</span>
-                      <span>{mockAiResponse.user.totalXP} / 2000 XP</span>
-                    </div>
-                    <div className={styles.readinessBarBg} style={{ height: '32px' }}>
-                      <div className={styles.readinessBarFillBlue} style={{ width: `${(mockAiResponse.user.totalXP / 2000) * 100}%` }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Top Row: Univ Rank & Scholarship Rank */}
-              <div className={styles.topRow}>
-                
-                {/* University Rank (Combined Concept 1 & 2) */}
-                <div className={styles.retroCard}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardTitle}>🎓 UNIVERSITY RANK</span>
-                  </div>
-                  <div className={styles.rankContent}>
-                    <div className={styles.tierBadge}>
-                      <span className={styles.tierIcon}>🏅</span>
-                      <span className={styles.tierName}>{mockAiResponse.universityTarget.targetTier}</span>
-                    </div>
-                    <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                        Target: {mockAiResponse.universityTarget.name}
-                      </p>
-                    </div>
-                    <div className={styles.readinessContainer}>
-                      <div className={styles.readinessLabel}>
-                        <span>READINESS</span>
-                        <span style={{ color: '#34d399' }}>{mockAiResponse.universityTarget.matchPercentage}% MATCH</span>
-                      </div>
-                      <div className={styles.readinessBarBg}>
-                        <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.universityTarget.matchPercentage}%` }} />
-                      </div>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
-                        {mockAiResponse.universityTarget.aiFeedback}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Scholarship Rank (Combined Concept 1 & 2) */}
-                <div className={styles.retroCard}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardTitle}>📜 SCHOLARSHIP RANK</span>
-                  </div>
-                  <div className={styles.rankContent}>
-                    <div className={styles.tierBadge}>
-                      <span className={styles.tierIcon}>🏆</span>
-                      <span className={styles.tierName}>{mockAiResponse.scholarshipTarget.currentTier}</span>
-                    </div>
-                    <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                        Target: {mockAiResponse.scholarshipTarget.name}
-                      </p>
-                    </div>
-                    <div className={styles.readinessContainer}>
-                      <div className={styles.readinessLabel}>
-                        <span>DOCUMENTS</span>
-                        <span style={{ color: '#34d399' }}>{mockAiResponse.scholarshipTarget.matchPercentage}% COMPLETE</span>
-                      </div>
-                      <div className={styles.readinessBarBg}>
-                        <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.scholarshipTarget.matchPercentage}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className={styles.topRow}>
-                
-                {/* Daily Missions / Quest Log */}
-                <div className={styles.retroCard}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.cardTitle}>📜 QUEST LOG (MISSIONS)</span>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>
-                      {completedCount}/{bounties.length}
-                    </span>
-                  </div>
-                  <div className={styles.questList}>
-                    <AnimatePresence>
-                      {bounties.map((bounty) => (
-                        <div 
-                          key={bounty.id} 
-                          className={`${styles.questItem} ${bounty.claimed ? styles.questItemDone : ''}`}
-                          onClick={() => toggleBounty(bounty.id)}
-                        >
-                          <div className={styles.questIcon}>
-                            {bounty.claimed ? '✅' : (bounty.done ? '🎁' : '❔')}
-                          </div>
-                          <div className={styles.questInfo}>
-                            <span className={`${styles.questTitle} ${bounty.claimed ? styles.questTitleDone : ''}`}>
-                              {bounty.task}
-                            </span>
-                            <span className={styles.questDesc}>{bounty.desc}</span>
-                          </div>
-                          <span className={styles.questReward} style={
-                            bounty.claimed 
-                              ? { background: '#a3a3a3', borderColor: '#525252', color: '#fff', opacity: 0.8 } 
-                              : (bounty.done 
-                                  ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } 
-                                  : {})
-                          }>
-                            {bounty.claimed ? 'CLAIMED' : (bounty.done ? 'CLAIM' : bounty.reward)}
-                          </span>
-                        </div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Right Column: Leaderboard & Vault */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  
-                  {/* Leaderboard Preview */}
-                  <div className={styles.retroCard}>
-                    <div className={styles.cardHeader}>
-                      <span className={styles.cardTitle}>👑 WEEKLY LEADERBOARD</span>
-                    </div>
-                    <div className={styles.lbList}>
-                      {LEADERBOARD_MOCK.map((lb) => (
-                        <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
-                          <div className={styles.lbRankInfo}>
-                            <span className={styles.lbRankNum}>#{lb.rank}</span>
-                            <span className={styles.lbName}>{lb.name}</span>
-                          </div>
-                          <span className={styles.lbScore}>{lb.score} XP</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Achievement Vault Showcase */}
-                  <div className={styles.retroCard}>
-                    <div className={styles.cardHeader}>
-                      <span className={styles.cardTitle}>💎 ACHIEVEMENT VAULT</span>
-                      <span 
-                        onClick={() => setActiveNav('Relics & Treasures')}
-                        style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
-                      >
-                        VIEW ALL
-                      </span>
-                    </div>
-                    <div className={styles.vaultGrid}>
-                      {VAULT_SBTS.map((sbt) => (
-                        <div key={sbt.id} className={`${styles.sbtItem} ${!sbt.earned ? styles.sbtItemLocked : ''}`}>
-                          <div className={styles.sbtIcon}>{sbt.icon}</div>
-                          <div className={styles.sbtInfo}>
-                            <span className={styles.sbtName}>{sbt.name}</span>
-                            <span className={styles.sbtDesc}>{sbt.desc}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {activeNav === 'Learning Progress' && <LearningProgress />}
-          {activeNav === 'University Hub' && <UniversityHub />}
-          {activeNav === 'Scholarship Hub' && <ScholarshipHub />}
-          {activeNav === 'Relics & Treasures' && <RelicsAndTreasures />}
         </div>
-      </main>
+
+        {/* Scholarship Rank (Combined Concept 1 & 2) */}
+        <div className={styles.retroCard}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>📜 SCHOLARSHIP RANK</span>
+          </div>
+          <div className={styles.rankContent}>
+            <div className={styles.tierBadge}>
+              <span className={styles.tierIcon}>🏆</span>
+              <span className={styles.tierName}>{mockAiResponse.scholarshipTarget.currentTier}</span>
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
+                Target: {mockAiResponse.scholarshipTarget.name}
+              </p>
+            </div>
+            <div className={styles.readinessContainer}>
+              <div className={styles.readinessLabel}>
+                <span>PROFILE MATCH</span>
+                <span style={{ color: '#34d399' }}>{mockAiResponse.scholarshipTarget.matchPercentage}% MATCH</span>
+              </div>
+              <div className={styles.readinessBarBg}>
+                <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.scholarshipTarget.matchPercentage}%` }} />
+              </div>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
+                {mockAiResponse.scholarshipTarget.aiFeedback}
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div className={styles.topRow}>
+        
+        {/* Daily Missions / Quest Log */}
+        <div className={styles.retroCard}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>📜 QUEST LOG (MISSIONS)</span>
+            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>
+              {completedCount}/{bounties.length}
+            </span>
+          </div>
+          <div className={styles.questList}>
+            <AnimatePresence>
+              {bounties.map((bounty) => (
+                <div 
+                  key={bounty.id} 
+                  className={`${styles.questItem} ${bounty.claimed ? styles.questItemDone : ''}`}
+                  onClick={() => toggleBounty(bounty.id)}
+                >
+                  <div className={styles.questIcon}>
+                    {bounty.claimed ? '✅' : (bounty.done ? '🎁' : '❔')}
+                  </div>
+                  <div className={styles.questInfo}>
+                    <span className={`${styles.questTitle} ${bounty.claimed ? styles.questTitleDone : ''}`}>
+                      {bounty.task}
+                    </span>
+                    <span className={styles.questDesc}>{bounty.desc}</span>
+                  </div>
+                  <span className={styles.questReward} style={
+                    bounty.claimed 
+                      ? { background: '#a3a3a3', borderColor: '#525252', color: '#fff', opacity: 0.8 } 
+                      : (bounty.done 
+                          ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } 
+                          : {})
+                  }>
+                    {bounty.claimed ? 'CLAIMED' : (bounty.done ? 'CLAIM' : bounty.reward)}
+                  </span>
+                </div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Right Column: Leaderboard & Vault */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* Leaderboard Preview */}
+          <div className={styles.retroCard}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>👑 WEEKLY LEADERBOARD</span>
+            </div>
+            <div className={styles.lbList}>
+              {LEADERBOARD_MOCK.map((lb) => (
+                <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
+                  <div className={styles.lbRankInfo}>
+                    <span className={styles.lbRankNum}>#{lb.rank}</span>
+                    <span className={styles.lbName}>{lb.name}</span>
+                  </div>
+                  <span className={styles.lbScore}>{lb.score} XP</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Achievement Vault Showcase */}
+          <div className={styles.retroCard}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>💎 ACHIEVEMENT VAULT</span>
+              <span 
+                onClick={() => router.push('/sma/certificate')}
+                style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
+              >
+                VIEW ALL
+              </span>
+            </div>
+            <div className={styles.vaultGrid}>
+              {VAULT_SBTS.map((sbt) => (
+                <div key={sbt.id} className={`${styles.sbtItem} ${!sbt.earned ? styles.sbtItemLocked : ''}`}>
+                  <div className={styles.sbtIcon}>{sbt.icon}</div>
+                  <div className={styles.sbtInfo}>
+                    <span className={styles.sbtName}>{sbt.name}</span>
+                    <span className={styles.sbtDesc}>{sbt.desc}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 }

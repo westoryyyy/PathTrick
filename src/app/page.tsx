@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePrivy } from '@privy-io/react-auth';
 import styles from './page.module.css';
 
 /* ─── Feature icon cards ─── */
@@ -38,13 +39,35 @@ const STATS = [
 ];
 
 const NAV_LINKS = [
-  { label: 'Leaderboard', href: '#' },
-  { label: 'Docs', href: '#' },
+  { label: 'Features', href: '#features' },
+  { label: 'Docs', href: '/docs' },
 ];
 
 export default function LandingPage() {
+  const { login } = usePrivy();
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+
+  React.useEffect(() => {
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(e => console.log('Autoplay blocked by browser:', e));
+      }
+    };
+    
+    // Coba putar langsung saat halaman dibuka
+    playAudio();
+
+    // Fallback: Kalau browser ngeblokir (karena security policy), kita tunggu klik pertama user
+    document.addEventListener('click', playAudio, { once: true });
+    return () => document.removeEventListener('click', playAudio);
+  }, []);
+
   return (
     <div className={styles.page}>
+      
+      {/* ════════ AUDIO BACKGROUND ════════ */}
+      <audio ref={audioRef} src="/music%20for%20Landing%20Page.ogg" autoPlay loop preload="auto" />
+
 
       {/* ════════ NAVBAR ════════ */}
       <nav className={styles.nav}>
@@ -60,10 +83,10 @@ export default function LandingPage() {
             />
           </Link>
           <div className={styles.navLinks}>
-            {NAV_LINKS.map(l => <a key={l.label} href={l.href} className={styles.navLink}>{l.label}</a>)}
+            {NAV_LINKS.map(l => <Link key={l.label} href={l.href} className={styles.navLink}>{l.label}</Link>)}
           </div>
           <div className={styles.navRight}>
-            <Link href="/login" className={styles.signUpBtn} id="nav-signup-btn">
+            <button onClick={login} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <Image
                 src="/Sign Up.png"
                 alt="Sign Up"
@@ -72,7 +95,7 @@ export default function LandingPage() {
                 unoptimized
                 style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
               />
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
@@ -94,11 +117,12 @@ export default function LandingPage() {
             width={700}
             height={320}
             unoptimized
+            className={styles.heroTitleFloat}
             style={{ objectFit: 'contain', imageRendering: 'pixelated', maxWidth: '100%', display: 'block', marginTop: '48px' }}
           />
-          <Link href="/login" className={styles.ctaImgBtn} id="hero-start-btn" style={{ marginTop: '30px', marginLeft: '-60px' }}>
+          <button onClick={login} className={styles.ctaImgBtn} id="hero-start-btn" style={{ marginTop: '30px', marginLeft: '-60px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
             <Image src="/StartLearn.png" alt="Start Learning" width={260} height={78} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
-          </Link>
+          </button>
         </div>
 
         <div className={styles.scrollHint}>
@@ -107,7 +131,7 @@ export default function LandingPage() {
       </section>
 
       {/* ════════ FEATURE ICON ROW ════════ */}
-      <section className={styles.featureIconSection}>
+      <section id="features" className={styles.featureIconSection}>
         <div className={styles.featureIconRow}>
           {FEATURE_ICONS.map((f, i) => (
             <div key={i} className={styles.featureIconCard} id={`feature-${i}`}>
@@ -149,9 +173,22 @@ export default function LandingPage() {
             })}
           </div>
           <div className={styles.exploreAllWrap}>
-            <Link href="/map" className={styles.exploreAllBtn} id="explore-all-btn">
+            {/* ════════ WALKING GIF (Static) ════════ */}
+            <div className={styles.staticGifWrap}>
+              <Image 
+                src="/Walking_transparent_v2.gif" 
+                alt="Walking character" 
+                width={80} 
+                height={80} 
+                unoptimized 
+                style={{ imageRendering: 'pixelated' }} 
+                className={styles.staticGifImg}
+              />
+            </div>
+            
+            <button onClick={login} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
-            </Link>
+            </button>
           </div>
         </div>
       </section>

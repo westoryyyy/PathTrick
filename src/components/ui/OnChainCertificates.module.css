@@ -1,0 +1,136 @@
+/* ══════════════════════════════════════════
+   CERTIFICATES & BADGES (RETRO PIXEL)
+   ══════════════════════════════════════════ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.headerTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: #fbbf24;
+  text-shadow: 2px 2px 0 #3b261b;
+  margin-bottom: 12px;
+}
+
+.headerDesc {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #d4d4d8;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.certCard {
+  background: #bc8f65;
+  border: 4px solid #5a3a29;
+  padding: 24px;
+  box-shadow: inset 2px 2px 0px rgba(255,255,255,0.2), 
+              inset -4px -4px 8px rgba(0,0,0,0.3), 
+              4px 4px 0px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.certHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.certIcon {
+  width: 64px;
+  height: 64px;
+  background: #4c1d95;
+  border: 4px solid #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.5), 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.certInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.certTitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #fff;
+  text-shadow: 1px 1px 0 #3b261b;
+  line-height: 1.4;
+}
+
+.certIssuer {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #fbbf24;
+}
+
+.certMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 2px dashed #5a3a29;
+  padding-top: 16px;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+}
+
+.metaLabel {
+  color: #d4d4d8;
+}
+
+.metaValue {
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.metaBadge {
+  background: #3b261b;
+  border: 2px solid #5a3a29;
+  padding: 4px 8px;
+  color: #34d399;
+}
+
+.explorerBtn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: #fff;
+  background: #1d4ed8;
+  border: 4px solid #3b82f6;
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+  text-shadow: 1px 1px 0 #000;
+  text-align: center;
+}
+
+.explorerBtn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.explorerBtn:hover {
+  background: #1e40af;
+}

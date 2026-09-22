@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import AssessmentShell from './AssessmentShell';
 import RIASECStep, { isRIASECComplete } from './sma/RIASECStep';
@@ -35,7 +35,7 @@ export default function AssessmentWizard() {
   const riasec = useOnboardingStore((s) => s.smaAssessment.riasec);
   const budget = useOnboardingStore((s) => s.smaAssessment.budgetPreference);
   const cvStatus = useOnboardingStore((s) => s.mahasiswaAssessment.cvExtractionStatus);
-  const industries = useOnboardingStore((s) => s.mahasiswaAssessment.preferredIndustries);
+  const preferredGICS = useOnboardingStore((s) => s.mahasiswaAssessment.preferredGICS);
 
   if (!role) return null;
 
@@ -54,7 +54,7 @@ export default function AssessmentWizard() {
   } else {
     switch (currentStep) {
       case 0: canNext = cvStatus === 'done'; break;
-      case 1: canNext = industries.length > 0; break;
+      case 1: canNext = preferredGICS.length > 0; break;
     }
   }
 
@@ -89,7 +89,7 @@ export default function AssessmentWizard() {
   };
 
   // Framer Motion Variants
-  const variants = {
+  const variants: Variants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
     exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: 'easeIn' } },

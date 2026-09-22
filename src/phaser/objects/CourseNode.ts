@@ -41,8 +41,7 @@ export class CourseNode {
 
   /** Resolve the correct sprite key for this node */
   private getIconSpriteKey(): string {
-    // All nodes in this map will use the Professor NPC
-    return 'npc-professor';
+    return this.data.npcKey || 'npc-professor';
   }
 
   private create() {
@@ -69,18 +68,33 @@ export class CourseNode {
       
     const displayText = status === 'locked' ? `🔒\n${titleText}` : titleText;
 
-    // Label permanently visible ABOVE node
+    // Create text without built-in backgroundColor
     this.labelText = this.scene.add.text(0, -CourseNode.NODE_RADIUS - 24, displayText, {
       fontSize: '9px',
       fontFamily: '"Press Start 2P", monospace',
       color: status === 'locked' ? '#94a3b8' : '#fbbf24',
       align: 'center',
-      wordWrap: { width: 120 },
+      wordWrap: { width: 200 },
       stroke: '#000000',
-      strokeThickness: 4,
-      backgroundColor: 'rgba(0,0,0,0.85)',
-      padding: { x: 4, y: 4 },
+      strokeThickness: 3,
     }).setOrigin(0.5, 1).setAlpha(1);
+
+    // Draw Dinkum-style rounded background
+    const padX = 10;
+    const padY = 6;
+    const labelW = this.labelText.width + padX * 2;
+    const labelH = this.labelText.height + padY * 2;
+    const labelX = -labelW / 2;
+    // label is origin(0.5, 1), so top Y is -CourseNode.NODE_RADIUS - 24 - height
+    const labelY = -CourseNode.NODE_RADIUS - 24 - this.labelText.height - padY;
+
+    const labelBg = this.scene.add.graphics();
+    labelBg.fillStyle(0x3b261b, 0.95); // Retro brown fill
+    labelBg.fillRoundedRect(labelX, labelY, labelW, labelH, 8);
+    labelBg.lineStyle(3, 0x5a3a29, 1); // Thick border
+    labelBg.strokeRoundedRect(labelX, labelY, labelW, labelH, 8);
+
+    this.container.add(labelBg);
     this.container.add(this.labelText);
 
     // Quest order badge (Duolingo mode)
@@ -116,7 +130,12 @@ export class CourseNode {
 
     // Scale & alpha
     this.container.setScale(cfg.scale);
-    this.container.setAlpha(status === 'locked' ? 0.6 : 1.0);
+    this.container.setAlpha(status === 'locked' ? 0.4 : 1.0);
+    if (status === 'locked') {
+      this.iconImage.setTint(0x555555); // Darken the locked node
+    } else {
+      this.iconImage.clearTint();
+    }
 
     // Enable interaction
     this.innerCircle.setInteractive({ useHandCursor: true });
@@ -199,8 +218,9 @@ export class CourseNode {
 
     if (isNear !== this.isNearPlayer) {
       this.isNearPlayer = isNear;
-      // Highlight the label
-      this.labelText.setStyle({ color: isNear ? '#c084fc' : '#f1f5f9' });
+      // Highlight the label (White when near, yellow/gray when far based on status)
+      const defaultColor = this.data.status === 'locked' ? '#94a3b8' : '#fbbf24';
+      this.labelText.setStyle({ color: isNear ? '#ffffff' : defaultColor });
       // Scale icon on proximity
       this.scene.tweens.add({
         targets: this.iconImage,
@@ -222,6 +242,7 @@ export class CourseNode {
       onComplete: () => {
         this.container.setAlpha(1);
         this.container.setScale(1);
+        this.iconImage.clearTint();
         
         // Update label
         const titleText = this.data.title.includes('Level') 

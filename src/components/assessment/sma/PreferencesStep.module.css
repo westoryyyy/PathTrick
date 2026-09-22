@@ -25,7 +25,7 @@
 }
 
 .sectionTitle {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.85rem;
   color: #fff;
   margin: 0;
@@ -34,7 +34,7 @@
 }
 
 .optBadge {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.5rem;
   color: #fbbf24;
   background: #78350f;
@@ -45,7 +45,7 @@
 }
 
 .sectionHint {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.55rem;
   color: rgba(240,232,255,0.7);
   margin: 0;
@@ -74,7 +74,7 @@
     2px 2px 0px 0px rgba(0,0,0,0.5);
     
   color: #fff;
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-pixel), monospace;
   font-size: 0.6rem;
   text-shadow: 1px 1px 0 #3b261b;
   

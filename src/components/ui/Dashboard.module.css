@@ -547,6 +547,17 @@
   padding: 12px;
 }
 
+.btnDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8), 0 0 5px #10b981; transform: scale(1); }
+  50% { box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8), 0 0 20px #34d399; transform: scale(1.02); }
+  100% { box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8), 0 0 5px #10b981; transform: scale(1); }
+}
+
 .sbtItemLocked {
   opacity: 0.5;
   filter: grayscale(100%);

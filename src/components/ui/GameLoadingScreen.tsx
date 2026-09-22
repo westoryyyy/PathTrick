@@ -8,7 +8,7 @@ const LOADING_TIPS = [
   { icon: '🏆', text: 'Skill Badge adalah sertifikat on-chain yang tidak bisa dipalsukan oleh siapapun.' },
   { icon: '🤖', text: 'AI kami menganalisis RIASEC-mu untuk memberikan rekomendasi course yang tepat.' },
   { icon: '⚡', text: 'Selesaikan quest berurutan untuk membuka Boss Challenge di setiap course!' },
-  { icon: '🎯', text: 'Platform ini gratis! Semua biaya blockchain ditanggung oleh Treasury PATHTRICK.' },
+
   { icon: '🔮', text: 'Kamu bisa melihat progres belajarmu secara real-time di Dashboard.' },
 ];
 
@@ -65,7 +65,7 @@ export default function GameLoadingScreen({
               className="h-14 sm:h-16 object-contain mb-3" 
             />
           </motion.div>
-          <p className="text-sm font-medium text-slate-500">SMA Career Platform</p>
+
         </div>
 
         {/* Loading Progress Card */}

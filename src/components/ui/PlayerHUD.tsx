@@ -30,7 +30,7 @@ export default function PlayerHUD({
         <div className={styles.statsCard} id="player-hud-stats">
           <div className={styles.statItem}>
             <img
-              src={ASSET_PATHS.BADGE_FIRST_STEP}
+              src="/first-step.png"
               alt="Badge"
               className={styles.statIconImg}
             />
@@ -42,7 +42,7 @@ export default function PlayerHUD({
           <div className={styles.statDivider} />
           <div className={styles.statItem}>
             <img
-              src={ASSET_PATHS.OBJ_COIN}
+              src="/Coin.png"
               alt="XP"
               className={styles.statIconImg}
             />
@@ -57,7 +57,7 @@ export default function PlayerHUD({
         <div className={styles.playerCard} id="player-hud-card">
           <div className={styles.avatar}>
             <img
-              src={ASSET_PATHS.CHAR_IDLE}
+              src="/idle.png"
               alt="Avatar"
               className={styles.avatarImg}
             />
