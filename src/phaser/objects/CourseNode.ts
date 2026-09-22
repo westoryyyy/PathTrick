@@ -19,6 +19,7 @@ export class CourseNode {
   private iconImage!: Phaser.GameObjects.Image;
   private labelText!: Phaser.GameObjects.Text;
   private isNearPlayer = false;
+  private baseScale = 0.35;
   private onInteract: NodeEventCallback;
 
   /** Quest order number — shown as a small circle badge in Duolingo mode */
@@ -59,9 +60,10 @@ export class CourseNode {
 
     // Pixel art icon image (replacing emoji text)
     const spriteKey = this.getIconSpriteKey();
+    this.baseScale = spriteKey === 'npc-professor' ? 0.5 : 0.35; // Slightly larger for professor
     this.iconImage = this.scene.add.image(0, -10, spriteKey)
       .setOrigin(0.5)
-      .setScale(0.35); // Adjusted scale to match player character
+      .setScale(this.baseScale);
     this.container.add(this.iconImage);
 
     const titleText = this.data.title.replace(': ', '\n');
@@ -224,7 +226,7 @@ export class CourseNode {
       // Scale icon on proximity
       this.scene.tweens.add({
         targets: this.iconImage,
-        scale: isNear ? 0.45 : 0.35,
+        scale: isNear ? this.baseScale * 1.3 : this.baseScale,
         duration: 200,
         ease: 'Back.easeOut',
       });

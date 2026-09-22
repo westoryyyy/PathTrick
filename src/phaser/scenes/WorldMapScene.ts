@@ -146,10 +146,21 @@ export class WorldMapScene extends Phaser.Scene {
       if (state.role !== prevState.role || state.activeChapterId !== prevState.activeChapterId) {
         let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
         
-        // If there's an active chapter, deterministically pick a map
         if (state.activeChapterId) {
           if (state.activeChapterId === 'module-health-1-bab-1') {
             textureKey = 'world-map-kedokteran';
+          } else if (state.activeChapterId === 'module-education-1-bab-2') {
+            textureKey = 'world-map-3';
+          } else if (state.activeChapterId === 'module-arts-1-bab-1') {
+            textureKey = 'world-map-4';
+          } else if (state.activeChapterId === 'module-arts-1-bab-2') {
+            textureKey = 'world-map-5';
+          } else if (state.activeChapterId === 'module-social-1-bab-1') {
+            textureKey = 'world-map-6';
+          } else if (state.activeChapterId === 'module-social-1-bab-2') {
+            textureKey = 'world-map-7';
+          } else if (state.activeChapterId === 'module-agriculture-1-bab-1') {
+            textureKey = 'world-map-8';
           } else if (state.activeChapterId.startsWith('module-engineering')) {
             textureKey = 'world-map-mahasiswa';
           } else {
@@ -195,6 +206,18 @@ export class WorldMapScene extends Phaser.Scene {
     if (state.activeChapterId) {
       if (state.activeChapterId === 'module-health-1-bab-1') {
         textureKey = 'world-map-kedokteran';
+      } else if (state.activeChapterId === 'module-education-1-bab-2') {
+        textureKey = 'world-map-3';
+      } else if (state.activeChapterId === 'module-arts-1-bab-1') {
+        textureKey = 'world-map-4';
+      } else if (state.activeChapterId === 'module-arts-1-bab-2') {
+        textureKey = 'world-map-5';
+      } else if (state.activeChapterId === 'module-social-1-bab-1') {
+        textureKey = 'world-map-6';
+      } else if (state.activeChapterId === 'module-social-1-bab-2') {
+        textureKey = 'world-map-7';
+      } else if (state.activeChapterId === 'module-agriculture-1-bab-1') {
+        textureKey = 'world-map-8';
       } else if (state.activeChapterId.startsWith('module-engineering')) {
         textureKey = 'world-map-mahasiswa';
       } else {
