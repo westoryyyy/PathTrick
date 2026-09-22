@@ -48,13 +48,18 @@ const MANUAL_POSITIONS = [
 
 /** Calculate world positions for the quest chain */
 function computeQuestPositions(quests: QuestNode[]): { x: number; y: number }[] {
-  return quests.map((quest, index) => {
+  return quests.map((quest) => {
     // If the store has explicit non-zero coordinates, use them
     if (quest.x !== 0 || quest.y !== 0) {
       return { x: quest.x, y: quest.y };
     }
-    // Otherwise fallback to our manual estimated positions for the 12 houses
-    return MANUAL_POSITIONS[index % MANUAL_POSITIONS.length];
+    
+    // Generate random positions within a safe land area of the map
+    // X between 300 and 950, Y between 250 and 750
+    const randX = Math.floor(Math.random() * (950 - 300 + 1)) + 300;
+    const randY = Math.floor(Math.random() * (750 - 250 + 1)) + 250;
+    
+    return { x: randX, y: randY };
   });
 }
 
