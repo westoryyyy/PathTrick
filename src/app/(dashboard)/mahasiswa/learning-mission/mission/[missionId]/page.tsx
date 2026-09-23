@@ -5,9 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
-import MintSBTButton from '@/components/ui/MintSBTButton';
 import { mockBackendData } from '@/data/mockBackendData';
-import { Stage } from '@/types/backend';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
@@ -276,7 +274,7 @@ export default function MissionFlowPage() {
           });
         }
       }
-    } catch (e) {
+    } catch {
       showDialog('error', 'Gagal menghubungi AI backend.');
     } finally {
       setIsSubmitting(false);
@@ -427,7 +425,7 @@ export default function MissionFlowPage() {
               const currentQuiz = quizArray[quizIndex];
               return (
                 <div className={styles.quizOptions}>
-                  {currentQuiz.options.map((opt: any, i: number) => (
+                  {currentQuiz.options.map((opt, i) => (
                     <button
                       key={i}
                       className={styles.optionBtn}

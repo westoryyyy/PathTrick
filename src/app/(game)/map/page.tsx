@@ -1,15 +1,16 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useCallback, useEffect, Suspense, useRef } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { CourseNodeData } from '@/phaser/config';
 import { useMapStore } from '@/store/useMapStore';
 import PlayerHUD from '@/components/ui/PlayerHUD';
 import NodeInfoPanel from '@/components/ui/NodeInfoPanel';
 import SBTBadgePopup from '@/components/ui/SBTBadgePopup';
-import QuestTracker from '@/components/ui/QuestTracker';
 import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
+import { mockBackendData } from '@/data/mockBackendData';
+import type { Chapter } from '@/types/backend';
 
 // WorldMapGame must be client-only (Phaser uses window)
 const WorldMapGame = dynamic(() => import('@/components/game/WorldMapGame'), {
@@ -34,14 +35,14 @@ function MapContent() {
   const roleQuery = searchParams.get('role');
 
   const {
-    nodes, isLoading, fetchRoadmap, completeNode, role,
-    fetchRecommendedCourses, currentActiveCourse,
+    isLoading, fetchRoadmap, role,
+    fetchRecommendedCourses,
   } = useMapStore();
 
   const [selectedNode, setSelectedNode] = useState<CourseNodeData | null>(null);
   const [nearbyNode,   setNearbyNode]   = useState<CourseNodeData | null>(null);
   const [showSBT,      setShowSBT]      = useState(false);
-  const [sbtData,      setSbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
+  const [sbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
   const [houseId,      setHouseId]      = useState<string | null>(null);
   
   // Dynamic nodes based on Module and Chapter
@@ -63,17 +64,14 @@ function MapContent() {
       }
 
       // Find the Chapter inside the Module (Legacy SMA)
-      const { mockBackendData } = require('@/data/mockBackendData');
-      let targetChapter = null;
-      let targetModule = null;
+      let targetChapter: Chapter | null = null;
       let targetHouseId = null;
       for (const h of mockBackendData.houses) {
         for (const s of h.stages) {
           if (s.chapters) {
-            const found = s.chapters.find((c: any) => c.id === chapterId);
+            const found = s.chapters.find(c => c.id === chapterId);
             if (found) {
               targetChapter = found;
-              targetModule = s;
               targetHouseId = h.id;
               break;
             }
@@ -84,11 +82,13 @@ function MapContent() {
       
       // Fallback for Mahasiswa modules
       if (!targetChapter && moduleId && chapterId) {
-        targetChapter = { name: `Bab ${chapterId}`, duration: chapterId === '3' ? '1 Levels' : '3 Levels' };
+        targetChapter = { id: chapterId, name: `Bab ${chapterId}`, duration: chapterId === '3' ? '1 Levels' : '3 Levels' };
         useMapStore.setState({ role: 'MAHASISWA' });
       }
       
       if (targetHouseId) {
+        // This state mirrors the selected legacy house from the URL.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHouseId(targetHouseId);
       }
       
@@ -111,7 +111,7 @@ function MapContent() {
           {x: 10, y: 28}
         ];
         
-        let levels: any[] = [];
+        let levels: CourseNodeData[] = [];
         
         const baseIdPrefix = targetHouseId ? chapterId : `${moduleId}-bab-${chapterId}`;
         
@@ -122,7 +122,7 @@ function MapContent() {
           
           let title = `Level ${i}: Materi Praktik`;
           let badgeImage = '/book.png';
-          let category = 'skill';
+          let category: CourseNodeData['category'] = 'skill';
           
           if (isFirst) {
             title = `Level 1: Teori Dasar`;
@@ -156,7 +156,7 @@ function MapContent() {
             return { ...level, status: 'completed' };
           }
           if (level.prerequisites.length > 0) {
-            const allPrereqsMet = level.prerequisites.every((req: string) => completedDynamicNodes.includes(req));
+            const allPrereqsMet = level.prerequisites.every(req => completedDynamicNodes.includes(req));
             if (allPrereqsMet) {
               return { ...level, status: 'available' };
             }
@@ -164,9 +164,8 @@ function MapContent() {
           return level;
         });
 
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDynamicNodes(levels as any);
-        useMapStore.setState({ nodes: levels as any, isLoading: false, activeChapterId: chapterId }); // override store for Map Game
+        setDynamicNodes(levels);
+        useMapStore.setState({ nodes: levels, isLoading: false, activeChapterId: chapterId }); // override store for Map Game
       } else {
         useMapStore.setState({ isLoading: false, activeChapterId: undefined });
       }
@@ -177,7 +176,7 @@ function MapContent() {
         fetchRoadmap();
       }
     }
-  }, [moduleId, chapterId, role, fetchRecommendedCourses, fetchRoadmap]);
+  }, [moduleId, chapterId, role, roleQuery, fetchRecommendedCourses, fetchRoadmap]);
 
   const handleNodeSelected = useCallback((node: CourseNodeData) => {
     setSelectedNode(node);
@@ -205,9 +204,6 @@ function MapContent() {
   if (isLoading || (chapterId && dynamicNodes.length === 0)) {
     return <GameLoadingScreen statusText="Menyiapkan Data Peta..." />;
   }
-
-  // Determine which nodes to pass to QuestTracker
-  const trackerNodes = chapterId ? dynamicNodes : (currentActiveCourse ? currentActiveCourse.quests : nodes);
 
   return (
     <>

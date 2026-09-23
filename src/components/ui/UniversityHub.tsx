@@ -33,8 +33,10 @@ const MOCK_UNIVERSITIES = [
   }
 ];
 
+type University = (typeof MOCK_UNIVERSITIES)[number];
+
 export default function UniversityHub() {
-  const [selectedUni, setSelectedUni] = useState<any>(null);
+  const [selectedUni, setSelectedUni] = useState<University | null>(null);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
