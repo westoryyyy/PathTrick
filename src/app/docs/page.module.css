@@ -514,6 +514,14 @@
   image-rendering: pixelated;
 }
 
+.cardInlineIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
 .cardIconBlue {
   background: #dbeafe;
   border-color: #3b82f6;

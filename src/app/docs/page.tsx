@@ -322,10 +322,10 @@ export default function DocsPage() {
                     </div>
                     <div>
                       <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3e2723', marginBottom: '8px', lineHeight: '1.4' }}>
-                        Wagmi (Sang Kurir Transaksi)
+                        Wallet Provider + Ethers (Sang Kurir Transaksi)
                       </h4>
                       <p className={styles.text} style={{ textAlign: 'justify', fontSize: '1rem', lineHeight: '1.6', margin: 0 }}>
-                        Setelah pengguna memiliki dompet dari Privy, frontend memakai provider wallet dan <strong>ethers</strong> untuk membaca contract serta mengirim transaksi ke BNB Smart Chain Testnet. Alur mint saat ini memeriksa network, saldo, mint price, receipt, dan event contract sebelum certificate dikonfirmasi ke backend.
+                        Setelah pengguna memiliki dompet dari Privy, provider wallet dan <strong>ethers</strong> mengambil alih tugas berat. Keduanya mengantarkan instruksi dari layar PathTrick langsung menuju <strong>Smart Contract</strong> di BNB Chain, mulai dari membaca data sertifikat hingga mengeksekusi pencetakan Soulbound Token. Alur mint tetap memeriksa network, saldo, mint price, receipt, dan event contract sebelum certificate dikonfirmasi ke backend.
                       </p>
                     </div>
                   </div>
@@ -336,7 +336,7 @@ export default function DocsPage() {
                 <h3 className={styles.sectionTitle}>Mengapa BNB Chain?</h3>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard} style={{ padding: '20px' }}>
-                    <div className={styles.cardTitle} style={{ marginBottom: '8px' }}>💰 Biaya Rendah</div>
+                    <div className={styles.cardTitle} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}><Image src="/Coin.png" alt="" width={28} height={28} className={styles.cardInlineIcon} /> Biaya Rendah</div>
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>Ini adalah pilihan yang sangat ideal untuk mencetak jutaan <strong>sertifikat pelajar</strong> masa depan tanpa perlu membebani mereka dengan <strong>biaya gas</strong> yang mencekik.</div>
                   </div>
                   <div className={styles.featureCard} style={{ padding: '20px' }}>
@@ -344,7 +344,7 @@ export default function DocsPage() {
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>Dunia ini dibangun di atas fondasi <strong>kontrak pintar</strong> yang matang, <strong>super aman</strong>, dan mengikuti standar baku sehingga sangat <strong>transparan</strong> untuk diaudit oleh siapapun.</div>
                   </div>
                   <div className={styles.featureCard} style={{ padding: '20px' }}>
-                    <div className={styles.cardTitle} style={{ marginBottom: '8px' }}>🌏 Adopsi Lokal</div>
+                    <div className={styles.cardTitle} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}><Image src="/globe.svg" alt="" width={28} height={28} className={styles.cardInlineIcon} /> Adopsi Lokal</div>
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>Ekosistem ini sudah berhasil memenangkan hati <strong>komunitas lokal</strong>, menjadikannya rumah yang paling tepat dengan tingkat <strong>adopsi yang luar biasa tinggi</strong> di pasar <strong>Indonesia</strong>.</div>
                   </div>
                 </div>
