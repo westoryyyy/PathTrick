@@ -118,6 +118,9 @@
 }
 
 .sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: 'Press Start 2P', monospace;
   font-size: 0.3rem;
   color: rgba(192,132,252,0.6);
@@ -176,7 +179,7 @@
 }
 
 .questIcon {
-  font-size: 0.9rem;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -205,12 +208,17 @@
 }
 
 .questStatus {
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
 /* Completed count */
 .completedRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   font-family: 'Press Start 2P', monospace;
   font-size: 0.3rem;
   color: rgba(45, 212, 191, 0.7);

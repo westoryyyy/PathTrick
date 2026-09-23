@@ -2,6 +2,7 @@
 
 import styles from './QuestTracker.module.css';
 import type { CourseNodeData } from '@/phaser/config';
+import Image from 'next/image';
 
 interface QuestTrackerProps {
   nodes: CourseNodeData[];
@@ -9,10 +10,10 @@ interface QuestTrackerProps {
 }
 
 const CATEGORY_ICON: Record<string, string> = {
-  foundation: '🏛️',
-  skill: '⚡',
-  project: '🔨',
-  milestone: '🏆',
+  foundation: '/Book.png',
+  skill: '/Energy Shard.png',
+  project: '/Sword.png',
+  milestone: '/course-master.png',
 };
 
 export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps) {
@@ -33,7 +34,7 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
     <div className={styles.tracker} id="quest-tracker">
       {/* Header */}
       <div className={styles.header}>
-        <span className={styles.headerIcon}>🗺️</span>
+        <Image className={styles.headerIcon} src="/Compass.png" alt="" width={24} height={24} />
         <span className={styles.headerTitle}>Roadmap</span>
         <span className={styles.progressPct}>{progress}%</span>
       </div>
@@ -57,13 +58,13 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
               onClick={() => onSelectNode?.(n)}
               title={`Klik untuk lihat detail: ${n.title}`}
             >
-              <span className={styles.questIcon}>{CATEGORY_ICON[n.category]}</span>
+              <Image className={styles.questIcon} src={CATEGORY_ICON[n.category] ?? '/Book.png'} alt="" width={24} height={24} />
               <div className={styles.questInfo}>
                 <p className={styles.questName}>{n.title}</p>
                 <p className={styles.questXp}>+{n.xp} XP</p>
               </div>
               <span className={styles.questStatus}>
-                {n.status === 'in_progress' ? '📖' : '✨'}
+                <Image src={n.status === 'in_progress' ? '/Book.png' : '/Energy Shard.png'} alt="" width={20} height={20} />
               </span>
             </button>
           ))}
@@ -73,7 +74,7 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
       {/* Upcoming */}
       {upcoming.length > 0 && (
         <div className={styles.section}>
-          <p className={styles.sectionTitle}>🔒 Selanjutnya</p>
+          <p className={styles.sectionTitle}><Image src="/Keyhole.png" alt="" width={16} height={16} /> Selanjutnya</p>
           {upcoming.map(n => (
             <button
               key={n.id}
@@ -81,12 +82,12 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
               onClick={() => onSelectNode?.(n)}
               title={`Lihat syarat: ${n.title}`}
             >
-              <span className={styles.questIcon} style={{ opacity: 0.4 }}>{CATEGORY_ICON[n.category]}</span>
+              <Image className={styles.questIcon} src={CATEGORY_ICON[n.category] ?? '/Book.png'} alt="" width={24} height={24} style={{ opacity: 0.4 }} />
               <div className={styles.questInfo}>
                 <p className={styles.questName} style={{ opacity: 0.5 }}>{n.title}</p>
                 <p className={styles.questXp} style={{ opacity: 0.4 }}>+{n.xp} XP</p>
               </div>
-              <span className={styles.questStatus} style={{ opacity: 0.4 }}>🔒</span>
+              <Image src="/Keyhole.png" alt="Locked" width={20} height={20} style={{ opacity: 0.4 }} />
             </button>
           ))}
         </div>
@@ -97,7 +98,7 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
         <>
           <div className={styles.divider} />
           <div className={styles.completedRow}>
-            <span>✅ {completed.length} misi selesai</span>
+            <span><Image src="/course-master.png" alt="" width={18} height={18} /> {completed.length} misi selesai</span>
           </div>
         </>
       )}

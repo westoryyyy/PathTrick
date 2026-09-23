@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 
 import { classifySkills } from '@/data/wefSkillData';
@@ -43,6 +44,7 @@ export default function CVUploadStep() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const portfolioInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   /* ── File Validation ── */
   const validateFile = (file: File): string | null => {
@@ -55,9 +57,10 @@ export default function CVUploadStep() {
   const handleCVFile = useCallback(async (file: File) => {
     const error = validateFile(file);
     if (error) {
-      alert(error);
+      setValidationError(error);
       return;
     }
+    setValidationError('');
 
     setMahasiswaField('cvFile', file);
     setMahasiswaField('cvFileName', file.name);
@@ -118,6 +121,11 @@ export default function CVUploadStep() {
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-[600px] mx-auto">
+      {validationError && (
+        <p role="alert" className="m-0 border-4 border-red-950 bg-red-900 px-4 py-3 font-pixel text-[0.6rem] leading-[1.6] text-red-100 shadow-[4px_4px_0_#2a120d]">
+          {validationError}
+        </p>
+      )}
       {/* ══════════ CV UPLOAD ZONE ══════════ */}
       <div
         className={`relative w-full min-h-[280px] sm:min-h-[220px] flex flex-col justify-center bg-[#bc8f65] border-4 border-[#5a3a29] transition-colors duration-200 cursor-pointer shadow-[inset_0_0_16px_rgba(0,0,0,0.3),4px_4px_0_0_rgba(0,0,0,0.5)] ${isDragOver ? '!bg-[#cba37b] !border-[#f59e0b]' : ''} ${status === 'done' ? '!bg-[#1e1b4b] !border-[#4c1d95] !cursor-default' : ''} ${status === 'error' ? '!bg-[#450a0a] !border-[#ef4444]' : ''}`}
@@ -141,7 +149,7 @@ export default function CVUploadStep() {
         {/* ── IDLE STATE ── */}
         {status === 'idle' && (
           <div className="flex flex-col items-center gap-4 p-10 sm:p-7 text-center">
-            <span className="text-[3rem] sm:text-[2.2rem] leading-none drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)] animate-[iconFloat_2s_ease-in-out_infinite]">📜</span>
+            <Image src="/Scroll.png" alt="" width={48} height={48} className="object-contain drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)] animate-[iconFloat_2s_ease-in-out_infinite]" />
             <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">Drag & Drop CV-mu di sini</p>
             <p className="font-pixel text-[0.6rem] text-white m-0 uppercase drop-shadow-[1px_1px_0_#3b261b]">atau klik untuk browse file</p>
             <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF, DOC, DOCX • Maks {MAX_SIZE_MB}MB</p>
@@ -166,7 +174,7 @@ export default function CVUploadStep() {
         {status === 'extracting' && (
           <div className="flex flex-col items-center gap-3.5 px-6 py-10 text-center">
             <div className="relative w-16 h-16 flex items-center justify-center bg-[#1e1b4b] border-4 border-[#4c1d95] overflow-hidden">
-              <span className="text-[3.2rem] z-10 leading-none">🤖</span>
+              <Image src="/NPC Wizard.png" alt="" width={48} height={48} className="relative z-10 object-contain" />
               <div className="absolute left-0 right-0 h-1 bg-[#2dd4bf] shadow-[0_0_16px_#2dd4bf] animate-[scanMove_1.5s_steps(10)_infinite]" />
             </div>
             <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">AI SEDANG MENGANALISIS SCROLL-MU...</p>
@@ -183,7 +191,7 @@ export default function CVUploadStep() {
         {status === 'done' && mState.cvExtractedData && (
           <div className="flex flex-col gap-4.5 p-6 sm:p-3.5 w-full text-left">
             <div className="flex items-center gap-4">
-              <span className="text-[3rem] shrink-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)] leading-none">✅</span>
+              <Image src="/Green Potion.png" alt="" width={48} height={48} className="shrink-0 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
               <div>
                 <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">CV Berhasil Dianalisis!</p>
                 <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{mState.cvFileName}</p>
@@ -199,7 +207,7 @@ export default function CVUploadStep() {
 
             {/* Extracted Skills */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">🎯 Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
               <div className="flex flex-wrap gap-2.5">
                 {(mState.cvExtractedData?.skills ?? []).map((skill, i) => (
                   <span key={i} className="font-pixel text-[0.55rem] text-white bg-[#4c1d95] border-2 border-[#a855f7] shadow-[2px_2px_0_rgba(0,0,0,0.5)] px-2.5 py-1.5 animate-[tagIn_0.35s_steps(4)_both]" style={{ animationDelay: `${i * 0.08}s` }}>
@@ -230,7 +238,7 @@ export default function CVUploadStep() {
         {/* ── ERROR STATE ── */}
         {status === 'error' && (
           <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
-            <span className="text-[4.5rem] leading-none drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]">❌</span>
+            <Image src="/Red Potion.png" alt="" width={72} height={72} className="object-contain drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
             <p className="font-pixel text-[0.9rem] text-[#f87171] m-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)] text-center">Gagal menganalisis CV</p>
             <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0 text-center leading-[1.6]">Terjadi kesalahan. Silakan coba lagi.</p>
             <button

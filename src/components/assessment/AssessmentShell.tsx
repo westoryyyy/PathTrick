@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 
 interface AssessmentShellProps {
   currentStep: number;
@@ -35,7 +36,7 @@ export default function AssessmentShell({
 }: AssessmentShellProps) {
   const stepLabels = totalSteps === 3 ? STEP_LABELS_SMA : STEP_LABELS_MAHASISWA;
   const isLast = currentStep === totalSteps - 1;
-  const finalLabel = nextLabel ?? (isLast ? '🚀 Mulai Petualangan' : 'Lanjut →');
+  const finalLabel = nextLabel ?? (isLast ? 'Mulai Petualangan' : 'Lanjut →');
   const progressPercent = ((currentStep + 1) / totalSteps) * 100;
 
   return (
@@ -159,7 +160,10 @@ export default function AssessmentShell({
               Memproses...
             </>
           ) : (
-            finalLabel
+            <>
+              {isLast && <Image src="/Sword.png" alt="" width={20} height={20} className="object-contain" />}
+              {finalLabel}
+            </>
           )}
         </button>
       </div>

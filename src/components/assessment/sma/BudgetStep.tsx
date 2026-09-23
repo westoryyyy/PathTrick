@@ -1,13 +1,14 @@
 'use client';
 
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import Image from 'next/image';
 
 const BUDGET_OPTIONS = [
-  { value: 'under5',    label: '< Rp 5 jt / semester',  icon: '🪙', desc: 'Terjangkau' },
-  { value: '5to15',     label: 'Rp 5 – 15 jt',          icon: '💰', desc: 'Menengah' },
-  { value: '15to30',    label: 'Rp 15 – 30 jt',         icon: '💎', desc: 'Premium' },
-  { value: 'above30',   label: '> Rp 30 jt',             icon: '👑', desc: 'Eksklusif' },
-  { value: 'beasiswa',  label: 'Beasiswa Penuh',         icon: '🎓', desc: 'Full Scholarship' },
+  { value: 'under5',    label: '< Rp 5 jt / semester',  icon: '/Coin.png', desc: 'Terjangkau' },
+  { value: '5to15',     label: 'Rp 5 – 15 jt',          icon: '/Coin 2.png', desc: 'Menengah' },
+  { value: '15to30',    label: 'Rp 15 – 30 jt',         icon: '/blue-gem.png', desc: 'Premium' },
+  { value: 'above30',   label: '> Rp 30 jt',             icon: '/Gold Ticket.png', desc: 'Eksklusif' },
+  { value: 'beasiswa',  label: 'Beasiswa Penuh',         icon: '/Scroll.png', desc: 'Full Scholarship' },
 ];
 
 export default function BudgetStep() {
@@ -31,7 +32,7 @@ export default function BudgetStep() {
               id={`budget-${opt.value}`}
             >
               <span className="text-[2.5rem] leading-none shrink-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
-                {opt.icon}
+                <Image src={opt.icon} alt="" width={48} height={48} className="object-contain" />
               </span>
               <div className="flex flex-col gap-1.5 flex-1">
                 <span className="font-pixel text-[0.85rem] text-white tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]">
