@@ -951,26 +951,26 @@ export default function DocsPage() {
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Investor Scorecard</h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Setiap kuartal, tim sebaiknya menilai PathTrick dari lima pertanyaan: apakah user mendapatkan outcome yang lebih baik, apakah mereka kembali tanpa dipaksa, apakah partner bersedia membayar atau memperpanjang, apakah unit economics membaik, dan apakah sistem dapat melayani cohort baru tanpa biaya operasional yang naik secara tidak terkendali.
+                  Untuk konteks <strong>PathTrick</strong> dan <strong>Indonesia Web3 Hackathon</strong>, scorecard ini bukan sekadar laporan bisnis. Ini adalah cara membuktikan bahwa teknologi yang kita bangun menyelesaikan masalah nyata: membantu siswa dan mahasiswa memilih jalur yang lebih tepat, menyelesaikan pembelajaran, lalu membawa <strong>skill evidence yang dapat diverifikasi</strong> ke pendidikan atau dunia kerja. Setiap kuartal, tim menilai apakah produk semakin berguna, semakin dipercaya, dan semakin mudah diadopsi oleh user maupun partner.
                 </p>
                 <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Traction</strong></div><div className={styles.cardText}>Cohort growth, active learners, completion, retention, dan verified outcomes.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Efficiency</strong></div><div className={styles.cardText}>CAC, payback period, AI cost per user, support cost, dan gross margin.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Moat</strong></div><div className={styles.cardText}>Outcome dataset yang consented, partner network, content quality, dan trust layer.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Execution</strong></div><div className={styles.cardText}>Release velocity, reliability, security posture, dan kemampuan tim mengulang playbook.</div></div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardTitle}><strong>Traction — Apakah PathTrick Dipakai?</strong></div>
+                    <div className={styles.cardText}>Ukur pertumbuhan cohort siswa SMA dan mahasiswa, jumlah user yang memilih role, menyelesaikan assessment RIASEC atau CV, memulai quest pertama, kembali di minggu berikutnya, dan menuntaskan course. Untuk demo hackathon, bukti terpenting bukan jumlah wallet yang tersambung, tetapi alur nyata dari <strong>assessment → learning mission → project → verified certificate</strong>.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardTitle}><strong>Efficiency — Apakah Model Ini Bisa Diulang?</strong></div>
+                    <div className={styles.cardText}>Ukur biaya mendapatkan satu learner melalui sekolah, komunitas, atau referral; biaya AI untuk assessment dan CV; biaya support; serta waktu yang dibutuhkan untuk mengaktifkan satu cohort. PathTrick harus membuktikan bahwa cohort baru dapat dilayani tanpa menambah biaya secara tidak terkendali, sementara certificate tetap memakai <strong>mintPrice</strong> contract dan user membayar gas secara transparan.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardTitle}><strong>Moat — Mengapa PathTrick Sulit Ditiru?</strong></div>
+                    <div className={styles.cardText}>Moat PathTrick bukan sekadar tampilan pixel-art atau penggunaan blockchain. Moat dibangun dari kombinasi <strong>outcome dataset yang memiliki consent</strong>, learning journey yang membuat user menyelesaikan skill, partner sekolah dan content, kualitas rekomendasi RIASEC/CV, serta <strong>on-chain proof</strong> yang dapat diverifikasi tanpa bergantung pada klaim internal platform.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardTitle}><strong>Execution — Apakah Tim Mampu Memenangkan Pasar?</strong></div>
+                    <div className={styles.cardText}>Nilai kemampuan tim mengubah feedback menjadi release, menjaga frontend tetap stabil saat backend dan wallet masuk, menjalankan pilot dengan sekolah atau kampus, serta mengulang playbook yang berhasil. Untuk hackathon, ini terlihat dari demo end-to-end yang mulus, integrasi BNB Testnet yang benar, UX yang mudah dipahami pengguna non-crypto, dan roadmap yang realistis.</div>
+                  </div>
                 </div>
-              </section>
-              <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Use of Funds Mindset</h3>
-                <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Jika menerima investasi, alokasi dana harus dikaitkan ke milestone: engineering untuk reliability dan backend, content untuk course berkualitas, distribution untuk pilot dan partnership, serta trust untuk security, privacy, dan compliance. Hindari burn besar untuk vanity growth sebelum retention dan unit economics terbukti.
-                </p>
-              </section>
-              <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Risiko yang Harus Dikendalikan</h3>
-                <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Pertumbuhan harus tetap menjaga kualitas rekomendasi AI, privasi CV dan data assessment, fairness pada career matching, biaya RPC dan gas, moderasi content partner, serta ketergantungan pada provider login dan blockchain. Sebelum scale besar, tambahkan audit security, observability, rate limiting, backup database, consent management, dan proses support yang terukur.
-                </p>
               </section>
             </>
           )}
