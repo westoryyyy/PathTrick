@@ -161,7 +161,7 @@
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 48px clamp(24px, 5vw, 64px);
+  padding: 48px clamp(24px, 3vw, 40px) 48px clamp(24px, 4vw, 56px);
   background: #fdfaf6;
   /* Very clean warm white */
   scrollbar-width: thin;
@@ -206,7 +206,7 @@
   font-size: 1.125rem;
   line-height: 1.8;
   color: #334155;
-  max-width: 980px;
+  max-width: none;
 }
 
 .tableScroll {
@@ -225,7 +225,7 @@
 
 .callout {
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   background: #fff8e1;
   /* Clean amber tint */
   border: 3px solid #ffb300;
@@ -386,7 +386,7 @@
     }
 
     .content {
-      padding: 36px 32px 48px;
+      padding: 36px 24px 48px;
     }
 
     .docTitle {
