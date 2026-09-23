@@ -102,10 +102,10 @@ export default function DocsPage() {
                   Selamat datang di pusat dokumentasi resmi <strong>PathTrick</strong>!
                 </p>
                 <p className={styles.text} style={{ marginBottom: '24px', textAlign: 'justify' }}>
-                  Setiap tahun, jutaan pelajar Indonesia diminta mengambil keputusan besar—memilih jurusan, mengejar beasiswa, atau menyiapkan karier—jauh sebelum mereka benar-benar memahami kekuatan dan arah dirinya. Informasi tersedia di mana-mana, tetapi jalannya tetap terasa kabur. Assessment berhenti sebagai hasil, course berdiri sendiri, dan CV belum tentu mampu membuktikan apa yang benar-benar bisa dikerjakan.
+                  Setiap tahun, jutaan pelajar Indonesia diminta mengambil keputusan besar seperti memilih jurusan, mengejar beasiswa, atau menyiapkan karier jauh sebelum mereka benar-benar memahami kekuatan dan arah dirinya. Informasi tersedia di mana-mana, tetapi jalannya tetap terasa kabur. Assessment berhenti sebagai hasil, course berdiri sendiri, dan CV belum tentu mampu membuktikan apa yang benar-benar bisa dikerjakan.
                 </p>
                 <p className={styles.text} style={{ marginBottom: '36px', textAlign: 'justify' }}>
-                  <strong>PathTrick mengubah kebingungan itu menjadi perjalanan yang bisa dijalani.</strong> Kami menggabungkan assessment RIASEC dan CV dengan roadmap belajar, mission, project, dan credential yang dapat diverifikasi. Semuanya dikemas dalam dunia <strong>RPG Pixel-Art</strong> agar langkah pertama terasa ringan, progress terlihat nyata, dan belajar tidak berhenti di rekomendasi. Di sini, setiap quest membawa user lebih dekat pada skill yang bisa dibuktikan—bukan sekadar angka di dashboard.
+                  <strong>PathTrick mengubah kebingungan itu menjadi perjalanan yang bisa dijalani.</strong> Kami menggabungkan assessment RIASEC dan CV dengan roadmap belajar, mission, project, dan credential yang dapat diverifikasi. Semuanya dikemas dalam dunia <strong>RPG Pixel-Art</strong> agar langkah pertama terasa ringan, progress terlihat nyata, dan belajar tidak berhenti di rekomendasi. Di sini, setiap quest membawa user lebih dekat pada skill yang bisa dibuktikan, bukan sekadar angka di dashboard.
                 </p>
                 <div className={styles.callout} style={{ textAlign: 'justify' }}>
                   <strong>PathTrick adalah jembatan dari “Saya tidak tahu harus mulai dari mana” menjadi “Saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya punya bukti untuk menunjukkannya.”</strong>
@@ -243,7 +243,7 @@ export default function DocsPage() {
                       <div className={styles.cardTitle}>Token Standard</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Sertifikat digital kelulusan Anda dicetak sebagai <strong>Soulbound Token (SBT)</strong>. Ini adalah bukti pencapaian permanen yang <strong>mengikat jiwa</strong> karakternya; sekali diterbitkan, sertifikat ini tidak akan pernah bisa <strong>dipindahtangankan</strong> atau dijual ke orang lain.
+                      Sertifikat digital kelulusan Anda dicetak sebagai <strong>Soulbound Token (SBT)</strong>. Ini adalah bukti pencapaian permanen yang <strong>mengikat jiwa</strong> karakternya. Sekali diterbitkan, sertifikat ini tidak akan pernah bisa <strong>dipindahtangankan</strong> atau dijual ke orang lain.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
@@ -653,7 +653,7 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>5</div>
                     <div className={styles.timelineContent}>
-                      <strong>Penempaan Kurikulum Baru:</strong> Hasil temuan kelemahan itu akhirnya ditempa menjadi sebuah urutan Misi Belajar (Learning Mission) tingkat lanjut. Alhasil, pengguna tidak perlu lagi meraba-raba dalam gelap; mereka tahu persis skill apa yang harus ditaklukkan selanjutnya.
+                      <strong>Penempaan Kurikulum Baru:</strong> Hasil temuan kelemahan itu akhirnya ditempa menjadi sebuah urutan Misi Belajar (Learning Mission) tingkat lanjut. Alhasil, pengguna tidak perlu lagi meraba-raba dalam gelap. Mereka tahu persis skill apa yang harus ditaklukkan selanjutnya.
                     </div>
                   </div>
                 </div>
@@ -716,7 +716,7 @@ export default function DocsPage() {
                   Dalam medan perang ini, privasi adalah perisai paling berharga. Saat Anda menyerahkan dokumen sakti berformat PDF atau teks, prajurit library di server kami akan mengekstrak isinya dengan kehati-hatian tingkat tinggi. Seluruh kata yang berhasil diselamatkan kemudian dibisikkan kepada AI melalui mantra yang sangat ketat, membatasi AI agar tidak membayangkan hal-hal yang tidak tertulis.
                 </p>
                 <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
-                  Yang terpenting, gulungan rahasia (file CV) milik Anda tidak akan pernah kami simpan. Begitu isinya berhasil disalin, file aslinya akan langsung dilebur tak bersisa menjadi debu. Hanya catatan analisis akhirnya yang kami simpan di brankas database. Dan yang lebih menyenangkan lagi, Anda bebas menyerahkan CV baru kapan saja Anda merasa sudah bertambah kuat; AI kami akan dengan senang hati menganalisis ulang semuanya dari awal dan merestorasi peta perjalanan karir Anda detik itu juga.
+                  Yang terpenting, gulungan rahasia (file CV) milik Anda tidak akan pernah kami simpan. Begitu isinya berhasil disalin, file aslinya akan langsung dilebur tak bersisa menjadi debu. Hanya catatan analisis akhirnya yang kami simpan di brankas database. Dan yang lebih menyenangkan lagi, Anda bebas menyerahkan CV baru kapan saja Anda merasa sudah bertambah kuat. AI kami akan dengan senang hati menganalisis ulang semuanya dari awal dan merestorasi peta perjalanan karir Anda detik itu juga.
                 </p>
               </section>
             </>
@@ -775,7 +775,7 @@ export default function DocsPage() {
                   <tbody>
                     <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td>Base URL backend asli. Suffix <code>/api</code> akan dinormalisasi oleh frontend.</td></tr>
                     <tr><td><code>NEXT_PUBLIC_PRIVY_APP_ID</code></td><td>Public application ID untuk login dan embedded wallet Privy.</td></tr>
-                    <tr><td><code>NEXT_PUBLIC_PATHTRICK_SBT_ADDRESS</code></td><td>Alamat contract publik; default diarahkan ke deployment BNB Testnet terbaru.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_PATHTRICK_SBT_ADDRESS</code></td><td>Alamat contract publik. Default diarahkan ke deployment BNB Testnet terbaru.</td></tr>
                     <tr><td><code>NEXT_PUBLIC_BNB_TESTNET_RPC_URL</code></td><td>RPC Chain ID 97 untuk membaca contract dan mengirim transaksi.</td></tr>
                     <tr><td><code>NEXT_PUBLIC_USE_MOCK_BACKEND</code></td><td>Memaksa request memakai mock route lokal Next.js.</td></tr>
                     <tr><td><code>NEXT_PUBLIC_ALLOW_LOCAL_ROLE_FALLBACK</code></td><td>Mengizinkan role lokal hanya sebagai fallback demo. Set <code>false</code> di production.</td></tr>
@@ -788,7 +788,7 @@ export default function DocsPage() {
                   Frontend mengharapkan <code>GET /api/roles</code> untuk metadata role dan <code>POST /api/users/me/role</code> dengan body <code>{`{ roleId }`}</code>. Untuk certificate, frontend memanggil <code>POST /api/certificates/prepare-mint</code>, membaca <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, dan <code>signature</code>, lalu mengirim <code>POST /api/certificates/confirm-mint</code> dengan <code>courseId</code> dan <code>txHash</code>.
                 </p>
                 <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
-                  Backend harus menyelesaikan user dari session/authenticated wallet. Frontend tidak mengirim private key, admin signer key, owner key, atau BscScan API key. Signature mint harus dibuat ulang oleh backend jika signature invalid atau expired; frontend tidak mengubah nonce maupun deadline secara manual.
+                  Backend harus menyelesaikan user dari session/authenticated wallet. Frontend tidak mengirim private key, admin signer key, owner key, atau BscScan API key. Signature mint harus dibuat ulang oleh backend jika signature invalid atau expired. Frontend tidak mengubah nonce maupun deadline secara manual.
                 </p>
               </section>
               <section className={styles.section}>
@@ -841,7 +841,7 @@ export default function DocsPage() {
                     <tr><td><strong>Premium Learning</strong></td><td>Roadmap lanjutan, project review, mentor, dan analytics</td><td>Subscription bulanan atau paket course</td></tr>
                     <tr><td><strong>Institutional SaaS</strong></td><td>Dashboard sekolah/kampus, cohort analytics, dan admin tools</td><td>Kontrak tahunan per institution atau per cohort</td></tr>
                     <tr><td><strong>Recruiter Access</strong></td><td>Talent search berbasis verified skill evidence</td><td>Memerlukan consent, privacy control, dan anti-discrimination review</td></tr>
-                    <tr><td><strong>Certificate Fee</strong></td><td>Mint certificate dengan harga contract saat ini plus gas</td><td>Frontend membaca <code>mintPrice()</code>; harga tidak boleh di-hardcode</td></tr>
+                    <tr><td><strong>Certificate Fee</strong></td><td>Mint certificate dengan harga contract saat ini plus gas</td><td>Frontend membaca <code>mintPrice()</code>. Harga tidak boleh di-hardcode</td></tr>
                   </tbody>
                 </table>
               </section>
@@ -882,25 +882,25 @@ export default function DocsPage() {
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Founder and Investor Mindset</h3>
                 <div className={styles.callout}>
-                  Prinsip utama PathTrick: <strong>jangan scale vanity metrics; scale outcomes.</strong> Wallet connect, sign-up, dan page views penting untuk funnel, tetapi nilai bisnis muncul ketika pengguna benar-benar menyelesaikan learning journey dan partner melihat outcome yang lebih baik.
+                  Prinsip utama PathTrick: <strong>jangan scale vanity metrics, scale outcomes.</strong> Wallet connect, sign-up, dan page views penting untuk funnel, tetapi nilai bisnis muncul ketika pengguna benar-benar menyelesaikan learning journey dan partner melihat outcome yang lebih baik.
                 </div>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard}><div className={styles.cardTitle}>Solve Pain First</div><div className={styles.cardText}>Validasi bahwa user membayar atau partner memperpanjang kontrak karena masalah career uncertainty benar-benar terselesaikan.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Evidence Over Hype</div><div className={styles.cardText}>Pisahkan data actual, target, dan assumption. Jangan menjual blockchain sebagai tujuan; gunakan blockchain sebagai trust layer untuk skill evidence.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Evidence Over Hype</div><div className={styles.cardText}>Pisahkan data actual, target, dan assumption. Jangan menjual blockchain sebagai tujuan. Gunakan blockchain sebagai trust layer untuk skill evidence.</div></div>
                   <div className={styles.featureCard}><div className={styles.cardTitle}>Distribution Is Product</div><div className={styles.cardText}>Bangun jalur distribusi melalui sekolah, kampus, komunitas, mentor, dan recruiter sejak awal, bukan setelah produk selesai.</div></div>
                   <div className={styles.featureCard}><div className={styles.cardTitle}>Capital Discipline</div><div className={styles.cardText}>Setiap dana harus membeli learning velocity: product quality, partner acquisition, content supply, atau measurable user outcome.</div></div>
                 </div>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}><strong>Q1 — Prove the Wedge</strong></h3>
+                <h3 className={styles.sectionTitle}><strong>Q1: Prove the Wedge</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Fokus Q1 adalah membuktikan bahwa pengalaman PathTrick membuat user memulai dan menyelesaikan learning journey. Jangan mengejar terlalu banyak persona sekaligus; pilih satu wedge utama, misalnya siswa SMA yang sedang mencari jurusan dan roadmap persiapan.
+                  Fokus Q1 adalah membuktikan bahwa pengalaman PathTrick membuat user memulai dan menyelesaikan learning journey. Jangan mengejar terlalu banyak persona sekaligus. Pilih satu wedge utama, misalnya siswa SMA yang sedang mencari jurusan dan roadmap persiapan.
                 </p>
                 <table className={styles.techTable}>
                   <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
                   <tbody>
                     <tr><td>Product</td><td>Onboarding, assessment, first quest, progress, dan certificate flow stabil tanpa critical bug.</td></tr>
-                    <tr><td>Validation</td><td>Interview terstruktur dan pilot kecil; ukur activation, first quest completion, serta alasan user berhenti.</td></tr>
+                    <tr><td>Validation</td><td>Interview terstruktur dan pilot kecil. Ukur activation, first quest completion, serta alasan user berhenti.</td></tr>
                     <tr><td>Backend</td><td>Auth, role persistence, progress persistence, dan audit log sudah memakai backend asli.</td></tr>
                     <tr><td>Trust</td><td>Jelaskan data privacy, consent, certificate verification, dan batasan AI secara transparan.</td></tr>
                     <tr><td><strong>Gate</strong></td><td>Lanjut ke Q2 hanya jika ada <strong>repeat usage</strong> dan bukti bahwa user meminta lebih banyak content atau guidance.</td></tr>
@@ -908,9 +908,9 @@ export default function DocsPage() {
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}><strong>Q2 — Prove Repeatability</strong></h3>
+                <h3 className={styles.sectionTitle}><strong>Q2: Prove Repeatability</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Fokus Q2 adalah mengubah keberhasilan pilot menjadi playbook yang dapat diulang. Satu sekolah atau komunitas yang berhasil belum menjadi bisnis scalable; kita perlu tahu channel mana yang menghasilkan user berkualitas dan berapa biaya untuk melayani mereka.
+                  Fokus Q2 adalah mengubah keberhasilan pilot menjadi playbook yang dapat diulang. Satu sekolah atau komunitas yang berhasil belum menjadi bisnis scalable. Kita perlu tahu channel mana yang menghasilkan user berkualitas dan berapa biaya untuk melayani mereka.
                 </p>
                 <table className={styles.techTable}>
                   <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
@@ -924,9 +924,9 @@ export default function DocsPage() {
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}><strong>Q3 — Build the Growth Engine</strong></h3>
+                <h3 className={styles.sectionTitle}><strong>Q3: Build the Growth Engine</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Fokus Q3 adalah memperbesar supply dan demand secara seimbang. User membutuhkan course dan mentor yang berkualitas; partner membutuhkan audience dan outcome. Marketplace effect hanya boleh dikejar setelah quality control dan consent sudah kuat.
+                  Fokus Q3 adalah memperbesar supply dan demand secara seimbang. User membutuhkan course dan mentor yang berkualitas. Partner membutuhkan audience dan outcome. Marketplace effect hanya boleh dikejar setelah quality control dan consent sudah kuat.
                 </p>
                 <table className={styles.techTable}>
                   <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
@@ -940,7 +940,7 @@ export default function DocsPage() {
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}><strong>Q4 — Prepare for Institutional Scale</strong></h3>
+                <h3 className={styles.sectionTitle}><strong>Q4: Prepare for Institutional Scale</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Fokus Q4 adalah kesiapan menjual dan melayani institusi secara serius. Investor perlu melihat bahwa pertumbuhan tidak menambah chaos operasional, debt keamanan, atau ketergantungan pada satu orang.
                 </p>
@@ -962,19 +962,19 @@ export default function DocsPage() {
                 </p>
                 <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Traction — Apakah Perjalanan Dimulai dan Diselesaikan?</strong></div>
+                    <div className={styles.cardTitle}><strong>Traction: Apakah Perjalanan Dimulai dan Diselesaikan?</strong></div>
                     <div className={styles.cardText}>Kami mengikuti jejak user dari memilih role, menyelesaikan assessment RIASEC atau CV, memulai quest pertama, kembali di minggu berikutnya, hingga menuntaskan course. Untuk demo hackathon, bukti terpenting bukan jumlah wallet yang tersambung, tetapi alur utuh: <strong>assessment → learning mission → project → verified certificate</strong>.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Efficiency — Apakah Jalan Ini Bisa Dibuka untuk Cohort Berikutnya?</strong></div>
+                    <div className={styles.cardTitle}><strong>Efficiency: Apakah Jalan Ini Bisa Dibuka untuk Cohort Berikutnya?</strong></div>
                     <div className={styles.cardText}>Kami mengukur biaya untuk membawa satu learner dari sekolah, komunitas, atau referral sampai aktif, termasuk AI, support, dan onboarding cohort. PathTrick harus menunjukkan bahwa semakin banyak pelajar yang dibantu tidak berarti biaya tumbuh tanpa kendali, sementara certificate tetap memakai <strong>mintPrice</strong> contract dan gas fee terlihat transparan bagi user.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Moat — Mengapa Bukti Ini Lebih Dipercaya?</strong></div>
+                    <div className={styles.cardTitle}><strong>Moat: Mengapa Bukti Ini Lebih Dipercaya?</strong></div>
                     <div className={styles.cardText}>Keunggulan PathTrick bukan sekadar pixel-art atau blockchain. Ia tumbuh dari kombinasi <strong>outcome dataset yang memiliki consent</strong>, learning journey yang mendorong completion, partner sekolah dan content, kualitas rekomendasi RIASEC/CV, serta <strong>on-chain proof</strong> yang dapat diverifikasi di luar klaim internal platform.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Execution — Apakah Visi Ini Bisa Menjadi Kebiasaan User?</strong></div>
+                    <div className={styles.cardTitle}><strong>Execution: Apakah Visi Ini Bisa Menjadi Kebiasaan User?</strong></div>
                     <div className={styles.cardText}>Kami membuktikannya melalui release yang cepat, frontend yang tetap stabil saat backend dan wallet masuk, pilot sekolah atau kampus, dan playbook yang dapat diulang. Untuk hackathon, execution terlihat dari demo end-to-end yang mulus, integrasi BNB Testnet yang benar, UX yang ramah non-crypto, dan roadmap yang berpijak pada kenyataan.</div>
                   </div>
                 </div>
@@ -1061,14 +1061,14 @@ export default function DocsPage() {
               <div className={styles.separator} />
               <section className={styles.section}>
                 <div className={styles.callout}>
-                  <strong>PathTrick menunjukkan bahwa Web3 dapat menjadi infrastructure of trust untuk pendidikan dan karier.</strong> User datang karena ingin menemukan arah, bertahan karena learning game, lalu pulang membawa bukti skill yang dapat diverifikasi—bukan sekadar collectible digital.
+                  <strong>PathTrick menunjukkan bahwa Web3 dapat menjadi infrastructure of trust untuk pendidikan dan karier.</strong> User datang karena ingin menemukan arah, bertahan karena learning game, lalu pulang membawa bukti skill yang dapat diverifikasi, bukan sekadar collectible digital.
                 </div>
                 <h3 className={styles.sectionTitle}>Judging Narrative</h3>
                 <table className={styles.techTable}>
                   <thead><tr><th><strong>Yang Dinilai</strong></th><th><strong>Bukti PathTrick</strong></th></tr></thead>
                   <tbody>
                     <tr><td><strong>Problem</strong></td><td>Seorang pelajar dapat memiliki banyak pilihan, tetapi tidak memiliki peta. PathTrick menjawab career uncertainty, salah jurusan, dan jarak antara belajar dengan bukti skill.</td></tr>
-                    <tr><td><strong>Innovation</strong></td><td>Insight RIASEC/CV tidak berhenti sebagai laporan; insight itu berubah menjadi <strong>learning journey</strong> yang bisa dimainkan, diukur, dan diselesaikan.</td></tr>
+                    <tr><td><strong>Innovation</strong></td><td>Insight RIASEC/CV tidak berhenti sebagai laporan. Insight itu berubah menjadi <strong>learning journey</strong> yang bisa dimainkan, diukur, dan diselesaikan.</td></tr>
                     <tr><td><strong>Web3 Relevance</strong></td><td>Certificate memakai signature authorization, live mint price, receipt verification, dan event <code>CertificateMinted(to, courseId)</code> di BNB Testnet untuk menciptakan bukti yang dapat dipercaya.</td></tr>
                     <tr><td><strong>Usability</strong></td><td>Privy embedded wallet dan pixel-RPG UX menyembunyikan kompleksitas crypto, sehingga user dapat fokus pada perjalanan belajar, bukan konfigurasi teknis.</td></tr>
                     <tr><td><strong>Impact</strong></td><td>PathTrick membantu user bergerak dari “saya bingung” menjadi “saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya bisa membuktikannya.”</td></tr>
@@ -1079,7 +1079,7 @@ export default function DocsPage() {
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>The 90-Second Demo Story</h3>
                 <div className={styles.timeline}>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}>Semuanya dimulai dari seorang user yang memilih persona <strong>The Dreamer</strong> atau <strong>The Chaser</strong>—tanpa form panjang dan tanpa harus mengerti crypto.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}>Semuanya dimulai dari seorang user yang memilih persona <strong>The Dreamer</strong> atau <strong>The Chaser</strong> tanpa form panjang dan tanpa harus mengerti crypto.</div></div>
                   <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}>Assessment mengubah kebingungan menjadi arah personal, lalu membuka dashboard RPG sebagai peta perjalanan.</div></div>
                   <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}>Di dalam House, user menyelesaikan mission, quiz, dan project. Setiap langkah memberi feedback dan progress yang bisa dilihat.</div></div>
                   <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}>Setelah berhasil, wallet berpindah ke BNB Testnet. Frontend membaca harga contract secara live dan user melakukan mint certificate.</div></div>
