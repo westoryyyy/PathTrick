@@ -252,13 +252,51 @@ export default function DocsPage() {
                       <div className={styles.cardTitle}>Gas Fee Model</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Pencetakan sertifikat mengusung sistem <strong>User-Paid & AI Signed</strong>. Pengguna akan menanggung sedikit <strong>biaya gas</strong> secara mandiri sebagai bentuk <strong>komitmen</strong> atas portofolio mereka. Namun, sertifikat ini hanya bisa dicetak jika pengguna telah mendapatkan <strong>segel persetujuan kriptografi (Signature)</strong> mutlak dari dewan <strong>AI</strong> kami.
+                      Pencetakan sertifikat mengusung sistem <strong>User-Paid & Backend Authorized</strong>. Pengguna menanggung <strong>mint price</strong> dan sedikit <strong>biaya gas</strong> secara mandiri. Sebelum transaksi dikirim, backend memeriksa kelulusan course lalu menerbitkan <strong>signature berumur terbatas</strong>. AI membantu proses evaluasi, sedangkan otorisasi kriptografi tetap dibuat oleh signer backend yang tidak pernah terekspos ke frontend.
                     </div>
                   </div>
                 </div>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Arsitektur Koneksi (Privy + Wagmi)</h3>
+                <h3 className={styles.sectionTitle}>Implementasi yang Berjalan</h3>
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>1</div><div className={styles.cardTitle}>Jaringan dan Contract</div></div>
+                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
+                      Deployment aktif berada di <strong>BNB Smart Chain Testnet</strong> dengan <strong>Chain ID 97</strong>. Contract certificate menggunakan alamat <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> dan ABI resmi dari <code>integration/PathtrickSBT.abi.json</code>. Data transaksi dapat diverifikasi melalui BscScan Testnet.
+                    </div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>2</div><div className={styles.cardTitle}>Authorization Flow</div></div>
+                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
+                      Setelah course selesai, frontend meminta authorization ke <code>POST /api/certificates/prepare-mint</code>. Backend mengembalikan <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, dan <strong>signature</strong>. Frontend tidak membuat, mengubah, atau memakai ulang nonce dan deadline secara manual.
+                    </div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>3</div><div className={styles.cardTitle}>On-chain Verification</div></div>
+                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
+                      Wallet harus berada di Chain ID 97. Frontend membaca <strong>mintPrice()</strong> secara langsung, menghitung kebutuhan saldo bersama gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>. Setelah receipt tersedia, frontend memeriksa event <strong>CertificateMinted(to, courseId)</strong>.
+                    </div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>4</div><div className={styles.cardTitle}>Backend Confirmation</div></div>
+                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
+                      Certificate belum dianggap selesai hanya karena wallet mengirim transaksi. Setelah receipt dan event valid, frontend mengirim <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. Status sukses baru ditampilkan setelah backend menerima dan memvalidasi transaksi tersebut.
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Batasan dan Arah Produksi</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Deployment saat ini ditujukan untuk demo dan validasi di testnet. Nilai tBNB tidak memiliki nilai ekonomi nyata, RPC dapat mengalami keterlambatan, dan status certificate tetap bergantung pada ketersediaan backend. Untuk produksi, PathTrick perlu menambahkan monitoring transaksi, retry yang aman, indexing certificate, pengelolaan consent, kebijakan wallet recovery, dan keputusan bisnis apakah biaya gas tetap dibayar user atau disubsidi partner.
+                </p>
+                <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
+                  SBT dirancang sebagai bukti pencapaian yang terikat pada wallet penerima. Karena interface token menggunakan standar ERC-1155, sifat soulbound harus dipahami sebagai kebijakan transfer yang ditegakkan oleh implementasi contract, bukan sekadar label UI. Verifikasi akhir tetap dilakukan melalui contract dan event yang tercatat di chain.
+                </p>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Arsitektur Koneksi (Privy + Ethers)</h3>
                 <div className={styles.text} style={{ textAlign: 'justify', marginBottom: '24px' }}>
                   Dalam dunia PathTrick, kami menggabungkan dua pusaka teknologi yang saling bekerja sama dengan mulus layaknya sebuah kedai petualang:
                 </div>
@@ -287,7 +325,7 @@ export default function DocsPage() {
                         Wagmi (Sang Kurir Transaksi)
                       </h4>
                       <p className={styles.text} style={{ textAlign: 'justify', fontSize: '1rem', lineHeight: '1.6', margin: 0 }}>
-                        Setelah pengguna memiliki dompet dari Privy, Wagmi mengambil alih tugas berat. Kumpulan <strong>React Hooks</strong> canggih ini bertugas mengantarkan instruksi dari layar PathTrick langsung menuju <strong>Smart Contract</strong> di BNB Chain. Mulai dari membaca data sertifikat hingga mengeksekusi pencetakan Soulbound Token.
+                        Setelah pengguna memiliki dompet dari Privy, frontend memakai provider wallet dan <strong>ethers</strong> untuk membaca contract serta mengirim transaksi ke BNB Smart Chain Testnet. Alur mint saat ini memeriksa network, saldo, mint price, receipt, dan event contract sebelum certificate dikonfirmasi ke backend.
                       </p>
                     </div>
                   </div>
@@ -492,7 +530,7 @@ export default function DocsPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
                       <p style={{ color: '#d7ccc8', fontSize: '0.7rem', marginBottom: '8px', fontFamily: '"Press Start 2P"' }}>NETWORK</p>
-                      <p style={{ color: '#ffb300', fontWeight: 'bold' }}>BNB Testnet (BSC Testnet)</p>
+                      <p style={{ color: '#ffb300', fontWeight: 'bold' }}>BNB Smart Chain Testnet, Chain ID 97</p>
                     </div>
                     <div>
                       <p style={{ color: '#d7ccc8', fontSize: '0.7rem', marginBottom: '8px', fontFamily: '"Press Start 2P"' }}>TOKEN TYPE</p>
@@ -503,6 +541,9 @@ export default function DocsPage() {
                       <code style={{ background: '#1d120d', padding: '10px 14px', borderRadius: '4px', color: '#fdfaf6', fontSize: '0.9rem', wordBreak: 'break-all', display: 'block', border: '1px solid #5d4037' }}>
                         0x39632892C33435a76043343Ef17Ac03124627ba9
                       </code>
+                      <a href="https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9" target="_blank" rel="noreferrer" style={{ color: '#ffb300', display: 'inline-block', marginTop: '10px', fontSize: '0.8rem' }}>
+                        View contract on BscScan Testnet
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -513,31 +554,31 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>1</div>
                     <div className={styles.timelineContent}>
-                      <strong>Pembuktian Akhir:</strong> Semuanya bermula saat pengguna berhasil menaklukkan tantangan Mini-Project dan diakui kelayakannya oleh wasit kecerdasan buatan kita.
+                      <strong>Course selesai:</strong> Pengguna menyelesaikan course dan memenuhi syarat kelulusan yang ditentukan sistem.
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>2</div>
                     <div className={styles.timelineContent}>
-                      <strong>Stempel Persetujuan AI:</strong> Secara diam-diam di balik layar, sistem kita menggunakan otoritas rahasianya (Backend AI) untuk memberikan tanda tangan kriptografi (ECDSA Signature). Ini adalah bukti mutlak tak terbantahkan bahwa sang petualang telah lulus ujian secara sah.
+                      <strong>Authorization backend:</strong> Frontend meminta <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, dan <code>signature</code> melalui <code>POST /api/certificates/prepare-mint</code>. Signature dibuat oleh signer backend, bukan oleh frontend.
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>3</div>
                     <div className={styles.timelineContent}>
-                      <strong>Prosesi Penempaan Mandiri:</strong> Dengan berbekal stempel persetujuan dari AI, pengguna kini bisa memanggil ritual penempaan. Pengguna akan membayar sedikit koin energi (gas fee) dari kantong mereka sendiri untuk mengukir sejarah keberhasilan mereka di atas jaringan blockchain.
+                      <strong>Mint oleh wallet:</strong> Frontend memastikan wallet berada di Chain ID 97, membaca <code>mintPrice()</code>, memeriksa saldo untuk mint price dan gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>.
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>4</div>
                     <div className={styles.timelineContent}>
-                      <strong>Prasasti Abadi:</strong> Pada detik itu juga, mesin kontrak pintar di ekosistem <strong>BNB Testnet</strong> secara resmi mengukir dan mengirimkan sertifikat tersebut langsung ke dalam dompet pengguna untuk selamanya.
+                      <strong>Receipt dan event:</strong> Setelah transaksi confirmed, frontend memeriksa receipt dan event <code>CertificateMinted(to, courseId)</code>. Error seperti signature expired, insufficient funds, wrong network, dan user rejection ditampilkan dengan jelas.
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>5</div>
                     <div className={styles.timelineContent}>
-                      <strong>Validasi Dunia:</strong> Sang petualang akan disambut dengan sorak sorai notifikasi keberhasilan, lengkap dengan sebuah tautan sakti menuju blok penjelajah. Di sanalah seluruh dunia bisa menjadi saksi nyata atas keaslian prestasi mereka.
+                      <strong>Konfirmasi backend:</strong> Frontend mengirim <code>courseId</code> dan <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. UI hanya menampilkan sukses setelah backend menerima transaksi.
                     </div>
                   </div>
                 </div>
@@ -545,7 +586,7 @@ export default function DocsPage() {
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Kekuatan Soulbound Token</h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Medali yang kita berikan ini bukanlah piagam sembarangan. Ia mengemban kekuatan <strong>Soulbound</strong>, yang artinya jiwa sertifikat ini terikat mati dengan sang pemilik dan sama sekali tidak bisa dipindahtangankan, dipinjamkan, apalagi dijual ke orang lain. Begitu diukir, datanya akan terpatri secara permanen di dalam luasnya jaringan blockchain, melindunginya dari segala bentuk manipulasi tangan jahil atau penghapusan paksa. Lebih menakjubkan lagi, rekruter manapun dari ujung dunia bisa melacak dan memvalidasi keaslian medali ini secara instan hanya dengan melihat alamat dompet sang petualang.
+                  Certificate dirancang sebagai <strong>Soulbound Token</strong> berbasis BEP-1155. Credential terikat pada wallet penerima dan dapat diverifikasi melalui contract, transaction receipt, event <code>CertificateMinted</code>, serta explorer BNB Testnet. Sifat non-transferable ditegakkan oleh implementasi contract, bukan hanya oleh tampilan frontend.
                 </p>
               </section>
             </>
