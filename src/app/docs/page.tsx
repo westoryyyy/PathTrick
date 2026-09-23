@@ -14,7 +14,9 @@ type DocSection =
   | 'eight_houses'
   | 'smart_contract'
   | 'ai_riasec'
-  | 'ai_cv';
+  | 'ai_cv'
+  | 'system_status'
+  | 'integration_notes';
 
 export default function DocsPage() {
   const router = useRouter();
@@ -38,6 +40,8 @@ export default function DocsPage() {
     { key: 'smart_contract', label: '7. Smart Contract', group: 'BLOCKCHAIN' },
     { key: 'ai_riasec', label: '8. AI: RIASEC Engine', group: 'AI ENGINE' },
     { key: 'ai_cv', label: '9. AI: CV Analyzer', group: '' },
+    { key: 'system_status', label: '10. Current System Status', group: 'OPERATIONS' },
+    { key: 'integration_notes', label: '11. Integration Notes', group: '' },
   ];
 
   return (
@@ -488,7 +492,7 @@ export default function DocsPage() {
                     <div style={{ gridColumn: '1 / -1' }}>
                       <p style={{ color: '#d7ccc8', fontSize: '0.7rem', marginBottom: '8px', fontFamily: '"Press Start 2P"' }}>SBT CONTRACT ADDRESS</p>
                       <code style={{ background: '#1d120d', padding: '10px 14px', borderRadius: '4px', color: '#fdfaf6', fontSize: '0.9rem', wordBreak: 'break-all', display: 'block', border: '1px solid #5d4037' }}>
-                        0x... (Cek file run-latest.json di repo Smart Contract)
+                        0x39632892C33435a76043343Ef17Ac03124627ba9
                       </code>
                     </div>
                   </div>
@@ -704,6 +708,87 @@ export default function DocsPage() {
                 </p>
                 <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
                   Yang terpenting, gulungan rahasia (file CV) milik Anda tidak akan pernah kami simpan. Begitu isinya berhasil disalin, file aslinya akan langsung dilebur tak bersisa menjadi debu. Hanya catatan analisis akhirnya yang kami simpan di brankas database. Dan yang lebih menyenangkan lagi, Anda bebas menyerahkan CV baru kapan saja Anda merasa sudah bertambah kuat; AI kami akan dengan senang hati menganalisis ulang semuanya dari awal dan merestorasi peta perjalanan karir Anda detik itu juga.
+                </p>
+              </section>
+            </>
+          )}
+
+          {/* ── 10. CURRENT SYSTEM STATUS ── */}
+          {activeSection === 'system_status' && (
+            <>
+              <h2 className={styles.docTitle}>CURRENT SYSTEM STATUS</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <div className={styles.callout}>
+                  Frontend saat ini sudah dapat didemokan end-to-end dengan data lokal. Saat backend asli tersedia, endpoint API dan persistence dapat diaktifkan melalui environment tanpa mengubah struktur halaman utama.
+                </div>
+                <h3 className={styles.sectionTitle}>Yang Sudah Berjalan</h3>
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>1</div><div className={styles.cardTitle}>Onboarding</div></div>
+                    <div className={styles.cardText}>Role diambil dari API roles, memiliki fallback lokal untuk demo, dan pilihan role disimpan bersama identitas Privy.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>2</div><div className={styles.cardTitle}>Learning Game</div></div>
+                    <div className={styles.cardText}>Dashboard, houses, mission, quiz, lives, retry, game over, reward, dan certificate entry tersedia dalam alur pixel-RPG.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>3</div><div className={styles.cardTitle}>Profile State</div></div>
+                    <div className={styles.cardText}>Nickname dan avatar pilihan disimpan melalui Zustand persistence dan digunakan konsisten di profile, dashboard, header, serta game HUD.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>4</div><div className={styles.cardTitle}>Pixel UI</div></div>
+                    <div className={styles.cardText}>Tampilan utama menggunakan font pixel, panel kayu, border tebal, asset karakter, dan icon pixel-art tanpa placeholder visual generik.</div>
+                  </div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Yang Masih Membutuhkan Environment Asli</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Data role, progress, assessment, scholarship, dan career match masih dapat memakai mock/local state ketika backend belum terhubung. Persistence lintas perangkat, autentikasi server, indexing certificate, serta data AI produksi membutuhkan backend dan database yang sebenarnya.
+                </p>
+                <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
+                  Transaksi certificate membutuhkan wallet yang memiliki tBNB di BNB Smart Chain Testnet. Mode demo tidak boleh dianggap sebagai bukti bahwa transaksi blockchain atau konfirmasi backend produksi telah berhasil.
+                </p>
+              </section>
+            </>
+          )}
+
+          {/* ── 11. INTEGRATION NOTES ── */}
+          {activeSection === 'integration_notes' && (
+            <>
+              <h2 className={styles.docTitle}>INTEGRATION NOTES</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Environment Variables</h3>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td>Base URL backend asli. Suffix <code>/api</code> akan dinormalisasi oleh frontend.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_PRIVY_APP_ID</code></td><td>Public application ID untuk login dan embedded wallet Privy.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_PATHTRICK_SBT_ADDRESS</code></td><td>Alamat contract publik; default diarahkan ke deployment BNB Testnet terbaru.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_BNB_TESTNET_RPC_URL</code></td><td>RPC Chain ID 97 untuk membaca contract dan mengirim transaksi.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_USE_MOCK_BACKEND</code></td><td>Memaksa request memakai mock route lokal Next.js.</td></tr>
+                    <tr><td><code>NEXT_PUBLIC_ALLOW_LOCAL_ROLE_FALLBACK</code></td><td>Mengizinkan role lokal hanya sebagai fallback demo. Set <code>false</code> di production.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Backend Contract yang Diharapkan</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Frontend mengharapkan <code>GET /api/roles</code> untuk metadata role dan <code>POST /api/users/me/role</code> dengan body <code>{`{ roleId }`}</code>. Untuk certificate, frontend memanggil <code>POST /api/certificates/prepare-mint</code>, membaca <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, dan <code>signature</code>, lalu mengirim <code>POST /api/certificates/confirm-mint</code> dengan <code>courseId</code> dan <code>txHash</code>.
+                </p>
+                <p className={styles.text} style={{ marginTop: '16px', textAlign: 'justify' }}>
+                  Backend harus menyelesaikan user dari session/authenticated wallet. Frontend tidak mengirim private key, admin signer key, owner key, atau BscScan API key. Signature mint harus dibuat ulang oleh backend jika signature invalid atau expired; frontend tidak mengubah nonce maupun deadline secara manual.
+                </p>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Certificate Transaction Checklist</h3>
+                <div className={styles.callout}>
+                  Wallet harus berada di Chain ID 97, memiliki saldo tBNB untuk mint price dan gas, membaca <code>mintPrice()</code> dari contract, menunggu receipt, memeriksa event <code>CertificateMinted(to, courseId)</code>, lalu menunggu backend menerima konfirmasi txHash sebelum UI menampilkan status berhasil.
+                </div>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Error yang perlu ditampilkan dengan jelas meliputi wrong network, insufficient funds, user rejected transaction, <code>IncorrectMintFee</code>, <code>AlreadyCertified</code>, <code>InvalidSignature</code>, dan <code>SignatureExpired</code>.
                 </p>
               </section>
             </>
