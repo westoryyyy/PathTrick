@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
 
 const MOCK_SCHOLARSHIPS = [
@@ -35,6 +36,7 @@ const MOCK_SCHOLARSHIPS = [
 ];
 
 export default function ScholarshipHub() {
+  const [selectedScholarship, setSelectedScholarship] = useState<typeof MOCK_SCHOLARSHIPS[number] | null>(null);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       {/* Header */}
@@ -109,13 +111,85 @@ export default function ScholarshipHub() {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.boxShadow = '4px 4px 0 #3b261b';
               }}
-              onClick={() => window.open(scholarship.url, '_blank')}
+              onClick={() => setSelectedScholarship(scholarship)}
             >
               VIEW DETAILS
             </button>
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {selectedScholarship && (
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedScholarship.title} details`}
+            onClick={() => setSelectedScholarship(null)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px',
+              background: 'rgba(35, 17, 8, 0.82)',
+            }}
+          >
+            <motion.div
+              onClick={(event) => event.stopPropagation()}
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.96 }}
+              style={{
+                width: 'min(620px, 100%)',
+                maxHeight: '85vh',
+                overflowY: 'auto',
+                padding: '28px',
+                background: '#d4a373',
+                border: '5px solid #3b261b',
+                boxShadow: '8px 8px 0 #1f120a, inset 0 0 0 4px #e8c98a',
+                color: '#3b261b',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', borderBottom: '3px dashed #5a3a29', paddingBottom: '18px' }}>
+                <div>
+                  <h2 style={{ margin: 0, fontFamily: '"Press Start 2P"', fontSize: '1rem', lineHeight: 1.6 }}>
+                    {selectedScholarship.title}
+                  </h2>
+                  <p style={{ margin: '8px 0 0', fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
+                    {selectedScholarship.provider}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedScholarship(null)}
+                  aria-label="Close scholarship details"
+                  style={{ background: '#b91c1c', border: '3px solid #450a0a', color: '#fff', padding: '8px 12px', fontFamily: '"Press Start 2P"', cursor: 'pointer', boxShadow: '3px 3px 0 #3b261b' }}
+                >
+                  X
+                </button>
+              </div>
+              <div style={{ display: 'grid', gap: '14px', marginTop: '22px', fontFamily: '"Press Start 2P"', fontSize: '0.65rem', lineHeight: 1.7 }}>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>💰 COVERAGE: {selectedScholarship.coverage}</div>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>⏳ DEADLINE: {selectedScholarship.deadline}</div>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>📋 REQUIREMENTS: {selectedScholarship.requirements.join(' • ')}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.open(selectedScholarship.url, '_blank', 'noopener,noreferrer')}
+                style={{ width: '100%', marginTop: '24px', padding: '16px', background: '#fbbf24', border: '3px solid #3b261b', boxShadow: '4px 4px 0 #3b261b', color: '#3b261b', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', cursor: 'pointer' }}
+              >
+                OPEN OFFICIAL QUEST ↗
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

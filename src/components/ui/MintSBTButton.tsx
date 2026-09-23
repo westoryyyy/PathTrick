@@ -1,13 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWallets, usePrivy } from '@privy-io/react-auth';
-import { BrowserProvider, parseEther, Contract } from 'ethers';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { BrowserProvider, Contract, formatEther } from 'ethers';
+import pathtrickSbtAbi from '../../../integration/PathtrickSBT.abi.json';
+import {
+  BNB_TESTNET_CHAIN,
+  PATHTRICK_SBT_ADDRESS,
+  API_BASE_URL,
+  getApiError,
+  readApiResponse,
+} from '@/config/pathtrick';
 
-// Fallback ABI just in case the JSON is missing
-const fallbackAbi = [
-  "function mintCertificate(uint256 courseId, bytes signature) public payable"
-];
+type MintStatus = 'idle' | 'preparing' | 'pending' | 'confirming' | 'success' | 'error';
 
 interface MintSBTButtonProps {
   courseId: number;
@@ -15,10 +20,97 @@ interface MintSBTButtonProps {
   onSuccess?: () => void;
 }
 
+interface MintAuthorization {
+  courseId: string;
+  nonce: string;
+  deadline: string;
+  signature: `0x${string}`;
+}
+
+function getErrorMessage(error: unknown): string {
+  const message = getErrorText(error);
+  const normalized = message.toLowerCase();
+
+  if (
+    (typeof error === 'object' && error !== null && 'code' in error && (error as { code?: unknown }).code === 4001) ||
+    normalized.includes('user rejected') ||
+    normalized.includes('action_rejected')
+  ) {
+    return 'Transaksi dibatalkan oleh user.';
+  }
+  if (normalized.includes('insufficient funds')) {
+    return 'Saldo tBNB tidak cukup untuk mint dan gas.';
+  }
+  if (normalized.includes('wrong network') || normalized.includes('chain')) {
+    return 'Hubungkan wallet ke BNB Smart Chain Testnet (Chain ID 97).';
+  }
+  if (normalized.includes('incorrectmintfee')) {
+    return 'Biaya mint berubah. Silakan coba lagi.';
+  }
+  if (normalized.includes('alreadycertified')) {
+    return 'Sertifikat untuk course ini sudah pernah dicetak.';
+  }
+  if (normalized.includes('invalidsignature')) {
+    return 'Otorisasi mint tidak valid. Otorisasi baru akan diminta saat mencoba lagi.';
+  }
+  if (normalized.includes('signatureexpired')) {
+    return 'Otorisasi mint kedaluwarsa. Otorisasi baru akan diminta saat mencoba lagi.';
+  }
+
+  return message || 'Mint gagal. Silakan coba lagi.';
+}
+
+function getErrorText(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (typeof error !== 'object' || error === null) return String(error);
+
+  const details = error as {
+    message?: unknown;
+    reason?: unknown;
+    shortMessage?: unknown;
+    code?: unknown;
+    info?: { error?: { message?: unknown } };
+    cause?: unknown;
+  };
+  return [
+    details.message,
+    details.reason,
+    details.shortMessage,
+    details.code,
+    details.info?.error?.message,
+    details.cause ? getErrorText(details.cause) : '',
+  ]
+    .filter((value): value is string | number => typeof value === 'string' || typeof value === 'number')
+    .join(' ');
+}
+
+async function requestMintAuthorization(courseId: number): Promise<MintAuthorization> {
+  const response = await fetch(`${API_BASE_URL}/api/certificates/prepare-mint`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ courseId: String(courseId) }),
+  });
+  const data = await readApiResponse(response);
+  if (!response.ok) throw new Error(getApiError(data, 'Gagal menyiapkan otorisasi mint.'));
+  if (
+    Array.isArray(data) ||
+    typeof data.courseId !== 'string' ||
+    typeof data.nonce !== 'string' ||
+    typeof data.deadline !== 'string' ||
+    typeof data.signature !== 'string' ||
+    !/^0x[0-9a-f]+$/i.test(data.signature)
+  ) {
+    throw new Error('Respons otorisasi mint tidak lengkap.');
+  }
+  return data as unknown as MintAuthorization;
+}
+
 export default function MintSBTButton({ courseId, customStyle, onSuccess }: MintSBTButtonProps) {
   const { wallets } = useWallets();
   const { linkWallet } = usePrivy();
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<MintStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
@@ -27,241 +119,207 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
     try {
       setIsConnectingWallet(true);
       await linkWallet();
-      setIsConnectingWallet(false);
     } catch (error) {
-      console.error('Wallet connection error:', error);
-      setIsConnectingWallet(false);
       setStatus('error');
-      setErrorMessage('Failed to connect wallet. Please try again.');
+      setErrorMessage(getErrorMessage(error));
+    } finally {
+      setIsConnectingWallet(false);
     }
   };
 
   const handleMint = async () => {
+    const activeWallet = wallets[0];
+    if (!activeWallet) {
+      setStatus('error');
+      setErrorMessage('Hubungkan wallet terlebih dahulu.');
+      return;
+    }
+
     try {
-      // Check if wallet is connected
-      if (!wallets || wallets.length === 0) {
-        setStatus('error');
-        setErrorMessage('No wallet found. Please connect your wallet first.');
-        return;
-      }
-
-      setStatus('loading');
+      setStatus('preparing');
       setErrorMessage('');
+      setSuccessMessage('');
 
-      // 1. Get the active wallet from Privy
-      const activeWallet = wallets[0];
-      if (!activeWallet) {
-        throw new Error('No wallet found. Please connect your wallet first.');
+      const walletChainId = Number(activeWallet.chainId.split(':').pop());
+      if (walletChainId !== BNB_TESTNET_CHAIN.id) {
+        await activeWallet.switchChain(BNB_TESTNET_CHAIN.id);
       }
 
-      // 2. Ensure network is BNB Testnet (Chain ID 97)
-      // NOTE: Privy wallet.chainId returns 'eip155:97' format, not just '97'
-      const targetChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '97');
-      const walletChainId = parseInt(activeWallet.chainId.split(':').pop() || '0');
-      
-      if (walletChainId !== targetChainId) {
-        try {
-          await activeWallet.switchChain(targetChainId);
-        } catch (switchError) {
-          console.log("Switch chain error:", switchError);
-          throw new Error(`Please switch your wallet network to BNB Testnet (Chain ID ${targetChainId}).`);
-        }
-      }
-
-      // 3. Request EIP-712 Signature from our backend
-      const sigResponse = await fetch('/api/claim-sbt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAddress: activeWallet.address, courseId }),
-      });
-      const sigData = await sigResponse.json();
-
-      if (!sigResponse.ok) {
-        throw new Error(sigData.error || 'Failed to get signature from AI Backend.');
-      }
-
-      const { signature } = sigData;
-
-      // 4. Initialize Ethers provider & signer using Privy's EIP1193 provider
       const provider = await activeWallet.getEthereumProvider();
       const ethersProvider = new BrowserProvider(provider);
+      const network = await ethersProvider.getNetwork();
+      if (Number(network.chainId) !== BNB_TESTNET_CHAIN.id) {
+        throw new Error('Wrong network: BNB Smart Chain Testnet is required.');
+      }
+
+      const authorization = await requestMintAuthorization(courseId);
       const signer = await ethersProvider.getSigner();
+      const contract = new Contract(
+        PATHTRICK_SBT_ADDRESS,
+        pathtrickSbtAbi.abi as unknown as ConstructorParameters<typeof Contract>[1],
+        signer
+      );
+      const mintPrice = await contract.mintPrice();
+      const balance = await ethersProvider.getBalance(activeWallet.address);
+      const sendMintTransaction = async (mintAuthorization: MintAuthorization) => {
+        const gasLimit = await contract.mintCertificate.estimateGas(
+          BigInt(mintAuthorization.courseId),
+          BigInt(mintAuthorization.deadline),
+          mintAuthorization.signature,
+          { value: mintPrice }
+        );
+        const feeData = await ethersProvider.getFeeData();
+        const estimatedGasCost = gasLimit * (feeData.maxFeePerGas || feeData.gasPrice || BigInt(0));
+        if (balance < mintPrice + estimatedGasCost) {
+          throw new Error(`Insufficient funds. Mint price is ${formatEther(mintPrice)} tBNB plus gas.`);
+        }
+        return contract.mintCertificate(
+          BigInt(mintAuthorization.courseId),
+          BigInt(mintAuthorization.deadline),
+          mintAuthorization.signature,
+          { value: mintPrice }
+        );
+      };
 
-      // Load ABI
-      let abi = fallbackAbi;
+      setStatus('pending');
+      let transaction;
       try {
-        const PathtrickABI = require('@/abis/PathtrickSBT.abi.json');
-        abi = PathtrickABI.abi || fallbackAbi;
-      } catch (e) {
-        console.warn('ABI JSON not found, using fallback ABI string.', e);
+        transaction = await sendMintTransaction(authorization);
+      } catch (error) {
+        const message = getErrorText(error).toLowerCase();
+        if (!message.includes('invalidsignature') && !message.includes('signatureexpired')) {
+          throw error;
+        }
+        const refreshedAuthorization = await requestMintAuthorization(courseId);
+        transaction = await sendMintTransaction(refreshedAuthorization);
+      }
+      const receipt = await transaction.wait();
+      if (!receipt) {
+        throw new Error('Receipt transaksi tidak tersedia.');
       }
 
-      // 5. Connect to Smart Contract and Mint
-      const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-      if (!contractAddress) {
-        throw new Error('Contract address not configured in environment variables.');
+      const certificateEvent = receipt.logs
+        .map((log: unknown) => {
+          try {
+            return contract.interface.parseLog(log as Parameters<typeof contract.interface.parseLog>[0]);
+          } catch {
+            return null;
+          }
+        })
+        .find((parsed: { name?: string } | null) => parsed?.name === 'CertificateMinted');
+
+      if (!certificateEvent) {
+        throw new Error('Transaksi berhasil, tetapi event CertificateMinted tidak ditemukan.');
       }
 
-      const contract = new Contract(contractAddress, abi, signer);
-      const mintPrice = process.env.NEXT_PUBLIC_MINT_PRICE || '0.005';
+      const mintedCourseId = certificateEvent.args?.courseId;
+      const mintedTo = certificateEvent.args?.to;
+      if (
+        mintedCourseId === undefined ||
+        mintedCourseId !== BigInt(courseId) ||
+        typeof mintedTo !== 'string' ||
+        mintedTo.toLowerCase() !== activeWallet.address.toLowerCase()
+      ) {
+        throw new Error('Event CertificateMinted memiliki course yang tidak valid.');
+      }
 
-      // Send transaction: mintCertificate(courseId, signature)
-      const tx = await contract.mintCertificate(courseId, signature, {
-        value: parseEther(mintPrice),
+      setStatus('confirming');
+      const confirmation = await fetch(`${API_BASE_URL}/api/certificates/confirm-mint`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ courseId: String(courseId), txHash: transaction.hash }),
       });
-
-      // Wait for transaction to be mined
-      await tx.wait();
+      const confirmationData = await readApiResponse(confirmation);
+      if (!confirmation.ok) {
+        throw new Error(getApiError(confirmationData, 'Backend belum menerima konfirmasi transaksi.'));
+      }
 
       setStatus('success');
-      setSuccessMessage(`Berhasil Minting! Hash: ${tx.hash.substring(0, 10)}...`);
+      setSuccessMessage(`Sertifikat berhasil dicetak. Tx: ${transaction.hash.slice(0, 10)}...`);
       onSuccess?.();
-
-    } catch (error: any) {
-      console.error('Minting error:', error);
+    } catch (error) {
+      console.error('Certificate mint failed:', error);
       setStatus('error');
-      
-      let displayMsg = 'Terjadi kesalahan saat minting.';
-      if (error.code === 'ACTION_REJECTED' || error.message?.includes('user rejected')) {
-        displayMsg = 'Transaksi dibatalkan oleh user.';
-      } else if (error.message) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes('0x8baa579f') || msg.includes('invalidsignature')) {
-          displayMsg = 'Invalid Signature: Coba refresh dan ulangi.';
-        } else if (msg.includes('0xa45675fe') || msg.includes('alreadycertified')) {
-          displayMsg = 'SBT sudah pernah diklaim untuk modul ini.';
-        } else if (msg.includes('0x31a5d181') || msg.includes('incorrectmintfee')) {
-          displayMsg = 'Biaya Minting tidak sesuai.';
-        } else if (msg.includes('insufficient funds')) {
-          displayMsg = 'Saldo BNB Testnet tidak cukup.';
-        } else {
-          displayMsg = 'Transaksi ditolak oleh Smart Contract.';
-        }
-      }
-      setErrorMessage(displayMsg);
+      setErrorMessage(getErrorMessage(error));
     }
   };
 
-  // If no wallet, show connect button
-  if (!wallets || wallets.length === 0) {
+  const isBusy = status === 'preparing' || status === 'pending' || status === 'confirming';
+  const buttonStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
+    fontSize: '0.65rem',
+    lineHeight: 1.6,
+    color: '#fff7ed',
+    background: status === 'success' ? '#4d7c0f' : status === 'error' ? '#b91c1c' : '#d97706',
+    border: '4px solid #3b261b',
+    borderRadius: '6px',
+    padding: '14px 20px',
+    cursor: isBusy || status === 'success' ? 'not-allowed' : 'pointer',
+    textShadow: '2px 2px 0 #3b261b',
+    boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.3), 0 5px 0 #3b261b',
+    imageRendering: 'pixelated',
+    opacity: isBusy ? 0.75 : 1,
+    ...customStyle,
+  };
+
+  if (!wallets.length) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <button
-          onClick={handleConnectWallet}
-          disabled={isConnectingWallet}
-          style={{
-            fontFamily: '"Press Start 2P", monospace',
-            fontSize: '0.8rem',
-            color: '#fff',
-            background: '#3b82f6',
-            border: 'none',
-            padding: '16px 24px',
-            cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
-            boxShadow: '4px 4px 0 #1e40af',
-            transition: 'transform 0.1s',
-            textShadow: '1px 1px 0 #000',
-            opacity: isConnectingWallet ? 0.7 : 1,
-            ...customStyle,
-          }}
-          onMouseDown={(e) => {
-            if (!isConnectingWallet) {
-              e.currentTarget.style.transform = 'translate(2px, 2px)';
-              e.currentTarget.style.boxShadow = '2px 2px 0 #1e40af';
-            }
-          }}
-          onMouseUp={(e) => {
-            if (!isConnectingWallet) {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '4px 4px 0 #1e40af';
-            }
-          }}
-        >
-          {isConnectingWallet ? '⏳ CONNECTING WALLET...' : '🔗 CONNECT WALLET'}
-        </button>
-        <div style={{
-          background: '#1e3a8a',
-          border: '2px solid #1e40af',
-          padding: '12px',
-          borderRadius: '4px',
-          boxShadow: 'inset 0 0 0 2px #3b82f6, 2px 2px 0 #1e40af',
-        }}>
-          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#93c5fd', lineHeight: '1.6', margin: 0 }}>
-            ℹ️ Hubungkan wallet untuk minting SBT Sertifikat
-          </p>
-        </div>
-      </div>
+      <button
+        onClick={handleConnectWallet}
+        disabled={isConnectingWallet}
+        style={{
+          ...buttonStyle,
+          opacity: isConnectingWallet ? 0.75 : 1,
+        }}
+      >
+        {isConnectingWallet ? 'CONNECTING WALLET...' : 'CONNECT WALLET'}
+      </button>
     );
   }
 
+  const label = status === 'preparing' ? 'PREPARING MINT...' :
+    status === 'pending' ? 'WAITING FOR WALLET...' :
+    status === 'confirming' ? 'CONFIRMING...' :
+    status === 'success' ? 'CERTIFICATE MINTED' :
+    status === 'error' ? 'MINT FAILED - RETRY' : 'MINT CERTIFICATE';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <button
-        onClick={handleMint}
-        disabled={status === 'loading' || status === 'success'}
-        style={{
-          fontFamily: '"Press Start 2P", monospace',
-          fontSize: '0.8rem',
-          color: '#fff',
-          background: '#1d4ed8',
-          border: 'none',
-          padding: '16px 24px',
-          cursor: (status === 'loading' || status === 'success') ? 'not-allowed' : 'pointer',
-          boxShadow: '4px 4px 0 #3b261b',
-          transition: 'transform 0.1s',
-          textShadow: '1px 1px 0 #000',
-          ...customStyle,
-        }}
-        onMouseDown={(e) => {
-          if (status !== 'loading' && status !== 'success') {
-            e.currentTarget.style.transform = 'translate(2px, 2px)';
-            e.currentTarget.style.boxShadow = '2px 2px 0 #3b261b';
-          }
-        }}
-        onMouseUp={(e) => {
-          if (status !== 'loading' && status !== 'success') {
-            e.currentTarget.style.transform = 'none';
-            e.currentTarget.style.boxShadow = '4px 4px 0 #3b261b';
-          }
-        }}
-      >
-        {status === 'idle' && '🛡️ MINT SBT (0.005 BNB)'}
-        {status === 'loading' && '⏳ PROCESSING...'}
-        {status === 'success' && '✅ SBT CLAIMED!'}
-        {status === 'error' && '❌ MINT FAILED - RETRY'}
+      <button onClick={handleMint} disabled={isBusy || status === 'success'} style={buttonStyle}>
+        {label}
       </button>
-
-      {/* 16-bit Error Message Box */}
-      {status === 'error' && errorMessage && (
-        <div style={{
+      {status === 'error' && (
+        <p role="alert" style={{
+          margin: 0,
+          padding: '10px 12px',
+          color: '#fecaca',
           background: '#7f1d1d',
-          border: '2px solid #450a0a',
-          padding: '12px',
+          border: '3px solid #450a0a',
           borderRadius: '4px',
-          boxShadow: 'inset 0 0 0 2px #ef4444, 2px 2px 0 #3b261b',
-          imageRendering: 'pixelated',
-          marginTop: '4px'
+          fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
+          fontSize: '0.5rem',
+          lineHeight: 1.7,
+          textShadow: '1px 1px 0 #450a0a',
         }}>
-          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#fecaca', lineHeight: '1.6', margin: 0 }}>
-            {errorMessage}
-          </p>
-        </div>
+          {errorMessage}
+        </p>
       )}
-
-      {/* 16-bit Success Message Box */}
-      {status === 'success' && successMessage && (
-        <div style={{
-          background: '#14532d',
-          border: '2px solid #052e16',
-          padding: '12px',
+      {status === 'success' && (
+        <p role="status" style={{
+          margin: 0,
+          padding: '10px 12px',
+          color: '#d9f99d',
+          background: '#365314',
+          border: '3px solid #1a2e05',
           borderRadius: '4px',
-          boxShadow: 'inset 0 0 0 2px #22c55e, 2px 2px 0 #3b261b',
-          imageRendering: 'pixelated',
-          marginTop: '4px'
+          fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
+          fontSize: '0.5rem',
+          lineHeight: 1.7,
+          textShadow: '1px 1px 0 #1a2e05',
         }}>
-          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#bbf7d0', lineHeight: '1.6', margin: 0 }}>
-            {successMessage}
-          </p>
-        </div>
+          {successMessage}
+        </p>
       )}
     </div>
   );

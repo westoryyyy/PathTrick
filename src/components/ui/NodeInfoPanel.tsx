@@ -13,11 +13,12 @@ interface NodeInfoPanelProps {
   onClose: () => void;
 }
 
-const CATEGORY_META = {
+const CATEGORY_META: Record<CourseNodeData['category'], { icon: string; label: string; color: string }> = {
   foundation: { icon: ASSET_PATHS.OBJ_COMPASS_ROSE, label: 'Fondasi',  color: '#7c3aed' },
   skill:      { icon: ASSET_PATHS.OBJ_SWORD,        label: 'Skill',     color: '#14b8a6' },
   project:    { icon: ASSET_PATHS.OBJ_SCROLL,       label: 'Proyek',    color: '#f59e0b' },
   milestone:  { icon: ASSET_PATHS.BADGE_COURSE_MASTER, label: 'Milestone', color: '#10b981' },
+  bonus:      { icon: ASSET_PATHS.OBJ_COMPASS_ROSE, label: 'Bonus', color: '#ec4899' },
 };
 
 const STATUS_META = {
@@ -38,22 +39,21 @@ const BOSS_DIALOGUE_LINES = [
 
 export default function NodeInfoPanel({
   node,
-  isNearby,
   onStartCourse,
   onClose,
 }: NodeInfoPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [displayNode, setDisplayNode] = useState<CourseNodeData | null>(null);
   const [bossLineIndex, setBossLineIndex] = useState(0);
-  const [bossConfirmed, setBossConfirmed] = useState(false);
   const role = useMapStore(state => state.role);
 
   useEffect(() => {
     if (node) {
+      // The transition state must update when the selected node changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayNode(node);
       setIsVisible(true);
       setBossLineIndex(0);
-      setBossConfirmed(false);
     } else {
       setIsVisible(false);
       const t = setTimeout(() => setDisplayNode(null), 400);
@@ -76,7 +76,11 @@ export default function NodeInfoPanel({
 
   if (!displayNode) return null;
 
-  const catMeta       = CATEGORY_META[displayNode.category];
+  const catMeta       = CATEGORY_META[displayNode.category] ?? {
+    icon: ASSET_PATHS.OBJ_COMPASS_ROSE,
+    label: 'Bonus',
+    color: '#ec4899',
+  };
   const statusMeta    = STATUS_META[displayNode.status];
   const canStart      = displayNode.status === 'available' || displayNode.status === 'in_progress';
   const isBoss        = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');

@@ -281,36 +281,37 @@ export class LearningAPI {
   }
 
   /**
-   * Claim a Soulbound Token (SBT)
+   * Confirm a Soulbound Token (SBT) mint after the wallet transaction is mined.
    *
    * Mints and claims an on-chain SBT when stage requirements are met.
    * Transfers the SBT to the user's wallet address.
    *
-   * @param houseId - ID of the house completed
-   * @returns Promise<{ success: boolean; tokenId: string; claimedAt: string }>
-   * @throws Error if prerequisites not met or SBT cannot be minted
+   * @param courseId - ID of the completed course
+   * @param txHash - Confirmed wallet transaction hash
+   * @returns Promise<{ success: boolean; courseId: string; txHash: string }>
+   * @throws Error if the backend cannot confirm the mint
    */
-  static async claimSoulboundToken(houseId: string): Promise<{
+  static async confirmSoulboundToken(courseId: string, txHash: string): Promise<{
     success: boolean;
-    tokenId: string;
-    claimedAt: string;
+    courseId: string;
+    txHash: string;
   }> {
     try {
       const authToken = getAuthToken();
 
       if (!authToken) {
-        throw new Error('Authentication required to claim SBT');
+        throw new Error('Authentication required to confirm SBT');
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/user/claim-sbt`,
+        `${API_BASE_URL}/certificates/confirm-mint`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`,
           },
-          body: JSON.stringify({ houseId }),
+          body: JSON.stringify({ courseId, txHash }),
         }
       );
 

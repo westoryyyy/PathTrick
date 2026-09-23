@@ -7,7 +7,6 @@ import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import { mockBackendData } from '@/data/mockBackendData';
-import { Stage } from '@/types/backend';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
@@ -280,7 +279,7 @@ export default function MissionFlowPage() {
           });
         }
       }
-    } catch (e) {
+    } catch {
       showDialog('error', 'Gagal menghubungi AI backend.');
     } finally {
       setIsSubmitting(false);
@@ -432,7 +431,7 @@ export default function MissionFlowPage() {
               const currentQuiz = quizArray[quizIndex];
               return (
                 <div className={styles.quizOptions}>
-                  {currentQuiz.options.map((opt: any, i: number) => (
+                  {currentQuiz.options.map((opt, i: number) => (
                     <button
                       key={i}
                       className={styles.optionBtn}
@@ -719,11 +718,15 @@ export default function MissionFlowPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className={styles.dialogTitle} style={{ color: dialogState.type === 'success' ? '#059669' : '#ef4444' }}>
-                {dialogState.type === 'success' ? 'BERHASIL!' : 'UPS! SALAH'}
+                {dialogState.type === 'success'
+                  ? 'BERHASIL!'
+                  : dialogState.message.startsWith('GAME OVER!')
+                    ? 'GAME OVER'
+                    : 'UPS! SALAH'}
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
               <button className={styles.btn} onClick={closeDialog}>
-                {dialogState.type === 'success' && dialogState.onConfirm ? 'LANJUT ➔' : 'TUTUP'}
+                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
               </button>
             </motion.div>
           </motion.div>

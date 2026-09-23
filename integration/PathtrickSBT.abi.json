@@ -196,6 +196,11 @@
           "internalType": "uint256"
         },
         {
+          "name": "deadline",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
           "name": "signature",
           "type": "bytes",
           "internalType": "bytes"
@@ -771,6 +776,11 @@
     {
       "type": "error",
       "name": "InvalidShortString",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "SignatureExpired",
       "inputs": []
     },
     {

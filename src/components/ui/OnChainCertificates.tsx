@@ -7,19 +7,7 @@ import { useAccount, useReadContracts } from 'wagmi';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import MintSBTButton from './MintSBTButton';
-
-// ABI with hasCertificate
-const fallbackAbi = [
-  "function hasCertificate(address account, uint256 courseId) view returns (bool)"
-];
-
-let PathtrickABI: any;
-try {
-  PathtrickABI = require('@/abis/PathtrickSBT.abi.json');
-} catch (e) {
-  // Ignored
-}
-const abi = PathtrickABI?.abi || fallbackAbi;
+import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS } from '@/config/pathtrick';
 
 type Props = {
   hideHeader?: boolean;
@@ -40,14 +28,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
 
   // Find all Boss nodes
   const bossNodes = useMemo(() => {
-    const realNodes = completedDynamicNodes.filter(nodeId => nodeId.endsWith('-level-6') || nodeId.includes('boss') || nodeId === 'module-framer-bab-1-level-1');
-    
-    // DEMO: Memaksa memunculkan 1 modul "Unminted" buat ngetes tampilan Gembok
-    if (!realNodes.includes('module-demo-unminted-level-6')) {
-      realNodes.push('module-demo-unminted-level-6');
-    }
-    
-    return realNodes;
+    return completedDynamicNodes.filter(nodeId => nodeId.endsWith('-level-6') || nodeId.includes('boss') || nodeId === 'module-framer-bab-1-level-1');
   }, [completedDynamicNodes]);
 
   const { user } = usePrivy();
@@ -60,7 +41,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
     || user?.email?.address?.split('@')[0] 
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Scholar');
 
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+  const contractAddress = PATHTRICK_SBT_ADDRESS;
 
   // Prepare batch calls to check SBT ownership
   const contractCalls = useMemo(() => {
@@ -69,15 +50,21 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       const baseChapterId = nodeId.replace(/-level-\d+$/, '');
       return {
         address: contractAddress,
-        abi: abi as any,
+        abi: PATHTRICK_SBT_ABI,
         functionName: 'hasCertificate',
-        args: [address, generateCourseId(baseChapterId)],
+        args: [address, BigInt(generateCourseId(baseChapterId))],
       };
     });
   }, [bossNodes, address, contractAddress]);
 
-  const { data: sbtOwnershipResults, refetch } = useReadContracts({
+  const {
+    data: sbtOwnershipResults,
+    error: ownershipError,
+    isLoading: isLoadingOwnership,
+    refetch,
+  } = useReadContracts({
     contracts: contractCalls,
+    query: { enabled: contractCalls.length > 0 },
   });
 
   // Generate earned certificates dynamically based on verified ownership
@@ -106,7 +93,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
     });
   }, [bossNodes, sbtOwnershipResults]);
 
-  const handleExplorerClick = (title: string, isMinted: boolean) => {
+  const handleExplorerClick = (isMinted: boolean) => {
     if (!isMinted || !address) return;
     // Buka BscScan untuk address user (tab ERC-1155 Tokens)
     window.open(`https://testnet.bscscan.com/address/${address}#tokentxnsErc1155`, '_blank');
@@ -126,7 +113,22 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       )}
 
       <div className={styles.grid}>
-        {earnedCertificates.length > 0 ? (
+        {!address ? (
+          <div style={{ color: '#fbbf24', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
+            Hubungkan wallet untuk memuat sertifikat On-Chain.
+          </div>
+        ) : isLoadingOwnership ? (
+          <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
+            Memuat sertifikat On-Chain...
+          </div>
+        ) : ownershipError ? (
+          <div style={{ color: '#fca5a5', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
+            Sertifikat belum dapat dimuat.{' '}
+            <button type="button" onClick={() => refetch()} style={{ color: '#fbbf24', textDecoration: 'underline', fontFamily: 'inherit', fontSize: 'inherit', background: 'none', border: 0, cursor: 'pointer' }}>
+              Coba lagi
+            </button>
+          </div>
+        ) : earnedCertificates.length > 0 ? (
           earnedCertificates.map(cert => (
             <div key={cert.id} style={{ 
               background: '#c8a96e',
@@ -224,7 +226,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
               
               {cert.isMinted ? (
                 <button 
-                  onClick={() => handleExplorerClick(cert.title, cert.isMinted)}
+                  onClick={() => handleExplorerClick(cert.isMinted)}
                   style={{ 
                     width: '100%', 
                     padding: '14px', 

@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useOnboardingStore, type UserRole } from '@/store/useOnboardingStore';
 import { useUserStore } from '@/store/useUserStore';
+import {
+  API_BASE_URL,
+  getApiError,
+  isLocalRoleFallbackEnabled,
+  readApiResponse,
+} from '@/config/pathtrick';
+import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
 import styles from './page.module.css';
-
-const ROLES = [
-  { id: 'sma',       role: 'The Dreamer', title: 'Siswa SMA',              img: '/NPC High School Student.png', color: '#a855f7', glow: 'rgba(168,85,247,0.5)', desc: 'Masih SMA & bingung mau kuliah apa? Temukan jurusan & karier sesuai bakatmu.',        perks: ['Asesmen Minat & Bakat', 'Tes RIASEC', 'Rekomendasi Jurusan', 'Info Beasiswa'],   tag: 'POPULER' },
-  { id: 'mahasiswa', role: 'The Chaser',  title: 'Mahasiswa / Fresh Grad', img: '/NPC University Student.png',   color: '#f59e0b', glow: 'rgba(245,158,11,0.5)', desc: 'Mahasiswa atau baru lulus? Upload CV-mu dan biarkan AI membuatkan roadmap kariermu.', perks: ['Asesmen Karier AI', 'CV Analysis', 'Job Matching', 'Career Roadmap'],             tag: null      },
-];
 
 export default function SelectRolePage() {
   const router = useRouter();
@@ -28,6 +29,9 @@ export default function SelectRolePage() {
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
 
   const [selected, setSelected] = useState<string | null>(null);
+  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const [rolesError, setRolesError] = useState('');
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [entering, setEntering] = useState(false);
 
   const hasName = !!(savedName || user?.google?.name || user?.email?.address);
@@ -40,6 +44,45 @@ export default function SelectRolePage() {
   const [nickname, setNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/roles`, { credentials: 'include' })
+      .then(async (response) => {
+        const data = await readApiResponse(response);
+        if (!response.ok) throw new Error(getApiError(data, 'Gagal memuat role.'));
+        const roleData = Array.isArray(data) ? data : data.roles;
+        if (!Array.isArray(roleData)) throw new Error('Format role dari backend tidak valid.');
+        const validRoles = roleData.filter((role): role is RoleOption =>
+          typeof role === 'object' &&
+          role !== null &&
+          typeof role.id === 'string' &&
+          typeof role.displayName === 'string' &&
+          typeof role.description === 'string' &&
+          Array.isArray(role.perks) &&
+          role.perks.every((perk: unknown) => typeof perk === 'string') &&
+          typeof role.imageUrl === 'string'
+        );
+        if (!validRoles.length) throw new Error('Backend tidak mengembalikan role yang valid.');
+        if (!cancelled) setRoles(validRoles);
+      })
+      .catch((error: unknown) => {
+        console.warn('Roles API unavailable:', error);
+        if (!cancelled) {
+          if (isLocalRoleFallbackEnabled()) {
+            setRoles(LOCAL_ROLES);
+            setRolesError('');
+          } else {
+            setRoles([]);
+            setRolesError('Role belum dapat dimuat. Coba lagi atau hubungi administrator.');
+          }
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingRoles(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   // If user already has a role AND it belongs to the current user → go to their dashboard
   // If it's a different user → clear stale data and show role selection
@@ -75,16 +118,43 @@ export default function SelectRolePage() {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selected) return;
     // If Google login but no wallet, prompt to connect first
     if (isGoogleLogin && wallets.length === 0) {
       handleConnectWallet();
       return;
     }
-    setEntering(true);
-    setRole(selected as UserRole, user?.id);  // tie role to current Privy user ID
-    setTimeout(() => router.push('/assessment'), 1200);
+    try {
+      setEntering(true);
+      const response = await fetch(`${API_BASE_URL}/api/users/me/role`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ roleId: selected }),
+      });
+      const data = await readApiResponse(response);
+      if (!response.ok) throw new Error(getApiError(data, 'Role gagal disimpan.'));
+      if (selected !== 'sma' && selected !== 'mahasiswa') {
+        throw new Error('Role dari backend belum memiliki halaman yang tersedia.');
+      }
+      setRole(selected as UserRole, user?.id);
+      router.push('/assessment');
+    } catch (error) {
+      console.warn('Role API unavailable:', error);
+      if (selected !== 'sma' && selected !== 'mahasiswa') {
+        setRolesError(error instanceof Error ? error.message : 'Role gagal disimpan.');
+        setEntering(false);
+        return;
+      }
+      if (isLocalRoleFallbackEnabled()) {
+        setRole(selected as UserRole, user?.id);
+        router.push('/assessment');
+      } else {
+        setRolesError('Role gagal disimpan. Coba lagi atau hubungi administrator.');
+        setEntering(false);
+      }
+    }
   };
 
   return (
@@ -278,7 +348,16 @@ export default function SelectRolePage() {
           )}
         </div>
         <div className={styles.boardContent}>
-          {ROLES.map((role) => {
+          {isLoadingRoles && <p>Memuat role...</p>}
+          {!isLoadingRoles && rolesError && (
+            <p role="alert">
+              {rolesError}{' '}
+              <button type="button" onClick={() => window.location.reload()}>
+                Coba lagi
+              </button>
+            </p>
+          )}
+          {!isLoadingRoles && !rolesError && roles.map((role) => {
             const isSelected = selected === role.id;
             return (
               <div key={role.id} className={styles.panelWrapper}>
@@ -288,12 +367,12 @@ export default function SelectRolePage() {
                   onClick={() => setSelected(role.id)}
                 >
                   <div className={styles.panelHeader}>
-                    Peran: {role.title}
+                    Peran: {role.displayName}
                   </div>
                   <div className={styles.panelBody}>
-                    <Image
-                      src={role.img}
-                      alt={role.role}
+                    <img
+                      src={role.imageUrl || '/PathTrick.png'}
+                      alt={role.displayName}
                       width={160}
                       height={160}
                       className={styles.charImg}
@@ -301,7 +380,8 @@ export default function SelectRolePage() {
                     />
                   </div>
                   <div className={styles.panelFooter}>
-                    {role.desc}
+                    <p>{role.description}</p>
+                    {role.perks.length > 0 && <small>{role.perks.join(' • ')}</small>}
                   </div>
                 </button>
               </div>
@@ -322,7 +402,7 @@ export default function SelectRolePage() {
           ) : entering ? (
             <><span className={styles.spinner} /> Memulai Petualangan...</>
           ) : selected ? (
-            <>⚔️ Mulai sebagai {ROLES.find(r => r.id === selected)?.role}</>
+            <>⚔️ Mulai sebagai {roles.find(r => r.id === selected)?.displayName}</>
           ) : (
             'Pilih karaktermu dulu →'
           )}

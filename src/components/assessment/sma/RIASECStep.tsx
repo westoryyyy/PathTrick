@@ -112,12 +112,14 @@ export default function RIASECStep() {
               {/* Labels */}
               <span className="font-pixel" style={{
                 position: 'absolute', bottom: '5px', left: '8px',
-                fontSize: '0.3rem', color: 'rgba(255,255,255,0.5)',
+                fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
+                textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
               }}>Rendah</span>
               <span className="font-pixel" style={{
                 position: 'absolute', bottom: '5px', right: '8px',
-                fontSize: '0.3rem', color: 'rgba(255,255,255,0.5)',
+                fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
+                textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
               }}>Tinggi</span>
             </div>

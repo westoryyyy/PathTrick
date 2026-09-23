@@ -12,7 +12,7 @@ export default function ProfilePage() {
   const { user } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, setProfile } = useUserStore();
-  const role = useOnboardingStore((s) => s.role);
+  const role = useOnboardingStore((s) => s.selectedRole);
 
   // Priority: 1. Auto-detected from Privy, 2. Saved in Zustand
   const privyName = user?.google?.name || user?.email?.address?.split('@')[0] || '';
@@ -97,7 +97,7 @@ export default function ProfilePage() {
             <input 
               type="text" 
               className={styles.input} 
-              value={role === 'sma' ? 'Siswa SMA (The Dreamer)' : 'Mahasiswa (The Chaser)'} 
+              value={role === 'sma' ? 'Siswa SMA (The Dreamer)' : role === 'mahasiswa' ? 'Mahasiswa (The Chaser)' : 'Belum dipilih'}
               disabled
               style={{ opacity: 0.7, cursor: 'not-allowed' }}
             />
