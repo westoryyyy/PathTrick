@@ -803,21 +803,21 @@ export default function DocsPage() {
               <div className={styles.separator} />
               <section className={styles.section}>
                 <div className={styles.callout}>
-                  PathTrick dirancang sebagai career-learning platform yang menggabungkan assessment, learning game, career matching, dan bukti skill on-chain. Scaling tidak hanya berarti menambah user, tetapi juga meningkatkan kualitas rekomendasi, completion rate, partner outcome, dan recurring revenue tanpa mengorbankan pengalaman pixel-RPG.
+                  <strong>PathTrick</strong> dirancang sebagai <strong>career-learning platform</strong> yang menggabungkan assessment, learning game, career matching, dan <strong>bukti skill on-chain</strong>. Scaling tidak hanya berarti menambah user, tetapi juga meningkatkan <strong>kualitas rekomendasi</strong>, completion rate, partner outcome, dan <strong>recurring revenue</strong> tanpa mengorbankan pengalaman pixel-RPG.
                 </div>
                 <h3 className={styles.sectionTitle}>Target Customer</h3>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}>1</div><div className={styles.cardTitle}>B2C Student</div></div>
-                    <div className={styles.cardText}>Siswa SMA dan mahasiswa yang membutuhkan validasi minat, roadmap belajar, portfolio, serta bukti kompetensi.</div>
+                    <div className={styles.cardText}>Siswa SMA dan mahasiswa yang membutuhkan <strong>validasi minat</strong>, roadmap belajar, portfolio, serta bukti kompetensi.</div>
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}>2</div><div className={styles.cardTitle}>Schools & Campus</div></div>
-                    <div className={styles.cardText}>Sekolah, kampus, dan career center yang membutuhkan assessment, dashboard cohort, dan monitoring kesiapan siswa.</div>
+                    <div className={styles.cardText}>Sekolah, kampus, dan career center yang membutuhkan assessment, <strong>dashboard cohort</strong>, dan monitoring kesiapan siswa.</div>
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}>3</div><div className={styles.cardTitle}>Employers</div></div>
-                    <div className={styles.cardText}>Perusahaan dan recruiter yang ingin menemukan kandidat berdasarkan skill evidence, bukan hanya CV.</div>
+                    <div className={styles.cardText}>Perusahaan dan recruiter yang ingin menemukan kandidat berdasarkan <strong>skill evidence</strong>, bukan hanya CV.</div>
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}>4</div><div className={styles.cardTitle}>Content Partners</div></div>
@@ -830,11 +830,11 @@ export default function DocsPage() {
                 <table className={styles.techTable}>
                   <thead><tr><th>Model</th><th>Value</th><th>Catatan Eksekusi</th></tr></thead>
                   <tbody>
-                    <tr><td>Freemium</td><td>Assessment dasar, dashboard, dan sebagian quest gratis</td><td>Menjaga acquisition tetap rendah friksi</td></tr>
-                    <tr><td>Premium Learning</td><td>Roadmap lanjutan, project review, mentor, dan analytics</td><td>Subscription bulanan atau paket course</td></tr>
-                    <tr><td>Institutional SaaS</td><td>Dashboard sekolah/kampus, cohort analytics, dan admin tools</td><td>Kontrak tahunan per institution atau per cohort</td></tr>
-                    <tr><td>Recruiter Access</td><td>Talent search berbasis verified skill evidence</td><td>Memerlukan consent, privacy control, dan anti-discrimination review</td></tr>
-                    <tr><td>Certificate Fee</td><td>Mint certificate dengan harga contract saat ini plus gas</td><td>Frontend membaca <code>mintPrice()</code>; harga tidak boleh di-hardcode</td></tr>
+                    <tr><td><strong>Freemium</strong></td><td>Assessment dasar, dashboard, dan sebagian quest gratis</td><td>Menjaga acquisition tetap rendah friksi</td></tr>
+                    <tr><td><strong>Premium Learning</strong></td><td>Roadmap lanjutan, project review, mentor, dan analytics</td><td>Subscription bulanan atau paket course</td></tr>
+                    <tr><td><strong>Institutional SaaS</strong></td><td>Dashboard sekolah/kampus, cohort analytics, dan admin tools</td><td>Kontrak tahunan per institution atau per cohort</td></tr>
+                    <tr><td><strong>Recruiter Access</strong></td><td>Talent search berbasis verified skill evidence</td><td>Memerlukan consent, privacy control, dan anti-discrimination review</td></tr>
+                    <tr><td><strong>Certificate Fee</strong></td><td>Mint certificate dengan harga contract saat ini plus gas</td><td>Frontend membaca <code>mintPrice()</code>; harga tidak boleh di-hardcode</td></tr>
                   </tbody>
                 </table>
               </section>
@@ -854,10 +854,10 @@ export default function DocsPage() {
                   Fokus awal bukan jumlah wallet, melainkan <strong>verified learning outcomes</strong>: jumlah user yang menyelesaikan assessment, menyelesaikan quest, lulus project, memperoleh certificate, dan mendapatkan outcome berikutnya seperti internship, university match, atau job interview.
                 </p>
                 <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Activation</div><div className={styles.cardText}>Role selected, assessment started, dan first quest completed.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Retention</div><div className={styles.cardText}>D7/D30 return, weekly quest completion, dan learning streak.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Conversion</div><div className={styles.cardText}>Premium upgrade, certificate mint, atau institutional seat usage.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Outcome</div><div className={styles.cardText}>Course completion, verified skill, partner satisfaction, dan placement signal.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Activation</strong></div><div className={styles.cardText}>Role selected, assessment started, dan first quest completed.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Retention</strong></div><div className={styles.cardText}>D7/D30 return, weekly quest completion, dan learning streak.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Conversion</strong></div><div className={styles.cardText}>Premium upgrade, certificate mint, atau institutional seat usage.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Outcome</strong></div><div className={styles.cardText}>Course completion, verified skill, partner satisfaction, dan placement signal.</div></div>
                 </div>
               </section>
               <section className={styles.section}>
@@ -865,10 +865,10 @@ export default function DocsPage() {
                 <table className={styles.techTable}>
                   <thead><tr><th>Stage</th><th>Prioritas</th></tr></thead>
                   <tbody>
-                    <tr><td>Stage 1: Validate</td><td>Stabilkan onboarding, learning completion, wallet flow, mock-to-real backend, dan 1-2 pilot institution.</td></tr>
-                    <tr><td>Stage 2: Repeat</td><td>Bangun admin dashboard, analytics cohort, content pipeline, referral, dan subscription billing.</td></tr>
-                    <tr><td>Stage 3: Expand</td><td>Tambah partner course, recruiter portal, multi-language, multi-chain strategy, dan regional distribution.</td></tr>
-                    <tr><td>Stage 4: Platform</td><td>Buka API/SDK untuk institution dan content partner dengan permission, audit, serta SLA yang jelas.</td></tr>
+                    <tr><td><strong>Stage 1: Validate</strong></td><td>Stabilkan onboarding, learning completion, wallet flow, mock-to-real backend, dan 1-2 pilot institution.</td></tr>
+                    <tr><td><strong>Stage 2: Repeat</strong></td><td>Bangun admin dashboard, analytics cohort, content pipeline, referral, dan subscription billing.</td></tr>
+                    <tr><td><strong>Stage 3: Expand</strong></td><td>Tambah partner course, recruiter portal, multi-language, multi-chain strategy, dan regional distribution.</td></tr>
+                    <tr><td><strong>Stage 4: Platform</strong></td><td>Buka API/SDK untuk institution dan content partner dengan permission, audit, serta SLA yang jelas.</td></tr>
                   </tbody>
                 </table>
               </section>
@@ -885,66 +885,66 @@ export default function DocsPage() {
                 </div>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Q1 — Prove the Wedge</h3>
+                <h3 className={styles.sectionTitle}><strong>Q1 — Prove the Wedge</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Fokus Q1 adalah membuktikan bahwa pengalaman PathTrick membuat user memulai dan menyelesaikan learning journey. Jangan mengejar terlalu banyak persona sekaligus; pilih satu wedge utama, misalnya siswa SMA yang sedang mencari jurusan dan roadmap persiapan.
                 </p>
                 <table className={styles.techTable}>
-                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
                   <tbody>
                     <tr><td>Product</td><td>Onboarding, assessment, first quest, progress, dan certificate flow stabil tanpa critical bug.</td></tr>
                     <tr><td>Validation</td><td>Interview terstruktur dan pilot kecil; ukur activation, first quest completion, serta alasan user berhenti.</td></tr>
                     <tr><td>Backend</td><td>Auth, role persistence, progress persistence, dan audit log sudah memakai backend asli.</td></tr>
                     <tr><td>Trust</td><td>Jelaskan data privacy, consent, certificate verification, dan batasan AI secara transparan.</td></tr>
-                    <tr><td>Gate</td><td>Lanjut ke Q2 hanya jika ada repeat usage dan bukti bahwa user meminta lebih banyak content atau guidance.</td></tr>
+                    <tr><td><strong>Gate</strong></td><td>Lanjut ke Q2 hanya jika ada <strong>repeat usage</strong> dan bukti bahwa user meminta lebih banyak content atau guidance.</td></tr>
                   </tbody>
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Q2 — Prove Repeatability</h3>
+                <h3 className={styles.sectionTitle}><strong>Q2 — Prove Repeatability</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Fokus Q2 adalah mengubah keberhasilan pilot menjadi playbook yang dapat diulang. Satu sekolah atau komunitas yang berhasil belum menjadi bisnis scalable; kita perlu tahu channel mana yang menghasilkan user berkualitas dan berapa biaya untuk melayani mereka.
                 </p>
                 <table className={styles.techTable}>
-                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
                   <tbody>
                     <tr><td>Distribution</td><td>Playbook partnership sekolah/kampus, referral, ambassador, dan content campaign.</td></tr>
                     <tr><td>Monetization</td><td>Uji willingness-to-pay untuk premium learning, certificate, dan institutional package.</td></tr>
                     <tr><td>Operations</td><td>Admin dashboard, support workflow, content QA, dan partner onboarding checklist.</td></tr>
                     <tr><td>Metrics</td><td>Bandingkan activation, retention, completion, conversion, CAC, dan support cost per channel.</td></tr>
-                    <tr><td>Gate</td><td>Masuk Q3 setelah ada channel yang repeatable dan cohort yang menunjukkan retention lebih baik.</td></tr>
+                    <tr><td><strong>Gate</strong></td><td>Masuk Q3 setelah ada channel yang <strong>repeatable</strong> dan cohort yang menunjukkan retention lebih baik.</td></tr>
                   </tbody>
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Q3 — Build the Growth Engine</h3>
+                <h3 className={styles.sectionTitle}><strong>Q3 — Build the Growth Engine</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Fokus Q3 adalah memperbesar supply dan demand secara seimbang. User membutuhkan course dan mentor yang berkualitas; partner membutuhkan audience dan outcome. Marketplace effect hanya boleh dikejar setelah quality control dan consent sudah kuat.
                 </p>
                 <table className={styles.techTable}>
-                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
                   <tbody>
                     <tr><td>Content Supply</td><td>Partner course dan project dengan rubric, learning objective, reviewer, serta certificate policy yang konsisten.</td></tr>
                     <tr><td>Career Network</td><td>Employer pilot untuk skill evidence dan feedback loop dari recruiter.</td></tr>
                     <tr><td>Product Loops</td><td>Shareable achievement, referral, cohort challenge, dan re-engagement yang tidak bergantung pada gimmick.</td></tr>
                     <tr><td>Infrastructure</td><td>Observability, queue untuk AI jobs, caching, rate limit, analytics events, dan cost monitoring.</td></tr>
-                    <tr><td>Gate</td><td>Scale paid acquisition hanya jika retention dan gross margin per cohort sudah dipahami.</td></tr>
+                    <tr><td><strong>Gate</strong></td><td>Scale paid acquisition hanya jika retention dan <strong>gross margin per cohort</strong> sudah dipahami.</td></tr>
                   </tbody>
                 </table>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Q4 — Prepare for Institutional Scale</h3>
+                <h3 className={styles.sectionTitle}><strong>Q4 — Prepare for Institutional Scale</strong></h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Fokus Q4 adalah kesiapan menjual dan melayani institusi secara serius. Investor perlu melihat bahwa pertumbuhan tidak menambah chaos operasional, debt keamanan, atau ketergantungan pada satu orang.
                 </p>
                 <table className={styles.techTable}>
-                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <thead><tr><th><strong>Workstream</strong></th><th><strong>Target Investor-Ready</strong></th></tr></thead>
                   <tbody>
                     <tr><td>Enterprise Product</td><td>Role-based admin, cohort reporting, export, permission, SSO plan, dan SLA support.</td></tr>
                     <tr><td>Revenue Quality</td><td>Renewal signal, annual contract, expansion revenue, gross margin, dan pipeline yang dapat diprediksi.</td></tr>
                     <tr><td>Governance</td><td>Security review, incident response, privacy policy, data retention, vendor review, dan financial reporting.</td></tr>
                     <tr><td>Fundraising</td><td>Investor data room berisi traction, cohort data, product demo, roadmap, cap table, legal readiness, dan use of funds.</td></tr>
-                    <tr><td>Gate</td><td>Fundraise berdasarkan bukti repeatability dan capital-efficient growth, bukan sekadar jumlah fitur.</td></tr>
+                    <tr><td><strong>Gate</strong></td><td>Fundraise berdasarkan bukti repeatability dan <strong>capital-efficient growth</strong>, bukan sekadar jumlah fitur.</td></tr>
                   </tbody>
                 </table>
               </section>
@@ -954,10 +954,10 @@ export default function DocsPage() {
                   Setiap kuartal, tim sebaiknya menilai PathTrick dari lima pertanyaan: apakah user mendapatkan outcome yang lebih baik, apakah mereka kembali tanpa dipaksa, apakah partner bersedia membayar atau memperpanjang, apakah unit economics membaik, dan apakah sistem dapat melayani cohort baru tanpa biaya operasional yang naik secara tidak terkendali.
                 </p>
                 <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Traction</div><div className={styles.cardText}>Cohort growth, active learners, completion, retention, dan verified outcomes.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Efficiency</div><div className={styles.cardText}>CAC, payback period, AI cost per user, support cost, dan gross margin.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Moat</div><div className={styles.cardText}>Outcome dataset yang consented, partner network, content quality, dan trust layer.</div></div>
-                  <div className={styles.featureCard}><div className={styles.cardTitle}>Execution</div><div className={styles.cardText}>Release velocity, reliability, security posture, dan kemampuan tim mengulang playbook.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Traction</strong></div><div className={styles.cardText}>Cohort growth, active learners, completion, retention, dan verified outcomes.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Efficiency</strong></div><div className={styles.cardText}>CAC, payback period, AI cost per user, support cost, dan gross margin.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Moat</strong></div><div className={styles.cardText}>Outcome dataset yang consented, partner network, content quality, dan trust layer.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Execution</strong></div><div className={styles.cardText}>Release velocity, reliability, security posture, dan kemampuan tim mengulang playbook.</div></div>
                 </div>
               </section>
               <section className={styles.section}>
