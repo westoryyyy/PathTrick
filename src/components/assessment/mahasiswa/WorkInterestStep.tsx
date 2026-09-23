@@ -2,6 +2,7 @@
 
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import { GICS_SECTORS, GICSSectorCode } from '@/data/gicsData';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 function toggleInArray<T>(arr: T[], value: T): T[] {
   return arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value];
@@ -44,7 +45,7 @@ export default function WorkInterestStep() {
       {extractedData && extractedData.skills.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex items-center gap-3 flex-wrap">
-            <h3 className="font-pixel text-[0.7rem] text-[#f0e8ff] m-0 tracking-[0.06em]">🎯 Skills dari CV-mu</h3>
+            <h3 className="flex items-center gap-2 font-pixel text-[0.7rem] text-[#f0e8ff] m-0 tracking-[0.06em]"><PixelIcon icon="🎯" size={20} /> Skills dari CV-mu</h3>
             <span className="font-pixel text-[0.5rem] text-[rgba(240,232,255,0.5)]">Klik ✕ untuk hapus yang tidak relevan</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -94,7 +95,7 @@ export default function WorkInterestStep() {
                 disabled={isDisabled}
                 title={sector.description}
               >
-                <span className="text-[2rem] leading-none">{sector.icon}</span>
+                <PixelIcon icon={sector.icon} size={40} />
                 <span className={`font-pixel text-[0.5rem] text-white tracking-[0.05em] text-center leading-[1.4] drop-shadow-[1px_1px_0_#3b261b] ${isSelected ? 'text-white' : ''}`}>{sector.nameID}</span>
                 {isSelected && <span className="absolute top-1.5 right-2 font-pixel text-[0.55rem] text-[color:var(--ind-color)] animate-[checkPop_0.25s_cubic-bezier(0.22,1,0.36,1)]">✓</span>}
               </button>
@@ -115,7 +116,7 @@ export default function WorkInterestStep() {
                 gap: '10px',
                 alignItems: 'flex-start',
               }}>
-                <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{sector.icon}</span>
+                <PixelIcon icon={sector.icon} size={24} />
                 <div>
                   <span style={{ fontFamily: "var(--font-pixel)", fontSize: '0.5rem', color: sector.accentColor, display: 'block', marginBottom: '4px' }}>
                     {sector.nameID}
@@ -133,7 +134,7 @@ export default function WorkInterestStep() {
       {/* ── Work Interest / Type ── */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="font-pixel text-[0.7rem] text-[#f0e8ff] m-0 tracking-[0.06em]">💼 Tipe Pekerjaan</h3>
+          <h3 className="flex items-center gap-2 font-pixel text-[0.7rem] text-[#f0e8ff] m-0 tracking-[0.06em]"><PixelIcon icon="💼" size={20} /> Tipe Pekerjaan</h3>
         </div>
         <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 leading-[1.5]">Kamu lebih tertarik bekerja sebagai...</p>
         <div className="flex flex-wrap gap-2">

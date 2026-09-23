@@ -103,7 +103,7 @@ export default function AssessmentWizard() {
       stepDescription={step.desc}
       optionalFrom={role === 'sma' ? 2 : undefined}
       canNext={canNext}
-      nextLabel={isLast ? '🚀 Mulai Petualangan' : undefined}
+      nextLabel={isLast ? 'Mulai Petualangan' : undefined}
       onNext={handleNext}
       onBack={prevStep}
       isSubmitting={isSubmitting}

@@ -6,22 +6,23 @@ import { useMapStore } from '@/store/useMapStore';
 import type { RecommendedCourse } from '@/store/useMapStore';
 import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
 import styles from './CourseBentoGrid.module.css';
+import { pixelAssetFor } from './PixelIcon';
 
 /* ═══════════════════════════════════════════════
    Category Config
    ═══════════════════════════════════════════════ */
 
-const CATEGORY_CONFIG: Record<string, { emoji: string; label: string }> = {
-  coding:      { emoji: '💻', label: 'Coding' },
-  design:      { emoji: '🎨', label: 'Design' },
-  data:        { emoji: '📊', label: 'Data' },
-  business:    { emoji: '💼', label: 'Business' },
-  general:     { emoji: '📚', label: 'General' },
-  health:      { emoji: '🏥', label: 'Kesehatan' },
-  law:         { emoji: '⚖️', label: 'Hukum' },
-  psychology:  { emoji: '🧠', label: 'Psikologi' },
-  education:   { emoji: '🎓', label: 'Pendidikan' },
-  engineering: { emoji: '⚙️', label: 'Teknik' },
+const CATEGORY_CONFIG: Record<string, { icon: string; label: string }> = {
+  coding:      { icon: '💻', label: 'Coding' },
+  design:      { icon: '🎨', label: 'Design' },
+  data:        { icon: '📊', label: 'Data' },
+  business:    { icon: '💼', label: 'Business' },
+  general:     { icon: '📚', label: 'General' },
+  health:      { icon: '🏥', label: 'Kesehatan' },
+  law:         { icon: '⚖️', label: 'Hukum' },
+  psychology:  { icon: '🧠', label: 'Psikologi' },
+  education:   { icon: '🎓', label: 'Pendidikan' },
+  engineering: { icon: '⚙️', label: 'Teknik' },
 };
 
 const DIFFICULTY_CLASS: Record<string, string> = {
@@ -64,7 +65,7 @@ function ComingSoonPopup({
       >
         {/* Pixel construction icon */}
         <div className={styles.popupIconWrap}>
-          <span className={styles.popupEmoji}>🏗️</span>
+          <Image src={pixelAssetFor('🏗️')} alt="" width={64} height={64} />
         </div>
 
         {/* Title */}
@@ -72,7 +73,7 @@ function ComingSoonPopup({
 
         {/* Course name */}
         <p className={styles.popupCourseName}>
-          {catConfig.emoji} {course.title}
+          <Image src={pixelAssetFor(catConfig.icon)} alt="" width={24} height={24} /> {course.title}
         </p>
 
         {/* Message */}
@@ -149,7 +150,7 @@ function CourseCard({
       onKeyDown={handleKeyDown}
     >
       {/* Locked overlay */}
-      {course.isLocked && <span className={styles.lockIcon}>🔒</span>}
+      {course.isLocked && <Image src={pixelAssetFor('🔒')} alt="Locked" width={28} height={28} className={styles.lockIcon} />}
 
       {/* Top Half: Illustration Area */}
       <div className={styles.cardIllustration}>
@@ -183,7 +184,7 @@ function CourseCard({
         <div className={styles.floatingBadges}>
           {course.aiMatchPercent && (
             <span className={styles.matchBadge}>
-              🤖 AI {course.aiMatchPercent}%
+              AI {course.aiMatchPercent}%
             </span>
           )}
           <span className={`${styles.difficultyBadge} ${diffClass}`}>

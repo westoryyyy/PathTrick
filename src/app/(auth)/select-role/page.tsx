@@ -13,6 +13,7 @@ import {
   readApiResponse,
 } from '@/config/pathtrick';
 import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
+import PixelIcon from '@/components/ui/PixelIcon';
 import styles from './page.module.css';
 
 export default function SelectRolePage() {
@@ -184,7 +185,7 @@ export default function SelectRolePage() {
               padding: '32px 28px',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
             }}>
-              <div style={{ fontSize: '3.5rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>⚔️</div>
+              <PixelIcon icon="⚔️" size={56} />
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px', lineHeight: 1.6 }}>
                   CHOOSE YOUR
@@ -278,7 +279,7 @@ export default function SelectRolePage() {
               padding: '32px 28px',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
             }}>
-              <div style={{ fontSize: '3rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>💼</div>
+              <PixelIcon icon="💼" size={48} />
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px', lineHeight: 1.6 }}>
                   CONNECT WALLET
@@ -343,7 +344,7 @@ export default function SelectRolePage() {
                 margin: 0,
                 lineHeight: 1.6
               }}>
-                ⚠️ Wallet belum terhubung. Hubungkan wallet sebelum lanjut!
+                Wallet belum terhubung. Hubungkan wallet sebelum lanjut!
               </p>
             </div>
           )}
@@ -399,11 +400,11 @@ export default function SelectRolePage() {
           {isConnectingWallet ? (
             <><span className={styles.spinner} /> Menghubungkan Wallet...</>
           ) : needsWalletConnection ? (
-            <>🔗 Hubungkan Wallet Dulu →</>
+            <>Hubungkan Wallet Dulu →</>
           ) : entering ? (
             <><span className={styles.spinner} /> Memulai Petualangan...</>
           ) : selected ? (
-            <>⚔️ Mulai sebagai {roles.find(r => r.id === selected)?.displayName}</>
+            <>Mulai sebagai {roles.find(r => r.id === selected)?.displayName}</>
           ) : (
             'Pilih karaktermu dulu →'
           )}

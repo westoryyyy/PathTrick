@@ -8,6 +8,7 @@ import Image from 'next/image';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 type NavItem = { href: string; label: string; icon: string; badge?: string };
 
@@ -16,7 +17,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/sma/learning-progress', label: 'Learning Progress', icon: '🎯' },
   { href: '/sma/university-hub', label: 'University Hub', icon: '🎓' },
   { href: '/sma/scholarship-hub', label: 'Scholarship Hub', icon: '📜' },
-  { href: '/sma/certificate', label: 'Relics & Treasures', icon: '🏅' },
+  { href: '/sma/certificate', label: 'Relics & Treasures', icon: '🏆' },
 ];
 
 export default function SMALayout({
@@ -83,7 +84,7 @@ export default function SMALayout({
                 className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
               >
                 <div className={styles.navIconTitle}>
-                  <span>{item.icon}</span>
+                  <PixelIcon icon={item.icon} size={22} />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
@@ -148,7 +149,7 @@ export default function SMALayout({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
                       <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>AI Career Coach</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>Your personal roadmap is ready! Let's explore.</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>Your personal roadmap is ready! Let&apos;s explore.</p>
                     </div>
                     <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
                       <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>PathTrick Sys</p>
@@ -203,7 +204,7 @@ export default function SMALayout({
                 onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }} 
                 style={{ cursor: 'pointer' }}
               >
-                <div className={styles.profileAvatar}>👨‍🎓</div>
+                <div className={styles.profileAvatar}><PixelIcon icon="👨‍🎓" size={32} /></div>
                 <div className={styles.profileInfo}>
                   <span className={styles.profileName}>{displayName}</span>
                   <span className={styles.profileEmail}>{displayEmail}</span>

@@ -191,7 +191,7 @@ export default function CVUploadStep() {
         {status === 'done' && mState.cvExtractedData && (
           <div className="flex flex-col gap-4.5 p-6 sm:p-3.5 w-full text-left">
             <div className="flex items-center gap-4">
-              <Image src="/Green Potion.png" alt="" width={48} height={48} className="shrink-0 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
+              <Image src="/Healing Potions.png" alt="" width={48} height={48} className="shrink-0 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
               <div>
                 <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">CV Berhasil Dianalisis!</p>
                 <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{mState.cvFileName}</p>
@@ -219,7 +219,7 @@ export default function CVUploadStep() {
 
             {/* Extracted Experience */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">💼 Pengalaman</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pengalaman</p>
               <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
                 {mState.cvExtractedData.experience.map((exp, i) => (
                   <li key={i} className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] pl-5 relative leading-[1.8] animate-[tagIn_0.35s_steps(4)_both] before:content-['>'] before:absolute before:left-0 before:text-[#34d399]" style={{ animationDelay: `${0.5 + i * 0.1}s` }}>{exp}</li>
@@ -229,7 +229,7 @@ export default function CVUploadStep() {
 
             {/* Extracted Education */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">🎓 Pendidikan</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pendidikan</p>
               <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] m-0 leading-[1.8]">{mState.cvExtractedData.education}</p>
             </div>
           </div>

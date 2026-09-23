@@ -4,6 +4,7 @@ import React, { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockBackendData } from '@/data/mockBackendData';
 import { motion, AnimatePresence } from 'framer-motion';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem' }}>◀ KEMBALI</span>
           </button>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{house.icon}</span>
+            <PixelIcon icon={house.icon} size={32} alt={house.title} />
             <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #000' }}>
               {house.title}
             </h1>
@@ -58,7 +59,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
               ★ HOUSE {house.houseNumber} ★
             </div>
 
-            <div className="text-6xl drop-shadow-[0_4px_0_rgba(0,0,0,0.5)]">{house.icon}</div>
+            <PixelIcon icon={house.icon} size={96} alt={house.title} className="drop-shadow-[0_4px_0_rgba(0,0,0,0.5)]" />
             
             <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #000' }}>
               {house.title.replace('House of ', '').toUpperCase()}
@@ -85,7 +86,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
           {house.skillsOverview && (
             <div className="bg-[#a87b51] border-4 border-[#3b261b] p-6 shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
               <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b', marginBottom: '16px' }}>
-                ⚔️ SKILL YANG DIASAH
+                <PixelIcon icon="⚔️" size={22} /> SKILL YANG DIASAH
               </h3>
               <ul className="space-y-3">
                 {house.skillsOverview.map((skill, i) => (
@@ -101,7 +102,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
           {house.idealFor && (
             <div className="bg-[#a87b51] border-4 border-[#3b261b] p-6 shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
               <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b', marginBottom: '16px' }}>
-                💡 COCOK UNTUK
+                <PixelIcon icon="💡" size={22} /> COCOK UNTUK
               </h3>
               <ul className="space-y-3">
                 {house.idealFor.map((ideal, i) => (
@@ -119,7 +120,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       {/* ─── Module List (Accordion) ─── */}
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="flex items-center justify-center gap-4 mb-8">
-          <span className="text-[#3b261b]">⚔</span>
+          <PixelIcon icon="⚔️" size={24} />
           <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b' }}>PILIH MODUL</h3>
         </div>
 
@@ -133,7 +134,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
               >
                 <div className="w-20 bg-[#3b261b] border-r-4 border-[#291a13] flex flex-col items-center justify-center gap-2 p-4">
                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fbbf24' }}>{index + 1}</span>
-                   <span className="text-2xl">📚</span>
+                   <PixelIcon icon="📚" size={30} />
                 </div>
                 
                 <div className="flex-1 p-6 flex flex-col justify-center">
@@ -227,7 +228,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
             onClick={() => router.push('/sma/dashboard')}
             className="px-6 py-4 bg-[#fbbf24] border-4 border-[#b45309] text-[#78350f] shadow-[4px_4px_0_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-[2px_2px_0_rgba(0,0,0,0.5)] transition-all flex items-center gap-3"
          >
-            <span className="text-xl">🏠</span>
+            <PixelIcon icon="🏠" size={24} />
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem' }}>DASHBOARD</span>
          </button>
       </div>

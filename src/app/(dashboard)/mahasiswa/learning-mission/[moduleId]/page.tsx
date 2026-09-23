@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import PixelIcon from '@/components/ui/PixelIcon';
 import styles from '@/components/ui/Dashboard.module.css';
 
 // Mock course/module details
@@ -27,6 +28,8 @@ export default function ModuleChaptersPage({ params }: { params: Promise<{ modul
   const { moduleId } = use(params);
   
   const [isClient, setIsClient] = useState(false);
+  // This client gate prevents browser-only map state from rendering during SSR.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setIsClient(true); }, []);
 
   if (!isClient) return null;
@@ -55,7 +58,7 @@ export default function ModuleChaptersPage({ params }: { params: Promise<{ modul
         </button>
 
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', marginTop: '8px' }}>
-          {moduleInfo.icon} {moduleInfo.title.toUpperCase()}
+          <PixelIcon icon={moduleInfo.icon} size={32} /> {moduleInfo.title.toUpperCase()}
         </h1>
         <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
           Pilih Bab (Chapter) untuk memulai petualangan belajarmu. Setiap Bab memiliki beberapa level (Sub-bab) yang harus diselesaikan.

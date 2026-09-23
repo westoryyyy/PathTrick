@@ -1,6 +1,7 @@
 'use client';
 
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 /* ── Faculty/Majors options (Mapped to 10 Houses) ── */
 const FACULTIES = [
@@ -67,7 +68,7 @@ export default function PreferencesStep() {
       {/* ── Faculty ── */}
       <section className="flex flex-col gap-4">
         <div className="flex items-center gap-2.5">
-          <h3 className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]">🎓 Fakultas / Jurusan</h3>
+          <h3 className="flex items-center gap-2 font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]"><PixelIcon icon="🎓" size={22} /> Fakultas / Jurusan</h3>
           <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 tracking-[0.06em] shadow-[2px_2px_0_0_rgba(0,0,0,0.5)]">Opsional</span>
         </div>
         <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 leading-[1.6] uppercase">Pilih jurusan yang kamu minati (boleh lebih dari satu).</p>
@@ -81,7 +82,7 @@ export default function PreferencesStep() {
                 className={`flex items-center gap-2 py-2.5 px-3.5 sm:py-2 sm:px-2.5 bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] text-white font-pixel text-[0.6rem] sm:text-[0.5rem] drop-shadow-[1px_1px_0_#3b261b] cursor-pointer transition-transform duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:text-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),1px_1px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !text-white !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] translate-x-[1px] translate-y-[1px]' : ''}`}
                 onClick={() => setField('facultyPreferences', toggleInArray(faculties, f.value))}
               >
-                <span className="text-[1.8rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">{f.icon}</span>
+                <PixelIcon icon={f.icon} size={36} className="drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
                 <span>{f.label}</span>
               </button>
             );
@@ -106,7 +107,7 @@ export default function PreferencesStep() {
                 className={`flex items-center gap-2 py-2.5 px-3.5 sm:py-2 sm:px-2.5 bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] text-white font-pixel text-[0.6rem] sm:text-[0.5rem] drop-shadow-[1px_1px_0_#3b261b] cursor-pointer transition-transform duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:text-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),1px_1px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !text-white !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] translate-x-[1px] translate-y-[1px]' : ''}`}
                 onClick={() => setField('countryPreferences', toggleInArray(countries, c.value))}
               >
-                <span className="text-[1.8rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">{c.flag}</span>
+                <PixelIcon icon="🌍" size={32} className="drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
                 <span>{c.label}</span>
               </button>
             );

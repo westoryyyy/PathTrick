@@ -9,6 +9,7 @@ import { useMapStore } from '@/store/useMapStore';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 const NAV_ITEMS = [
   { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: '📊' },
@@ -86,7 +87,7 @@ export default function MahasiswaLayout({
                 className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
               >
                 <div className={styles.navIconTitle}>
-                  <span>{item.icon}</span>
+                  <PixelIcon icon={item.icon} size={22} />
                   <span>{item.label}</span>
                 </div>
               </Link>
@@ -204,7 +205,7 @@ export default function MahasiswaLayout({
                 onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }} 
                 style={{ cursor: 'pointer' }}
               >
-                <div className={styles.profileAvatar}>👨‍💻</div>
+                <div className={styles.profileAvatar}><PixelIcon icon="👨‍🎓" size={32} /></div>
                 <div className={styles.profileInfo}>
                   <span className={styles.profileName}>{displayName}</span>
                   <span className={styles.profileEmail}>{displayEmail}</span>
