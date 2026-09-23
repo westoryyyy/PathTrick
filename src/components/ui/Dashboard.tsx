@@ -118,7 +118,7 @@ export default function Dashboard() {
   const [unreadNotifs, setUnreadNotifs] = useState([{ id: 1, msg: 'Anda berhasil naik ke Level 12!' }]);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
-  const { displayName: savedName } = useUserStore();
+  const { displayName: savedName, avatarUrl } = useUserStore();
 
   // Real user display name - same priority as layouts
   const activeWallet = wallets[0];
@@ -171,8 +171,8 @@ export default function Dashboard() {
       
       {/* Profile XP Banner */}
       <div className={styles.retroCard} style={{ flexDirection: 'row', alignItems: 'center', gap: '24px' }}>
-        <div style={{ fontSize: '4rem', background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px' }}>
-          <PixelIcon icon="👨‍🎓" size={64} />
+        <div style={{ background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Image src={avatarUrl} alt="Profile avatar" width={64} height={64} />
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
