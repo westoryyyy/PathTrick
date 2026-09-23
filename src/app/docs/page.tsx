@@ -17,7 +17,10 @@ type DocSection =
   | 'ai_cv'
   | 'system_status'
   | 'integration_notes'
-  | 'business_scaling';
+  | 'business_scaling'
+  | 'market_strategy'
+  | 'competitive_edge'
+  | 'hackathon_case';
 
 export default function DocsPage() {
   const router = useRouter();
@@ -44,6 +47,9 @@ export default function DocsPage() {
     { key: 'system_status', label: '10. Current System Status', group: 'OPERATIONS' },
     { key: 'integration_notes', label: '11. Integration Notes', group: '' },
     { key: 'business_scaling', label: '12. Business Scaling', group: 'BUSINESS' },
+    { key: 'market_strategy', label: '13. Market & GTM', group: '' },
+    { key: 'competitive_edge', label: '14. Competitive Edge', group: '' },
+    { key: 'hackathon_case', label: '15. Hackathon Case', group: 'INVESTOR READINESS' },
   ];
 
   return (
@@ -971,6 +977,115 @@ export default function DocsPage() {
                     <div className={styles.cardText}>Nilai kemampuan tim mengubah feedback menjadi release, menjaga frontend tetap stabil saat backend dan wallet masuk, menjalankan pilot dengan sekolah atau kampus, serta mengulang playbook yang berhasil. Untuk hackathon, ini terlihat dari demo end-to-end yang mulus, integrasi BNB Testnet yang benar, UX yang mudah dipahami pengguna non-crypto, dan roadmap yang realistis.</div>
                   </div>
                 </div>
+              </section>
+            </>
+          )}
+
+          {/* ── 13. MARKET AND GO-TO-MARKET ── */}
+          {activeSection === 'market_strategy' && (
+            <>
+              <h2 className={styles.docTitle}>MARKET &amp; GO-TO-MARKET</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <div className={styles.callout}>
+                  PathTrick masuk melalui masalah yang spesifik: siswa dan mahasiswa Indonesia sering harus memilih jurusan, skill, dan karier dengan informasi yang terpecah. Produk dimulai dari <strong>career discovery</strong>, lalu berkembang menjadi learning infrastructure dan verified skill network.
+                </div>
+                <h3 className={styles.sectionTitle}>Beachhead Market</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Beachhead awal adalah siswa SMA dan mahasiswa yang sedang memilih jurusan, mencari beasiswa, atau menyiapkan skill kerja digital. Segmen ini cukup fokus untuk divalidasi, tetapi cukup besar untuk membuka jalur ekspansi ke sekolah, kampus, bootcamp, career center, dan employer.
+                </p>
+                <h3 className={styles.sectionTitle}>Market Expansion Logic</h3>
+                <table className={styles.techTable}>
+                  <thead><tr><th><strong>Layer</strong></th><th><strong>Customer</strong></th><th><strong>Value</strong></th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>Entry</strong></td><td>Student</td><td>Assessment, roadmap, quest, dan progress yang personal.</td></tr>
+                    <tr><td><strong>Distribution</strong></td><td>School, campus, community</td><td>Cohort dashboard, readiness insight, dan engagement program.</td></tr>
+                    <tr><td><strong>Supply</strong></td><td>Mentor, bootcamp, course partner</td><td>Content distribution, project rubric, dan certificate issuance.</td></tr>
+                    <tr><td><strong>Outcome</strong></td><td>Employer, recruiter</td><td>Verified skill evidence dan talent discovery yang lebih relevan.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Go-to-Market Wedge</h3>
+                <div className={styles.timeline}>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}><strong>Community-led:</strong> Masuk melalui student community, mentor, dan ambassador yang sudah dipercaya.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}><strong>Institution pilot:</strong> Jalankan cohort kecil dengan sekolah atau career center dan ukur outcome sebelum menjual kontrak besar.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}><strong>Content partnership:</strong> Gunakan course dan project partner untuk memperkaya learning map tanpa membangun semua konten sendiri.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}><strong>Outcome distribution:</strong> Tampilkan certificate dan portfolio yang dapat diverifikasi agar user menjadi channel pertumbuhan berikutnya.</div></div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ── 14. COMPETITIVE EDGE ── */}
+          {activeSection === 'competitive_edge' && (
+            <>
+              <h2 className={styles.docTitle}>COMPETITIVE EDGE</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Positioning</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  PathTrick bukan hanya platform course, bukan hanya tes minat bakat, dan bukan hanya wallet certificate. PathTrick menyatukan <strong>discovery, learning, proof, dan outcome</strong> dalam satu perjalanan yang terasa seperti game tetapi menghasilkan data dan credential yang serius.
+                </p>
+                <table className={styles.techTable}>
+                  <thead><tr><th><strong>Alternatif</strong></th><th><strong>Keterbatasan</strong></th><th><strong>Perbedaan PathTrick</strong></th></tr></thead>
+                  <tbody>
+                    <tr><td>Course platform</td><td>Konten tersedia, tetapi user tidak selalu tahu harus mulai dari mana.</td><td>RIASEC/CV membantu menentukan entry point dan roadmap.</td></tr>
+                    <tr><td>Career test</td><td>Insight berhenti di rekomendasi dan tidak selalu menjadi aksi.</td><td>Insight langsung diteruskan ke quest dan learning mission.</td></tr>
+                    <tr><td>Game edukasi</td><td>Engagement ada, tetapi bukti skill dan outcome karier belum kuat.</td><td>Progress berujung pada project dan certificate yang dapat diverifikasi.</td></tr>
+                    <tr><td>Web3 certificate</td><td>Credential bisa diterbitkan tanpa learning journey yang bermakna.</td><td>Mint mengikuti completion, authorization backend, dan event contract.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>What We Must Defend</h3>
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Completion Loop</strong></div><div className={styles.cardText}>Pixel-RPG progression membuat user terus bergerak dari rekomendasi ke aksi, bukan berhenti di hasil assessment.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Local Relevance</strong></div><div className={styles.cardText}>Bahasa, konteks jurusan, beasiswa, dan career path dirancang untuk realitas siswa Indonesia.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Trust Layer</strong></div><div className={styles.cardText}>BNB Testnet dan Soulbound certificate memberi bukti publik tanpa menjadikan crypto sebagai hambatan utama.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}><strong>Partner Network</strong></div><div className={styles.cardText}>Semakin banyak institution, mentor, course, dan employer yang terhubung, semakin bernilai outcome network.</div></div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ── 15. HACKATHON CASE ── */}
+          {activeSection === 'hackathon_case' && (
+            <>
+              <h2 className={styles.docTitle}>WHY PATHTRICK SHOULD WIN</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <div className={styles.callout}>
+                  PathTrick menunjukkan bahwa Web3 dapat menjadi <strong>infrastructure of trust</strong> untuk pendidikan dan karier, bukan sekadar fitur spekulatif. User datang karena ingin menemukan arah, bertahan karena learning game, dan membawa pulang bukti skill yang dapat diverifikasi.
+                </div>
+                <h3 className={styles.sectionTitle}>Judging Narrative</h3>
+                <table className={styles.techTable}>
+                  <thead><tr><th><strong>Yang Dinilai</strong></th><th><strong>Bukti PathTrick</strong></th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>Problem</strong></td><td>Career uncertainty, salah jurusan, dan gap antara belajar dengan bukti skill adalah masalah nyata bagi pelajar Indonesia.</td></tr>
+                    <tr><td><strong>Innovation</strong></td><td>RIASEC/CV insight diubah menjadi game-like learning journey dan on-chain credential.</td></tr>
+                    <tr><td><strong>Web3 Relevance</strong></td><td>Certificate memakai signature authorization, live mint price, receipt verification, dan event <code>CertificateMinted(to, courseId)</code> di BNB Testnet.</td></tr>
+                    <tr><td><strong>Usability</strong></td><td>Privy embedded wallet dan pixel-RPG UX membuat user non-crypto dapat mengikuti flow tanpa memahami detail blockchain.</td></tr>
+                    <tr><td><strong>Impact</strong></td><td>Membantu user bergerak dari bingung menjadi punya roadmap, skill evidence, dan jalur pendidikan/karier yang lebih jelas.</td></tr>
+                    <tr><td><strong>Scalability</strong></td><td>Role-based product dapat berkembang dari student experience menjadi institution, content partner, dan recruiter network.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>The 90-Second Demo Story</h3>
+                <div className={styles.timeline}>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}>User memilih persona <strong>The Dreamer</strong> atau <strong>The Chaser</strong> tanpa form yang membingungkan.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}>Assessment menghasilkan arah personal dan membawa user ke dashboard RPG.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}>User masuk ke House, menyelesaikan mission, quiz, dan project dengan feedback yang jelas.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}>Wallet berpindah ke BNB Testnet, frontend membaca harga contract, lalu user mint certificate.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>5</div><div className={styles.timelineContent}>Receipt, event, dan backend confirmation selesai; user melihat certificate sebagai bukti skill.</div></div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>What We Need to Prove Next</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Setelah hackathon, prioritas PathTrick adalah mengganti mock persistence dengan backend produksi, menjalankan pilot dengan cohort nyata, mengukur completion dan retention, menguji willingness-to-pay, serta mengumpulkan feedback dari mentor, sekolah, kampus, dan recruiter. Dengan begitu, demo yang kuat dapat berubah menjadi bukti product-market fit yang dapat dipertanggungjawabkan.
+                </p>
               </section>
             </>
           )}
