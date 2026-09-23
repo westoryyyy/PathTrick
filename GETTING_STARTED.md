@@ -20,7 +20,7 @@ export function MyForm() {
   return (
     <form className="flex flex-col gap-4 p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
       <label className="flex flex-col gap-2">
-        <span className="font-mono text-sm font-bold text-gray-700">Email</span>
+        <span className="font-pixel text-sm font-bold text-gray-700">Email</span>
         <input 
           type="email"
           className="px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
@@ -77,7 +77,7 @@ export function MyForm() {
 | Spacing | `p-6`, `m-4`, `gap-3` | `<div className="p-6 gap-4">` |
 | Color | `bg-blue-500`, `text-white`, `border-gray-300` | `<div className="bg-[#8c5d41]">` |
 | Size | `w-full`, `h-screen`, `max-w-md` | `<div className="w-full max-w-4xl">` |
-| Font | `text-lg`, `font-bold`, `font-mono` | `<h1 className="text-2xl font-mono">` |
+| Font | `text-lg`, `font-bold`, `font-pixel` | `<h1 className="text-2xl font-mono">` |
 | Layout | `flex`, `grid`, `absolute`, `relative` | `<div className="flex items-center">` |
 | Border | `border`, `border-2`, `rounded-lg` | `<div className="border-2 rounded">` |
 | Shadow | `shadow-lg`, `shadow-xl` | `<div className="shadow-lg">` |
@@ -102,7 +102,7 @@ export function MyForm() {
 
 ### Pixel Font (Game Aesthetic)
 ```tsx
-<p className="font-mono text-sm">
+<p className="font-pixel text-sm">
   Text in pixel font (Press Start 2P)
 </p>
 ```
