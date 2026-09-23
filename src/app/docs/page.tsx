@@ -991,19 +991,19 @@ export default function DocsPage() {
                   PathTrick masuk melalui masalah yang spesifik: siswa dan mahasiswa Indonesia sering harus memilih jurusan, skill, dan karier dengan informasi yang terpecah. Produk dimulai dari <strong>career discovery</strong>, lalu berkembang menjadi learning infrastructure dan verified skill network.
                 </div>
                 <h3 className={styles.sectionTitle}>Beachhead Market</h3>
-                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                <p className={styles.text} style={{ textAlign: 'justify', marginBottom: '36px' }}>
                   Beachhead awal adalah siswa SMA dan mahasiswa yang sedang memilih jurusan, mencari beasiswa, atau menyiapkan skill kerja digital. Segmen ini cukup fokus untuk divalidasi, tetapi cukup besar untuk membuka jalur ekspansi ke sekolah, kampus, bootcamp, career center, dan employer.
                 </p>
-                <h3 className={styles.sectionTitle}>Market Expansion Logic</h3>
+                <h3 className={styles.sectionTitle} style={{ marginTop: '12px' }}>Market Expansion Logic</h3>
                 <div className={styles.tableScroll}>
                   <table className={styles.techTable}>
-                  <thead><tr><th><strong>Layer</strong></th><th><strong>Customer</strong></th><th><strong>Value</strong></th></tr></thead>
-                  <tbody>
-                    <tr><td><strong>Entry</strong></td><td>Student</td><td>Assessment, roadmap, quest, dan progress yang personal.</td></tr>
-                    <tr><td><strong>Distribution</strong></td><td>School, campus, community</td><td>Cohort dashboard, readiness insight, dan engagement program.</td></tr>
-                    <tr><td><strong>Supply</strong></td><td>Mentor, bootcamp, course partner</td><td>Content distribution, project rubric, dan certificate issuance.</td></tr>
-                    <tr><td><strong>Outcome</strong></td><td>Employer, recruiter</td><td>Verified skill evidence dan talent discovery yang lebih relevan.</td></tr>
-                  </tbody>
+                    <thead><tr><th><strong>Layer</strong></th><th><strong>Customer</strong></th><th><strong>Value</strong></th></tr></thead>
+                    <tbody>
+                      <tr><td><strong>Entry</strong></td><td>Student</td><td>Assessment, roadmap, quest, dan progress yang personal.</td></tr>
+                      <tr><td><strong>Distribution</strong></td><td>School, campus, community</td><td>Cohort dashboard, readiness insight, dan engagement program.</td></tr>
+                      <tr><td><strong>Supply</strong></td><td>Mentor, bootcamp, course partner</td><td>Content distribution, project rubric, dan certificate issuance.</td></tr>
+                      <tr><td><strong>Outcome</strong></td><td>Employer, recruiter</td><td>Verified skill evidence dan talent discovery yang lebih relevan.</td></tr>
+                    </tbody>
                   </table>
                 </div>
               </section>
