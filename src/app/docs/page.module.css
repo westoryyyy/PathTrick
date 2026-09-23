@@ -151,6 +151,7 @@
 .content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 48px 64px;
   background: #fdfaf6;
   /* Very clean warm white */
@@ -195,6 +196,13 @@
   font-size: 1.125rem;
   line-height: 1.8;
   color: #334155;
+  max-width: 980px;
+}
+
+.tableScroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
 }
 
 .callout {
@@ -344,6 +352,70 @@
   font-size: 0.6rem;
   color: #94a3b8;
   line-height: 2;
+}
+
+@media (max-width: 900px) {
+  .topBar {
+    padding: 0 16px;
+  }
+
+  .body {
+    display: block;
+    overflow: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: 220px;
+    border-right: none;
+    border-bottom: 2px solid #1d120d;
+    padding: 16px 0;
+  }
+
+  .sidebarTab {
+    display: inline-block;
+    width: auto;
+    margin: 2px 0;
+    padding: 8px 14px;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .sidebarTabActive {
+    border-bottom-color: #ffb300;
+  }
+
+  .content {
+    height: auto;
+    padding: 32px 24px 48px;
+  }
+
+  .docTitle {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .topBarTitle {
+    font-size: 0.5rem;
+  }
+
+  .topBarLogo {
+    display: none;
+  }
+
+  .content {
+    padding: 24px 16px 40px;
+  }
+
+  .text,
+  .callout {
+    font-size: 1rem;
+  }
+
+  .section {
+    margin-bottom: 36px;
+  }
 }
 
 /* ── Feature Grid ── */

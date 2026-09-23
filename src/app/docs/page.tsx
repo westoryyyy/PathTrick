@@ -168,7 +168,7 @@ export default function DocsPage() {
                 <p className={styles.text} style={{ marginBottom: '16px', textAlign: 'justify' }}>
                   Belakangan ini, timeline X (Twitter) sering diramaikan oleh keluh kesah mahasiswa yang merasa "salah jurusan". Fenomena ini sebetulnya tidak mengejutkan. Di luar negeri, universitas terkemuka justru menyarankan calon mahasiswa untuk mengambil <strong>gap year</strong> demi bereksplorasi dan menemukan minat bakat asli mereka tanpa tekanan. Sayangnya, kultur di Indonesia sangat berbeda. Kita hidup dalam bayang-bayang tuntutan sosial dan dikejar "argo" umur, di mana pada usia 20 harus sudah begini, di usia 25 harus sudah begitu. Akibatnya, lebih dari 50% siswa SMA terpaksa memilih jurusan secara terburu-buru tanpa bimbingan sistematis yang bisa membantu mereka menjawab pertanyaan mendasar: <strong>"Saya ini sebenarnya cocoknya jadi apa?"</strong>
                 </p>
-                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                <p className={styles.text} style={{ textAlign: 'justify', marginBottom: '32px' }}>
                   Namun, krisis ini tidak berhenti di gerbang kelulusan kampus. Setelah lulus dan menjadi <strong>fresh graduate</strong>, masalah baru muncul. <strong>Skill gap</strong> antara teori di kampus dan praktik riil di industri makin menganga lebar. Para mahasiswa yang sadar akan hal ini berlomba-lomba mengumpulkan berbagai sertifikat kursus digital (Web2) untuk menghias CV mereka. Ironisnya, sertifikat-sertifikat ini sangat mudah dipalsukan. Di sisi lain, rekruter kehabisan waktu dan tenaga karena tidak memiliki mekanisme verifikasi portofolio dan keahlian kandidat yang bisa dipercaya secara mutlak. Mahasiswa butuh validasi, rekruter butuh kepastian, tetapi keduanya terjebak dalam sistem yang usang.
                 </p>
               </section>
@@ -995,7 +995,8 @@ export default function DocsPage() {
                   Beachhead awal adalah siswa SMA dan mahasiswa yang sedang memilih jurusan, mencari beasiswa, atau menyiapkan skill kerja digital. Segmen ini cukup fokus untuk divalidasi, tetapi cukup besar untuk membuka jalur ekspansi ke sekolah, kampus, bootcamp, career center, dan employer.
                 </p>
                 <h3 className={styles.sectionTitle}>Market Expansion Logic</h3>
-                <table className={styles.techTable}>
+                <div className={styles.tableScroll}>
+                  <table className={styles.techTable}>
                   <thead><tr><th><strong>Layer</strong></th><th><strong>Customer</strong></th><th><strong>Value</strong></th></tr></thead>
                   <tbody>
                     <tr><td><strong>Entry</strong></td><td>Student</td><td>Assessment, roadmap, quest, dan progress yang personal.</td></tr>
@@ -1003,7 +1004,8 @@ export default function DocsPage() {
                     <tr><td><strong>Supply</strong></td><td>Mentor, bootcamp, course partner</td><td>Content distribution, project rubric, dan certificate issuance.</td></tr>
                     <tr><td><strong>Outcome</strong></td><td>Employer, recruiter</td><td>Verified skill evidence dan talent discovery yang lebih relevan.</td></tr>
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </section>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Go-to-Market Wedge</h3>
