@@ -102,13 +102,13 @@ export default function DocsPage() {
                   Selamat datang di pusat dokumentasi resmi <strong>PathTrick</strong>!
                 </p>
                 <p className={styles.text} style={{ marginBottom: '24px', textAlign: 'justify' }}>
-                  Bayangkan sebuah dunia di mana sistem edukasi dan rekrutmen tidak lagi kaku, membosankan, atau terputus dari kenyataan industri. Selama bertahun-tahun, proses pencarian jati diri bagi para pelajar, baik itu saat mempersiapkan diri masuk universitas maupun langkah awal merintis karir profesional, selalu diwarnai dengan tekanan sosial dan kebingungan. Kami di PathTrick hadir dengan sebuah misi berani: <strong>mengubah narasi usang tersebut</strong>. Kami menolak anggapan bahwa belajar dan mengejar mimpi harus selalu terasa seperti beban berat di pundak Anda.
+                  Setiap tahun, jutaan pelajar Indonesia diminta mengambil keputusan besar—memilih jurusan, mengejar beasiswa, atau menyiapkan karier—jauh sebelum mereka benar-benar memahami kekuatan dan arah dirinya. Informasi tersedia di mana-mana, tetapi jalannya tetap terasa kabur. Assessment berhenti sebagai hasil, course berdiri sendiri, dan CV belum tentu mampu membuktikan apa yang benar-benar bisa dikerjakan.
                 </p>
                 <p className={styles.text} style={{ marginBottom: '36px', textAlign: 'justify' }}>
-                  Untuk mewujudkannya, kami merombak total pengalaman edukasi tradisional dan mengemas seluruh perjalanan pembelajaran Anda dalam balutan mekanik permainan <strong>RPG Pixel-Art Klasik</strong>. Di dunia PathTrick, Anda bukanlah sekadar murid yang duduk pasif di kelas atau pelamar kerja yang putus asa mengirim CV. Anda adalah seorang <strong>Petualang</strong> sejati. Anda akan bertualang menaklukkan berbagai <strong>"Houses"</strong>, menyelesaikan misi harian yang menantang di <strong>Quest Log</strong>, dan mengalahkan <strong>Boss</strong> ujian untuk membuktikan kelayakan Anda, hingga akhirnya Anda membawa pulang <strong>sertifikat abadi</strong> yang tercatat selamanya di jaringan <strong>blockchain</strong>!
+                  <strong>PathTrick mengubah kebingungan itu menjadi perjalanan yang bisa dijalani.</strong> Kami menggabungkan assessment RIASEC dan CV dengan roadmap belajar, mission, project, dan credential yang dapat diverifikasi. Semuanya dikemas dalam dunia <strong>RPG Pixel-Art</strong> agar langkah pertama terasa ringan, progress terlihat nyata, dan belajar tidak berhenti di rekomendasi. Di sini, setiap quest membawa user lebih dekat pada skill yang bisa dibuktikan—bukan sekadar angka di dashboard.
                 </p>
                 <div className={styles.callout} style={{ textAlign: 'justify' }}>
-                  "Kami meracik elemen Game untuk membuat Anda betah berlama-lama belajar, menyuntikkan kecerdasan buatan (AI) untuk memastikan Anda mempelajari hal yang tepat sasaran, dan memanfaatkan Web3 agar Anda bisa membuktikan keahlian tersebut kepada dunia tanpa keraguan sedikit pun."
+                  <strong>PathTrick adalah jembatan dari “Saya tidak tahu harus mulai dari mana” menjadi “Saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya punya bukti untuk menunjukkannya.”</strong>
                 </div>
               </section>
               <section className={styles.section}>
@@ -958,24 +958,24 @@ export default function DocsPage() {
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Investor Scorecard</h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
-                  Untuk konteks <strong>PathTrick</strong> dan <strong>Indonesia Web3 Hackathon</strong>, scorecard ini bukan sekadar laporan bisnis. Ini adalah cara membuktikan bahwa teknologi yang kita bangun menyelesaikan masalah nyata: membantu siswa dan mahasiswa memilih jalur yang lebih tepat, menyelesaikan pembelajaran, lalu membawa <strong>skill evidence yang dapat diverifikasi</strong> ke pendidikan atau dunia kerja. Setiap kuartal, tim menilai apakah produk semakin berguna, semakin dipercaya, dan semakin mudah diadopsi oleh user maupun partner.
+                  Untuk konteks <strong>PathTrick</strong> dan <strong>Indonesia Web3 Hackathon</strong>, scorecard ini bukan sekadar laporan bisnis. Ini adalah cara mengikuti perjalanan user dari rasa ragu menuju bukti nyata: menemukan arah, menyelesaikan misi, membangun skill, dan membawa <strong>skill evidence yang dapat diverifikasi</strong> ke pendidikan atau dunia kerja. Setiap kuartal, kami bertanya: apakah PathTrick membuat langkah berikutnya terasa lebih jelas, lebih mudah dilakukan, dan lebih bernilai?
                 </p>
                 <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Traction — Apakah PathTrick Dipakai?</strong></div>
-                    <div className={styles.cardText}>Ukur pertumbuhan cohort siswa SMA dan mahasiswa, jumlah user yang memilih role, menyelesaikan assessment RIASEC atau CV, memulai quest pertama, kembali di minggu berikutnya, dan menuntaskan course. Untuk demo hackathon, bukti terpenting bukan jumlah wallet yang tersambung, tetapi alur nyata dari <strong>assessment → learning mission → project → verified certificate</strong>.</div>
+                    <div className={styles.cardTitle}><strong>Traction — Apakah Perjalanan Dimulai dan Diselesaikan?</strong></div>
+                    <div className={styles.cardText}>Kami mengikuti jejak user dari memilih role, menyelesaikan assessment RIASEC atau CV, memulai quest pertama, kembali di minggu berikutnya, hingga menuntaskan course. Untuk demo hackathon, bukti terpenting bukan jumlah wallet yang tersambung, tetapi alur utuh: <strong>assessment → learning mission → project → verified certificate</strong>.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Efficiency — Apakah Model Ini Bisa Diulang?</strong></div>
-                    <div className={styles.cardText}>Ukur biaya mendapatkan satu learner melalui sekolah, komunitas, atau referral; biaya AI untuk assessment dan CV; biaya support; serta waktu yang dibutuhkan untuk mengaktifkan satu cohort. PathTrick harus membuktikan bahwa cohort baru dapat dilayani tanpa menambah biaya secara tidak terkendali, sementara certificate tetap memakai <strong>mintPrice</strong> contract dan user membayar gas secara transparan.</div>
+                    <div className={styles.cardTitle}><strong>Efficiency — Apakah Jalan Ini Bisa Dibuka untuk Cohort Berikutnya?</strong></div>
+                    <div className={styles.cardText}>Kami mengukur biaya untuk membawa satu learner dari sekolah, komunitas, atau referral sampai aktif, termasuk AI, support, dan onboarding cohort. PathTrick harus menunjukkan bahwa semakin banyak pelajar yang dibantu tidak berarti biaya tumbuh tanpa kendali, sementara certificate tetap memakai <strong>mintPrice</strong> contract dan gas fee terlihat transparan bagi user.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Moat — Mengapa PathTrick Sulit Ditiru?</strong></div>
-                    <div className={styles.cardText}>Moat PathTrick bukan sekadar tampilan pixel-art atau penggunaan blockchain. Moat dibangun dari kombinasi <strong>outcome dataset yang memiliki consent</strong>, learning journey yang membuat user menyelesaikan skill, partner sekolah dan content, kualitas rekomendasi RIASEC/CV, serta <strong>on-chain proof</strong> yang dapat diverifikasi tanpa bergantung pada klaim internal platform.</div>
+                    <div className={styles.cardTitle}><strong>Moat — Mengapa Bukti Ini Lebih Dipercaya?</strong></div>
+                    <div className={styles.cardText}>Keunggulan PathTrick bukan sekadar pixel-art atau blockchain. Ia tumbuh dari kombinasi <strong>outcome dataset yang memiliki consent</strong>, learning journey yang mendorong completion, partner sekolah dan content, kualitas rekomendasi RIASEC/CV, serta <strong>on-chain proof</strong> yang dapat diverifikasi di luar klaim internal platform.</div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardTitle}><strong>Execution — Apakah Tim Mampu Memenangkan Pasar?</strong></div>
-                    <div className={styles.cardText}>Nilai kemampuan tim mengubah feedback menjadi release, menjaga frontend tetap stabil saat backend dan wallet masuk, menjalankan pilot dengan sekolah atau kampus, serta mengulang playbook yang berhasil. Untuk hackathon, ini terlihat dari demo end-to-end yang mulus, integrasi BNB Testnet yang benar, UX yang mudah dipahami pengguna non-crypto, dan roadmap yang realistis.</div>
+                    <div className={styles.cardTitle}><strong>Execution — Apakah Visi Ini Bisa Menjadi Kebiasaan User?</strong></div>
+                    <div className={styles.cardText}>Kami membuktikannya melalui release yang cepat, frontend yang tetap stabil saat backend dan wallet masuk, pilot sekolah atau kampus, dan playbook yang dapat diulang. Untuk hackathon, execution terlihat dari demo end-to-end yang mulus, integrasi BNB Testnet yang benar, UX yang ramah non-crypto, dan roadmap yang berpijak pada kenyataan.</div>
                   </div>
                 </div>
               </section>
@@ -989,7 +989,7 @@ export default function DocsPage() {
               <div className={styles.separator} />
               <section className={styles.section}>
                 <div className={styles.callout}>
-                  PathTrick masuk melalui masalah yang spesifik: siswa dan mahasiswa Indonesia sering harus memilih jurusan, skill, dan karier dengan informasi yang terpecah. Produk dimulai dari <strong>career discovery</strong>, lalu berkembang menjadi learning infrastructure dan verified skill network.
+                  PathTrick dimulai dari satu momen yang sangat manusiawi: seorang pelajar membuka banyak tab, mendengar terlalu banyak nasihat, tetapi tetap tidak tahu langkah berikutnya. Kami masuk melalui <strong>career discovery</strong>, membantu user menemukan arah yang terasa personal, lalu membawa mereka ke learning infrastructure dan verified skill network.
                 </div>
                 <h3 className={styles.sectionTitle}>Beachhead Market</h3>
                 <p className={styles.text} style={{ textAlign: 'justify', marginBottom: '36px' }}>
@@ -1061,29 +1061,29 @@ export default function DocsPage() {
               <div className={styles.separator} />
               <section className={styles.section}>
                 <div className={styles.callout}>
-                  PathTrick menunjukkan bahwa Web3 dapat menjadi <strong>infrastructure of trust</strong> untuk pendidikan dan karier, bukan sekadar fitur spekulatif. User datang karena ingin menemukan arah, bertahan karena learning game, dan membawa pulang bukti skill yang dapat diverifikasi.
+                  <strong>PathTrick menunjukkan bahwa Web3 dapat menjadi infrastructure of trust untuk pendidikan dan karier.</strong> User datang karena ingin menemukan arah, bertahan karena learning game, lalu pulang membawa bukti skill yang dapat diverifikasi—bukan sekadar collectible digital.
                 </div>
                 <h3 className={styles.sectionTitle}>Judging Narrative</h3>
                 <table className={styles.techTable}>
                   <thead><tr><th><strong>Yang Dinilai</strong></th><th><strong>Bukti PathTrick</strong></th></tr></thead>
                   <tbody>
-                    <tr><td><strong>Problem</strong></td><td>Career uncertainty, salah jurusan, dan gap antara belajar dengan bukti skill adalah masalah nyata bagi pelajar Indonesia.</td></tr>
-                    <tr><td><strong>Innovation</strong></td><td>RIASEC/CV insight diubah menjadi game-like learning journey dan on-chain credential.</td></tr>
-                    <tr><td><strong>Web3 Relevance</strong></td><td>Certificate memakai signature authorization, live mint price, receipt verification, dan event <code>CertificateMinted(to, courseId)</code> di BNB Testnet.</td></tr>
-                    <tr><td><strong>Usability</strong></td><td>Privy embedded wallet dan pixel-RPG UX membuat user non-crypto dapat mengikuti flow tanpa memahami detail blockchain.</td></tr>
-                    <tr><td><strong>Impact</strong></td><td>Membantu user bergerak dari bingung menjadi punya roadmap, skill evidence, dan jalur pendidikan/karier yang lebih jelas.</td></tr>
-                    <tr><td><strong>Scalability</strong></td><td>Role-based product dapat berkembang dari student experience menjadi institution, content partner, dan recruiter network.</td></tr>
+                    <tr><td><strong>Problem</strong></td><td>Seorang pelajar dapat memiliki banyak pilihan, tetapi tidak memiliki peta. PathTrick menjawab career uncertainty, salah jurusan, dan jarak antara belajar dengan bukti skill.</td></tr>
+                    <tr><td><strong>Innovation</strong></td><td>Insight RIASEC/CV tidak berhenti sebagai laporan; insight itu berubah menjadi <strong>learning journey</strong> yang bisa dimainkan, diukur, dan diselesaikan.</td></tr>
+                    <tr><td><strong>Web3 Relevance</strong></td><td>Certificate memakai signature authorization, live mint price, receipt verification, dan event <code>CertificateMinted(to, courseId)</code> di BNB Testnet untuk menciptakan bukti yang dapat dipercaya.</td></tr>
+                    <tr><td><strong>Usability</strong></td><td>Privy embedded wallet dan pixel-RPG UX menyembunyikan kompleksitas crypto, sehingga user dapat fokus pada perjalanan belajar, bukan konfigurasi teknis.</td></tr>
+                    <tr><td><strong>Impact</strong></td><td>PathTrick membantu user bergerak dari “saya bingung” menjadi “saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya bisa membuktikannya.”</td></tr>
+                    <tr><td><strong>Scalability</strong></td><td>Perjalanan individual ini dapat berkembang menjadi infrastructure untuk cohort, institution, content partner, dan recruiter network.</td></tr>
                   </tbody>
                 </table>
               </section>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>The 90-Second Demo Story</h3>
                 <div className={styles.timeline}>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}>User memilih persona <strong>The Dreamer</strong> atau <strong>The Chaser</strong> tanpa form yang membingungkan.</div></div>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}>Assessment menghasilkan arah personal dan membawa user ke dashboard RPG.</div></div>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}>User masuk ke House, menyelesaikan mission, quiz, dan project dengan feedback yang jelas.</div></div>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}>Wallet berpindah ke BNB Testnet, frontend membaca harga contract, lalu user mint certificate.</div></div>
-                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>5</div><div className={styles.timelineContent}>Receipt, event, dan backend confirmation selesai; user melihat certificate sebagai bukti skill.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}>Semuanya dimulai dari seorang user yang memilih persona <strong>The Dreamer</strong> atau <strong>The Chaser</strong>—tanpa form panjang dan tanpa harus mengerti crypto.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}>Assessment mengubah kebingungan menjadi arah personal, lalu membuka dashboard RPG sebagai peta perjalanan.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}>Di dalam House, user menyelesaikan mission, quiz, dan project. Setiap langkah memberi feedback dan progress yang bisa dilihat.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}>Setelah berhasil, wallet berpindah ke BNB Testnet. Frontend membaca harga contract secara live dan user melakukan mint certificate.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>5</div><div className={styles.timelineContent}>Receipt, event, dan backend confirmation selesai. Yang tersisa bukan hanya layar kemenangan, tetapi <strong>bukti skill yang dapat dibawa ke langkah berikutnya</strong>.</div></div>
                 </div>
               </section>
               <section className={styles.section}>
