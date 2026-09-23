@@ -16,7 +16,8 @@ type DocSection =
   | 'ai_riasec'
   | 'ai_cv'
   | 'system_status'
-  | 'integration_notes';
+  | 'integration_notes'
+  | 'business_scaling';
 
 export default function DocsPage() {
   const router = useRouter();
@@ -42,6 +43,7 @@ export default function DocsPage() {
     { key: 'ai_cv', label: '9. AI: CV Analyzer', group: '' },
     { key: 'system_status', label: '10. Current System Status', group: 'OPERATIONS' },
     { key: 'integration_notes', label: '11. Integration Notes', group: '' },
+    { key: 'business_scaling', label: '12. Business Scaling', group: 'BUSINESS' },
   ];
 
   return (
@@ -789,6 +791,91 @@ export default function DocsPage() {
                 </div>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Error yang perlu ditampilkan dengan jelas meliputi wrong network, insufficient funds, user rejected transaction, <code>IncorrectMintFee</code>, <code>AlreadyCertified</code>, <code>InvalidSignature</code>, dan <code>SignatureExpired</code>.
+                </p>
+              </section>
+            </>
+          )}
+
+          {/* ── 12. BUSINESS SCALING ── */}
+          {activeSection === 'business_scaling' && (
+            <>
+              <h2 className={styles.docTitle}>BUSINESS SCALING</h2>
+              <div className={styles.separator} />
+              <section className={styles.section}>
+                <div className={styles.callout}>
+                  PathTrick dirancang sebagai career-learning platform yang menggabungkan assessment, learning game, career matching, dan bukti skill on-chain. Scaling tidak hanya berarti menambah user, tetapi juga meningkatkan kualitas rekomendasi, completion rate, partner outcome, dan recurring revenue tanpa mengorbankan pengalaman pixel-RPG.
+                </div>
+                <h3 className={styles.sectionTitle}>Target Customer</h3>
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>1</div><div className={styles.cardTitle}>B2C Student</div></div>
+                    <div className={styles.cardText}>Siswa SMA dan mahasiswa yang membutuhkan validasi minat, roadmap belajar, portfolio, serta bukti kompetensi.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>2</div><div className={styles.cardTitle}>Schools & Campus</div></div>
+                    <div className={styles.cardText}>Sekolah, kampus, dan career center yang membutuhkan assessment, dashboard cohort, dan monitoring kesiapan siswa.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>3</div><div className={styles.cardTitle}>Employers</div></div>
+                    <div className={styles.cardText}>Perusahaan dan recruiter yang ingin menemukan kandidat berdasarkan skill evidence, bukan hanya CV.</div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}>4</div><div className={styles.cardTitle}>Content Partners</div></div>
+                    <div className={styles.cardText}>Bootcamp, mentor, dan penyedia course yang ingin mendistribusikan materi melalui quest dan certificate.</div>
+                  </div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Revenue Model</h3>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Model</th><th>Value</th><th>Catatan Eksekusi</th></tr></thead>
+                  <tbody>
+                    <tr><td>Freemium</td><td>Assessment dasar, dashboard, dan sebagian quest gratis</td><td>Menjaga acquisition tetap rendah friksi</td></tr>
+                    <tr><td>Premium Learning</td><td>Roadmap lanjutan, project review, mentor, dan analytics</td><td>Subscription bulanan atau paket course</td></tr>
+                    <tr><td>Institutional SaaS</td><td>Dashboard sekolah/kampus, cohort analytics, dan admin tools</td><td>Kontrak tahunan per institution atau per cohort</td></tr>
+                    <tr><td>Recruiter Access</td><td>Talent search berbasis verified skill evidence</td><td>Memerlukan consent, privacy control, dan anti-discrimination review</td></tr>
+                    <tr><td>Certificate Fee</td><td>Mint certificate dengan harga contract saat ini plus gas</td><td>Frontend membaca <code>mintPrice()</code>; harga tidak boleh di-hardcode</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Growth Loop</h3>
+                <div className={styles.timeline}>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>1</div><div className={styles.timelineContent}><strong>Discover:</strong> User masuk dari referral, sekolah, content partner, atau career campaign.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>2</div><div className={styles.timelineContent}><strong>Assess:</strong> Role dan assessment menghasilkan personal starting point.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>3</div><div className={styles.timelineContent}><strong>Progress:</strong> Quest, XP, streak, dan visual map mendorong completion.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>4</div><div className={styles.timelineContent}><strong>Prove:</strong> Project dan certificate menjadi skill evidence yang dapat dibagikan.</div></div>
+                  <div className={styles.timelineItem}><div className={styles.timelinePoint}>5</div><div className={styles.timelineContent}><strong>Refer:</strong> Achievement, leaderboard, dan outcome karier mengundang user serta partner baru.</div></div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>North Star Metrics</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Fokus awal bukan jumlah wallet, melainkan <strong>verified learning outcomes</strong>: jumlah user yang menyelesaikan assessment, menyelesaikan quest, lulus project, memperoleh certificate, dan mendapatkan outcome berikutnya seperti internship, university match, atau job interview.
+                </p>
+                <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Activation</div><div className={styles.cardText}>Role selected, assessment started, dan first quest completed.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Retention</div><div className={styles.cardText}>D7/D30 return, weekly quest completion, dan learning streak.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Conversion</div><div className={styles.cardText}>Premium upgrade, certificate mint, atau institutional seat usage.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Outcome</div><div className={styles.cardText}>Course completion, verified skill, partner satisfaction, dan placement signal.</div></div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Scale Roadmap</h3>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Stage</th><th>Prioritas</th></tr></thead>
+                  <tbody>
+                    <tr><td>Stage 1: Validate</td><td>Stabilkan onboarding, learning completion, wallet flow, mock-to-real backend, dan 1-2 pilot institution.</td></tr>
+                    <tr><td>Stage 2: Repeat</td><td>Bangun admin dashboard, analytics cohort, content pipeline, referral, dan subscription billing.</td></tr>
+                    <tr><td>Stage 3: Expand</td><td>Tambah partner course, recruiter portal, multi-language, multi-chain strategy, dan regional distribution.</td></tr>
+                    <tr><td>Stage 4: Platform</td><td>Buka API/SDK untuk institution dan content partner dengan permission, audit, serta SLA yang jelas.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Risiko yang Harus Dikendalikan</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Pertumbuhan harus tetap menjaga kualitas rekomendasi AI, privasi CV dan data assessment, fairness pada career matching, biaya RPC dan gas, moderasi content partner, serta ketergantungan pada provider login dan blockchain. Sebelum scale besar, tambahkan audit security, observability, rate limiting, backup database, consent management, dan proses support yang terukur.
                 </p>
               </section>
             </>
