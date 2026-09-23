@@ -3,12 +3,23 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useScholarStore } from '@/store/useScholarStore';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useUserStore } from '@/store/useUserStore';
 import styles from '@/components/ui/Dashboard.module.css';
 import { AnimatePresence } from 'framer-motion';
 
 export default function MahasiswaDashboard() {
   const { careerRank, xp, targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
   const [gapData, setGapData] = useState<{ missing: string[]; possessed: string[] }>({ missing: [], possessed: [] });
+  
+  const { user } = usePrivy();
+  const { wallets } = useWallets();
+  const { displayName: savedName } = useUserStore();
+  const activeWallet = wallets[0];
+  const displayName = savedName 
+    || user?.google?.name 
+    || user?.email?.address?.split('@')[0] 
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'The Chaser');
 
   useEffect(() => {
     fetchProfileData().then(() => {
@@ -29,8 +40,8 @@ export default function MahasiswaDashboard() {
       
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          WELCOME BACK, SCHOLAR!
+        <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
+          WELCOME BACK, {displayName}!
         </h1>
         <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
           Your AI Career Roadmap is actively scanning for opportunities.

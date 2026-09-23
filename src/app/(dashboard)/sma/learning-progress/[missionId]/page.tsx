@@ -94,12 +94,16 @@ export default function MissionFlowPage() {
 
   const handleLevelComplete = () => {
     completeDynamicNode(missionId as string);
-    if (isBossLevel) {
-      // If Boss is beaten, we go to SBT Claim / Certificate!
-      router.push('/sma/certificate');
-    } else {
-      setPhase('CLAIM');
+    setPhase('CLAIM');
+  };
+
+  // Helper to convert chapter ID string to uint256-compatible number for SBT Minting
+  const generateCourseId = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
+    return Math.abs(hash);
   };
 
   // Simple animation variants
@@ -514,14 +518,30 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
             <div style={{ textAlign: 'center', background: '#fffbeb', padding: '16px', borderRadius: '8px', border: '1px solid #fde68a' }}>
-              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>💎</span>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>{isBossLevel ? '📜' : '💎'}</span>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#92400e', lineHeight: '1.6' }}>
-                Reward XP dan item telah ditambahkan ke akunmu.
+                {isBossLevel 
+                  ? 'Selamat! Kamu berhasil menaklukkan Boss Modul ini. Sekarang kamu berhak mencetak (mint) Sertifikat SBT Web3 On-Chain sebagai bukti kelulusan.'
+                  : 'Reward XP dan item telah ditambahkan ke akunmu.'}
               </p>
             </div>
-            <button className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
-              KLAIM REWARD & KEMBALI KE PETA
-            </button>
+            
+            {isBossLevel ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', width: '100%' }}>
+                <MintSBTButton courseId={generateCourseId(baseChapterId)} />
+                <button 
+                  className={styles.btn} 
+                  onClick={() => router.push('/sma/certificate')} 
+                  style={{ fontSize: '0.7rem', padding: '12px 24px', background: '#f59e0b', borderColor: '#b45309' }}
+                >
+                  LIHAT SERTIFIKAT DI VAULT →
+                </button>
+              </div>
+            ) : (
+              <button className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
+                KLAIM REWARD & KEMBALI KE PETA
+              </button>
+            )}
           </div>
         );
 

@@ -27,6 +27,15 @@ const STATUS_META = {
   completed:   { label: 'Selesai',         badge: 'badge-green',  icon: '✅' },
 };
 
+// Sequential boss dialogue — Professor speaks one line at a time
+const BOSS_DIALOGUE_LINES = [
+  '⚔️  Ini bukan quest biasa, Petualang...',
+  'Level 1 hingga 5 sudah kamu taklukkan. Fondasi, Skill, Proyek, Kuis, Latihan — semuanya.',
+  'Sekarang, hanya satu rintangan tersisa. Boss Fight.',
+  '"Apakah kamu benar-benar siap menghadapinya?"',
+  'Aku sudah melihat perjuanganmu. Aku yakin kamu bisa. Buktikan pada dunia. ⚡',
+];
+
 export default function NodeInfoPanel({
   node,
   isNearby,
@@ -35,138 +44,191 @@ export default function NodeInfoPanel({
 }: NodeInfoPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [displayNode, setDisplayNode] = useState<CourseNodeData | null>(null);
+  const [bossLineIndex, setBossLineIndex] = useState(0);
+  const [bossConfirmed, setBossConfirmed] = useState(false);
   const role = useMapStore(state => state.role);
 
   useEffect(() => {
     if (node) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayNode(node);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(true);
+      setBossLineIndex(0);
+      setBossConfirmed(false);
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(false);
       const t = setTimeout(() => setDisplayNode(null), 400);
       return () => clearTimeout(t);
     }
   }, [node]);
 
+  // Auto-advance boss dialogue lines every 2.2 seconds
+  useEffect(() => {
+    if (!displayNode) return;
+    const isBoss = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');
+    if (!isBoss) return;
+    if (bossLineIndex >= BOSS_DIALOGUE_LINES.length - 1) return;
+
+    const t = setTimeout(() => {
+      setBossLineIndex(prev => prev + 1);
+    }, 2200);
+    return () => clearTimeout(t);
+  }, [bossLineIndex, displayNode]);
+
   if (!displayNode) return null;
 
-  const catMeta    = CATEGORY_META[displayNode.category];
-  const statusMeta = STATUS_META[displayNode.status];
-  const canStart   = displayNode.status === 'available' || displayNode.status === 'in_progress';
+  const catMeta       = CATEGORY_META[displayNode.category];
+  const statusMeta    = STATUS_META[displayNode.status];
+  const canStart      = displayNode.status === 'available' || displayNode.status === 'in_progress';
+  const isBoss        = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');
+  const allLinesShown = bossLineIndex >= BOSS_DIALOGUE_LINES.length - 1;
 
   return (
-    <div className={`${styles.panel} ${isVisible ? styles.visible : styles.hidden}`}>
-      {/* Header */}
-      <div className={styles.header} style={{ borderColor: catMeta.color }}>
-        <div className={styles.headerLeft}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={catMeta.icon} alt={catMeta.label} className={styles.categoryIconImg} />
-          <div>
-            <p className={styles.categoryLabel} style={{ color: catMeta.color }}>
-              {catMeta.label}
-            </p>
-            <h2 className={styles.nodeTitle}>{displayNode.title}</h2>
-          </div>
-        </div>
-        <button
-          id="node-panel-close"
-          className={styles.closeBtn}
-          onClick={onClose}
-          aria-label="Tutup panel"
-        />
+    <div className={`${styles.panel} ${isVisible ? styles.visible : styles.hidden} ${isBoss ? styles.bossMode : ''}`}>
+      <div className={styles.inner}>
 
+      {/* Character Portrait */}
+      <div className={`${styles.portraitBox} ${isBoss ? styles.bossPortrait : ''}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/npc-professor.png" alt="Professor" />
       </div>
 
-      {/* Status badge */}
-      <div className={styles.statusRow}>
-        <span className={`${styles.badge} ${styles[statusMeta.badge]}`}>
-          {statusMeta.icon} {statusMeta.label}
-        </span>
-        <span className={styles.xp}>+{displayNode.xp} XP</span>
-      </div>
-
-      {/* Description */}
-      <p className={styles.description}>{displayNode.description}</p>
-
-      {/* AI Recommendation */}
-      {displayNode.aiRecommendation && (
-        <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(20, 184, 166, 0.1)', border: '2px solid rgba(20, 184, 166, 0.4)', borderRadius: '4px' }}>
-          <p style={{ margin: 0, fontFamily: '"Press Start 2P", monospace', fontSize: '0.45rem', color: '#2dd4bf', marginBottom: '8px', lineHeight: '1.4' }}>
-            🤖 AI INSIGHT
-          </p>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: '#ccfbf1', lineHeight: '1.4' }}>
-            {displayNode.aiRecommendation}
-          </p>
+      {/* Dialogue Box */}
+      <div className={`${styles.dialogueBox} ${isBoss ? styles.bossDialogue : ''}`}>
+        <div className={`${styles.speakerName} ${isBoss ? styles.bossSpeakerName : ''}`}>
+          {isBoss ? '⚔️ Profesor PathTrick' : 'Profesor PathTrick'}
         </div>
-      )}
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Tutup panel">
+          ✖
+        </button>
 
-      {/* Proximity hint */}
-      {isNearby && canStart && (
-        <p className={styles.proximityHint}>
-          💡 Kamu dekat dengan node ini!
-        </p>
-      )}
+        <div className={styles.dialogueContent}>
+          {isBoss ? (
+            /* ─── BOSS FIGHT DIALOGUE MODE ─── */
+            <>
+              <div className={styles.bossLines}>
+                {BOSS_DIALOGUE_LINES.slice(0, bossLineIndex + 1).map((line, i) => (
+                  <p
+                    key={i}
+                    className={`${styles.dialogueText} ${
+                      i === bossLineIndex ? styles.dialogueActive : styles.dialogueFaded
+                    }`}
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
 
-      {/* Prerequisites */}
-      {displayNode.prerequisites.length > 0 && displayNode.status === 'locked' && (
-        <div className={styles.prereqSection}>
-          <p className={styles.prereqTitle}>Prasyarat:</p>
-          <div className={styles.prereqList}>
-            {displayNode.prerequisites.map(id => (
-              <span key={id} className={`${styles.badge} ${styles['badge-purple']}`}>🔗 {id}</span>
-            ))}
-          </div>
+              {/* Dot progress indicator */}
+              <div className={styles.dotProgress}>
+                {BOSS_DIALOGUE_LINES.map((_, i) => (
+                  <span key={i} className={i <= bossLineIndex ? styles.dotActive : styles.dot} />
+                ))}
+              </div>
+
+              {/* Info row */}
+              <div className={styles.infoRow}>
+                <span className={`${styles.badge} ${styles[statusMeta.badge]}`}>
+                  {statusMeta.icon} {statusMeta.label}
+                </span>
+                <span className={`${styles.xp} ${styles.bossXp}`}>+{displayNode.xp} XP 🔥</span>
+                <span style={{ fontSize: '0.5rem', color: '#fca5a5', letterSpacing: '0.05em' }}>
+                  ⚔️ BOSS FIGHT
+                </span>
+              </div>
+
+              {/* Boss CTA — only shows after all lines played */}
+              <div className={styles.actions}>
+                {canStart && allLinesShown && (
+                  <div className={styles.bossCtaGroup}>
+                    <p className={styles.bossWarning}>
+                      ⚠️ Pastikan kamu sudah siap! Level 1–5 harus dikuasai sebelum ini.
+                    </p>
+                    <button
+                      className={`${styles.actionBtn} ${styles.bossBtn}`}
+                      onClick={() => onStartCourse(displayNode)}
+                    >
+                      ⚔️ TERIMA TANTANGAN!
+                    </button>
+                  </div>
+                )}
+                {canStart && !allLinesShown && (
+                  <button
+                    className={styles.skipBtn}
+                    onClick={() => setBossLineIndex(BOSS_DIALOGUE_LINES.length - 1)}
+                  >
+                    Lewati ▶▶
+                  </button>
+                )}
+                {displayNode.status === 'completed' && (
+                  <button
+                    className={`${styles.actionBtn} ${styles.goldBtn}`}
+                    onClick={() => onStartCourse(displayNode)}
+                  >
+                    Lihat Badge 🌟
+                  </button>
+                )}
+                {displayNode.status === 'locked' && (
+                  <div className={styles.lockedMsg}>
+                    🔒 Selesaikan Level 1–5 terlebih dahulu, Petualang!
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            /* ─── NORMAL NODE DIALOGUE ─── */
+            <>
+              <p className={styles.dialogueText}>
+                &quot;Ah, Petualang! {displayNode.description} Apakah kamu siap untuk mengambil tantangan{' '}
+                <strong>{displayNode.title}</strong>?&quot;
+              </p>
+
+              <div className={styles.infoRow}>
+                <span className={`${styles.badge} ${styles[statusMeta.badge]}`}>
+                  {statusMeta.icon} {statusMeta.label}
+                </span>
+                <span className={styles.xp}>+{displayNode.xp} XP</span>
+                <span style={{ fontSize: '0.55rem', color: '#a78bfa' }}>• {catMeta.label}</span>
+              </div>
+
+              <div className={styles.actions}>
+                {canStart && (
+                  <>
+                    {displayNode.universityMatchId ? (
+                      <button className={styles.actionBtn} onClick={() => onStartCourse(displayNode)}>
+                        See University Details ▶
+                      </button>
+                    ) : displayNode.jobGapId ? (
+                      <button className={styles.actionBtn} onClick={() => onStartCourse(displayNode)}>
+                        View Job Match ▶
+                      </button>
+                    ) : (
+                      <button className={styles.actionBtn} onClick={() => onStartCourse(displayNode)}>
+                        {role === 'MAHASISWA'
+                          ? 'Train Skill ▶'
+                          : displayNode.status === 'in_progress'
+                          ? 'Lanjutkan ▶'
+                          : 'Mulai Misi ▶'}
+                      </button>
+                    )}
+                  </>
+                )}
+                {displayNode.status === 'completed' && (
+                  <button
+                    className={`${styles.actionBtn} ${styles.goldBtn}`}
+                    onClick={() => onStartCourse(displayNode)}
+                  >
+                    Lihat Badge 🌟
+                  </button>
+                )}
+                {displayNode.status === 'locked' && (
+                  <div className={styles.lockedMsg}>🔒 Prasyarat belum terpenuhi...</div>
+                )}
+              </div>
+            </>
+          )}
         </div>
-      )}
-
-      {/* Action buttons */}
-      <div className={styles.actions}>
-        {canStart && (
-          <>
-            {displayNode.universityMatchId ? (
-              <button
-                className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                onClick={() => onStartCourse(displayNode)}
-              >
-                See University Details
-              </button>
-            ) : displayNode.jobGapId ? (
-              <button
-                className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                onClick={() => onStartCourse(displayNode)}
-              >
-                View Job Match
-              </button>
-            ) : (
-              <button
-                id="node-start-course-btn"
-                className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                onClick={() => onStartCourse(displayNode)}
-              >
-                {role === 'MAHASISWA' ? 'Train Skill' : (displayNode.status === 'in_progress' ? 'Lanjutkan' : 'Mulai Misi')}
-              </button>
-            )}
-          </>
-        )}
-        
-        {displayNode.status === 'completed' && (
-          <button
-            id="node-view-badge-btn"
-            className={`${styles.actionBtn} ${styles.goldBtn}`}
-            onClick={() => onStartCourse(displayNode)}
-          >
-            Lihat Badge
-          </button>
-        )}
-        {displayNode.status === 'locked' && (
-          <div className={styles.lockedMsg}>
-            🔒 Selesaikan prasyarat untuk membuka node ini
-          </div>
-        )}
       </div>
+      </div> {/* .inner */}
     </div>
   );
 }

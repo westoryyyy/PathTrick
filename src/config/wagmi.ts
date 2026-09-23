@@ -1,12 +1,10 @@
 import { createConfig } from '@privy-io/wagmi';
-import { bscTestnet, bsc, mainnet } from 'viem/chains';
+import { bscTestnet } from 'viem/chains';
 import { http } from 'wagmi';
 
 export const wagmiConfig = createConfig({
-  chains: [bscTestnet, bsc, mainnet],
+  chains: [bscTestnet],
   transports: {
-    [bscTestnet.id]: http(),
-    [bsc.id]: http(),
-    [mainnet.id]: http(),
+    [bscTestnet.id]: http('https://data-seed-prebsc-1-s1.bnbchain.org:8545'),
   },
 });

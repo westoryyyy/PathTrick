@@ -6,6 +6,7 @@ import { mockBackendData } from '@/data/mockBackendData';
 import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
 import { useUserStore } from '@/store/useUserStore';
+import { useRouter } from 'next/navigation';
 
 const stageIconMap: Record<string, string> = {
   material: '📚',
@@ -22,6 +23,7 @@ const stageColorMap: Record<string, string> = {
 };
 
 export default function LearningProgress() {
+  const router = useRouter();
   const { houses, user } = mockBackendData;
   const { totalXP, level, dailyBountyClaimed, claimDailyBounty, addXP } = useUserStore();
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
@@ -47,8 +49,14 @@ export default function LearningProgress() {
         );
       case 'locked':
         return (
-          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#525252', border: '2px solid #404040', color: '#a3a3a3', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-            🔒 LOCKED
+          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#78350f', border: '2px solid #451a03', color: '#fcd34d', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>⚔️</span> SIDE QUEST
+          </span>
+        );
+      case 'lockedByLevel':
+        return (
+          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#3f3f46', border: '2px solid #27272a', color: '#a1a1aa', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>🔒</span> LOCKED
           </span>
         );
       default:
@@ -75,6 +83,7 @@ export default function LearningProgress() {
           {houses.map((house: House, idx: number) => {
             const isCompleted = house.status === 'completed';
             const isLocked = house.status === 'locked';
+            const isLockedByLevel = isLocked && level < 5;
             const progress = getProgressPercentage(house.stages);
 
             return (
@@ -84,16 +93,55 @@ export default function LearningProgress() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 className={styles.retroCard}
+                onClick={() => { if (!isLockedByLevel) router.push(`/house/${house.id}`); }}
                 style={{
                   padding: '0',
-                  opacity: isLocked ? 0.7 : 1,
-                  filter: isLocked ? 'grayscale(100%)' : 'none'
+                  opacity: isLockedByLevel ? 0.5 : (isLocked ? 0.7 : 1),
+                  filter: isLockedByLevel ? 'grayscale(100%) contrast(0.8)' : (isLocked ? 'grayscale(100%)' : 'none'),
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: isLockedByLevel ? 'not-allowed' : 'pointer'
                 }}
               >
-                {/* House Header Link */}
-                <a
-                  href={isLocked ? '#' : `/house/${house.id}`}
-                  style={{ width: '100%', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: isLocked ? 'not-allowed' : 'pointer', background: 'transparent', border: 'none', outline: 'none', textDecoration: 'none' }}
+                {isLockedByLevel && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'repeating-linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6) 10px, rgba(0,0,0,0.7) 10px, rgba(0,0,0,0.7) 20px)',
+                    zIndex: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                    pointerEvents: 'none'
+                  }}>
+                    <span style={{ fontSize: '3rem' }}>🔒</span>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fca5a5', background: '#7f1d1d', padding: '8px 16px', border: '2px solid #b91c1c' }}>
+                      REACH LVL 5 TO UNLOCK
+                    </span>
+                  </div>
+                )}
+                {isLocked && !isLockedByLevel && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 12, right: -40,
+                    transform: 'rotate(45deg)',
+                    background: '#b91c1c',
+                    padding: '8px 48px',
+                    border: '2px solid #7f1d1d',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                    zIndex: 10,
+                    pointerEvents: 'none'
+                  }}>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fca5a5' }}>
+                      EXP PENALTY
+                    </span>
+                  </div>
+                )}
+                {/* House Header */}
+                <div
+                  style={{ width: '100%', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'transparent' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                     <div style={{ width: '56px', height: '56px', background: '#3b261b', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
@@ -111,54 +159,55 @@ export default function LearningProgress() {
 
                   {/* Status Badge & Progress */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff' }}>
-                        {progress}%
-                      </span>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: '#fbbf24' }}>DONE</span>
-                    </div>
+                    {!isLockedByLevel ? (
+                      <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff' }}>
+                          {progress}%
+                        </span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: '#fbbf24' }}>DONE</span>
+                      </div>
+                    ) : (
+                      <div style={{ background: '#27272a', border: '2px solid #3f3f46', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#a1a1aa' }}>
+                          🔒
+                        </span>
+                      </div>
+                    )}
 
-                    {!isLocked && (
+                    {!isLockedByLevel && (
                       <div style={{ fontSize: '1.5rem', color: '#fbbf24' }}>
                         ➔
                       </div>
                     )}
                   </div>
-                </a>
+                </div>
 
                 {/* Info (Preview Modul & Minat Bakat) */}
                 <div style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   
+                  {isLockedByLevel ? (
+                    <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '12px', borderLeft: '3px solid #525252', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '1rem' }}>🔒</span>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#a3a3a3', lineHeight: '1.6' }}>
+                        Selesaikan Main Quest dan kumpulkan XP hingga Level 5 untuk membuka area ini.
+                      </span>
+                    </div>
+                  ) : (
+                    isLocked && (
+                      <div style={{ background: 'rgba(185, 28, 28, 0.1)', padding: '12px', borderLeft: '3px solid #b91c1c', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '1rem' }}>⚠️</span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fca5a5', lineHeight: '1.6' }}>
+                          AI tidak menyarankan path ini. Modul tetap bisa diakses, tetapi hadiah XP berkurang 50%.
+                        </span>
+                      </div>
+                    )
+                  )}
+
                   {/* Status & Modules count */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {getStatusBadge(house.status)}
+                    {getStatusBadge(isLockedByLevel ? 'lockedByLevel' : house.status)}
                     <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.stages.length} MODUL DI DALAM</span>
                   </div>
-
-                  {/* Skills Overview */}
-                  {house.skillsOverview && house.skillsOverview.length > 0 && (
-                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderLeft: '3px solid #059669', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#059669' }}>SKILL YANG DIASAH:</span>
-                      <ul style={{ margin: 0, paddingLeft: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#5a3a29', lineHeight: '1.8' }}>
-                        {house.skillsOverview.slice(0, 3).map((skill, i) => (
-                          <li key={i}>{skill}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Ideal For */}
-                  {house.idealFor && house.idealFor.length > 0 && (
-                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderLeft: '3px solid #2563eb', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#2563eb' }}>COCOK UNTUK:</span>
-                      <ul style={{ margin: 0, paddingLeft: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#5a3a29', lineHeight: '1.8' }}>
-                        {house.idealFor.slice(0, 3).map((ideal, i) => (
-                          <li key={i}>{ideal}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
                 </div>
               </motion.div>
             );
@@ -172,10 +221,10 @@ export default function LearningProgress() {
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>🏛️ THE VAULT</span>
-              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#fbbf24', cursor: 'pointer' }}>VIEW ALL</span>
+              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', cursor: 'pointer' }}>VIEW ALL</span>
             </div>
             
-            <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#d4d4d8', marginBottom: '16px', lineHeight: '1.6' }}>
+            <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', marginBottom: '16px', lineHeight: '1.6' }}>
               Claimed Soulbound Tokens
             </p>
 
@@ -298,11 +347,11 @@ export default function LearningProgress() {
                   )}
                 </AnimatePresence>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#60a5fa' }}>{totalXP}</p>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#d4d4d8', marginTop: '8px' }}>TOTAL XP</p>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#d4d4d8', marginTop: '8px' }}>TOTAL XP</p>
               </div>
               <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', textAlign: 'center', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>LV {level}</p>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#d4d4d8', marginTop: '8px' }}>LEVEL</p>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#d4d4d8', marginTop: '8px' }}>LEVEL</p>
               </div>
             </div>
           </div>

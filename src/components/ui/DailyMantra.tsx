@@ -52,7 +52,7 @@ export default function DailyMantra() {
         <div style={{
           position: 'relative',
           marginBottom: '16px',
-          width: '320px',
+          width: '420px',
           imageRendering: 'pixelated',
           pointerEvents: 'auto',
         }}>
@@ -69,7 +69,7 @@ export default function DailyMantra() {
               background: '#f5e6c8',
               border: '2px solid #8b5e34',
               borderRadius: '2px',
-              padding: '10px 12px 14px',
+              padding: '16px',
             }}>
               {/* Name plate */}
               <div style={{
@@ -77,9 +77,9 @@ export default function DailyMantra() {
                 background: '#5a3520',
                 color: '#f5e6c8',
                 fontFamily: '"Press Start 2P"',
-                fontSize: '0.38rem',
-                padding: '3px 8px',
-                marginBottom: '8px',
+                fontSize: '0.6rem',
+                padding: '6px 12px',
+                marginBottom: '12px',
                 borderRadius: '2px',
                 letterSpacing: '0.05em',
               }}>
@@ -89,7 +89,7 @@ export default function DailyMantra() {
               {/* Quote text */}
               <p style={{
                 fontFamily: '"Press Start 2P"',
-                fontSize: '0.42rem',
+                fontSize: '0.7rem',
                 color: '#3b1f0e',
                 lineHeight: '1.9',
                 margin: 0,
@@ -102,9 +102,9 @@ export default function DailyMantra() {
                 onClick={() => setIsOpen(false)}
                 style={{
                   textAlign: 'right',
-                  marginTop: '6px',
+                  marginTop: '12px',
                   fontFamily: '"Press Start 2P"',
-                  fontSize: '0.45rem',
+                  fontSize: '0.8rem',
                   color: '#5a3520',
                   cursor: 'pointer',
                   opacity: 0.7,

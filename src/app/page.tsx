@@ -3,7 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
+import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './page.module.css';
 
 /* ─── Feature icon cards ─── */
@@ -44,8 +46,20 @@ const NAV_LINKS = [
 ];
 
 export default function LandingPage() {
-  const { login } = usePrivy();
+  const { login, ready, authenticated } = usePrivy();
+  const router = useRouter();
+  const { selectedRole } = useOnboardingStore();
   const audioRef = React.useRef<HTMLAudioElement>(null);
+
+  React.useEffect(() => {
+    if (ready && authenticated) {
+      if (selectedRole) {
+        router.push(`/${selectedRole}/dashboard`);
+      } else {
+        router.push('/select-role');
+      }
+    }
+  }, [ready, authenticated, router, selectedRole]);
 
   React.useEffect(() => {
     const playAudio = () => {

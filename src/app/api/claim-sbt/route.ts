@@ -11,10 +11,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: In a real implementation, this would:
-    // 1. Verify the user has actually completed the course in the database
-    // 2. Or call an AI model to grade their submission
-    // 3. Sign the message using an Admin Private Key and ethers.js
+    // =========================================================================
+    // SECURITY TODO: In a REAL production environment connected to a database,
+    // this API must verify the user's completion status BEFORE signing.
+    // Right now, any user calling this API gets a signature.
+    // 
+    // Example pseudocode for future implementation:
+    // 
+    // const userProgress = await db.collection('progress').findOne({ wallet: userAddress });
+    // if (!userProgress || !userProgress.completedModules.includes(courseId)) {
+    //   return NextResponse.json({ error: 'Misi belum tamat / Progress tidak valid.' }, { status: 403 });
+    // }
+    // =========================================================================
     
     const adminPrivateKey = process.env.ADMIN_PRIVATE_KEY;
     
@@ -32,23 +40,27 @@ export async function POST(request: Request) {
     const { ethers } = require('ethers');
     const signer = new ethers.Wallet(adminPrivateKey);
 
-    // Assuming EIP-712 Domain and Types for PathTrick SBT
+    // EIP-712 Domain - MUST match the deployed contract exactly
+    // Verified via: cast call ... "eip712Domain()" => name: "PathtrickSBT", version: "1", chainId: 97
     const domain = {
-      name: 'PathTrick',
+      name: 'PathtrickSBT',
       version: '1',
       chainId: 97, // BNB Testnet
       verifyingContract: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     };
 
+    // EIP-712 Types - MUST match exactly:
+    // Contract line 37: keccak256("MintCertificate(address user,uint256 courseId)")
+    // Contract line 98: keccak256(abi.encode(MINT_TYPEHASH, msg.sender, courseId))
     const types = {
-      MintRequest: [
-        { name: 'minter', type: 'address' },
+      MintCertificate: [
+        { name: 'user', type: 'address' },
         { name: 'courseId', type: 'uint256' },
       ],
     };
 
     const value = {
-      minter: userAddress,
+      user: userAddress,
       courseId: courseId,
     };
 

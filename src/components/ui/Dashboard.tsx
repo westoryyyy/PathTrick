@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useUserStore } from '@/store/useUserStore';
 import LearningProgress from '@/components/learning/LearningProgress';
 import UniversityHub from '@/components/ui/UniversityHub';
 import ScholarshipHub from '@/components/ui/ScholarshipHub';
@@ -98,7 +99,7 @@ const VAULT_SBTS = [
 
 const LEADERBOARD_MOCK = [
   { rank: 1, name: 'AlexTheGreat', score: 3450 },
-  { rank: 2, name: 'Tukiman', score: 1250 },
+  { rank: 2, name: 'You', score: 1250 },
   { rank: 3, name: 'BudiSetiawan', score: 980 },
 ];
 
@@ -114,7 +115,16 @@ export default function Dashboard() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadMails, setUnreadMails] = useState([{ id: 1, sender: 'Prof. Oak', msg: 'Jangan lupa kerjakan kuis HTML!' }, { id: 2, sender: 'System', msg: 'Selamat datang di PathTrick!' }]);
   const [unreadNotifs, setUnreadNotifs] = useState([{ id: 1, msg: 'Anda berhasil naik ke Level 12!' }]);
-  const { logout, connectWallet } = usePrivy();
+  const { logout, user } = usePrivy();
+  const { wallets } = useWallets();
+  const { displayName: savedName } = useUserStore();
+
+  // Real user display name - same priority as layouts
+  const activeWallet = wallets[0];
+  const displayName = savedName
+    || user?.google?.name
+    || user?.email?.address?.split('@')[0]
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Explorer');
 
   const toggleMail = () => { setIsMailOpen(!isMailOpen); setIsNotifOpen(false); setIsDropdownOpen(false); };
   const toggleNotif = () => { setIsNotifOpen(!isNotifOpen); setIsMailOpen(false); setIsDropdownOpen(false); };
@@ -166,7 +176,7 @@ export default function Dashboard() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-              {mockAiResponse.user.name}
+              {displayName}
             </h2>
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>{mockAiResponse.user.level}</span>
           </div>
@@ -302,7 +312,10 @@ export default function Dashboard() {
                 <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
                   <div className={styles.lbRankInfo}>
                     <span className={styles.lbRankNum}>#{lb.rank}</span>
-                    <span className={styles.lbName}>{lb.name}</span>
+                    <span className={styles.lbName}>
+                      {lb.rank === 2 ? displayName : lb.name}
+                      {lb.rank === 2 && <span style={{ fontSize: '0.6em', color: '#fbbf24', marginLeft: '6px' }}>(YOU)</span>}
+                    </span>
                   </div>
                   <span className={styles.lbScore}>{lb.score} XP</span>
                 </div>

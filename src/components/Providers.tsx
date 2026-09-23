@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { wagmiConfig } from "@/config/wagmi";
 
+import { bscTestnet } from "viem/chains";
+
 const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -13,6 +15,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
       config={{
+        defaultChain: bscTestnet,
+        supportedChains: [bscTestnet],
         loginMethods: ["email", "google", "wallet"],
         appearance: {
           theme: "dark",

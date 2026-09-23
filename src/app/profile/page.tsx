@@ -2,16 +2,23 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useUserStore } from '@/store/useUserStore';
+import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user } = usePrivy();
-  
-  const [name, setName] = useState('Tukiman');
-  const [email, setEmail] = useState(user?.email?.address || 'D.Tukiman@gmail.com');
-  const [password, setPassword] = useState('');
+  const { wallets } = useWallets();
+  const { displayName: savedName, setProfile } = useUserStore();
+  const role = useOnboardingStore((s) => s.role);
+
+  // Priority: 1. Auto-detected from Privy, 2. Saved in Zustand
+  const privyName = user?.google?.name || user?.email?.address?.split('@')[0] || '';
+  const privyEmail = user?.google?.email || user?.email?.address || '';
+
+  const [name, setName] = useState(savedName || privyName);
 
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -21,12 +28,10 @@ export default function ProfilePage() {
     if (isSaving) return;
     
     setIsSaving(true);
-    // Simulate network request
     setTimeout(() => {
+      setProfile(name, privyEmail); // Persist to Zustand (localStorage)
       setIsSaving(false);
       setIsSaved(true);
-      
-      // Reset saved state after 2 seconds
       setTimeout(() => setIsSaved(false), 2000);
     }, 800);
   };
@@ -66,24 +71,35 @@ export default function ProfilePage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>EMAIL ADDRESS</label>
+            <label className={styles.label}>EMAIL ADDRESS (Verified via {user?.google ? 'Google' : 'OTP'})</label>
             <input 
               type="email" 
               className={styles.input} 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              value={privyEmail} 
+              disabled
+              style={{ opacity: 0.7, cursor: 'not-allowed' }}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>NEW PASSWORD</label>
+            <label className={styles.label}>WEB3 WALLET ADDRESS</label>
             <input 
-              type="password" 
+              type="text" 
               className={styles.input} 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter new password (optional)"
+              value={wallets[0]?.address || 'No wallet detected'} 
+              disabled
+              style={{ opacity: 0.7, cursor: 'not-allowed' }}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>CURRENT ROLE</label>
+            <input 
+              type="text" 
+              className={styles.input} 
+              value={role === 'sma' ? 'Siswa SMA (The Dreamer)' : 'Mahasiswa (The Chaser)'} 
+              disabled
+              style={{ opacity: 0.7, cursor: 'not-allowed' }}
             />
           </div>
 

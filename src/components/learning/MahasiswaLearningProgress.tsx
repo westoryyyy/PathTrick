@@ -159,8 +159,8 @@ export default function MahasiswaLearningProgress() {
                               <div className="flex items-center gap-4">
                                 <span className="text-xl">📘</span>
                                 <div>
-                                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#3b261b' }}>{chapter.name}</h4>
-                                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#78350f', marginTop: '6px' }}>{chapter.duration}</p>
+                                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.75rem', color: '#3b261b' }}>{chapter.name}</h4>
+                                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#78350f', marginTop: '6px' }}>{chapter.duration}</p>
                                 </div>
                               </div>
                               <button 
@@ -192,15 +192,15 @@ export default function MahasiswaLearningProgress() {
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #5a3a29', paddingBottom: '12px' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#a8a29e' }}>Level</span>
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#a8a29e' }}>Level</span>
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>{level}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #5a3a29', paddingBottom: '12px' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#a8a29e' }}>Total XP</span>
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#a8a29e' }}>Total XP</span>
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#34d399' }}>{totalXP}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#a8a29e' }}>Missing Skills</span>
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#a8a29e' }}>Missing Skills</span>
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#f87171' }}>{missingSkills.length}</span>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function MahasiswaLearningProgress() {
             </div>
             <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', textAlign: 'center' }}>
               <span style={{ fontSize: '3rem', filter: dailyBountyClaimed ? 'grayscale(100%)' : 'none' }}>📦</span>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#5a3a29', lineHeight: '1.6' }}>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.6' }}>
                 {dailyBountyClaimed 
                   ? "You've claimed today's bounty! Come back tomorrow." 
                   : (hasCompletedQuizToday 

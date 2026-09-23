@@ -11,35 +11,37 @@ const fallbackAbi = [
 
 interface MintSBTButtonProps {
   courseId: number;
+  customStyle?: React.CSSProperties;
+  onSuccess?: () => void;
 }
 
-export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
+export default function MintSBTButton({ courseId, customStyle, onSuccess }: MintSBTButtonProps) {
   const { wallets } = useWallets();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleMint = async () => {
     try {
       setStatus('loading');
       setErrorMessage('');
 
-      // 1. Get the embedded wallet from Privy
-      const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
-      if (!embeddedWallet) {
-        throw new Error('No embedded wallet found. Please connect your wallet first.');
+      // 1. Get the active wallet from Privy
+      const activeWallet = wallets[0];
+      if (!activeWallet) {
+        throw new Error('No wallet found. Please connect your wallet first.');
       }
 
       // 2. Ensure network is BNB Testnet (Chain ID 97)
-      const targetChainId = process.env.NEXT_PUBLIC_CHAIN_ID || '97';
-      const targetChainIdHex = `0x${parseInt(targetChainId).toString(16)}`;
+      // NOTE: Privy wallet.chainId returns 'eip155:97' format, not just '97'
+      const targetChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '97');
+      const walletChainId = parseInt(activeWallet.chainId.split(':').pop() || '0');
       
-      if (embeddedWallet.chainId !== targetChainId) {
+      if (walletChainId !== targetChainId) {
         try {
-          await embeddedWallet.switchChain(parseInt(targetChainId));
+          await activeWallet.switchChain(targetChainId);
         } catch (switchError) {
-          console.log("Switch chain error (might not be added):", switchError);
-          // If the network is not added, we'd ideally add it here.
-          // For simplicity, we just throw for now.
+          console.log("Switch chain error:", switchError);
           throw new Error(`Please switch your wallet network to BNB Testnet (Chain ID ${targetChainId}).`);
         }
       }
@@ -48,7 +50,7 @@ export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
       const sigResponse = await fetch('/api/claim-sbt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAddress: embeddedWallet.address, courseId }),
+        body: JSON.stringify({ userAddress: activeWallet.address, courseId }),
       });
       const sigData = await sigResponse.json();
 
@@ -59,7 +61,7 @@ export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
       const { signature } = sigData;
 
       // 4. Initialize Ethers provider & signer using Privy's EIP1193 provider
-      const provider = await embeddedWallet.getEthereumProvider();
+      const provider = await activeWallet.getEthereumProvider();
       const ethersProvider = new BrowserProvider(provider);
       const signer = await ethersProvider.getSigner();
 
@@ -90,13 +92,31 @@ export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
       await tx.wait();
 
       setStatus('success');
-      alert(`🎉 SBT Successfully Minted! Transaction Hash: ${tx.hash}`);
+      setSuccessMessage(`Berhasil Minting! Hash: ${tx.hash.substring(0, 10)}...`);
+      onSuccess?.();
 
     } catch (error: any) {
       console.error('Minting error:', error);
       setStatus('error');
-      setErrorMessage(error.message || 'An unexpected error occurred during minting.');
-      alert(`❌ Minting Failed: ${error.message || 'Unknown error'}`);
+      
+      let displayMsg = 'Terjadi kesalahan saat minting.';
+      if (error.code === 'ACTION_REJECTED' || error.message?.includes('user rejected')) {
+        displayMsg = 'Transaksi dibatalkan oleh user.';
+      } else if (error.message) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes('0x8baa579f') || msg.includes('invalidsignature')) {
+          displayMsg = 'Invalid Signature: Coba refresh dan ulangi.';
+        } else if (msg.includes('0xa45675fe') || msg.includes('alreadycertified')) {
+          displayMsg = 'SBT sudah pernah diklaim untuk modul ini.';
+        } else if (msg.includes('0x31a5d181') || msg.includes('incorrectmintfee')) {
+          displayMsg = 'Biaya Minting tidak sesuai.';
+        } else if (msg.includes('insufficient funds')) {
+          displayMsg = 'Saldo BNB Testnet tidak cukup.';
+        } else {
+          displayMsg = 'Transaksi ditolak oleh Smart Contract.';
+        }
+      }
+      setErrorMessage(displayMsg);
     }
   };
 
@@ -109,13 +129,14 @@ export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
           fontFamily: '"Press Start 2P", monospace',
           fontSize: '0.8rem',
           color: '#fff',
-          background: status === 'success' ? '#10b981' : (status === 'loading' ? '#9ca3af' : '#b91c1c'),
-          border: '4px solid #7f1d1d',
+          background: '#1d4ed8',
+          border: 'none',
           padding: '16px 24px',
           cursor: (status === 'loading' || status === 'success') ? 'not-allowed' : 'pointer',
           boxShadow: '4px 4px 0 #3b261b',
           transition: 'transform 0.1s',
           textShadow: '1px 1px 0 #000',
+          ...customStyle,
         }}
         onMouseDown={(e) => {
           if (status !== 'loading' && status !== 'success') {
@@ -136,10 +157,38 @@ export default function MintSBTButton({ courseId }: MintSBTButtonProps) {
         {status === 'error' && '❌ MINT FAILED - RETRY'}
       </button>
 
+      {/* 16-bit Error Message Box */}
       {status === 'error' && errorMessage && (
-        <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#ef4444', marginTop: '8px' }}>
-          {errorMessage}
-        </span>
+        <div style={{
+          background: '#7f1d1d',
+          border: '2px solid #450a0a',
+          padding: '12px',
+          borderRadius: '4px',
+          boxShadow: 'inset 0 0 0 2px #ef4444, 2px 2px 0 #3b261b',
+          imageRendering: 'pixelated',
+          marginTop: '4px'
+        }}>
+          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#fecaca', lineHeight: '1.6', margin: 0 }}>
+            {errorMessage}
+          </p>
+        </div>
+      )}
+
+      {/* 16-bit Success Message Box */}
+      {status === 'success' && successMessage && (
+        <div style={{
+          background: '#14532d',
+          border: '2px solid #052e16',
+          padding: '12px',
+          borderRadius: '4px',
+          boxShadow: 'inset 0 0 0 2px #22c55e, 2px 2px 0 #3b261b',
+          imageRendering: 'pixelated',
+          marginTop: '4px'
+        }}>
+          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#bbf7d0', lineHeight: '1.6', margin: 0 }}>
+            {successMessage}
+          </p>
+        </div>
       )}
     </div>
   );

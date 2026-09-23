@@ -10,17 +10,17 @@
 
 .headerTitle {
   font-family: 'Press Start 2P', monospace;
-  font-size: 1.2rem;
-  color: #fbbf24;
+  font-size: 1.8rem;
+  color: #fff;
   text-shadow: 2px 2px 0 #3b261b;
   margin-bottom: 12px;
 }
 
 .headerDesc {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  color: #d4d4d8;
-  line-height: 1.5;
+  font-size: 0.8rem;
+  color: #fff;
+  line-height: 1.6;
 }
 
 .grid {

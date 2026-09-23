@@ -1,42 +1,115 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import styles from './OnChainCertificates.module.css';
 import { useMapStore } from '@/store/useMapStore';
+import { useAccount, useReadContracts } from 'wagmi';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useUserStore } from '@/store/useUserStore';
+import MintSBTButton from './MintSBTButton';
+
+// ABI with hasCertificate
+const fallbackAbi = [
+  "function hasCertificate(address account, uint256 courseId) view returns (bool)"
+];
+
+let PathtrickABI: any;
+try {
+  PathtrickABI = require('@/abis/PathtrickSBT.abi.json');
+} catch (e) {
+  // Ignored
+}
+const abi = PathtrickABI?.abi || fallbackAbi;
 
 type Props = {
   hideHeader?: boolean;
 };
 
+// Helper to convert chapter ID string to uint256-compatible number for SBT Minting
+const generateCourseId = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+};
+
 export default function OnChainCertificates({ hideHeader = false }: Props = {}) {
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
+  const { address } = useAccount();
 
-  // Generate earned certificates dynamically based on completed Boss levels
-  const earnedCertificates = [];
+  // Find all Boss nodes
+  const bossNodes = useMemo(() => {
+    const realNodes = completedDynamicNodes.filter(nodeId => nodeId.endsWith('-level-6') || nodeId.includes('boss') || nodeId === 'module-framer-bab-1-level-1');
+    
+    // DEMO: Memaksa memunculkan 1 modul "Unminted" buat ngetes tampilan Gembok
+    if (!realNodes.includes('module-demo-unminted-level-6')) {
+      realNodes.push('module-demo-unminted-level-6');
+    }
+    
+    return realNodes;
+  }, [completedDynamicNodes]);
+
+  const { user } = usePrivy();
+  const { wallets } = useWallets();
+  const { displayName: savedName } = useUserStore();
   
-  if (completedDynamicNodes.includes('module-html-css-level-6') || completedDynamicNodes.includes('module-framer-bab-1-level-1')) {
-    earnedCertificates.push({
-      id: 'html-css',
-      title: 'Tech Basics Mastery',
-      issuer: 'House of Tech',
-      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      type: 'SBT On-Chain'
-    });
-  }
+  const activeWallet = wallets[0];
+  const displayName = savedName 
+    || user?.google?.name 
+    || user?.email?.address?.split('@')[0] 
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Scholar');
 
-  // Add more dynamic checks here for other modules as they are created
-  if (completedDynamicNodes.includes('module-javascript-level-6')) {
-    earnedCertificates.push({
-      id: 'javascript',
-      title: 'Javascript Mastery',
-      issuer: 'House of Logic',
-      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      type: 'SBT On-Chain'
-    });
-  }
+  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 
-  const handleExplorerClick = (title: string) => {
-    alert(`[Simulasi Web3] Membuka Blockchain Explorer untuk memverifikasi keaslian Sertifikat On-Chain (SBT): ${title}...`);
+  // Prepare batch calls to check SBT ownership
+  const contractCalls = useMemo(() => {
+    if (!address || !contractAddress) return [];
+    return bossNodes.map(nodeId => {
+      const baseChapterId = nodeId.replace(/-level-\d+$/, '');
+      return {
+        address: contractAddress,
+        abi: abi as any,
+        functionName: 'hasCertificate',
+        args: [address, generateCourseId(baseChapterId)],
+      };
+    });
+  }, [bossNodes, address, contractAddress]);
+
+  const { data: sbtOwnershipResults, refetch } = useReadContracts({
+    contracts: contractCalls,
+  });
+
+  // Generate earned certificates dynamically based on verified ownership
+  const earnedCertificates = useMemo(() => {
+    return bossNodes.map((nodeId, index) => {
+      const isMinted = sbtOwnershipResults?.[index]?.result === true;
+      const baseChapterId = nodeId.replace(/-level-\d+$/, '');
+      const courseId = generateCourseId(baseChapterId);
+
+      const match = nodeId.match(/module-([a-zA-Z0-9-]+?)(?:-bab|-level)/);
+      let rawName = match ? match[1] : 'Unknown';
+      
+      // Clean up names (e.g. 'agriculture-1' -> 'Agriculture', 'html-css' -> 'HTML CSS')
+      rawName = rawName.replace(/-\d+$/, '').replace(/-/g, ' ');
+      const moduleName = rawName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+      return {
+        id: nodeId,
+        courseId,
+        title: `${moduleName} Mastery`,
+        issuer: `House of ${moduleName}`,
+        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        type: 'SBT On-Chain',
+        isMinted
+      };
+    });
+  }, [bossNodes, sbtOwnershipResults]);
+
+  const handleExplorerClick = (title: string, isMinted: boolean) => {
+    if (!isMinted || !address) return;
+    // Buka BscScan untuk address user (tab ERC-1155 Tokens)
+    window.open(`https://testnet.bscscan.com/address/${address}#tokentxnsErc1155`, '_blank');
   };
 
   return (
@@ -55,17 +128,38 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       <div className={styles.grid}>
         {earnedCertificates.length > 0 ? (
           earnedCertificates.map(cert => (
-            <div key={cert.id} style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#3b261b', padding: '16px', borderRadius: '16px', border: '4px solid #5a3a29' }}>
-              {/* Certificate Image Container */}
-              <div style={{ 
-                position: 'relative', 
-                width: '100%', 
-                aspectRatio: '1.414', // Landscape standard ratio
-                borderRadius: '8px', 
-                overflow: 'hidden',
-                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)',
-                backgroundColor: '#f5f5f5'
+            <div key={cert.id} style={{ 
+              background: '#c8a96e',
+              border: '4px solid #5a3520',
+              borderRadius: '4px',
+              padding: '4px',
+              boxShadow: '4px 4px 0 #3b1f0e, inset 0 0 0 2px #e8c98a',
+              imageRendering: 'pixelated',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '16px', 
+                background: '#784626', /* Darker inner wood */
+                border: '2px solid #3b1f0e',
+                borderRadius: '2px',
+                padding: '16px',
+                position: 'relative'
               }}>
+                {/* Certificate Image Container */}
+                <div style={{ 
+                  position: 'relative', 
+                  width: '100%', 
+                  aspectRatio: '1.414', // Landscape standard ratio
+                  borderRadius: '2px', 
+                  overflow: 'hidden',
+                  border: '4px solid #e8c98a',
+                  boxShadow: '0 0 0 4px #3b1f0e',
+                  backgroundColor: '#f5f5f5',
+                  filter: cert.isMinted ? 'none' : 'grayscale(100%) brightness(0.6)',
+                  transition: 'all 0.3s'
+                }}>
                 <img 
                   src="/certificate-template.png" 
                   alt="Certificate Template" 
@@ -99,7 +193,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                     color: '#333', 
                     fontWeight: 'bold' 
                   }}>
-                    Awarded to Scholar
+                    Awarded to {displayName}
                   </p>
                   
                   <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -111,15 +205,67 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                     </p>
                   </div>
                 </div>
+
+                {/* Locked Overlay Icon */}
+                {!cert.isMinted && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 3,
+                    fontSize: '4rem',
+                    textShadow: '0px 0px 10px rgba(0,0,0,0.8)'
+                  }}>
+                    🔒
+                  </div>
+                )}
               </div>
               
-              <button 
-                className={styles.explorerBtn}
-                onClick={() => handleExplorerClick(cert.title)}
-                style={{ width: '100%', padding: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', background: '#fbbf24', border: '4px solid #b45309', color: '#451a03', cursor: 'pointer' }}
-              >
-                VIEW ON EXPLORER
-              </button>
+              {cert.isMinted ? (
+                <button 
+                  onClick={() => handleExplorerClick(cert.title, cert.isMinted)}
+                  style={{ 
+                    width: '100%', 
+                    padding: '14px', 
+                    fontFamily: '"Press Start 2P"', 
+                    fontSize: '0.6rem', 
+                    background: '#5cb85c', 
+                    border: '4px solid #224a22',
+                    borderTopColor: '#98e098',
+                    borderLeftColor: '#98e098',
+                    color: '#fff', 
+                    textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
+                    cursor: 'pointer',
+                    imageRendering: 'pixelated',
+                    transition: 'transform 0.1s'
+                  }}
+                  onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'}
+                  onMouseUp={(e) => e.currentTarget.style.transform = 'none'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+                >
+                  VIEW ON EXPLORER
+                </button>
+              ) : (
+                <MintSBTButton 
+                  courseId={cert.courseId}
+                  onSuccess={() => refetch()}
+                  customStyle={{
+                    width: '100%', 
+                    padding: '14px', 
+                    fontFamily: '"Press Start 2P"', 
+                    fontSize: '0.6rem', 
+                    background: '#fbbf24', 
+                    border: '4px solid #b45309',
+                    borderTopColor: '#fde68a',
+                    borderLeftColor: '#fde68a',
+                    color: '#451a03', 
+                    textShadow: '1px 1px 0 rgba(255,255,255,0.5)',
+                    imageRendering: 'pixelated',
+                  }}
+                />
+              )}
+              </div>
             </div>
           ))
         ) : (

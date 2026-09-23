@@ -36,8 +36,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`}>
-      <body style={{ fontFamily: "var(--font-inter), sans-serif" }}>
+    <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof window !== 'undefined') {
+              const _setAttribute = Element.prototype.setAttribute;
+              Element.prototype.setAttribute = function(name, value) {
+                if (name === 'bis_skin_checked') return;
+                _setAttribute.call(this, name, value);
+              };
+            }
+          `
+        }} />
+      </head>
+      <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

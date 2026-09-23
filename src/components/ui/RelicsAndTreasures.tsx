@@ -10,7 +10,7 @@ type Props = {
   statsLabel?: string;
 };
 
-export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'RELICS UNLOCKED' }: Props = {}) {
+export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'BADGES UNLOCKED' }: Props = {}) {
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
   
   const isHtmlEarned = completedDynamicNodes.includes('module-framer-bab-1-level-1') || completedDynamicNodes.includes('module-html-css-level-6');
@@ -32,23 +32,15 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'R
       {!hideHeader && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-            RELICS & TREASURES
+            BADGES
           </h2>
           <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-            Your collection of Soulbound Tokens (SBT) and Achievements. Complete more missions to unlock all relics!
+            Your collection of Achievements. Complete more missions to unlock all badges!
           </p>
         </div>
       )}
 
-      {/* Stats Summary */}
-      <div style={{ display: 'flex', gap: '16px' }}>
-        <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', flex: 1, textAlign: 'center', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
-          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#fbbf24' }}>
-            {VAULT_SBTS.filter(s => s.earned).length} / {VAULT_SBTS.length}
-          </p>
-          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8', marginTop: '12px' }}>{statsLabel}</p>
-        </div>
-      </div>
+
 
       {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '24px', width: '100%', marginTop: '8px' }}>

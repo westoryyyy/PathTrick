@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { GICSSectorCode } from '@/data/gicsData';
 import { ClassifiedSkill } from '@/data/wefSkillData';
 
@@ -122,15 +123,17 @@ const STEP_COUNTS: Record<UserRole, number> = {
    Store
    ═══════════════════════════════════════════════ */
 
-export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
-  /* ── Role ── */
-  selectedRole: null,
-  setRole: (role) =>
-    set({
-      selectedRole: role,
-      currentStep: 0,
-      totalSteps: STEP_COUNTS[role],
-    }),
+export const useOnboardingStore = create<OnboardingStore>()(
+  persist(
+    (set, get) => ({
+      /* ── Role ── */
+      selectedRole: null,
+      setRole: (role) =>
+        set({
+          selectedRole: role,
+          currentStep: 0,
+          totalSteps: STEP_COUNTS[role],
+        }),
 
   /* ── Steps ── */
   currentStep: 0,
@@ -212,4 +215,10 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
       mahasiswaAssessment: { ...DEFAULT_MAHASISWA, preferredGICS: [], workInterests: [] },
       isSubmitting: false,
     }),
-}));
+    }),
+    {
+      name: 'pathtrick-onboarding-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);

@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 import Image from 'next/image';
 import { useMapStore } from '@/store/useMapStore';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
+import { useUserStore } from '@/store/useUserStore';
 
 const NAV_ITEMS = [
   { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: '📊' },
@@ -26,8 +27,22 @@ export default function MahasiswaLayout({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const { logout, connectWallet } = usePrivy();
+  const { logout, user } = usePrivy();
+  const { wallets } = useWallets();
+  const activeWallet = wallets[0];
   const { setRole } = useMapStore();
+  const { displayName: savedName, displayEmail: savedEmail } = useUserStore();
+
+  // Priority: 1. User-edited (Zustand), 2. Auto from Privy (Google/Email), 3. Wallet address fallback
+  const displayName = savedName
+    || user?.google?.name 
+    || user?.email?.address?.split('@')[0] 
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Explorer');
+  
+  const displayEmail = user?.google?.email 
+    || user?.email?.address 
+    || savedEmail
+    || (activeWallet ? activeWallet.address : '');
 
   React.useEffect(() => {
     setRole('MAHASISWA');
@@ -191,8 +206,8 @@ export default function MahasiswaLayout({
               >
                 <div className={styles.profileAvatar}>👨‍💻</div>
                 <div className={styles.profileInfo}>
-                  <span className={styles.profileName}>Tukiman</span>
-                  <span className={styles.profileEmail}>D.Tukiman@gmail.com</span>
+                  <span className={styles.profileName}>{displayName}</span>
+                  <span className={styles.profileEmail}>{displayEmail}</span>
                 </div>
                 <div style={{ marginLeft: '12px', background: '#3b261b', padding: '4px 8px', borderRadius: '4px', border: '2px solid #5a3a29' }}>
                   <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24' }}>▼</span>
@@ -216,8 +231,24 @@ export default function MahasiswaLayout({
                   overflow: 'hidden',
                   padding: '8px'
                 }}>
+                  <div style={{ padding: '12px', borderBottom: '2px dashed #5a3a29' }}>
+                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fbbf24', marginBottom: '8px' }}>Web3 Wallet Address:</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#d1d5db', wordBreak: 'break-all', background: '#3b261b', padding: '8px', borderRadius: '4px', border: '1px solid #5a3a29', flex: 1, margin: 0 }}>
+                        {activeWallet ? activeWallet.address : 'Auto-created on Mint'}
+                      </p>
+                      {activeWallet && (
+                        <button 
+                          onClick={() => navigator.clipboard.writeText(activeWallet.address)}
+                          style={{ background: '#5cb85c', border: '2px solid #224a22', color: '#fff', padding: '6px', cursor: 'pointer', borderRadius: '4px' }}
+                          title="Copy Address"
+                        >
+                          📋
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
-                  <button onClick={() => connectWallet()} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Connect Wallet</button>
                   <button onClick={() => router.push('/docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
                   <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
                 </div>

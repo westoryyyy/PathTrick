@@ -15,6 +15,7 @@ export class PlayerCharacter {
   private walkTimer = 0;
   private walkPhase = 0; // 0 = neutral, 1 = step1, 2 = neutral, 3 = step2
   private readonly WALK_INTERVAL = 150; // ms per walk phase
+  private walkSound?: Phaser.Sound.BaseSound;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
@@ -28,6 +29,10 @@ export class PlayerCharacter {
     this.setupAnimations();
     this.setupInput();
     this.addShadow();
+
+    if (scene.cache.audio.exists('walk-sound')) {
+      this.walkSound = scene.sound.add('walk-sound', { loop: true, volume: 0.8 });
+    }
   }
 
   private setupAnimations() {
@@ -178,6 +183,12 @@ export class PlayerCharacter {
       }
     }
 
+    if (moving && !this.isMoving) {
+      this.walkSound?.play();
+    } else if (!moving && this.isMoving) {
+      this.walkSound?.pause();
+    }
+
     this.isMoving = moving;
   }
 
@@ -205,6 +216,8 @@ export class PlayerCharacter {
     } else {
       this.facing = dy > 0 ? 'down' : 'up';
     }
+    
+    this.walkSound?.play();
 
     this.scene.tweens.add({
       targets: this.sprite,
@@ -228,6 +241,7 @@ export class PlayerCharacter {
       },
       onComplete: () => {
         this.isMoving = false;
+        this.walkSound?.pause();
         this.sprite.setAngle(0);
         const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
         this.sprite.setTexture(texKey);

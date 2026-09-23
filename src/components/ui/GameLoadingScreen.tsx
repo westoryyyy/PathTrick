@@ -19,8 +19,10 @@ export default function GameLoadingScreen({
 }) {
   const [progress, setProgress] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 95) {
@@ -43,8 +45,10 @@ export default function GameLoadingScreen({
 
   const currentTip = LOADING_TIPS[tipIndex];
 
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#F8FAFC] overflow-hidden relative font-sans">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#F8FAFC] overflow-hidden relative font-sans" suppressHydrationWarning>
       
       {/* Soft Background Decorators */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-300/20 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/4" />

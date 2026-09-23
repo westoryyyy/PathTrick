@@ -110,6 +110,11 @@ export class WorldMapScene extends Phaser.Scene {
 
     // ── NPCs ──
     this.load.image('npc-professor', ASSET_PATHS.NPC_PROFESSOR);
+    
+    // ── Audio ──
+    this.load.audio('walk-sound', '/jalanMusic.ogg');
+    this.load.audio('bgm-map', '/WorldMapMusic.ogg');
+    this.load.audio('bgm-boss', '/BossFightMusic.ogg');
   }
 
   create() {
@@ -132,6 +137,9 @@ export class WorldMapScene extends Phaser.Scene {
     this.buildPlayer();
     this.setupCamera();
     this.setupPointerMovement();
+
+    // Initial BGM check
+    this.updateBGM();
 
     const enterKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     if (enterKey) {
@@ -196,6 +204,13 @@ export class WorldMapScene extends Phaser.Scene {
         } else {
           this.syncCourseNodes(state.nodes);
         }
+      }
+    });
+
+    this.events.once(Phaser.Scenes.Events.DESTROY, () => {
+      if (this.unsubscribeStore) {
+        this.unsubscribeStore();
+        this.unsubscribeStore = undefined;
       }
     });
   }
@@ -316,6 +331,7 @@ export class WorldMapScene extends Phaser.Scene {
     });
     // Redraw paths to reflect new unlock state
     this.drawDuolingoPath();
+    this.updateBGM();
   }
 
   /* ═══════════════════════════════════════════
@@ -351,6 +367,40 @@ export class WorldMapScene extends Phaser.Scene {
         }
       }
     });
+    this.updateBGM();
+  }
+
+  /* ═══════════════════════════════════════════
+     Audio Management
+     ═══════════════════════════════════════════ */
+
+  private updateBGM() {
+    if (!this.sound || !this.sound.get) return; // Guard if destroyed
+    
+    let shouldPlayBossMusic = false;
+
+    // Check if there is any active Boss node
+    const hasActiveBossNode = this.courseNodes.some(node => {
+      const data = node.data;
+      const isBoss = data.category === 'milestone' || data.title.toLowerCase().includes('boss');
+      return isBoss && (data.status === 'available' || data.status === 'in_progress');
+    });
+
+    if (hasActiveBossNode) {
+      shouldPlayBossMusic = true;
+    }
+
+    const targetBgmKey = shouldPlayBossMusic ? 'bgm-boss' : 'bgm-map';
+    
+    // Play or switch the music
+    const currentSound = this.sound.get(targetBgmKey);
+    if (!currentSound || !currentSound.isPlaying) {
+      // Stop the other music if playing
+      const otherBgmKey = targetBgmKey === 'bgm-boss' ? 'bgm-map' : 'bgm-boss';
+      this.sound.stopByKey(otherBgmKey);
+      
+      this.sound.play(targetBgmKey, { loop: true, volume: 0.4 });
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -476,6 +526,7 @@ export class WorldMapScene extends Phaser.Scene {
   shutdown() {
     if (this.unsubscribeStore) {
       this.unsubscribeStore();
+      this.unsubscribeStore = undefined;
     }
   }
 }
