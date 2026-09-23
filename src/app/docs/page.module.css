@@ -205,6 +205,14 @@
   padding-bottom: 8px;
 }
 
+.marketExpansion {
+  margin-top: 44px;
+}
+
+.marketExpansion .techTable {
+  margin-top: 24px;
+}
+
 .callout {
   background: #fff8e1;
   /* Clean amber tint */
