@@ -2,6 +2,11 @@
 
 This guide helps you migrate CSS modules to Tailwind utility classes across the PathTrick project.
 
+> **PathTrick uses Tailwind CSS v4.** The active theme is defined in
+> [`src/app/globals.css`](src/app/globals.css). The legacy `tailwind.config.js`
+> file is not used by the build and must not be edited for fonts, colors, or
+> animations.
+
 ## Why Migrate to Tailwind?
 
 - **Reduced boilerplate**: No need for CSS modules with hundreds of lines
@@ -49,7 +54,7 @@ Use:
 | `gap: 8px` | `gap-2` | 8px = 2 × 4px |
 | `opacity: 0.5` | `opacity-50` | Opacity values are 0-100 |
 | `transition: all 0.2s` | `transition-all duration-200` | Duration in ms |
-| `font-family: monospace` | `font-mono` | Configured in theme |
+| `font-family: monospace` | `font-pixel` | Use the PathTrick pixel font for game and assessment UI |
 | `font-size: 0.8rem` | `text-sm` or `text-[0.8rem]` | Use preset or arbitrary |
 | `color: #fff` | `text-white` | |
 | `text-shadow: 2px 2px 0 #3b261b` | `style={{textShadow: '...'}}` | Use inline style for complex shadows |
@@ -135,7 +140,8 @@ import clsx from 'clsx';
 
 ### 4. Custom Animations
 
-Already configured in `tailwind.config.js`:
+Custom animations are defined in the `@theme` block in
+`src/app/globals.css`:
 
 ```tsx
 // Using shellIn animation
@@ -319,19 +325,17 @@ export default function AssessmentShell({ canNext, onNext }) {
 
 ---
 
-## Quick Reference: Tailwind Config
+## Quick Reference: Tailwind v4 Theme
 
-Your Tailwind config at `tailwind.config.js` includes:
+The active Tailwind v4 theme in `src/app/globals.css` includes:
 
-```js
-extend: {
-  borderWidth: {
-    6: '6px',  // For border-6
-  },
-  animation: {
-    shellIn: 'shellIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards',
-    contentFade: 'contentFade 0.35s ease forwards',
-  },
+```css
+@theme {
+  --font-pixel: var(--font-pixel);
+  --font-pixelify: var(--font-pixelify);
+  --font-vt323: var(--font-vt323);
+  --animate-shellIn: shellIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-contentFade: contentFade 0.35s ease forwards;
 }
 ```
 
