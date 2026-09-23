@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 import styles from './OnChainCertificates.module.css';
 import { useMapStore } from '@/store/useMapStore';
 import { useAccount, useReadContracts } from 'wagmi';
@@ -162,9 +163,10 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                   filter: cert.isMinted ? 'none' : 'grayscale(100%) brightness(0.6)',
                   transition: 'all 0.3s'
                 }}>
-                <img 
+                <Image
                   src="/certificate-template.png" 
                   alt="Certificate Template" 
+                  fill
                   style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
                 />
                 

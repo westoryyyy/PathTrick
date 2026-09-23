@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
@@ -11,7 +12,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user } = usePrivy();
   const { wallets } = useWallets();
-  const { displayName: savedName, setProfile } = useUserStore();
+  const { displayName: savedName, avatarUrl, setProfile, setAvatar } = useUserStore();
   const role = useOnboardingStore((s) => s.selectedRole);
 
   // Priority: 1. Auto-detected from Privy, 2. Saved in Zustand
@@ -22,6 +23,8 @@ export default function ProfilePage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
+  const avatarOptions = ['/char_dreamer.png', '/char_chaser.png', '/char_scholar.png', '/Main Character.png'];
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,12 +55,38 @@ export default function ProfilePage() {
         <form className={styles.boardContent} onSubmit={handleSave}>
           <div className={styles.profileAvatarSection}>
             <div className={styles.avatar}>
-              👨‍🎓
+              <Image src={avatarUrl} alt="Current avatar" width={96} height={96} />
             </div>
-            <button type="button" className={styles.changeAvatarBtn} onClick={() => alert('Avatar selection opened!')}>
+            <button type="button" className={styles.changeAvatarBtn} onClick={() => setIsAvatarPickerOpen(true)}>
               CHANGE AVATAR
             </button>
           </div>
+
+          {isAvatarPickerOpen && (
+            <div className={styles.avatarModalBackdrop} role="presentation" onClick={() => setIsAvatarPickerOpen(false)}>
+              <div className={styles.avatarModal} role="dialog" aria-modal="true" aria-labelledby="avatar-picker-title" onClick={(event) => event.stopPropagation()}>
+                <h2 id="avatar-picker-title">CHOOSE YOUR AVATAR</h2>
+                <div className={styles.avatarGrid}>
+                  {avatarOptions.map((avatar) => (
+                    <button
+                      type="button"
+                      key={avatar}
+                      className={`${styles.avatarOption} ${avatarUrl === avatar ? styles.avatarOptionSelected : ''}`}
+                      onClick={() => {
+                        setAvatar(avatar);
+                        setIsAvatarPickerOpen(false);
+                      }}
+                    >
+                      <Image src={avatar} alt="" width={72} height={72} />
+                    </button>
+                  ))}
+                </div>
+                <button type="button" className={styles.changeAvatarBtn} onClick={() => setIsAvatarPickerOpen(false)}>
+                  CLOSE
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label className={styles.label}>NICKNAME</label>

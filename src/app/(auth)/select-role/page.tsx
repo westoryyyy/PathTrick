@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useOnboardingStore, type UserRole } from '@/store/useOnboardingStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -370,7 +371,7 @@ export default function SelectRolePage() {
                     Peran: {role.displayName}
                   </div>
                   <div className={styles.panelBody}>
-                    <img
+                    <Image
                       src={role.imageUrl || '/PathTrick.png'}
                       alt={role.displayName}
                       width={160}

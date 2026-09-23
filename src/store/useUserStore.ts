@@ -9,10 +9,12 @@ interface UserState {
   hasCompletedQuizToday: boolean;
   displayName: string;
   displayEmail: string;
+  avatarUrl: string;
   addXP: (amount: number) => void;
   claimDailyBounty: () => void;
   completeQuiz: () => void;
   setProfile: (name: string, email: string) => void;
+  setAvatar: (avatarUrl: string) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -24,6 +26,7 @@ export const useUserStore = create<UserState>()(
       hasCompletedQuizToday: false,
       displayName: '',
       displayEmail: '',
+      avatarUrl: '/char_dreamer.png',
       addXP: (amount) => set((state) => {
         const newXP = state.totalXP + amount;
         const newLevel = Math.floor(newXP / 500) + 2; 
@@ -32,6 +35,7 @@ export const useUserStore = create<UserState>()(
       claimDailyBounty: () => set({ dailyBountyClaimed: true }),
       completeQuiz: () => set({ hasCompletedQuizToday: true }),
       setProfile: (name, email) => set({ displayName: name, displayEmail: email }),
+      setAvatar: (avatarUrl) => set({ avatarUrl }),
     }),
     {
       name: 'pathtrick-user-storage-v2',

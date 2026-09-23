@@ -8,7 +8,10 @@ export const PATHTRICK_SBT_ADDRESS =
 
 export const BNB_TESTNET_CHAIN = bscTestnet;
 export const PATHTRICK_SBT_ABI = pathtrickSbtAbi.abi as Abi;
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/api\/?$/, '');
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_USE_MOCK_BACKEND === 'true'
+    ? ''
+    : (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/api\/?$/, '');
 
 /**
  * Whether the client may continue onboarding when the roles API is unavailable.
