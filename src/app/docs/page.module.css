@@ -507,6 +507,13 @@
   box-shadow: 2px 2px 0px #b45309;
 }
 
+.cardIconImage {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .cardIconBlue {
   background: #dbeafe;
   border-color: #3b82f6;

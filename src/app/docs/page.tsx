@@ -261,25 +261,25 @@ export default function DocsPage() {
                 <h3 className={styles.sectionTitle}>Implementasi yang Berjalan</h3>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}>1</div><div className={styles.cardTitle}>Jaringan dan Contract</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/BNBSmartChainLogo.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>Jaringan dan Contract</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Deployment aktif berada di <strong>BNB Smart Chain Testnet</strong> dengan <strong>Chain ID 97</strong>. Contract certificate menggunakan alamat <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> dan ABI resmi dari <code>integration/PathtrickSBT.abi.json</code>. Data transaksi dapat diverifikasi melalui BscScan Testnet.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}>2</div><div className={styles.cardTitle}>Authorization Flow</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/Security.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>Authorization Flow</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Setelah course selesai, frontend meminta authorization ke <code>POST /api/certificates/prepare-mint</code>. Backend mengembalikan <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, dan <strong>signature</strong>. Frontend tidak membuat, mengubah, atau memakai ulang nonce dan deadline secara manual.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}>3</div><div className={styles.cardTitle}>On-chain Verification</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/sbt_logo.jpg" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>On-chain Verification</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Wallet harus berada di Chain ID 97. Frontend membaca <strong>mintPrice()</strong> secara langsung, menghitung kebutuhan saldo bersama gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>. Setelah receipt tersedia, frontend memeriksa event <strong>CertificateMinted(to, courseId)</strong>.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}>4</div><div className={styles.cardTitle}>Backend Confirmation</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/certificate-template.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>Backend Confirmation</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Certificate belum dianggap selesai hanya karena wallet mengirim transaksi. Setelah receipt dan event valid, frontend mengirim <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. Status sukses baru ditampilkan setelah backend menerima dan memvalidasi transaksi tersebut.
                     </div>
