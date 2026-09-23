@@ -74,15 +74,7 @@ export default function MahasiswaLearningProgress() {
         {/* ─── LEFT COLUMN: SKILL GAP ACCORDION ─── */}
         <div style={{ flex: '1 1 60%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-          {activeModules.length === 0 ? (
-            <div className={styles.retroCard} style={{ padding: '32px', textAlign: 'center', borderColor: '#047857' }}>
-              <span style={{ display: 'block', marginBottom: '16px' }}>NO GAPS</span>
-              <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#34d399', lineHeight: '1.6' }}>NO SKILL GAPS DETECTED!</h3>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.8', marginTop: '16px' }}>
-                You have met all the requirements for your target jobs or haven&apos;t selected any. Head to the Career Hub to explore more roles.
-              </p>
-            </div>
-          ) : (
+          {activeModules.length === 0 ? null : (
             activeModules.map((mod, idx) => {
               const isExpanded = expandedModule === mod.id;
               // Mock progress based on if it's earned

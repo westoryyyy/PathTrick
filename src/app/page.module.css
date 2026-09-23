@@ -972,7 +972,8 @@
   position: absolute;
   top: 40px;
   right: 6%;
-  font-size: 2.8rem;
+  width: 55px;
+  height: auto;
   animation: floatItem 2.5s ease-in-out infinite 0.8s;
   filter: drop-shadow(2px 4px 0 rgba(0, 0, 0, 0.15));
   image-rendering: pixelated;

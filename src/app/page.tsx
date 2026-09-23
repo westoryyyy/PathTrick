@@ -351,7 +351,7 @@ export default function LandingPage() {
       <section className={styles.portalSection}>
         {/* floating pixel items */}
         <div className={styles.portalChest} aria-hidden="true">🪙</div>
-        <div className={styles.portalGem} aria-hidden="true">PORTAL</div>
+        <img className={styles.portalGem} src="/red-gem.png" alt="" aria-hidden="true" />
 
         <div className={styles.portalInner}>
           <p className={styles.portalEyebrow}>Ready to Forge Your Path?</p>

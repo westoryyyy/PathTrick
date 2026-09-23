@@ -58,7 +58,7 @@ export default function MahasiswaDashboard() {
             </div>
             <div className={styles.rankContent}>
               <div className={styles.tierBadge}>
-                <span className={styles.tierIcon}>RANK</span>
+                <img src="/CareerRankLogo.png" alt="Rank" className={styles.tierIcon} style={{ width: '72px', height: '72px', objectFit: 'contain', imageRendering: 'pixelated' }} />
                 <span className={styles.tierName}>{careerRank} LEVEL</span>
               </div>
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>

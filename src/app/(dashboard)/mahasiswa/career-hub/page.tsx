@@ -97,11 +97,11 @@ export default function CareerHubPage() {
         <button
           onClick={() => setActiveFilter(null)}
           style={{
-            fontFamily: '"Press Start 2P"', fontSize: '0.5rem',
-            padding: '8px 12px', cursor: 'pointer',
-            background: activeFilter === null ? '#fbbf24' : 'rgba(255,255,255,0.08)',
-            color: activeFilter === null ? '#3b261b' : '#94a3b8',
-            border: `2px solid ${activeFilter === null ? '#b45309' : '#5a3a29'}`,
+            fontFamily: '"Press Start 2P"', fontSize: '0.65rem',
+            padding: '8px 14px', cursor: 'pointer',
+            background: activeFilter === null ? '#fbbf24' : 'rgba(255,255,255,0.1)',
+            color: activeFilter === null ? '#3b261b' : '#e2c99a',
+            border: `2px solid ${activeFilter === null ? '#b45309' : '#8a6040'}`,
           }}
         >
           ALL
@@ -111,11 +111,11 @@ export default function CareerHubPage() {
             key={sector.code}
             onClick={() => setActiveFilter(activeFilter === sector.code ? null : sector.code)}
             style={{
-              fontFamily: '"Press Start 2P"', fontSize: '0.45rem',
-              padding: '8px 12px', cursor: 'pointer',
-              background: activeFilter === sector.code ? sector.accentColor + '33' : 'rgba(255,255,255,0.05)',
-              color: activeFilter === sector.code ? sector.accentColor : '#94a3b8',
-              border: `2px solid ${activeFilter === sector.code ? sector.accentColor : '#5a3a29'}`,
+              fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
+              padding: '8px 14px', cursor: 'pointer',
+              background: activeFilter === sector.code ? sector.accentColor + '44' : 'rgba(255,255,255,0.08)',
+              color: activeFilter === sector.code ? sector.accentColor : '#e2c99a',
+              border: `2px solid ${activeFilter === sector.code ? sector.accentColor : '#8a6040'}`,
             }}
           >
             {sector.icon} {sector.nameID}
@@ -138,7 +138,7 @@ export default function CareerHubPage() {
             }}>
               <div className={styles.cardHeader} style={{ background: isPerfectMatch ? '#b45309' : undefined }}>
                 <span className={styles.cardTitle}>{job.company}</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: sector.accentColor, marginLeft: 'auto' }}>
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: sector.accentColor, marginLeft: 'auto', textShadow: '1px 1px 0 rgba(0,0,0,0.6)' }}>
                   {sector.icon} {sector.nameEN}
                 </span>
               </div>
@@ -165,13 +165,13 @@ export default function CareerHubPage() {
                     {job.possessed.map((skill: string) => (
                       <div key={skill} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '1rem' }}>✅</span>
-                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#34d399', lineHeight: '1.4' }}>{skill}</span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#6ee7b7', lineHeight: '1.4', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{skill}</span>
                       </div>
                     ))}
                     {job.missing.map((skill: string) => (
                       <div key={skill} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '1rem' }}>❌</span>
-                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#f87171', lineHeight: '1.4' }}>{skill}</span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fca5a5', lineHeight: '1.4', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{skill}</span>
                       </div>
                     ))}
                   </div>
