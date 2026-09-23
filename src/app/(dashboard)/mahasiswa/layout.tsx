@@ -124,7 +124,7 @@ export default function MahasiswaLayout({
                 className={styles.iconBtn} 
                 onClick={() => { setIsMessagesOpen(!isMessagesOpen); setIsNotificationsOpen(false); setIsDropdownOpen(false); }}
               >
-                ✉️
+                INBOX
                 <span className={styles.iconBadge}>2</span>
               </div>
               

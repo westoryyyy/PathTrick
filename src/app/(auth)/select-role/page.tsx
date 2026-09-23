@@ -314,10 +314,10 @@ export default function SelectRolePage() {
                 onMouseUp={(e) => { e.currentTarget.style.transform = 'none'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
               >
-                {isConnectingWallet ? '⏳ CONNECTING...' : '🔗 CONNECT WALLET'}
+                {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
               </button>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#a87b51', textAlign: 'center' }}>
-                ℹ️ Gunakan MetaMask, Wallet Connect, atau Privy Wallet
+                Gunakan MetaMask, Wallet Connect, atau Privy Wallet
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 const MOCK_UNIVERSITIES = [
   {
@@ -76,7 +77,7 @@ export default function UniversityHub() {
                   <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📊</span>
+                  <PixelIcon icon="📊" size={20} />
                   <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>Rate: {uni.acceptanceRate}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>

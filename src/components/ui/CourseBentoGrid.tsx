@@ -267,10 +267,10 @@ export default function CourseBentoGrid() {
         </p>
         <div className={styles.headerMeta}>
           <span className={styles.metaBadge}>
-            📚 {availableCount} Course Tersedia
+            {availableCount} Course Tersedia
           </span>
           <span className={styles.metaBadge}>
-            ⚔️ {totalQuests} Total Quest
+            {totalQuests} Total Quest
           </span>
           <span className={styles.metaBadge}>
             🔮 {recommendedCourses.length} Jurusan

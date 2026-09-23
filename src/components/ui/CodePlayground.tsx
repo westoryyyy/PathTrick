@@ -24,11 +24,11 @@ export default function CodePlayground({ initialCode, language, onChange }: Prop
           const trimmed = line.trim();
           if (trimmed.startsWith('console.log(') && trimmed.endsWith(')')) {
             const content = trimmed.substring(12, trimmed.length - 1);
-            let parsed = content.replace(/^["']|["']$/g, '');
+            const parsed = content.replace(/^["']|["']$/g, '');
             out += parsed + '\n';
           } else if (trimmed.startsWith('console.log(') && trimmed.endsWith(');')) {
             const content = trimmed.substring(12, trimmed.length - 2);
-            let parsed = content.replace(/^["']|["']$/g, '');
+            const parsed = content.replace(/^["']|["']$/g, '');
             out += parsed + '\n';
           }
         }
@@ -65,7 +65,7 @@ export default function CodePlayground({ initialCode, language, onChange }: Prop
   return (
     <div className={styles.playgroundContainer}>
       <div className={styles.header}>
-        <div className={styles.title}>💻 Interactive Playground</div>
+        <div className={styles.title}>Interactive Playground</div>
         <button className={styles.runBtn} onClick={handleRun}>▶ RUN CODE</button>
       </div>
       <div className={styles.splitView}>

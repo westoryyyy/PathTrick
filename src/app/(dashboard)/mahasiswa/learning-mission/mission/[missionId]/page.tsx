@@ -513,7 +513,7 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
             <div style={{ textAlign: 'center', background: '#fffbeb', padding: '16px', borderRadius: '8px', border: '1px solid #fde68a' }}>
-              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>💎</span>
+              <span style={{ display: 'block', marginBottom: '8px' }}>REWARD</span>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#92400e', lineHeight: '1.6' }}>
                 Reward XP dan item telah ditambahkan ke akunmu.
               </p>
@@ -640,7 +640,7 @@ export default function MissionFlowPage() {
                       transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       style={{ display: 'inline-block' }}
                     >
-                      <span style={{ fontSize: '3rem', filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }}>💎</span>
+                      <span style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }}>REWARD</span>
                     </motion.div>
                     <p className={styles.text} style={{ marginTop: '16px', fontSize: '0.65rem', color: '#92400e' }}>
                       Reward XP dan item telah ditambahkan ke akunmu.

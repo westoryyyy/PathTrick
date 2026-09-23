@@ -289,7 +289,7 @@ export default function DocsPage() {
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>Ini adalah pilihan yang sangat ideal untuk mencetak jutaan <strong>sertifikat pelajar</strong> masa depan tanpa perlu membebani mereka dengan <strong>biaya gas</strong> yang mencekik.</div>
                   </div>
                   <div className={styles.featureCard} style={{ padding: '20px' }}>
-                    <div className={styles.cardTitle} style={{ marginBottom: '8px' }}>⚙️ EVM Compatible</div>
+                    <div className={styles.cardTitle} style={{ marginBottom: '8px' }}>EVM Compatible</div>
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>Dunia ini dibangun di atas fondasi <strong>kontrak pintar</strong> yang matang, <strong>super aman</strong>, dan mengikuti standar baku sehingga sangat <strong>transparan</strong> untuk diaudit oleh siapapun.</div>
                   </div>
                   <div className={styles.featureCard} style={{ padding: '20px' }}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useOnboardingStore, type RIASECScores } from '@/store/useOnboardingStore';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 const DIMENSIONS: {
   key: keyof RIASECScores;
@@ -53,7 +54,7 @@ export default function RIASECStep() {
           >
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '1.5rem', lineHeight: 1, filter: 'drop-shadow(2px 2px 0 rgba(0,0,0,0.5))', flexShrink: 0 }}>{dim.icon}</span>
+              <PixelIcon icon={dim.icon} size={28} className="drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
               <h3 className="font-pixel" style={{ fontSize: '0.9rem', color: 'white', margin: 0, textShadow: '2px 2px 0 #3b261b', lineHeight: 1.4 }}>
                 {dim.label}
               </h3>

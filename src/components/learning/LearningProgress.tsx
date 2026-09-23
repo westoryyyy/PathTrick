@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { mockBackendData } from '@/data/mockBackendData';
 import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
+import PixelIcon from '@/components/ui/PixelIcon';
 import { useUserStore } from '@/store/useUserStore';
 import { useRouter } from 'next/navigation';
 
@@ -50,13 +51,13 @@ export default function LearningProgress() {
       case 'locked':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#78350f', border: '2px solid #451a03', color: '#fcd34d', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>⚔️</span> SIDE QUEST
+            <PixelIcon icon="⚔️" size={18} /> SIDE QUEST
           </span>
         );
       case 'lockedByLevel':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#3f3f46', border: '2px solid #27272a', color: '#a1a1aa', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>🔒</span> LOCKED
+            <PixelIcon icon="🔒" size={18} /> LOCKED
           </span>
         );
       default:
@@ -116,7 +117,7 @@ export default function LearningProgress() {
                     gap: '12px',
                     pointerEvents: 'none'
                   }}>
-                    <span style={{ fontSize: '3rem' }}>🔒</span>
+                    <PixelIcon icon="🔒" size={42} />
                     <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fca5a5', background: '#7f1d1d', padding: '8px 16px', border: '2px solid #b91c1c' }}>
                       REACH LVL 5 TO UNLOCK
                     </span>
@@ -145,7 +146,7 @@ export default function LearningProgress() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                     <div style={{ width: '56px', height: '56px', background: '#3b261b', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                      {house.icon}
+                      <PixelIcon icon={house.icon} size={40} />
                     </div>
                     <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '1px 1px 0 #3b261b', marginTop: '4px' }}>
@@ -169,7 +170,7 @@ export default function LearningProgress() {
                     ) : (
                       <div style={{ background: '#27272a', border: '2px solid #3f3f46', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
                         <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#a1a1aa' }}>
-                          🔒
+                          <PixelIcon icon="🔒" size={22} />
                         </span>
                       </div>
                     )}
@@ -187,7 +188,7 @@ export default function LearningProgress() {
                   
                   {isLockedByLevel ? (
                     <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '12px', borderLeft: '3px solid #525252', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '1rem' }}>🔒</span>
+                      <PixelIcon icon="🔒" size={20} />
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#a3a3a3', lineHeight: '1.6' }}>
                         Selesaikan Main Quest dan kumpulkan XP hingga Level 5 untuk membuka area ini.
                       </span>
@@ -195,7 +196,7 @@ export default function LearningProgress() {
                   ) : (
                     isLocked && (
                       <div style={{ background: 'rgba(185, 28, 28, 0.1)', padding: '12px', borderLeft: '3px solid #b91c1c', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '1rem' }}>⚠️</span>
+                        <PixelIcon icon="⚠️" size={20} />
                         <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fca5a5', lineHeight: '1.6' }}>
                           AI tidak menyarankan path ini. Modul tetap bisa diakses, tetapi hadiah XP berkurang 50%.
                         </span>
@@ -220,7 +221,7 @@ export default function LearningProgress() {
           {/* The Vault */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>🏛️ THE VAULT</span>
+              <span className={styles.cardTitle}>THE VAULT</span>
               <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', cursor: 'pointer' }}>VIEW ALL</span>
             </div>
             
@@ -266,7 +267,7 @@ export default function LearningProgress() {
           {/* Daily Bounty */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>⚔️ DAILY BOUNTY</span>
+              <span className={styles.cardTitle}><PixelIcon icon="⚔️" size={18} /> DAILY BOUNTY</span>
             </div>
 
             <div style={{ background: '#d4a373', border: '4px solid #5a3a29', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.2), inset -4px -4px 8px rgba(0,0,0,0.3)' }}>
@@ -326,7 +327,7 @@ export default function LearningProgress() {
                 ) : dailyBountyClaimed ? (
                   `NEXT CLAIM AT ${user.dailyBounty.nextClaimAt}`
                 ) : (
-                  '🎁 CLAIM DAILY XP'
+                  'CLAIM DAILY XP'
                 )}
               </button>
             </div>

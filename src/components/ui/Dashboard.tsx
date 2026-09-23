@@ -10,6 +10,7 @@ import LearningProgress from '@/components/learning/LearningProgress';
 import UniversityHub from '@/components/ui/UniversityHub';
 import ScholarshipHub from '@/components/ui/ScholarshipHub';
 import RelicsAndTreasures from '@/components/ui/RelicsAndTreasures';
+import PixelIcon from '@/components/ui/PixelIcon';
 import Image from 'next/image';
 import styles from './Dashboard.module.css';
 
@@ -171,7 +172,7 @@ export default function Dashboard() {
       {/* Profile XP Banner */}
       <div className={styles.retroCard} style={{ flexDirection: 'row', alignItems: 'center', gap: '24px' }}>
         <div style={{ fontSize: '4rem', background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px' }}>
-          👨‍🎓
+          <PixelIcon icon="👨‍🎓" size={64} />
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -198,11 +199,11 @@ export default function Dashboard() {
         {/* University Rank (Combined Concept 1 & 2) */}
         <div className={styles.retroCard}>
           <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>🎓 UNIVERSITY RANK</span>
+            <span className={styles.cardTitle}><PixelIcon icon="🎓" size={18} /> UNIVERSITY RANK</span>
           </div>
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
-              <span className={styles.tierIcon}>🏅</span>
+              <PixelIcon icon="🏆" size={28} />
               <span className={styles.tierName}>{mockAiResponse.universityTarget.targetTier}</span>
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>

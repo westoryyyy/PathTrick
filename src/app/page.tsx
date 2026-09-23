@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './page.module.css';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 /* ─── Feature icon cards ─── */
 const FEATURE_ICONS = [
@@ -336,7 +337,7 @@ export default function LandingPage() {
                   <p className={styles.heroWallet}>{hero.wallet}</p>
                   <p className={styles.heroTitle}>{hero.title}</p>
                   <div className={styles.heroBadgeRow}>
-                    <span className={styles.heroBadgeIcon}>{hero.badgeIcon}</span>
+                    <span className={styles.heroBadgeIcon}><PixelIcon icon={hero.badgeIcon} size={24} /></span>
                     <span className={styles.heroBadgeText}>{hero.badgeText}</span>
                   </div>
                 </div>
@@ -350,7 +351,7 @@ export default function LandingPage() {
       <section className={styles.portalSection}>
         {/* floating pixel items */}
         <div className={styles.portalChest} aria-hidden="true">🪙</div>
-        <div className={styles.portalGem} aria-hidden="true">💎</div>
+        <div className={styles.portalGem} aria-hidden="true">PORTAL</div>
 
         <div className={styles.portalInner}>
           <p className={styles.portalEyebrow}>Ready to Forge Your Path?</p>

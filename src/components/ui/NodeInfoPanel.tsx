@@ -225,7 +225,7 @@ export default function NodeInfoPanel({
                   </button>
                 )}
                 {displayNode.status === 'locked' && (
-                  <div className={styles.lockedMsg}>🔒 Prasyarat belum terpenuhi...</div>
+                  <div className={styles.lockedMsg}>Prasyarat belum terpenuhi...</div>
                 )}
               </div>
             </>

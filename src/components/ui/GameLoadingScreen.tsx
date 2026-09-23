@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 const LOADING_TIPS = [
   { icon: '💡', text: 'Setiap quest yang kamu selesaikan akan menambah XP dan membuka jalur baru!' },
@@ -106,7 +107,7 @@ export default function GameLoadingScreen({
               className="absolute inset-0 flex items-start gap-4 p-6 bg-blue-50/80 backdrop-blur-md border border-blue-100/80 rounded-[1.5rem]"
             >
               <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl shrink-0">
-                {currentTip.icon}
+                <PixelIcon icon={currentTip.icon} size={28} />
               </div>
               <p className="font-semibold text-sm text-blue-900 leading-relaxed pt-1">
                 {currentTip.text}

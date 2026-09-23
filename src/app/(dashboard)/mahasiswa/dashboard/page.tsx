@@ -54,11 +54,11 @@ export default function MahasiswaDashboard() {
           {/* ── Career Rank Widget ── */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>🏅 CAREER RANK</span>
+              <span className={styles.cardTitle}>CAREER RANK</span>
             </div>
             <div className={styles.rankContent}>
               <div className={styles.tierBadge}>
-                <span className={styles.tierIcon}>🧑‍💻</span>
+                <span className={styles.tierIcon}>RANK</span>
                 <span className={styles.tierName}>{careerRank} LEVEL</span>
               </div>
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>
@@ -108,7 +108,7 @@ export default function MahasiswaDashboard() {
           {/* ── AI Job Match Widget ── */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>🎯 AI JOB MATCH</span>
+              <span className={styles.cardTitle}>AI JOB MATCH</span>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', justifyContent: 'space-between' }}>
               <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>

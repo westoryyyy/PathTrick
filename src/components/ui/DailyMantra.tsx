@@ -158,7 +158,7 @@ export default function DailyMantra() {
           transform: isOpen ? 'scale(0.95)' : 'scale(1)',
         }}
       >
-        🧙‍♂️
+        MENTOR
         {/* "!" badge */}
         {!isOpen && (
           <div style={{

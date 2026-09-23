@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { mockBackendData } from '@/data/mockBackendData';
 import { CareerTrack } from '@/types/backend';
+import PixelIcon from '@/components/ui/PixelIcon';
 
 // categoryIcons removed
 const categories = [
@@ -114,7 +115,7 @@ export default function ExploreTracks() {
             className="lg:shrink-0 w-full lg:w-auto"
           >
             <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center gap-4 shadow-sm min-h-[280px]">
-              <div className="text-6xl animate-bounce">{mascot}</div>
+              <div className="animate-bounce"><PixelIcon icon={mascot} size={64} /></div>
               <div>
                 <h3 className="font-extrabold text-xl text-slate-900 mb-1">
                   Ready to Level Up?
@@ -124,9 +125,9 @@ export default function ExploreTracks() {
                 </p>
               </div>
               <div className="flex gap-2 text-lg mt-2">
-                <span>🎓</span>
+                <span>TRACK</span>
                 <span>💪</span>
-                <span>🚀</span>
+                <span>START</span>
               </div>
             </div>
           </motion.div>

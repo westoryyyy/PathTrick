@@ -660,7 +660,7 @@ export default function MissionFlowPage() {
                       transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       style={{ display: 'inline-block' }}
                     >
-                      <span style={{ fontSize: '3rem', filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }}>💎</span>
+                      <span style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }}>REWARD</span>
                     </motion.div>
                     <p className={styles.text} style={{ marginTop: '16px', fontSize: '0.65rem', color: '#92400e' }}>
                       Reward XP dan item telah ditambahkan ke akunmu.

@@ -162,7 +162,7 @@ export default function QuestPage() {
                       ? 'Menyiapkan...' 
                       : (currentQuestionIndex < content.questions.length - 1 
                           ? 'SOAL SELANJUTNYA ➜' 
-                          : 'LANJUT MATERI BERIKUTNYA 🚀')}
+                          : 'LANJUT MATERI BERIKUTNYA')}
                   </button>
                 )}
               </div>

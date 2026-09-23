@@ -48,7 +48,7 @@ export default function CareerHubPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center', marginTop: '64px' }}>
         <div className={styles.retroCard} style={{ maxWidth: '600px', width: '100%' }}>
           <div className={styles.cardHeader} style={{ background: '#7f1d1d' }}>
-            <span className={styles.cardTitle}>🪫 SKILL LEVEL TOO LOW</span>
+            <span className={styles.cardTitle}>SKILL LEVEL TOO LOW</span>
           </div>
           <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', textAlign: 'center' }}>
             <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.8' }}>
@@ -137,7 +137,7 @@ export default function CareerHubPage() {
               boxShadow: isPerfectMatch ? '0 0 20px rgba(251,191,36,0.2)' : undefined,
             }}>
               <div className={styles.cardHeader} style={{ background: isPerfectMatch ? '#b45309' : undefined }}>
-                <span className={styles.cardTitle}>💼 {job.company}</span>
+                <span className={styles.cardTitle}>{job.company}</span>
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: sector.accentColor, marginLeft: 'auto' }}>
                   {sector.icon} {sector.nameEN}
                 </span>

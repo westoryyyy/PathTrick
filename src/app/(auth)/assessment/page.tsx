@@ -25,7 +25,7 @@ export default function AssessmentPage() {
       <div className={styles.topBar}>
         <Image src="/PathTrick.png" alt="PathTrick" width={200} height={50} className={styles.logoImg} priority />
         <span className={styles.roleBadge}>
-          {role === 'sma' ? '🌟 The Dreamer' : '🔥 The Chaser'}
+          {role === 'sma' ? 'The Dreamer' : 'The Chaser'}
         </span>
       </div>
 
@@ -36,4 +36,3 @@ export default function AssessmentPage() {
     </div>
   );
 }
-
