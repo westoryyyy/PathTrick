@@ -60,7 +60,16 @@
   right: 0;
   z-index: 200;
   background: transparent;
-  padding: 12px 24px 0 0;
+  padding: 24px 24px 12px;
+  transition: all 0.3s ease;
+}
+
+/* When scrolled, add backdrop blur and background */
+.navScrolled {
+  background: rgba(82, 184, 232, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
 }
 
 .navInner {

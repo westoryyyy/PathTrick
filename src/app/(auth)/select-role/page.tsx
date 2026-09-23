@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
@@ -15,22 +15,44 @@ const ROLES = [
 
 export default function SelectRolePage() {
   const router = useRouter();
-  const setRole = useOnboardingStore((s) => s.setRole);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [entering, setEntering] = useState(false);
 
-  // Smart Gate: detect if wallet-only user needs to set a name
-  const { user } = usePrivy();
+  // Privy hooks — must come first as other hooks depend on `user`
+  const { user, linkWallet } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, setProfile } = useUserStore();
+
+  // Store
+  const setRole = useOnboardingStore((s) => s.setRole);
+  const selectedRole = useOnboardingStore((s) => s.selectedRole);
+  const savedPrivyUserId = useOnboardingStore((s) => s.savedPrivyUserId);
+  const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
+
+  const [selected, setSelected] = useState<string | null>(null);
+  const [entering, setEntering] = useState(false);
 
   const hasName = !!(savedName || user?.google?.name || user?.email?.address);
   const isWalletOnly = !user?.google && !user?.email && wallets.length > 0;
   const needsNicknameSetup = isWalletOnly && !hasName;
+  const isGoogleLogin = !!user?.google;
+  const needsWalletConnection = isGoogleLogin && wallets.length === 0;
 
   const [showGate, setShowGate] = useState(needsNicknameSetup);
   const [nickname, setNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState(false);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+
+  // If user already has a role AND it belongs to the current user → go to their dashboard
+  // If it's a different user → clear stale data and show role selection
+  useEffect(() => {
+    if (!user) return; // wait for Privy to load user
+    const currentUserId = user.id;
+    if (selectedRole && savedPrivyUserId === currentUserId) {
+      router.replace(`/${selectedRole}/dashboard`);
+    } else if (selectedRole && savedPrivyUserId !== currentUserId) {
+      // Different user logged in — clear stale role data
+      resetOnboarding();
+    }
+  }, [user, selectedRole, savedPrivyUserId, router, resetOnboarding]);
 
   const handleNicknameConfirm = () => {
     if (!nickname.trim()) return;
@@ -42,10 +64,26 @@ export default function SelectRolePage() {
     }, 600);
   };
 
+  const handleConnectWallet = async () => {
+    try {
+      setIsConnectingWallet(true);
+      await linkWallet();
+      setIsConnectingWallet(false);
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      setIsConnectingWallet(false);
+    }
+  };
+
   const handleContinue = () => {
     if (!selected) return;
+    // If Google login but no wallet, prompt to connect first
+    if (isGoogleLogin && wallets.length === 0) {
+      handleConnectWallet();
+      return;
+    }
     setEntering(true);
-    setRole(selected as UserRole);
+    setRole(selected as UserRole, user?.id);  // tie role to current Privy user ID
     setTimeout(() => router.push('/assessment'), 1200);
   };
 
@@ -145,9 +183,99 @@ export default function SelectRolePage() {
         </div>
       )}
 
+      {/* WALLET CONNECTION GATE – show when Google login but no wallet */}
+      {needsWalletConnection && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 999,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(4px)',
+        }}>
+          <div style={{
+            background: '#c8a96e',
+            border: '6px solid #5a3520',
+            borderRadius: '4px',
+            padding: '6px',
+            boxShadow: '6px 6px 0 #3b1f0e, inset 0 0 0 3px #e8c98a',
+            maxWidth: '480px',
+            width: '90%',
+          }}>
+            <div style={{
+              background: '#784626',
+              border: '3px solid #3b1f0e',
+              borderRadius: '2px',
+              padding: '32px 28px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
+            }}>
+              <div style={{ fontSize: '3rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>💼</div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px', lineHeight: 1.6 }}>
+                  CONNECT WALLET
+                </p>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: 1.6 }}>
+                  Essential untuk Web3
+                </p>
+              </div>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d4a96a', textAlign: 'center', lineHeight: 1.8 }}>
+                PathTrick membutuhkan wallet yang terhubung untuk minting sertifikat on-chain (SBT) dan menyelesaikan quest blockchain.
+              </p>
+              <button
+                onClick={handleConnectWallet}
+                disabled={isConnectingWallet}
+                style={{
+                  width: '100%',
+                  padding: '18px',
+                  fontFamily: '"Press Start 2P"',
+                  fontSize: '0.7rem',
+                  background: '#3b82f6',
+                  border: '4px solid',
+                  borderColor: '#1e40af',
+                  borderTopColor: '#60a5fa',
+                  borderLeftColor: '#60a5fa',
+                  color: '#fff',
+                  cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
+                  textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
+                  transition: 'all 0.2s',
+                  opacity: isConnectingWallet ? 0.7 : 1,
+                }}
+                onMouseDown={(e) => { if (!isConnectingWallet) e.currentTarget.style.transform = 'translate(2px,2px)'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'none'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+              >
+                {isConnectingWallet ? '⏳ CONNECTING...' : '🔗 CONNECT WALLET'}
+              </button>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#a87b51', textAlign: 'center' }}>
+                ℹ️ Gunakan MetaMask, Wallet Connect, atau Privy Wallet
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={styles.boardContainer}>
         <div className={styles.boardHeader}>
           <h1 className={styles.boardTitle}>Pilih Role Anda</h1>
+          {/* Show wallet connection hint for Google login without wallet */}
+          {isGoogleLogin && wallets.length === 0 && (
+            <div style={{
+              marginTop: '12px',
+              padding: '12px',
+              background: 'rgba(255,193,7,0.1)',
+              border: '2px solid #ffc107',
+              borderRadius: '4px',
+              textAlign: 'center'
+            }}>
+              <p style={{ 
+                fontFamily: '"Press Start 2P"', 
+                fontSize: '0.4rem', 
+                color: '#fbbf24', 
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                ⚠️ Wallet belum terhubung. Hubungkan wallet sebelum lanjut!
+              </p>
+            </div>
+          )}
         </div>
         <div className={styles.boardContent}>
           {ROLES.map((role) => {
@@ -184,9 +312,14 @@ export default function SelectRolePage() {
           id="role-continue-btn"
           className={`${styles.continueBtn} ${selected ? styles.continueBtnActive : ''}`}
           onClick={handleContinue}
-          disabled={!selected || entering}
+          disabled={!selected || entering || (needsWalletConnection && !isConnectingWallet)}
+          title={needsWalletConnection ? 'Hubungkan wallet terlebih dahulu' : ''}
         >
-          {entering ? (
+          {isConnectingWallet ? (
+            <><span className={styles.spinner} /> Menghubungkan Wallet...</>
+          ) : needsWalletConnection ? (
+            <>🔗 Hubungkan Wallet Dulu →</>
+          ) : entering ? (
             <><span className={styles.spinner} /> Memulai Petualangan...</>
           ) : selected ? (
             <>⚔️ Mulai sebagai {ROLES.find(r => r.id === selected)?.role}</>

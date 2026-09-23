@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-inter);
+  --font-pixel: var(--font-pixel);
+  --font-pixelify: var(--font-pixelify);
+  --font-vt323: var(--font-vt323);
+
+  --animate-shellIn: shellIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
+  --animate-contentFade: contentFade 0.35s ease forwards;
+
+  @keyframes shellIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes contentFade {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+}
+
 :root {
   --background: #0d1b2a;
   --foreground: #e2e8f0;
@@ -30,6 +49,9 @@ html {
   height: 100%;
   /* Smooth theme transitions */
   transition: background 0.3s ease, color 0.3s ease;
+  /* Prevent layout shift when scrollbar appears/disappears */
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 html,

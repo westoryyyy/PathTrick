@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWallets } from '@privy-io/react-auth';
+import { useWallets, usePrivy } from '@privy-io/react-auth';
 import { BrowserProvider, parseEther, Contract } from 'ethers';
 
 // Fallback ABI just in case the JSON is missing
@@ -17,12 +17,34 @@ interface MintSBTButtonProps {
 
 export default function MintSBTButton({ courseId, customStyle, onSuccess }: MintSBTButtonProps) {
   const { wallets } = useWallets();
+  const { linkWallet } = usePrivy();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+
+  const handleConnectWallet = async () => {
+    try {
+      setIsConnectingWallet(true);
+      await linkWallet();
+      setIsConnectingWallet(false);
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      setIsConnectingWallet(false);
+      setStatus('error');
+      setErrorMessage('Failed to connect wallet. Please try again.');
+    }
+  };
 
   const handleMint = async () => {
     try {
+      // Check if wallet is connected
+      if (!wallets || wallets.length === 0) {
+        setStatus('error');
+        setErrorMessage('No wallet found. Please connect your wallet first.');
+        return;
+      }
+
       setStatus('loading');
       setErrorMessage('');
 
@@ -119,6 +141,57 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
       setErrorMessage(displayMsg);
     }
   };
+
+  // If no wallet, show connect button
+  if (!wallets || wallets.length === 0) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button
+          onClick={handleConnectWallet}
+          disabled={isConnectingWallet}
+          style={{
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '0.8rem',
+            color: '#fff',
+            background: '#3b82f6',
+            border: 'none',
+            padding: '16px 24px',
+            cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
+            boxShadow: '4px 4px 0 #1e40af',
+            transition: 'transform 0.1s',
+            textShadow: '1px 1px 0 #000',
+            opacity: isConnectingWallet ? 0.7 : 1,
+            ...customStyle,
+          }}
+          onMouseDown={(e) => {
+            if (!isConnectingWallet) {
+              e.currentTarget.style.transform = 'translate(2px, 2px)';
+              e.currentTarget.style.boxShadow = '2px 2px 0 #1e40af';
+            }
+          }}
+          onMouseUp={(e) => {
+            if (!isConnectingWallet) {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = '4px 4px 0 #1e40af';
+            }
+          }}
+        >
+          {isConnectingWallet ? '⏳ CONNECTING WALLET...' : '🔗 CONNECT WALLET'}
+        </button>
+        <div style={{
+          background: '#1e3a8a',
+          border: '2px solid #1e40af',
+          padding: '12px',
+          borderRadius: '4px',
+          boxShadow: 'inset 0 0 0 2px #3b82f6, 2px 2px 0 #1e40af',
+        }}>
+          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.5rem', color: '#93c5fd', lineHeight: '1.6', margin: 0 }}>
+            ℹ️ Hubungkan wallet untuk minting SBT Sertifikat
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

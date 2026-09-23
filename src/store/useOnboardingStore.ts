@@ -55,7 +55,8 @@ export interface MahasiswaAssessmentState {
 interface OnboardingStore {
   /* ── Role Selection ── */
   selectedRole: UserRole | null;
-  setRole: (role: UserRole) => void;
+  savedPrivyUserId: string | null;        // ties selectedRole to a specific Privy user
+  setRole: (role: UserRole, privyUserId?: string) => void;
 
   /* ── Step Tracking ── */
   currentStep: number;
@@ -128,9 +129,11 @@ export const useOnboardingStore = create<OnboardingStore>()(
     (set, get) => ({
       /* ── Role ── */
       selectedRole: null,
-      setRole: (role) =>
+      savedPrivyUserId: null,
+      setRole: (role, privyUserId) =>
         set({
           selectedRole: role,
+          savedPrivyUserId: privyUserId ?? null,
           currentStep: 0,
           totalSteps: STEP_COUNTS[role],
         }),
@@ -209,6 +212,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
   resetOnboarding: () =>
     set({
       selectedRole: null,
+      savedPrivyUserId: null,
       currentStep: 0,
       totalSteps: 0,
       smaAssessment: { ...DEFAULT_SMA, riasec: { ...DEFAULT_RIASEC } },
@@ -222,3 +226,62 @@ export const useOnboardingStore = create<OnboardingStore>()(
     }
   )
 );
+
+/**
+ * Get the per-user storage key for a given Privy user ID.
+ * Each user gets their own isolated localStorage entry.
+ */
+export function getUserStorageKey(privyUserId: string): string {
+  return `pathtrick-onboarding-${privyUserId}`;
+}
+
+/**
+ * Load or save onboarding state scoped to a specific user ID.
+ * Call this after login to switch the store to the logged-in user's data.
+ */
+export function loadUserOnboarding(privyUserId: string) {
+  const key = getUserStorageKey(privyUserId);
+  const raw = localStorage.getItem(key);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      useOnboardingStore.setState({ ...parsed, savedPrivyUserId: privyUserId });
+    } catch {
+      // ignore corrupt data
+    }
+  } else {
+    // New user on this device — reset to clean slate
+    useOnboardingStore.getState().resetOnboarding();
+    useOnboardingStore.setState({ savedPrivyUserId: privyUserId });
+  }
+}
+
+/**
+ * Persist current onboarding state under the current user's key.
+ * Called automatically via store subscription.
+ */
+export function saveUserOnboarding(privyUserId: string) {
+  const key = getUserStorageKey(privyUserId);
+  const state = useOnboardingStore.getState();
+  // Omit non-serializable File objects
+  const toSave = {
+    selectedRole: state.selectedRole,
+    savedPrivyUserId: state.savedPrivyUserId,
+    currentStep: state.currentStep,
+    totalSteps: state.totalSteps,
+    smaAssessment: state.smaAssessment,
+    mahasiswaAssessment: {
+      ...state.mahasiswaAssessment,
+      cvFile: null,
+      portfolioFile: null,
+    },
+  };
+  localStorage.setItem(key, JSON.stringify(toSave));
+}
+
+/**
+ * Clear onboarding data for a specific user from localStorage.
+ */
+export function clearUserOnboarding(privyUserId: string) {
+  localStorage.removeItem(getUserStorageKey(privyUserId));
+}

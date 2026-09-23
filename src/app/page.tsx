@@ -50,16 +50,24 @@ export default function LandingPage() {
   const router = useRouter();
   const { selectedRole } = useOnboardingStore();
   const audioRef = React.useRef<HTMLAudioElement>(null);
+  const [isScrolled, setIsScrolled] = React.useState(false);
 
+  // After Privy OAuth completes, redirect to /select-role.
+  // The select-role page handles returning users (with saved role) → dashboard.
   React.useEffect(() => {
     if (ready && authenticated) {
-      if (selectedRole) {
-        router.push(`/${selectedRole}/dashboard`);
-      } else {
-        router.push('/select-role');
-      }
+      router.push('/select-role');
     }
-  }, [ready, authenticated, router, selectedRole]);
+  }, [ready, authenticated, router]);
+
+  const handleStart = () => {
+    if (!ready) return;
+    if (authenticated) {
+      router.push('/select-role');
+    } else {
+      login();
+    }
+  };
 
   React.useEffect(() => {
     const playAudio = () => {
@@ -76,6 +84,26 @@ export default function LandingPage() {
     return () => document.removeEventListener('click', playAudio);
   }, []);
 
+  // Handle scroll for navbar blur effect
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll for anchor links — keeps href intact for accessibility
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   return (
     <div className={styles.page}>
       
@@ -84,7 +112,7 @@ export default function LandingPage() {
 
 
       {/* ════════ NAVBAR ════════ */}
-      <nav className={styles.nav}>
+      <nav className={`${styles.nav} ${isScrolled ? styles.navScrolled : ''}`}>
         <div className={styles.navInner}>
           <Link href="/" className={styles.logo}>
             <Image
@@ -97,10 +125,19 @@ export default function LandingPage() {
             />
           </Link>
           <div className={styles.navLinks}>
-            {NAV_LINKS.map(l => <Link key={l.label} href={l.href} className={styles.navLink}>{l.label}</Link>)}
+            {NAV_LINKS.map(l => (
+              <Link
+                key={l.label}
+                href={l.href}
+                className={styles.navLink}
+                onClick={(e) => handleNavClick(e, l.href)}
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
           <div className={styles.navRight}>
-            <button onClick={login} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <Image
                 src="/Sign Up.png"
                 alt="Sign Up"
@@ -134,7 +171,7 @@ export default function LandingPage() {
             className={styles.heroTitleFloat}
             style={{ objectFit: 'contain', imageRendering: 'pixelated', maxWidth: '100%', display: 'block', marginTop: '48px' }}
           />
-          <button onClick={login} className={styles.ctaImgBtn} id="hero-start-btn" style={{ marginTop: '30px', marginLeft: '-60px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+          <button onClick={handleStart} className={styles.ctaImgBtn} id="hero-start-btn" style={{ marginTop: '30px', marginLeft: '-60px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
             <Image src="/StartLearn.png" alt="Start Learning" width={260} height={78} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
           </button>
         </div>
@@ -200,7 +237,7 @@ export default function LandingPage() {
               />
             </div>
             
-            <button onClick={login} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <button onClick={handleStart} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
             </button>
           </div>

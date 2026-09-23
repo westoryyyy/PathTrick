@@ -1,7 +1,6 @@
 'use client';
 
 import { useOnboardingStore } from '@/store/useOnboardingStore';
-import styles from './PreferencesStep.module.css';
 
 /* ── Faculty/Majors options (Mapped to 10 Houses) ── */
 const FACULTIES = [
@@ -64,25 +63,25 @@ export default function PreferencesStep() {
   const setField  = useOnboardingStore((s) => s.setSMAField);
 
   return (
-    <div className={styles.wrapper}>
+    <div className="flex flex-col gap-8 w-full max-w-[600px] mx-auto">
       {/* ── Faculty ── */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h3 className={styles.sectionTitle}>🎓 Fakultas / Jurusan</h3>
-          <span className={styles.optBadge}>Opsional</span>
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center gap-2.5">
+          <h3 className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]">🎓 Fakultas / Jurusan</h3>
+          <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 tracking-[0.06em] shadow-[2px_2px_0_0_rgba(0,0,0,0.5)]">Opsional</span>
         </div>
-        <p className={styles.sectionHint}>Pilih jurusan yang kamu minati (boleh lebih dari satu).</p>
-        <div className={styles.chipGrid}>
+        <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 leading-[1.6] uppercase">Pilih jurusan yang kamu minati (boleh lebih dari satu).</p>
+        <div className="flex flex-wrap gap-3 sm:gap-2">
           {FACULTIES.map((f) => {
             const isSelected = faculties.includes(f.value);
             return (
               <button
                 key={f.value}
                 type="button"
-                className={`${styles.chip} ${isSelected ? styles.chipSelected : ''}`}
+                className={`flex items-center gap-2 py-2.5 px-3.5 sm:py-2 sm:px-2.5 bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] text-white font-pixel text-[0.6rem] sm:text-[0.5rem] drop-shadow-[1px_1px_0_#3b261b] cursor-pointer transition-transform duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:text-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),1px_1px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !text-white !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] translate-x-[1px] translate-y-[1px]' : ''}`}
                 onClick={() => setField('facultyPreferences', toggleInArray(faculties, f.value))}
               >
-                <span className={styles.chipIcon}>{f.icon}</span>
+                <span className="text-[1.8rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">{f.icon}</span>
                 <span>{f.label}</span>
               </button>
             );
@@ -91,23 +90,23 @@ export default function PreferencesStep() {
       </section>
 
       {/* ── Country ── */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h3 className={styles.sectionTitle}>🌍 Negara Tujuan</h3>
-          <span className={styles.optBadge}>Opsional</span>
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center gap-2.5">
+          <h3 className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]">🌍 Negara Tujuan</h3>
+          <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 tracking-[0.06em] shadow-[2px_2px_0_0_rgba(0,0,0,0.5)]">Opsional</span>
         </div>
-        <p className={styles.sectionHint}>Di negara mana kamu ingin kuliah?</p>
-        <div className={styles.chipGrid}>
+        <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 leading-[1.6] uppercase">Di negara mana kamu ingin kuliah?</p>
+        <div className="flex flex-wrap gap-3 sm:gap-2">
           {COUNTRIES.map((c) => {
             const isSelected = countries.includes(c.value);
             return (
               <button
                 key={c.value}
                 type="button"
-                className={`${styles.chip} ${isSelected ? styles.chipSelected : ''}`}
+                className={`flex items-center gap-2 py-2.5 px-3.5 sm:py-2 sm:px-2.5 bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] text-white font-pixel text-[0.6rem] sm:text-[0.5rem] drop-shadow-[1px_1px_0_#3b261b] cursor-pointer transition-transform duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:text-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),1px_1px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !text-white !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] translate-x-[1px] translate-y-[1px]' : ''}`}
                 onClick={() => setField('countryPreferences', toggleInArray(countries, c.value))}
               >
-                <span className={styles.chipIcon}>{c.flag}</span>
+                <span className="text-[1.8rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">{c.flag}</span>
                 <span>{c.label}</span>
               </button>
             );

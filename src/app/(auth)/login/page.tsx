@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from './page.module.css';
 
 const SOCIAL_OPTIONS = [
   { id: 'google',  label: 'Google' },
@@ -26,7 +25,6 @@ export default function LoginPage() {
   const [step, setStep]       = useState<'login' | 'otp'>('login');
   const [otp, setOtp]         = useState(['', '', '', '', '', '']);
 
-  // If already authenticated, redirect
   if (ready && authenticated) {
     router.push('/select-role');
     return null;
@@ -35,7 +33,6 @@ export default function LoginPage() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    // Trigger Privy email login
     login({ loginMethods: ['email'], prefill: { type: 'email', value: email } });
   };
 
@@ -63,42 +60,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden p-6 bg-[#0b1437]">
       {/* ── Dynamic Background ── */}
-      <div className={styles.pageBg} />
-      <div className={styles.pageOverlay} />
+      <div 
+        className="absolute -inset-[2%] bg-[url('/px-hero-island.jpg')] bg-cover bg-center z-0 animate-[bgPan_40s_ease-in-out_infinite_alternate]"
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(10,15,30,0.4)_100%)] z-10" />
 
-
-
-      {/* Glassmorphism Back Button */}
-      <Link href="/" className={styles.logoBtn} id="login-back-btn">
+      {/* Back Button */}
+      <Link 
+        href="/" 
+        id="login-back-btn"
+        className="fixed top-10 left-6 z-20 flex items-center justify-center bg-transparent border-none outline-none transition-transform duration-100 hover:scale-105 active:scale-95 cursor-pointer"
+      >
         <Image src="/BACK BUTTON.png" alt="Back" width={150} height={70} unoptimized style={{ objectFit: 'contain' }} />
       </Link>
 
-      <div className={styles.container}>
-        {/* Logo using Image Asset */}
-        <div className={styles.logo}>
+      <div className="w-full max-w-[480px] flex flex-col items-center relative z-10">
+        {/* Logo */}
+        <div className="text-center mb-6 translate-y-10 z-20 relative">
           <Image src="/PATHTRICK LOGIN.png" alt="PathTrick Logo" width={400} height={120} style={{ objectFit: 'contain' }} unoptimized />
         </div>
 
         {/* Card */}
-        <div className={styles.card}>
+        <div className="w-full max-w-[540px] min-h-[480px] bg-transparent bg-[url('/Login\ Card.png')] bg-[length:100%_100%] bg-center bg-no-repeat p-[85px] relative flex flex-col justify-center drop-shadow-[0_12px_24px_rgba(0,0,0,0.4)]">
           {step === 'login' ? (
             <>
-              <h1 className={styles.title}>Mulai Petualangan</h1>
-              <p className={styles.subtitle}>
+              <h1 className="font-pixel text-base text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">
+                Mulai Petualangan
+              </h1>
+              <p className="font-pixelify text-[0.9rem] text-[#5d4037] text-center leading-[1.6] mb-6">
                 Login dengan email atau connect wallet untuk memulai.
               </p>
 
-              {/* Social buttons – side by side */}
-              <div className={styles.socialButtons}>
+              {/* Social buttons */}
+              <div className="flex gap-3 mb-1">
                 {SOCIAL_OPTIONS.map(opt => (
                   <button
                     key={opt.id}
                     id={`login-social-${opt.id}`}
-                    className={styles.socialBtn}
                     onClick={() => handleSocialLogin(opt.id)}
                     disabled={!!loading}
+                    className="flex-1 flex items-center justify-center gap-[10px] py-3 px-4 border-2 border-[#a67c52] rounded-lg bg-[#fcf3e3] cursor-pointer font-pixelify text-base text-[#3e2723] font-semibold shadow-[0_3px_0_#a67c52] normal-case transition-all duration-100 hover:bg-[#fff9ef] hover:-translate-y-[1px] hover:shadow-[0_4px_0_#a67c52] active:translate-y-[3px] active:shadow-[0_0_0_#a67c52] disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-[0_3px_0_#a67c52]"
                   >
                     {opt.id === 'google' ? (
                       <svg width="22" height="22" viewBox="0 0 24 24">
@@ -119,53 +122,55 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              <div className={styles.divider}>
+              <div className="flex items-center gap-3 my-6 text-[#a67c52] text-[0.8rem] font-pixelify uppercase before:content-[''] before:flex-1 before:h-[2px] before:bg-[#a67c52] after:content-[''] after:flex-1 after:h-[2px] after:bg-[#a67c52]">
                 <span>atau gunakan email</span>
               </div>
 
               {/* Email form */}
-              <form onSubmit={handleEmailSubmit} className={styles.emailForm}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="login-email" className={styles.label}>Email</label>
+              <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3.5">
+                <div className="flex flex-col gap-3.5">
+                  <label htmlFor="login-email" className="hidden">Email</label>
                   <input
                     id="login-email"
                     type="email"
-                    className={styles.inputField}
                     placeholder="Email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                     disabled={!!loading}
+                    className="w-full py-3.5 px-4 border-2 border-[#8b5a2b] rounded-lg bg-[#e6ccab] font-pixelify text-[0.95rem] text-[#3e2723] outline-none transition-colors duration-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] focus:border-[#5d4037] focus:bg-[#f1ebd8] placeholder-[#8d6e63]"
                   />
                 </div>
                 <button
                   id="login-email-btn"
                   type="submit"
-                  className={styles.submitBtn}
                   disabled={!!loading || !email}
+                  className="w-full p-4 mt-4 border-3 border-[#5d4037] rounded-lg bg-gradient-to-b from-[#ffd700] to-[#daa520] text-[#3e2723] font-pixel text-[0.85rem] drop-shadow-[0_1px_0_rgba(255,255,255,0.4)] cursor-pointer tracking-widest normal-case transition-all duration-100 shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_6px_0_#8b5a2b,0_8px_12px_rgba(0,0,0,0.3)] hover:-translate-y-[2px] hover:bg-gradient-to-b hover:from-[#ffdf33] hover:to-[#e8b122] hover:shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_8px_0_#8b5a2b,0_12px_16px_rgba(0,0,0,0.4)] active:translate-y-[6px] active:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_0_0_#8b5a2b,0_2px_4px_rgba(0,0,0,0.2)] disabled:bg-gradient-to-b disabled:from-[#d4c47b] disabled:to-[#bfa256] disabled:border-[#8b7d6b] disabled:text-[#7a6e5e] disabled:drop-shadow-none disabled:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_4px_0_#7a6e5e] disabled:cursor-not-allowed"
                 >
                   {loading === 'email' ? (
-                    <><span className={styles.spinner} /> Mengirim kode...</>
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="inline-block w-4 h-4 border-3 border-white/30 border-t-white rounded-full animate-spin" /> Mengirim kode...
+                    </span>
                   ) : (
                     'Sign up for free'
                   )}
                 </button>
               </form>
 
-              <p className={styles.privacy}>
+              <p className="font-pixelify text-[0.75rem] text-[#5d4037] text-center mt-4 leading-[1.6]">
                 By signing up, I agree to PathTrick&apos;s Terms.
               </p>
             </>
           ) : (
             /* OTP Step */
-            <div className={styles.otpSection}>
-              <div className={styles.otpIcon}>📬</div>
-              <h1 className={styles.title}>Cek Emailmu</h1>
-              <p className={styles.subtitle}>
-                Kami kirim kode 6 digit ke <strong style={{ color: '#DD1A21' }}>{email}</strong>
+            <div className="flex flex-col items-center gap-6">
+              <div className="text-[2.5rem] leading-none">📬</div>
+              <h1 className="font-pixel text-base text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">Cek Emailmu</h1>
+              <p className="font-pixelify text-[0.9rem] text-[#5d4037] text-center leading-[1.6] mb-6">
+                Kami kirim kode 6 digit ke <strong className="text-[#DD1A21]">{email}</strong>
               </p>
 
-              <div className={styles.otpInputs}>
+              <div className="flex gap-2">
                 {otp.map((val, i) => (
                   <input
                     key={i}
@@ -175,23 +180,23 @@ export default function LoginPage() {
                     maxLength={1}
                     value={val}
                     onChange={e => handleOtpChange(i, e.target.value)}
-                    className={styles.otpInput}
                     disabled={!!loading}
                     aria-label={`Digit OTP ke-${i + 1}`}
+                    className="w-11 h-[52px] bg-[#f9fafb] border-3 border-[#d1d5db] rounded-lg text-[#1a2a3a] font-pixelify text-[1.2rem] text-center outline-none shadow-none focus:border-[#DD1A21] focus:bg-white placeholder-shown:border-[#d1d5db] [&:not(:placeholder-shown)]:border-[#22c55e]"
                   />
                 ))}
               </div>
 
               {loading === 'otp' && (
-                <div className={styles.verifyingMsg}>
-                  <span className={styles.spinner} /> Memverifikasi...
+                <div className="flex items-center gap-3 text-[0.85rem] text-[#1a2a3a] font-pixelify">
+                  <span className="inline-block w-4 h-4 border-3 border-white/30 border-t-white rounded-full animate-spin" /> Memverifikasi...
                 </div>
               )}
 
               <button
-                className={styles.resendBtn}
                 onClick={() => { setStep('login'); setOtp(['','','','','','']); }}
                 id="login-back-to-email"
+                className="text-[0.8rem] text-[#6b7280] cursor-pointer bg-none border-none font-pixelify underline hover:text-[#1a2a3a]"
               >
                 ← Ganti email atau kirim ulang
               </button>
@@ -199,10 +204,10 @@ export default function LoginPage() {
           )}
         </div>
 
-        <p className={styles.terms}>
+        <p className="font-pixelify text-[0.8rem] text-white text-center leading-[1.8] mt-5 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] shadow-black">
           Dengan masuk, kamu menyetujui{' '}
-          <a href="#">Syarat & Ketentuan</a> dan{' '}
-          <a href="#">Kebijakan Privasi</a>.
+          <a href="#" className="text-[#ff5252] no-underline hover:underline">Syarat & Ketentuan</a> dan{' '}
+          <a href="#" className="text-[#ff5252] no-underline hover:underline">Kebijakan Privasi</a>.
         </p>
       </div>
     </div>

@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
-import styles from './CVUploadStep.module.css';
 
 import { classifySkills } from '@/data/wefSkillData';
 
@@ -118,10 +117,10 @@ export default function CVUploadStep() {
   const status = mState.cvExtractionStatus;
 
   return (
-    <div className={styles.wrapper}>
+    <div className="flex flex-col gap-8 w-full max-w-[600px] mx-auto">
       {/* ══════════ CV UPLOAD ZONE ══════════ */}
       <div
-        className={`${styles.dropZone} ${isDragOver ? styles.dropZoneDragOver : ''} ${status === 'done' ? styles.dropZoneDone : ''} ${status === 'error' ? styles.dropZoneError : ''}`}
+        className={`relative w-full min-h-[280px] sm:min-h-[220px] flex flex-col justify-center bg-[#bc8f65] border-4 border-[#5a3a29] transition-colors duration-200 cursor-pointer shadow-[inset_0_0_16px_rgba(0,0,0,0.3),4px_4px_0_0_rgba(0,0,0,0.5)] ${isDragOver ? '!bg-[#cba37b] !border-[#f59e0b]' : ''} ${status === 'done' ? '!bg-[#1e1b4b] !border-[#4c1d95] !cursor-default' : ''} ${status === 'error' ? '!bg-[#450a0a] !border-[#ef4444]' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -135,63 +134,63 @@ export default function CVUploadStep() {
           type="file"
           accept=".pdf,.doc,.docx"
           onChange={handleFileChange}
-          className={styles.hiddenInput}
+          className="hidden"
           aria-label="Upload CV"
         />
 
         {/* ── IDLE STATE ── */}
         {status === 'idle' && (
-          <div className={styles.idleContent}>
-            <span className={styles.uploadIcon}>📜</span>
-            <p className={styles.uploadTitle}>Drag & Drop CV-mu di sini</p>
-            <p className={styles.uploadHint}>atau klik untuk browse file</p>
-            <p className={styles.uploadFormats}>PDF, DOC, DOCX • Maks {MAX_SIZE_MB}MB</p>
+          <div className="flex flex-col items-center gap-4 p-10 sm:p-7 text-center">
+            <span className="text-[3rem] sm:text-[2.2rem] leading-none drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)] animate-[iconFloat_2s_ease-in-out_infinite]">📜</span>
+            <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">Drag & Drop CV-mu di sini</p>
+            <p className="font-pixel text-[0.6rem] text-white m-0 uppercase drop-shadow-[1px_1px_0_#3b261b]">atau klik untuk browse file</p>
+            <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF, DOC, DOCX • Maks {MAX_SIZE_MB}MB</p>
           </div>
         )}
 
         {/* ── UPLOADING STATE ── */}
         {status === 'uploading' && (
-          <div className={styles.processingContent}>
-            <div className={styles.uploadingIcon}>
-              <span className={styles.uploadingSpinner} />
+          <div className="flex flex-col items-center gap-3.5 px-6 py-10 text-center">
+            <div className="w-12 h-12 flex items-center justify-center">
+              <span className="block w-9 h-9 border-4 border-[#4c1d95] border-t-[#a855f7] animate-[spin_0.8s_steps(4)_infinite]" />
             </div>
-            <p className={styles.processingTitle}>Mengunggah...</p>
-            <p className={styles.processingFile}>{mState.cvFileName}</p>
-            <div className={styles.progressBarWrap}>
-              <div className={styles.progressBarFill} style={{ width: '60%' }} />
+            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">Mengunggah...</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{mState.cvFileName}</p>
+            <div className="w-[250px] h-4 bg-[#1e1b4b] border-4 border-[#4c1d95] shadow-[inset_4px_4px_0_rgba(0,0,0,0.4)] relative">
+              <div className="h-full bg-[#a855f7] transition-[width] duration-500 ease-[steps(10)]" style={{ width: '60%' }} />
             </div>
           </div>
         )}
 
         {/* ── EXTRACTING STATE ── */}
         {status === 'extracting' && (
-          <div className={styles.processingContent}>
-            <div className={styles.scannerWrap}>
-              <span className={styles.scannerIcon}>🤖</span>
-              <div className={styles.scanLine} />
+          <div className="flex flex-col items-center gap-3.5 px-6 py-10 text-center">
+            <div className="relative w-16 h-16 flex items-center justify-center bg-[#1e1b4b] border-4 border-[#4c1d95] overflow-hidden">
+              <span className="text-[3.2rem] z-10 leading-none">🤖</span>
+              <div className="absolute left-0 right-0 h-1 bg-[#2dd4bf] shadow-[0_0_16px_#2dd4bf] animate-[scanMove_1.5s_steps(10)_infinite]" />
             </div>
-            <p className={styles.processingTitle}>AI SEDANG MENGANALISIS SCROLL-MU...</p>
-            <p className={styles.processingFile}>{mState.cvFileName}</p>
-            <div className={styles.extractingDots}>
-              <span className={styles.extractDot} />
-              <span className={styles.extractDot} />
-              <span className={styles.extractDot} />
+            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">AI SEDANG MENGANALISIS SCROLL-MU...</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{mState.cvFileName}</p>
+            <div className="flex gap-1.5">
+              <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite]" />
+              <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite] [animation-delay:0.2s]" />
+              <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite] [animation-delay:0.4s]" />
             </div>
           </div>
         )}
 
         {/* ── DONE STATE ── */}
         {status === 'done' && mState.cvExtractedData && (
-          <div className={styles.doneContent}>
-            <div className={styles.doneHeader}>
-              <span className={styles.doneIcon}>✅</span>
+          <div className="flex flex-col gap-4.5 p-6 sm:p-3.5 w-full text-left">
+            <div className="flex items-center gap-4">
+              <span className="text-[3rem] shrink-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)] leading-none">✅</span>
               <div>
-                <p className={styles.doneTitle}>CV Berhasil Dianalisis!</p>
-                <p className={styles.doneFile}>{mState.cvFileName}</p>
+                <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">CV Berhasil Dianalisis!</p>
+                <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{mState.cvFileName}</p>
               </div>
               <button
                 type="button"
-                className={styles.retryBtn}
+                className="ml-auto font-pixel text-[0.6rem] text-white bg-[#b91c1c] border-2 border-[#f87171] px-3 py-2 cursor-pointer shadow-[2px_2px_0_rgba(0,0,0,0.5)] transition-transform duration-100 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                 onClick={(e) => { e.stopPropagation(); handleRetry(); }}
               >
                 🔄 Ganti
@@ -199,44 +198,44 @@ export default function CVUploadStep() {
             </div>
 
             {/* Extracted Skills */}
-            <div className={styles.extractedSection}>
-              <p className={styles.extractedLabel}>🎯 Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
-              <div className={styles.skillTags}>
+            <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">🎯 Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
+              <div className="flex flex-wrap gap-2.5">
                 {(mState.cvExtractedData?.skills ?? []).map((skill, i) => (
-                  <span key={i} className={styles.skillTag} style={{ animationDelay: `${i * 0.08}s` }}>
-                    {skill.name} <span className={styles.skillLevel}>Lv.{skill.level}</span>
+                  <span key={i} className="font-pixel text-[0.55rem] text-white bg-[#4c1d95] border-2 border-[#a855f7] shadow-[2px_2px_0_rgba(0,0,0,0.5)] px-2.5 py-1.5 animate-[tagIn_0.35s_steps(4)_both]" style={{ animationDelay: `${i * 0.08}s` }}>
+                    {skill.name} <span className="text-[#34d399]">Lv.{skill.level}</span>
                   </span>
                 ))}
               </div>
             </div>
 
             {/* Extracted Experience */}
-            <div className={styles.extractedSection}>
-              <p className={styles.extractedLabel}>💼 Pengalaman</p>
-              <ul className={styles.expList}>
+            <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">💼 Pengalaman</p>
+              <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
                 {mState.cvExtractedData.experience.map((exp, i) => (
-                  <li key={i} style={{ animationDelay: `${0.5 + i * 0.1}s` }}>{exp}</li>
+                  <li key={i} className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] pl-5 relative leading-[1.8] animate-[tagIn_0.35s_steps(4)_both] before:content-['>'] before:absolute before:left-0 before:text-[#34d399]" style={{ animationDelay: `${0.5 + i * 0.1}s` }}>{exp}</li>
                 ))}
               </ul>
             </div>
 
             {/* Extracted Education */}
-            <div className={styles.extractedSection}>
-              <p className={styles.extractedLabel}>🎓 Pendidikan</p>
-              <p className={styles.eduText}>{mState.cvExtractedData.education}</p>
+            <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">🎓 Pendidikan</p>
+              <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] m-0 leading-[1.8]">{mState.cvExtractedData.education}</p>
             </div>
           </div>
         )}
 
         {/* ── ERROR STATE ── */}
         {status === 'error' && (
-          <div className={styles.errorContent}>
-            <span className={styles.errorIcon}>❌</span>
-            <p className={styles.errorTitle}>Gagal menganalisis CV</p>
-            <p className={styles.errorHint}>Terjadi kesalahan. Silakan coba lagi.</p>
+          <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
+            <span className="text-[4.5rem] leading-none drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]">❌</span>
+            <p className="font-pixel text-[0.9rem] text-[#f87171] m-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)] text-center">Gagal menganalisis CV</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0 text-center leading-[1.6]">Terjadi kesalahan. Silakan coba lagi.</p>
             <button
               type="button"
-              className={styles.retryBtnLarge}
+              className="font-pixel text-[0.7rem] px-6 py-3 bg-[#991b1b] border-4 border-[#ef4444] shadow-[4px_4px_0_rgba(0,0,0,0.5)] text-white cursor-pointer mt-2.5 transition-transform duration-100 active:translate-x-1 active:translate-y-1 active:shadow-none"
               onClick={(e) => { e.stopPropagation(); handleRetry(); }}
             >
               🔄 Coba Lagi
@@ -246,13 +245,13 @@ export default function CVUploadStep() {
       </div>
 
       {/* ══════════ PORTFOLIO UPLOAD (OPTIONAL) ══════════ */}
-      <div className={styles.portfolioSection}>
-        <div className={styles.portfolioHeader}>
-          <span className={styles.portfolioLabel}>📎 Portfolio</span>
-          <span className={styles.optBadge}>Opsional</span>
+      <div className="flex flex-col gap-3 text-left">
+        <div className="flex items-center gap-2.5">
+          <span className="font-pixel text-[0.85rem] text-white tracking-[0.05em] drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">📎 Portfolio</span>
+          <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.5)]">Opsional</span>
         </div>
         <div
-          className={styles.portfolioZone}
+          className="px-5 py-4 bg-[#bc8f65] border-4 border-dashed border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3)] cursor-pointer text-center hover:bg-[#cba37b] hover:border-[#6a4734] transition-colors"
           onClick={() => portfolioInputRef.current?.click()}
           role="button"
           tabIndex={0}
@@ -262,13 +261,13 @@ export default function CVUploadStep() {
             type="file"
             accept=".pdf,.doc,.docx,.zip"
             onChange={handlePortfolioChange}
-            className={styles.hiddenInput}
+            className="hidden"
             aria-label="Upload Portfolio"
           />
           {mState.portfolioFileName ? (
-            <p className={styles.portfolioFile}>📄 {mState.portfolioFileName}</p>
+            <p className="font-pixel text-[0.6rem] text-[#34d399] m-0 drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">📄 {mState.portfolioFileName}</p>
           ) : (
-            <p className={styles.portfolioHint}>Klik untuk upload portfolio (PDF, ZIP)</p>
+            <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">Klik untuk upload portfolio (PDF, ZIP)</p>
           )}
         </div>
       </div>

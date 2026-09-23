@@ -42,3 +42,37 @@ Always follow these conventions when adding or modifying pages:
 
 4. **Map to Dashboard Navigation**:
    - When redirecting back to the dashboard from the Map (`src/app/(game)/map/page.tsx`), always check the current role/module and redirect to the appropriate `[role]/[page]`.
+
+# Tailwind v4 Configuration Rules
+This project uses **Tailwind CSS v4** (`tailwindcss: ^4.3.3`). The `tailwind.config.js` file is IGNORED by the build system.
+
+1. **`tailwind.config.js` is dead**: Do NOT modify `tailwind.config.js` to add fonts, colors, or animations. Changes there have zero effect at runtime.
+2. **Theme goes in `globals.css`**: All custom theme tokens (fonts, colors, keyframes, animations) MUST be declared inside the `@theme {}` block in `src/app/globals.css`.
+3. **Font variable mapping**: Next.js Google Fonts inject CSS variables (e.g., `var(--font-pixel)`). To make them available as Tailwind utility classes, map them inside `@theme` like:
+   ```css
+   @theme {
+     --font-pixel: var(--font-pixel);
+     --font-pixelify: var(--font-pixelify);
+   }
+   ```
+   This creates the Tailwind classes `font-pixel`, `font-pixelify`, etc.
+4. **Restart required**: After modifying `globals.css` theme config, always restart `npm run dev` for changes to take effect.
+
+# PathTrick Font System Rules
+This project has a strict pixel-art font system. NEVER substitute or rename these Tailwind classes:
+
+| Tailwind Class  | Font           | Usage                                       |
+|-----------------|----------------|---------------------------------------------|
+| `font-pixel`    | Press Start 2P | ALL game/assessment UI text. Primary font.  |
+| `font-pixelify` | Pixelify Sans  | Decorative headers, subheadings             |
+| `font-vt323`    | VT323          | Terminal/retro text effects                 |
+| `font-sans`     | Inter          | Body copy, non-game UI (e.g., dashboard)    |
+
+**NEVER replace `font-pixel` with `font-mono`**. `font-mono` is a generic Tailwind class mapping to a non-pixel monospace font (Consolas/Courier) and will immediately break the Stardew Valley / Dinkum aesthetic that is core to this product.
+
+# PathTrick Auth State Rules
+`localStorage` is shared across all users on the same browser. NEVER store role/onboarding state without tying it to a user identity.
+
+1. **Always store `savedPrivyUserId` together with `selectedRole`**: Use `useOnboardingStore`'s `setRole(role, userId)` which persists both values atomically.
+2. **Always verify identity on load**: On any page that reads `selectedRole`, compare `savedPrivyUserId` with the current Privy `user.id`. If they don't match, call `resetOnboarding()` before proceeding — this prevents role state from leaking between different Google accounts on the same device.
+3. **The `select-role` page is the auth gateway**: It is solely responsible for detecting stale/cross-user state and redirecting correctly. Do not duplicate this logic elsewhere.
