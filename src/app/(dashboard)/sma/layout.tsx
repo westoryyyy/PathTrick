@@ -33,7 +33,7 @@ export default function SMALayout({
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
-  const { displayName: savedName, displayEmail: savedEmail } = useUserStore();
+  const { displayName: savedName, displayEmail: savedEmail, avatarUrl } = useUserStore();
 
   // Priority: 1. User-edited (Zustand), 2. Auto from Privy (Google/Email), 3. Wallet address fallback
   const displayName = savedName
@@ -204,7 +204,9 @@ export default function SMALayout({
                 onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }} 
                 style={{ cursor: 'pointer' }}
               >
-                <div className={styles.profileAvatar}><PixelIcon icon="👨‍🎓" size={32} /></div>
+                <div className={styles.profileAvatar}>
+                  <Image src={avatarUrl} alt="Profile avatar" width={44} height={44} />
+                </div>
                 <div className={styles.profileInfo}>
                   <span className={styles.profileName}>{displayName}</span>
                   <span className={styles.profileEmail}>{displayEmail}</span>

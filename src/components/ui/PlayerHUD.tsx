@@ -2,6 +2,7 @@
 
 import styles from './PlayerHUD.module.css';
 import { ASSET_PATHS } from '@/phaser/config';
+import { useUserStore } from '@/store/useUserStore';
 
 interface PlayerHUDProps {
   playerName: string;
@@ -21,6 +22,7 @@ export default function PlayerHUD({
   nearbyNodeTitle,
 }: PlayerHUDProps) {
   const xpPercent = Math.min((xp / xpToNext) * 100, 100);
+  const avatarUrl = useUserStore((state) => state.avatarUrl);
 
   return (
     <>
@@ -57,7 +59,7 @@ export default function PlayerHUD({
         <div className={styles.playerCard} id="player-hud-card">
           <div className={styles.avatar}>
             <img
-              src="/idle.png"
+              src={avatarUrl}
               alt="Avatar"
               className={styles.avatarImg}
             />
