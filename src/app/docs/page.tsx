@@ -873,6 +873,100 @@ export default function DocsPage() {
                 </table>
               </section>
               <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Founder and Investor Mindset</h3>
+                <div className={styles.callout}>
+                  Prinsip utama PathTrick: <strong>jangan scale vanity metrics; scale outcomes.</strong> Wallet connect, sign-up, dan page views penting untuk funnel, tetapi nilai bisnis muncul ketika pengguna benar-benar menyelesaikan learning journey dan partner melihat outcome yang lebih baik.
+                </div>
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Solve Pain First</div><div className={styles.cardText}>Validasi bahwa user membayar atau partner memperpanjang kontrak karena masalah career uncertainty benar-benar terselesaikan.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Evidence Over Hype</div><div className={styles.cardText}>Pisahkan data actual, target, dan assumption. Jangan menjual blockchain sebagai tujuan; gunakan blockchain sebagai trust layer untuk skill evidence.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Distribution Is Product</div><div className={styles.cardText}>Bangun jalur distribusi melalui sekolah, kampus, komunitas, mentor, dan recruiter sejak awal, bukan setelah produk selesai.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Capital Discipline</div><div className={styles.cardText}>Setiap dana harus membeli learning velocity: product quality, partner acquisition, content supply, atau measurable user outcome.</div></div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Q1 — Prove the Wedge</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Fokus Q1 adalah membuktikan bahwa pengalaman PathTrick membuat user memulai dan menyelesaikan learning journey. Jangan mengejar terlalu banyak persona sekaligus; pilih satu wedge utama, misalnya siswa SMA yang sedang mencari jurusan dan roadmap persiapan.
+                </p>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <tbody>
+                    <tr><td>Product</td><td>Onboarding, assessment, first quest, progress, dan certificate flow stabil tanpa critical bug.</td></tr>
+                    <tr><td>Validation</td><td>Interview terstruktur dan pilot kecil; ukur activation, first quest completion, serta alasan user berhenti.</td></tr>
+                    <tr><td>Backend</td><td>Auth, role persistence, progress persistence, dan audit log sudah memakai backend asli.</td></tr>
+                    <tr><td>Trust</td><td>Jelaskan data privacy, consent, certificate verification, dan batasan AI secara transparan.</td></tr>
+                    <tr><td>Gate</td><td>Lanjut ke Q2 hanya jika ada repeat usage dan bukti bahwa user meminta lebih banyak content atau guidance.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Q2 — Prove Repeatability</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Fokus Q2 adalah mengubah keberhasilan pilot menjadi playbook yang dapat diulang. Satu sekolah atau komunitas yang berhasil belum menjadi bisnis scalable; kita perlu tahu channel mana yang menghasilkan user berkualitas dan berapa biaya untuk melayani mereka.
+                </p>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <tbody>
+                    <tr><td>Distribution</td><td>Playbook partnership sekolah/kampus, referral, ambassador, dan content campaign.</td></tr>
+                    <tr><td>Monetization</td><td>Uji willingness-to-pay untuk premium learning, certificate, dan institutional package.</td></tr>
+                    <tr><td>Operations</td><td>Admin dashboard, support workflow, content QA, dan partner onboarding checklist.</td></tr>
+                    <tr><td>Metrics</td><td>Bandingkan activation, retention, completion, conversion, CAC, dan support cost per channel.</td></tr>
+                    <tr><td>Gate</td><td>Masuk Q3 setelah ada channel yang repeatable dan cohort yang menunjukkan retention lebih baik.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Q3 — Build the Growth Engine</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Fokus Q3 adalah memperbesar supply dan demand secara seimbang. User membutuhkan course dan mentor yang berkualitas; partner membutuhkan audience dan outcome. Marketplace effect hanya boleh dikejar setelah quality control dan consent sudah kuat.
+                </p>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <tbody>
+                    <tr><td>Content Supply</td><td>Partner course dan project dengan rubric, learning objective, reviewer, serta certificate policy yang konsisten.</td></tr>
+                    <tr><td>Career Network</td><td>Employer pilot untuk skill evidence dan feedback loop dari recruiter.</td></tr>
+                    <tr><td>Product Loops</td><td>Shareable achievement, referral, cohort challenge, dan re-engagement yang tidak bergantung pada gimmick.</td></tr>
+                    <tr><td>Infrastructure</td><td>Observability, queue untuk AI jobs, caching, rate limit, analytics events, dan cost monitoring.</td></tr>
+                    <tr><td>Gate</td><td>Scale paid acquisition hanya jika retention dan gross margin per cohort sudah dipahami.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Q4 — Prepare for Institutional Scale</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Fokus Q4 adalah kesiapan menjual dan melayani institusi secara serius. Investor perlu melihat bahwa pertumbuhan tidak menambah chaos operasional, debt keamanan, atau ketergantungan pada satu orang.
+                </p>
+                <table className={styles.techTable}>
+                  <thead><tr><th>Workstream</th><th>Target Investor-Ready</th></tr></thead>
+                  <tbody>
+                    <tr><td>Enterprise Product</td><td>Role-based admin, cohort reporting, export, permission, SSO plan, dan SLA support.</td></tr>
+                    <tr><td>Revenue Quality</td><td>Renewal signal, annual contract, expansion revenue, gross margin, dan pipeline yang dapat diprediksi.</td></tr>
+                    <tr><td>Governance</td><td>Security review, incident response, privacy policy, data retention, vendor review, dan financial reporting.</td></tr>
+                    <tr><td>Fundraising</td><td>Investor data room berisi traction, cohort data, product demo, roadmap, cap table, legal readiness, dan use of funds.</td></tr>
+                    <tr><td>Gate</td><td>Fundraise berdasarkan bukti repeatability dan capital-efficient growth, bukan sekadar jumlah fitur.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Investor Scorecard</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Setiap kuartal, tim sebaiknya menilai PathTrick dari lima pertanyaan: apakah user mendapatkan outcome yang lebih baik, apakah mereka kembali tanpa dipaksa, apakah partner bersedia membayar atau memperpanjang, apakah unit economics membaik, dan apakah sistem dapat melayani cohort baru tanpa biaya operasional yang naik secara tidak terkendali.
+                </p>
+                <div className={styles.featureGrid} style={{ marginTop: '24px' }}>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Traction</div><div className={styles.cardText}>Cohort growth, active learners, completion, retention, dan verified outcomes.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Efficiency</div><div className={styles.cardText}>CAC, payback period, AI cost per user, support cost, dan gross margin.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Moat</div><div className={styles.cardText}>Outcome dataset yang consented, partner network, content quality, dan trust layer.</div></div>
+                  <div className={styles.featureCard}><div className={styles.cardTitle}>Execution</div><div className={styles.cardText}>Release velocity, reliability, security posture, dan kemampuan tim mengulang playbook.</div></div>
+                </div>
+              </section>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Use of Funds Mindset</h3>
+                <p className={styles.text} style={{ textAlign: 'justify' }}>
+                  Jika menerima investasi, alokasi dana harus dikaitkan ke milestone: engineering untuk reliability dan backend, content untuk course berkualitas, distribution untuk pilot dan partnership, serta trust untuk security, privacy, dan compliance. Hindari burn besar untuk vanity growth sebelum retention dan unit economics terbukti.
+                </p>
+              </section>
+              <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Risiko yang Harus Dikendalikan</h3>
                 <p className={styles.text} style={{ textAlign: 'justify' }}>
                   Pertumbuhan harus tetap menjaga kualitas rekomendasi AI, privasi CV dan data assessment, fairness pada career matching, biaya RPC dan gas, moderasi content partner, serta ketergantungan pada provider login dan blockchain. Sebelum scale besar, tambahkan audit security, observability, rate limiting, backup database, consent management, dan proses support yang terukur.
