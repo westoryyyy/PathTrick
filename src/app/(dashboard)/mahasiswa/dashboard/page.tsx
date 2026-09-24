@@ -43,8 +43,8 @@ export default function MahasiswaDashboard() {
         <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
           WELCOME BACK, {displayName}!
         </h1>
-        <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-          Your AI Career Roadmap is actively scanning for opportunities.
+        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
+          AI Career Roadmap kamu sedang aktif memindai berbagai peluang terbaik.
         </p>
       </div>
 

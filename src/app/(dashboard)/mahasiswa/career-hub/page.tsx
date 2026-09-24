@@ -80,28 +80,30 @@ export default function CareerHubPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', paddingBottom: '64px' }}>
       
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
           AI CAREER HUB
         </h1>
-        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-          We compared your verified on-chain SBTs with live industry requirements. Here are your matches and skill gaps.
+        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
+          Sistem AI membandingkan portofolio SBT on-chain kamu dengan kualifikasi industri secara real-time. Berikut adalah persentase kecocokan dan skill gap kamu.
         </p>
       </div>
 
       {/* ── GICS Sector Filter Bar ── */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
         <button
           onClick={() => setActiveFilter(null)}
           style={{
-            fontFamily: '"Press Start 2P"', fontSize: '0.65rem',
-            padding: '8px 14px', cursor: 'pointer',
+            fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
+            padding: '10px 16px', cursor: 'pointer',
             background: activeFilter === null ? '#fbbf24' : 'rgba(255,255,255,0.1)',
             color: activeFilter === null ? '#3b261b' : '#e2c99a',
             border: `2px solid ${activeFilter === null ? '#b45309' : '#8a6040'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: '36px'
           }}
         >
           ALL
@@ -112,18 +114,21 @@ export default function CareerHubPage() {
             onClick={() => setActiveFilter(activeFilter === sector.code ? null : sector.code)}
             style={{
               fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
-              padding: '8px 14px', cursor: 'pointer',
+              padding: '10px 16px', cursor: 'pointer',
               background: activeFilter === sector.code ? sector.accentColor + '44' : 'rgba(255,255,255,0.08)',
               color: activeFilter === sector.code ? sector.accentColor : '#e2c99a',
               border: `2px solid ${activeFilter === sector.code ? sector.accentColor : '#8a6040'}`,
+              display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center',
+              height: '36px'
             }}
           >
-            {sector.icon} {sector.nameID}
+            <span style={{ fontSize: '0.8rem' }}>{sector.icon}</span> 
+            <span>{sector.nameID}</span>
           </button>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' }}>
         {analyzedJobs
           .filter(job => activeFilter === null || job.gicsSector === activeFilter)
           .map((job) => {
@@ -135,22 +140,35 @@ export default function CareerHubPage() {
               display: 'flex', flexDirection: 'column',
               borderColor: isPerfectMatch ? '#fbbf24' : undefined,
               boxShadow: isPerfectMatch ? '0 0 20px rgba(251,191,36,0.2)' : undefined,
+              height: '100%',
+              position: 'relative'
             }}>
               <div className={styles.cardHeader} style={{ background: isPerfectMatch ? '#b45309' : undefined }}>
                 <span className={styles.cardTitle}>{job.company}</span>
               </div>
               
-              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, marginTop: '16px' }}>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.6' }}>{job.title}</h2>
-                  <div style={{ 
-                    background: isPerfectMatch ? '#fbbf24' : '#047857', 
-                    border: `2px solid ${isPerfectMatch ? '#b45309' : '#064e3b'}`, 
-                    color: isPerfectMatch ? '#3b261b' : '#fff', 
-                    fontSize: '0.7rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' 
-                  }}>
-                    {job.matchPercentage}% MATCH
+                  <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fff', textShadow: '2px 2px 0 #5a3a29', lineHeight: '1.6', maxWidth: '70%' }}>{job.title}</h2>
+                  
+                  {/* Right-aligned Ribbon Flag */}
+                  <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
+                    <div style={{ 
+                      background: isPerfectMatch ? '#fbbf24' : '#047857', 
+                      border: `2px solid ${isPerfectMatch ? '#b45309' : '#064e3b'}`, 
+                      color: isPerfectMatch ? '#3b261b' : '#fff', 
+                      fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
+                      whiteSpace: 'nowrap', position: 'relative', zIndex: 2
+                    }}>
+                      {job.matchPercentage}% MATCH
+                    </div>
+                    {/* 3D Fold under the right ribbon */}
+                    <div style={{ 
+                      position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
+                      borderTop: `12px solid ${isPerfectMatch ? '#78350f' : '#022c22'}`, 
+                      borderRight: '12px solid transparent', zIndex: 1 
+                    }} />
                   </div>
                 </div>
 
