@@ -10,6 +10,7 @@ import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
 import PixelIcon from '@/components/ui/PixelIcon';
+import BGMPlayer from '@/components/ui/BGMPlayer';
 
 const NAV_ITEMS = [
   { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: '📊' },
@@ -119,6 +120,7 @@ export default function MahasiswaLayout({
           </div>
 
           <div className={styles.headerActions}>
+            <BGMPlayer />
             <div style={{ position: 'relative' }}>
               <div 
                 className={styles.iconBtn} 

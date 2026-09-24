@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   description: "Explore, master skills, and unlock new career opportunities with PathTrick — the gamified AI-powered career roadmap platform.",
 };
 
+import GlobalAudio from '@/components/ui/GlobalAudio';
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`} suppressHydrationWarning>
@@ -56,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
+        <GlobalAudio />
         <Providers>{children}</Providers>
       </body>
     </html>
