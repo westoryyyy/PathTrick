@@ -532,7 +532,9 @@ const fetchAIRoadmapMock = async (role: 'SMA' | 'MAHASISWA', chapterId?: string)
    Store
    ═══════════════════════════════════════════════ */
 
-export const useMapStore = create<MapState>((set, get) => ({
+export const useMapStore = create<MapState>()(
+  persist(
+    (set, get) => ({
   role: 'SMA',
 
   /* ── SMA: Course Hierarchy ── */
@@ -664,8 +666,38 @@ export const useMapStore = create<MapState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const roadmap = await fetchAIRoadmapMock(get().role, chapterId);
-      set({ nodes: roadmap, isLoading: false });
+      
+      // Re-apply completion status from state
+      const { completedDynamicNodes } = get();
+      const completedSet = new Set(completedDynamicNodes);
+
+      let adjustedRoadmap = roadmap.map(node => {
+        if (completedSet.has(node.id)) {
+          return { ...node, status: 'completed' as const };
+        }
+        return node;
+      });
+
+      // Iteratively unlock nodes whose prerequisites are all completed
+      let changed = true;
+      let iterations = 0;
+      while (changed && iterations < 100) {
+        changed = false;
+        iterations++;
+        const currentCompleted = new Set(adjustedRoadmap.filter(n => n.status === 'completed').map(n => n.id));
+        
+        adjustedRoadmap = adjustedRoadmap.map(node => {
+          if (node.status === 'locked' && node.prerequisites?.length > 0 && node.prerequisites.every(req => currentCompleted.has(req))) {
+            changed = true;
+            return { ...node, status: 'available' as const };
+          }
+          return node;
+        });
+      }
+
+      set({ nodes: adjustedRoadmap, isLoading: false });
     } catch (err: unknown) {
+      console.error("fetchRoadmap error:", err);
       const message = err instanceof Error ? err.message : 'Failed to fetch roadmap';
       set({ error: message, isLoading: false });
     }
@@ -704,7 +736,20 @@ export const useMapStore = create<MapState>((set, get) => ({
 
   completeDynamicNode: (nodeId: string) => {
     set((state) => ({
-      completedDynamicNodes: [...state.completedDynamicNodes, nodeId],
+      completedDynamicNodes: state.completedDynamicNodes.includes(nodeId)
+        ? state.completedDynamicNodes
+        : [...state.completedDynamicNodes, nodeId],
     }));
   }
-}));
+  }),
+  {
+    name: 'pathtrick-map-progress',
+    storage: createJSONStorage(() => localStorage),
+    // Only persist the completed nodes list — everything else is re-derived on load
+    partialize: (state) => ({
+      completedDynamicNodes: state.completedDynamicNodes,
+    }),
+  }
+  )
+);
+

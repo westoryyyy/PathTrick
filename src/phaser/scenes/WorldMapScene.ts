@@ -379,11 +379,15 @@ export class WorldMapScene extends Phaser.Scene {
     
     let shouldPlayBossMusic = false;
 
-    // Check if there is any active Boss node
+    // Get completed nodes from persistent store
+    const completedDynamicNodes = useMapStore.getState().completedDynamicNodes;
+
+    // Check if there is any active (non-completed) Boss node
     const hasActiveBossNode = this.courseNodes.some(node => {
       const data = node.data;
       const isBoss = data.category === 'milestone' || data.title.toLowerCase().includes('boss');
-      return isBoss && (data.status === 'available' || data.status === 'in_progress');
+      const isCompleted = data.status === 'completed' || completedDynamicNodes.includes(data.id);
+      return isBoss && !isCompleted && (data.status === 'available' || data.status === 'in_progress');
     });
 
     if (hasActiveBossNode) {

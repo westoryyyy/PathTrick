@@ -81,7 +81,13 @@ function MapContent() {
       }
       
       // Fallback for Mahasiswa modules
-      if (!targetChapter && moduleId && chapterId) {
+      let inferredModuleId = moduleId;
+      if (!inferredModuleId && chapterId && chapterId.includes('-bab-')) {
+        const match = chapterId.match(/^(module-.*?)-bab/);
+        if (match) inferredModuleId = match[1];
+      }
+      
+      if (!targetChapter && inferredModuleId && chapterId) {
         targetChapter = { id: chapterId, name: `Bab ${chapterId}`, duration: chapterId === '3' ? '1 Levels' : '3 Levels' };
         useMapStore.setState({ role: 'MAHASISWA' });
       }
@@ -113,7 +119,7 @@ function MapContent() {
         
         let levels: CourseNodeData[] = [];
         
-        const baseIdPrefix = targetHouseId ? chapterId : `${moduleId}-bab-${chapterId}`;
+        const baseIdPrefix = targetHouseId ? chapterId : chapterId.includes('-bab-') ? chapterId : `${inferredModuleId || moduleId}-bab-${chapterId}`;
         
         for (let i = 1; i <= numLevels; i++) {
           const isFirst = i === 1;
