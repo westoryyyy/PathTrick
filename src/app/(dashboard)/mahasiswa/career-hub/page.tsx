@@ -138,9 +138,6 @@ export default function CareerHubPage() {
             }}>
               <div className={styles.cardHeader} style={{ background: isPerfectMatch ? '#b45309' : undefined }}>
                 <span className={styles.cardTitle}>{job.company}</span>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: sector.accentColor, marginLeft: 'auto', textShadow: '1px 1px 0 rgba(0,0,0,0.6)' }}>
-                  {sector.icon} {sector.nameEN}
-                </span>
               </div>
               
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1 }}>

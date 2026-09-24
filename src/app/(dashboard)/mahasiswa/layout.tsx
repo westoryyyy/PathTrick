@@ -124,7 +124,7 @@ export default function MahasiswaLayout({
                 className={styles.iconBtn} 
                 onClick={() => { setIsMessagesOpen(!isMessagesOpen); setIsNotificationsOpen(false); setIsDropdownOpen(false); }}
               >
-                <img src="/inboxLogo.png" alt="Inbox" className={styles.iconBtn} style={{ width: '48px', height: '48px', objectFit: 'contain', imageRendering: 'pixelated' }} />
+                <img src="/inboxLogo.png" alt="Inbox" style={{ width: '32px', height: '32px', objectFit: 'contain', imageRendering: 'pixelated' }} />
                 <span className={styles.iconBadge}>2</span>
               </div>
               

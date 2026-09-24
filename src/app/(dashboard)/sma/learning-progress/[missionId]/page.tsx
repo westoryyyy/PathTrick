@@ -362,7 +362,7 @@ export default function MissionFlowPage() {
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <div className={styles.cardSuccess}>
               <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', marginBottom: '16px' }}>
-                🎉 MISSION CLEARED!
+                MISSION CLEARED!
               </h2>
               <p className={styles.text} style={{ textAlign: 'center' }}>
                 Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.
@@ -649,7 +649,7 @@ export default function MissionFlowPage() {
                   style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', background: '#fdf6e3', border: '4px dashed #059669', padding: '48px 32px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
                 >
                   <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontSize: '1.2rem', lineHeight: '1.6' }}>
-                    🎉 MISSION CLEARED!
+                    MISSION CLEARED!
                   </h2>
                   <p className={styles.text} style={{ textAlign: 'center', fontSize: '0.75rem', lineHeight: '1.8' }}>
                     Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.
@@ -660,7 +660,7 @@ export default function MissionFlowPage() {
                       transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       style={{ display: 'inline-block' }}
                     >
-                      <span style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }}>REWARD</span>
+                      <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }} />
                     </motion.div>
                     <p className={styles.text} style={{ marginTop: '16px', fontSize: '0.65rem', color: '#92400e' }}>
                       Reward XP dan item telah ditambahkan ke akunmu.

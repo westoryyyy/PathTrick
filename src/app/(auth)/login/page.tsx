@@ -86,11 +86,11 @@ export default function LoginPage() {
         <div className="w-full max-w-[540px] min-h-[480px] bg-transparent bg-[url('/Login\ Card.png')] bg-[length:100%_100%] bg-center bg-no-repeat p-[85px] relative flex flex-col justify-center drop-shadow-[0_12px_24px_rgba(0,0,0,0.4)]">
           {step === 'login' ? (
             <>
-              <h1 className="font-pixel text-base text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">
-                Mulai Petualangan
+              <h1 className="font-pixel text-[1.1rem] text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">
+                Gerbang PathTrick
               </h1>
-              <p className="font-pixelify text-[0.9rem] text-[#5d4037] text-center leading-[1.6] mb-6">
-                Login dengan email atau connect wallet untuk memulai.
+              <p className="font-pixelify text-[0.85rem] text-[#5d4037] text-center leading-[1.6] mb-6">
+                Pilih metode otentikasi untuk menyimpan<br/>progres petualanganmu.
               </p>
 
               {/* Social buttons */}
@@ -101,17 +101,17 @@ export default function LoginPage() {
                     id={`login-social-${opt.id}`}
                     onClick={() => handleSocialLogin(opt.id)}
                     disabled={!!loading}
-                    className="flex-1 flex items-center justify-center gap-[10px] py-3 px-4 border-2 border-[#a67c52] rounded-lg bg-[#fcf3e3] cursor-pointer font-pixelify text-base text-[#3e2723] font-semibold shadow-[0_3px_0_#a67c52] normal-case transition-all duration-100 hover:bg-[#fff9ef] hover:-translate-y-[1px] hover:shadow-[0_4px_0_#a67c52] active:translate-y-[3px] active:shadow-[0_0_0_#a67c52] disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-[0_3px_0_#a67c52]"
+                    className="flex-1 flex items-center justify-center gap-[10px] py-3 px-4 border-2 border-[#8b5a2b] bg-[#e6ccab] cursor-pointer font-pixel text-[0.6rem] text-[#3e2723] shadow-[inset_0_0_4px_rgba(0,0,0,0.1),2px_2px_0_0_rgba(0,0,0,0.3)] transition-transform duration-100 hover:bg-[#f1ebd8] hover:border-[#5d4037] hover:shadow-[inset_0_0_4px_rgba(0,0,0,0.1),2px_2px_0_0_rgba(0,0,0,0.4)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[inset_0_0_4px_rgba(0,0,0,0.2),1px_1px_0_0_rgba(0,0,0,0.3)] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {opt.id === 'google' ? (
-                      <svg width="22" height="22" viewBox="0 0 24 24">
+                      <svg width="18" height="18" viewBox="0 0 24 24">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                       </svg>
                     ) : (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a2a3a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3e2723" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
                         <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
                         <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
@@ -122,8 +122,8 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 my-6 text-[#a67c52] text-[0.8rem] font-pixelify uppercase before:content-[''] before:flex-1 before:h-[2px] before:bg-[#a67c52] after:content-[''] after:flex-1 after:h-[2px] after:bg-[#a67c52]">
-                <span>atau gunakan email</span>
+              <div className="flex items-center gap-3 my-5 text-[#8b5a2b] text-[0.6rem] font-pixel uppercase tracking-widest before:content-[''] before:flex-1 before:h-[2px] before:bg-[#8b5a2b] after:content-[''] after:flex-1 after:h-[2px] after:bg-[#8b5a2b]">
+                <span>ATAU PAKAI SUREL</span>
               </div>
 
               {/* Email form */}
@@ -133,41 +133,39 @@ export default function LoginPage() {
                   <input
                     id="login-email"
                     type="email"
-                    placeholder="Email"
+                    placeholder="Alamat Surel (Email)"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                     disabled={!!loading}
-                    className="w-full py-3.5 px-4 border-2 border-[#8b5a2b] rounded-lg bg-[#e6ccab] font-pixelify text-[0.95rem] text-[#3e2723] outline-none transition-colors duration-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] focus:border-[#5d4037] focus:bg-[#f1ebd8] placeholder-[#8d6e63]"
+                    className="w-full py-3.5 px-4 border-2 border-[#8b5a2b] bg-[#e6ccab] font-pixelify text-[0.95rem] text-[#3e2723] outline-none transition-colors duration-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1),2px_2px_0_0_rgba(0,0,0,0.1)] focus:border-[#5d4037] focus:bg-[#f1ebd8] placeholder-[#8d6e63]"
                   />
                 </div>
                 <button
                   id="login-email-btn"
                   type="submit"
                   disabled={!!loading || !email}
-                  className="w-full p-4 mt-4 border-3 border-[#5d4037] rounded-lg bg-gradient-to-b from-[#ffd700] to-[#daa520] text-[#3e2723] font-pixel text-[0.85rem] drop-shadow-[0_1px_0_rgba(255,255,255,0.4)] cursor-pointer tracking-widest normal-case transition-all duration-100 shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_6px_0_#8b5a2b,0_8px_12px_rgba(0,0,0,0.3)] hover:-translate-y-[2px] hover:bg-gradient-to-b hover:from-[#ffdf33] hover:to-[#e8b122] hover:shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_8px_0_#8b5a2b,0_12px_16px_rgba(0,0,0,0.4)] active:translate-y-[6px] active:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_0_0_#8b5a2b,0_2px_4px_rgba(0,0,0,0.2)] disabled:bg-gradient-to-b disabled:from-[#d4c47b] disabled:to-[#bfa256] disabled:border-[#8b7d6b] disabled:text-[#7a6e5e] disabled:drop-shadow-none disabled:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_4px_0_#7a6e5e] disabled:cursor-not-allowed"
+                  className="w-full p-4 mt-2 border-3 border-[#5d4037] rounded-lg bg-gradient-to-b from-[#ffd700] to-[#daa520] text-[#3e2723] font-pixel text-[0.7rem] drop-shadow-[0_1px_0_rgba(255,255,255,0.4)] cursor-pointer tracking-widest uppercase transition-all duration-100 shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_6px_0_#8b5a2b,0_8px_12px_rgba(0,0,0,0.3)] hover:-translate-y-[2px] hover:bg-gradient-to-b hover:from-[#ffdf33] hover:to-[#e8b122] hover:shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_8px_0_#8b5a2b,0_12px_16px_rgba(0,0,0,0.4)] active:translate-y-[6px] active:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_0_0_#8b5a2b,0_2px_4px_rgba(0,0,0,0.2)] disabled:bg-gradient-to-b disabled:from-[#d4c47b] disabled:to-[#bfa256] disabled:border-[#8b7d6b] disabled:text-[#7a6e5e] disabled:drop-shadow-none disabled:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_4px_0_#7a6e5e] disabled:cursor-not-allowed"
                 >
                   {loading === 'email' ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="inline-block w-4 h-4 border-3 border-white/30 border-t-white rounded-full animate-spin" /> Mengirim kode...
+                    <span className="flex items-center justify-center gap-2 text-[0.6rem]">
+                      <span className="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> MENGIRIM KODE...
                     </span>
                   ) : (
-                    'Sign up for free'
+                    'Kirim Sihir OTP'
                   )}
                 </button>
               </form>
-
-              <p className="font-pixelify text-[0.75rem] text-[#5d4037] text-center mt-4 leading-[1.6]">
-                By signing up, I agree to PathTrick&apos;s Terms.
-              </p>
             </>
           ) : (
             /* OTP Step */
-            <div className="flex flex-col items-center gap-6">
-              <div className="text-[2.5rem] leading-none">📬</div>
-              <h1 className="font-pixel text-base text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">Cek Emailmu</h1>
-              <p className="font-pixelify text-[0.9rem] text-[#5d4037] text-center leading-[1.6] mb-6">
-                Kami kirim kode 6 digit ke <strong className="text-[#DD1A21]">{email}</strong>
+            <div className="flex flex-col items-center gap-4 mt-2">
+              <div className="text-[2rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.3)]">📜</div>
+              <h1 className="font-pixel text-[0.95rem] text-[#3e2723] text-center leading-[1.4] mb-0 drop-shadow-none">
+                Gulungan Pesan Diterima!
+              </h1>
+              <p className="font-pixelify text-[0.85rem] text-[#5d4037] text-center leading-[1.5] mb-4">
+                Masukkan 6 rune sihir rahasia yang<br/>kami kirim ke <strong className="text-[#8b0000]">{email}</strong>
               </p>
 
               <div className="flex gap-2">
@@ -181,33 +179,31 @@ export default function LoginPage() {
                     value={val}
                     onChange={e => handleOtpChange(i, e.target.value)}
                     disabled={!!loading}
-                    aria-label={`Digit OTP ke-${i + 1}`}
-                    className="w-11 h-[52px] bg-[#f9fafb] border-3 border-[#d1d5db] rounded-lg text-[#1a2a3a] font-pixelify text-[1.2rem] text-center outline-none shadow-none focus:border-[#DD1A21] focus:bg-white placeholder-shown:border-[#d1d5db] [&:not(:placeholder-shown)]:border-[#22c55e]"
+                    aria-label={`Rune ke-${i + 1}`}
+                    className="w-[42px] h-[52px] bg-[#e6ccab] border-2 border-[#8b5a2b] text-[#3e2723] font-pixel text-[1rem] text-center outline-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),2px_2px_0_0_rgba(0,0,0,0.2)] focus:border-[#5d4037] focus:bg-[#f1ebd8] focus:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1),0_0_0_2px_rgba(93,64,55,0.4)] transition-all"
                   />
                 ))}
               </div>
 
               {loading === 'otp' && (
-                <div className="flex items-center gap-3 text-[0.85rem] text-[#1a2a3a] font-pixelify">
-                  <span className="inline-block w-4 h-4 border-3 border-white/30 border-t-white rounded-full animate-spin" /> Memverifikasi...
+                <div className="flex items-center gap-3 mt-4 text-[0.7rem] text-[#3e2723] font-pixel animate-pulse">
+                  <span className="inline-block w-4 h-4 border-2 border-[#3e2723]/30 border-t-[#3e2723] rounded-full animate-spin" /> Merapalkan Mantra...
                 </div>
               )}
 
               <button
                 onClick={() => { setStep('login'); setOtp(['','','','','','']); }}
                 id="login-back-to-email"
-                className="text-[0.8rem] text-[#6b7280] cursor-pointer bg-none border-none font-pixelify underline hover:text-[#1a2a3a]"
+                className="text-[0.65rem] text-[#8b5a2b] mt-4 cursor-pointer bg-none border-none font-pixel underline hover:text-[#5d4037] drop-shadow-none"
               >
-                ← Ganti email atau kirim ulang
+                ← Salah Mantra? Ulangi
               </button>
             </div>
           )}
         </div>
 
-        <p className="font-pixelify text-[0.8rem] text-white text-center leading-[1.8] mt-5 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] shadow-black">
-          Dengan masuk, kamu menyetujui{' '}
-          <a href="#" className="text-[#ff5252] no-underline hover:underline">Syarat & Ketentuan</a> dan{' '}
-          <a href="#" className="text-[#ff5252] no-underline hover:underline">Kebijakan Privasi</a>.
+        <p className="font-pixelify text-[0.8rem] text-white text-center leading-[1.8] mt-6 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] shadow-black max-w-[400px]">
+          Dengan masuk, kamu menyetujui mematuhi <a href="#" className="text-[#facc15] no-underline hover:underline">Aturan Guild (S&K)</a> dan <a href="#" className="text-[#facc15] no-underline hover:underline">Kode Etik Privasi</a> PathTrick.
         </p>
       </div>
     </div>

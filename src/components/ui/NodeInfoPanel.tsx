@@ -61,7 +61,7 @@ export default function NodeInfoPanel({
     }
   }, [node]);
 
-  // Auto-advance boss dialogue lines every 2.2 seconds
+  // Auto-advance boss dialogue lines every 4 seconds
   useEffect(() => {
     if (!displayNode) return;
     const isBoss = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');
@@ -70,7 +70,7 @@ export default function NodeInfoPanel({
 
     const t = setTimeout(() => {
       setBossLineIndex(prev => prev + 1);
-    }, 2200);
+    }, 4000);
     return () => clearTimeout(t);
   }, [bossLineIndex, displayNode]);
 

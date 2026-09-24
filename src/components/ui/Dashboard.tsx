@@ -203,7 +203,7 @@ export default function Dashboard() {
           </div>
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
-              <PixelIcon icon="🏆" size={28} />
+              <PixelIcon icon="👨‍🎓" size={72} className="drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
               <span className={styles.tierName}>{mockAiResponse.universityTarget.targetTier}</span>
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
@@ -233,7 +233,7 @@ export default function Dashboard() {
           </div>
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
-              <span className={styles.tierIcon}>🏆</span>
+              <PixelIcon icon="🏆" size={72} className="drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
               <span className={styles.tierName}>{mockAiResponse.scholarshipTarget.currentTier}</span>
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>

@@ -89,7 +89,7 @@ export default function SelectRolePage() {
   // If user already has a role AND it belongs to the current user → go to their dashboard
   // If it's a different user → clear stale data and show role selection
   useEffect(() => {
-    if (!user) return; // wait for Privy to load user
+    if (!user || entering) return; // wait for Privy to load user, and don't redirect if currently picking a role
     const currentUserId = user.id;
     if (selectedRole && savedPrivyUserId === currentUserId) {
       router.replace(`/${selectedRole}/dashboard`);
@@ -97,7 +97,7 @@ export default function SelectRolePage() {
       // Different user logged in — clear stale role data
       resetOnboarding();
     }
-  }, [user, selectedRole, savedPrivyUserId, router, resetOnboarding]);
+  }, [user, selectedRole, savedPrivyUserId, router, resetOnboarding, entering]);
 
   const handleNicknameConfirm = () => {
     if (!nickname.trim()) return;

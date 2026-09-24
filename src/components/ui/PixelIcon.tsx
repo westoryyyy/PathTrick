@@ -1,14 +1,41 @@
 import Image from 'next/image';
 
 const PIXEL_ICON_ASSETS: Record<string, string> = {
-  '💻': '/px-js.jpg',
-  '👨‍🎓': '/NPC University Student.png',
-  '🎨': '/px-icon-badge.jpg',
-  '📊': '/px-icon-book.jpg',
-  '💼': '/Backpack.png',
-  '🏥': '/Healing Potions.png',
+  // ICT & Tech
+  '💻': '/gics_it.png',
+  '🤖': '/NPC AI Engineer.png',
+  // Engineering & Architecture
+  '🏗️': '/gics_real_estate.png',
+  '⚙️': '/gics_ind.png',
+  // Health & Medicine
+  '🩺': '/Healing Potions.png',
+  '💊': '/Red Potion 1.png',
+  // Business & Management
+  '💼': '/gics_fin.png',
+  '📈': '/Coin 2.png',
+  // Law & Public Policy
   '⚖️': '/Scroll.png',
-  '🧠': '/NPC Wizard.png',
+  '🏛️': '/px-icon-badge.jpg',
+  // Social Sciences
+  '📡': '/Letter.png',
+  '🌍': '/Word Map.png',
+  '🧠': '/NPC Mentor.png',
+  // Education
+  '🏫': '/npc-professor.png',
+  '📚': '/book 2.png',
+  // Arts & Humanities
+  '🎨': '/Lantern.png',
+  '✍️': '/Journall.png',
+  // Science & Math
+  '📐': '/Compass Rose.png',
+  '🧪': '/Mana Potion.png',
+  // Agriculture & Environment
+  '🌾': '/gics_staples.png',
+  '🌲': '/gics_material.png',
+  
+  // Others / Defaults
+  '👨‍🎓': '/NPC University Student.png',
+  '📊': '/px-icon-book.jpg',
   '🎓': '/Gold Ticket.png',
   '🚀': '/Sword.png',
   '🎯': '/Compass.png',
@@ -16,22 +43,23 @@ const PIXEL_ICON_ASSETS: Record<string, string> = {
   '🏆': '/course-master.png',
   '⭐': '/Energy Shard.png',
   '🛡️': '/Shield.png',
-  '⚙️': '/Energy Shard.png',
   '💎': '/blue-gem.png',
   '🔗': '/Compass.png',
   '🔒': '/Keyhole.png',
-  '📚': '/Book.png',
   '📜': '/Scroll.png',
-  '🏗️': '/Sword.png',
   '🪙': '/Coin.png',
   '💰': '/Coin 2.png',
   '👑': '/Gold Ticket.png',
   '⚔️': '/Sword.png',
   '⚒️': '/Sword.png',
-  '📡': '/Compass.png',
-  '🌍': '/globe.svg',
   '🏠': '/Map.png',
-  '🤖': '/NPC Wizard.png',
+  '🏦': '/gics_fin.png',
+  '🛍️': '/gics_disc.png',
+  '🏭': '/gics_ind.png',
+  '⚡': '/gics_energy.png',
+  '⚗️': '/gics_material.png',
+  '💧': '/gics_util.png',
+  '🏢': '/gics_real_estate.png',
 };
 
 export function pixelAssetFor(icon: string): string {

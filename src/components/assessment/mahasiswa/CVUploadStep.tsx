@@ -140,7 +140,7 @@ export default function CVUploadStep() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx"
+          accept=".pdf"
           onChange={handleFileChange}
           className="hidden"
           aria-label="Upload CV"
@@ -152,7 +152,7 @@ export default function CVUploadStep() {
             <Image src="/Scroll.png" alt="" width={48} height={48} className="object-contain drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)] animate-[iconFloat_2s_ease-in-out_infinite]" />
             <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">Drag & Drop CV-mu di sini</p>
             <p className="font-pixel text-[0.6rem] text-white m-0 uppercase drop-shadow-[1px_1px_0_#3b261b]">atau klik untuk browse file</p>
-            <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF, DOC, DOCX • Maks {MAX_SIZE_MB}MB</p>
+            <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF ONLY • Maks {MAX_SIZE_MB}MB</p>
           </div>
         )}
 
@@ -267,7 +267,7 @@ export default function CVUploadStep() {
           <input
             ref={portfolioInputRef}
             type="file"
-            accept=".pdf,.doc,.docx,.zip"
+            accept=".pdf"
             onChange={handlePortfolioChange}
             className="hidden"
             aria-label="Upload Portfolio"
@@ -275,7 +275,7 @@ export default function CVUploadStep() {
           {mState.portfolioFileName ? (
             <p className="font-pixel text-[0.6rem] text-[#34d399] m-0 drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">📄 {mState.portfolioFileName}</p>
           ) : (
-            <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">Klik untuk upload portfolio (PDF, ZIP)</p>
+            <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">Klik untuk upload portfolio (PDF ONLY)</p>
           )}
         </div>
       </div>
