@@ -17,10 +17,11 @@
 }
 
 .headerDesc {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.8rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.2rem;
   color: #fff;
   line-height: 1.6;
+  max-width: 900px;
 }
 
 .grid {

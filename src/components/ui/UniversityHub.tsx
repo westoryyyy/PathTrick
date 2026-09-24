@@ -45,8 +45,8 @@ export default function UniversityHub() {
         <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
           UNIVERSITY HUB
         </h2>
-        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-          Based on your RIASEC profile (Investigative/Realistic) and tech interests, our AI recommends these top university programs.
+        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '900px' }}>
+          Berdasarkan profil RIASEC (Investigative/Realistic) dan minat teknologimu, AI kami merekomendasikan program-program universitas terbaik ini.
         </p>
       </div>
 
@@ -56,11 +56,11 @@ export default function UniversityHub() {
           <div 
             key={uni.id} 
             className={styles.retroCard}
-            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px', height: '100%' }}
+            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px', height: '100%', position: 'relative' }}
           >
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '75%' }}>
                   <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b' }}>
                     {uni.major}
                   </h3>
@@ -68,8 +68,21 @@ export default function UniversityHub() {
                     {uni.title}
                   </p>
                 </div>
-                <div style={{ background: '#047857', border: '2px solid #064e3b', color: '#fff', fontSize: '0.7rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                  {uni.matchScore}% MATCH
+                
+                {/* Right-aligned Ribbon Flag */}
+                <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
+                  <div style={{ 
+                    background: '#047857', border: '2px solid #064e3b', color: '#fff', 
+                    fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
+                    whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
+                  }}>
+                    {uni.matchScore}% MATCH
+                  </div>
+                  {/* 3D Fold under the right ribbon */}
+                  <div style={{ 
+                    position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
+                    borderTop: '12px solid #022c22', borderRight: '12px solid transparent', zIndex: 1 
+                  }} />
                 </div>
               </div>
               
