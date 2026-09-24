@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 
 import { classifySkills } from '@/data/wefSkillData';
+import { extractTextFromPDF } from '@/lib/pdfExtractor';
 
 const ACCEPTED_TYPES = [
   'application/pdf',
@@ -67,15 +68,28 @@ export default function CVUploadStep() {
     setMahasiswaField('cvExtractionStatus', 'uploading');
 
     try {
-      // Phase 1: Upload
-      await new Promise((r) => setTimeout(r, 800));
       setMahasiswaField('cvExtractionStatus', 'extracting');
 
-      // Phase 2: AI Extraction
+      // Ekstrak teks dari PDF di frontend (Client-Side)
+      const text = await extractTextFromPDF(file, 8000);
+      
+      if (text.length < 50) {
+        setValidationError('PDF tidak dapat dibaca (mungkin hasil scan). Coba PDF dari Word/Google Docs.');
+        setMahasiswaField('cvExtractionStatus', 'error');
+        return;
+      }
+
+      setMahasiswaField('cvText', text);
+      
+      // Untuk sementara waktu, kita mock data extracted agar UI tidak rusak sampai integrasi backend selesai
       const data = await mockExtractCV();
       setCVExtractedData(data);
-    } catch {
+      
+      setMahasiswaField('cvExtractionStatus', 'done');
+    } catch (err) {
+      console.error(err);
       setMahasiswaField('cvExtractionStatus', 'error');
+      setValidationError('Gagal membaca PDF. Pastikan file tidak rusak.');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -100,11 +114,18 @@ export default function CVUploadStep() {
   };
 
   /* ── Portfolio Upload ── */
-  const handlePortfolioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePortfolioChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setMahasiswaField('portfolioFile', file);
       setMahasiswaField('portfolioFileName', file.name);
+      
+      try {
+        const text = await extractTextFromPDF(file, 4000);
+        setMahasiswaField('portfolioText', text);
+      } catch (err) {
+        console.error('Failed to extract portfolio PDF', err);
+      }
     }
   };
 

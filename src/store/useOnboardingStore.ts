@@ -42,8 +42,10 @@ export interface MahasiswaAssessmentState {
   cvFileName: string;
   cvExtractionStatus: 'idle' | 'uploading' | 'extracting' | 'done' | 'error';
   cvExtractedData: CVExtractedData | null;
+  cvText: string;
   portfolioFile: File | null;      // optional
   portfolioFileName: string;
+  portfolioText: string;
   workInterests: string[];         // tipe pekerjaan: Full-time, Remote, dll
   preferredGICS: GICSSectorCode[]; // GICS sectors (was: preferredIndustries: string[])
 }
@@ -108,8 +110,10 @@ const DEFAULT_MAHASISWA: MahasiswaAssessmentState = {
   cvFileName: '',
   cvExtractionStatus: 'idle',
   cvExtractedData: null,
+  cvText: '',
   portfolioFile: null,
   portfolioFileName: '',
+  portfolioText: '',
   workInterests: [],
   preferredGICS: [],
 };
@@ -186,18 +190,30 @@ export const useOnboardingStore = create<OnboardingStore>()(
     set({ isSubmitting: true });
     const { selectedRole, smaAssessment, mahasiswaAssessment } = get();
     try {
+      let requestBody: any = { role: selectedRole, data: smaAssessment };
+      
+      if (selectedRole === 'mahasiswa') {
+        const gicsNames = mahasiswaAssessment.preferredGICS.join(', ');
+        const workTypes = mahasiswaAssessment.workInterests.join(', ');
+        const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`;
+        
+        requestBody = {
+          type: "SCHOLAR_PROFILE",
+          payload: {
+            cvText: mahasiswaAssessment.cvText || "",
+            portfolioText: mahasiswaAssessment.portfolioText || null,
+            major: "Lulusan S1/Sederajat", // Fallback karena belum ada input jurusan di UI
+            jobPreference: jobPreferenceStr,
+          }
+        };
+      }
+
       const response = await fetch('/api/assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          role: selectedRole,
-          data: selectedRole === 'sma' ? smaAssessment : {
-            skills: mahasiswaAssessment.cvExtractedData?.skills,
-            gicsSectors: mahasiswaAssessment.preferredGICS,
-            workInterests: mahasiswaAssessment.workInterests,
-          }
-        }),
+        body: JSON.stringify(requestBody),
       });
+      
       if (!response.ok) throw new Error('API Error');
       const data = await response.json();
       console.log('AI Assessment Result:', data);
