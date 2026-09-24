@@ -566,28 +566,28 @@ export default function MissionFlowPage() {
           <div 
             className={`${styles.tab} ${styles.tabTeori} ${phase === 'MATERIAL' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 0) setPhaseWithProgress('MATERIAL'); }}
-            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 0 ? 1 : 0.5 }}
           >
             📚 TEORI
           </div>
           <div 
             className={`${styles.tab} ${styles.tabKuis} ${phase === 'QUIZ' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 1) setPhaseWithProgress('QUIZ'); }}
-            style={{ cursor: highestPhaseReached >= 1 ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: highestPhaseReached >= 1 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 1 ? 1 : 0.5 }}
           >
             {highestPhaseReached >= 1 ? '❓' : '🔒'} KUIS
           </div>
           <div 
             className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 2 ? 1 : 0.5 }}
           >
             {highestPhaseReached >= 2 ? '⚔️' : '🔒'} BOSS
           </div>
           <div 
             className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}
-            style={{ cursor: highestPhaseReached >= 3 ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: highestPhaseReached >= 3 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 3 ? 1 : 0.5 }}
           >
             {highestPhaseReached >= 3 ? '🏆' : '🔒'} REWARD
           </div>
@@ -637,7 +637,7 @@ export default function MissionFlowPage() {
 
           {/* CLAIM CERTIFICATE OVERLAY */}
           {phase === 'CLAIM' && (
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', zIndex: 10, background: 'rgba(60, 30, 10, 0.4)', backdropFilter: 'blur(6px)' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', zIndex: 10, background: 'rgba(60, 30, 10, 0.4)', backdropFilter: 'blur(6px)', borderRadius: '24px' }}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key="claim-page"

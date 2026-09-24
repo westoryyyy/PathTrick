@@ -6,10 +6,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 1200px;
+  max-width: 1600px;
+  /* Make it wider */
+  width: 95%;
+  /* Adjust width on smaller screens */
   margin: 0 auto;
   align-items: center;
-  padding: 64px 24px 32px 24px;
+  padding: 24px 24px 32px 24px;
+  /* Move content higher up */
 }
 
 /* ── Top Bar ── */
@@ -18,26 +22,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .backBtn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
-  padding: 12px 20px;
+  font-size: 0.7rem; /* Increased size */
+  padding: 12px 24px; /* Increased padding */
   background: #3b261b;
   border: 4px solid #5a3a29;
-  border-radius: 16px;
+  border-radius: 12px;
   color: #fbbf24;
   cursor: pointer;
-  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8);
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 4px 4px 0 rgba(0, 0, 0, 0.8);
   transition: transform 0.1s, background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Add gap for the arrow */
 }
 
 .backBtn:hover {
   background: #5a3a29;
   transform: translate(-2px, -2px);
-  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), 6px 6px 0 rgba(0,0,0,0.8);
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 6px 6px 0 rgba(0, 0, 0, 0.8);
 }
 
 .backBtn:active {
@@ -46,107 +53,145 @@
 }
 
 .missionId {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
   color: #fbbf24;
-  text-shadow: 2px 2px 0 #3b261b;
   background: #3b261b;
-  padding: 12px 16px;
+  padding: 8px 16px;
   border: 4px solid #5a3a29;
+  border-radius: 12px;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 4px 4px 0 rgba(0, 0, 0, 0.8);
+  margin-right: 48px;
+  /* Offset by the width of the bookmark tabs to align with the book body */
 }
 
 /* ── Quest Book Container ── */
 .questBook {
   width: 100%;
   display: flex;
-  flex-direction: column;
-  filter: drop-shadow(8px 8px 0 #1a0f08);
-}
-
-/* ── Tabs (Bookmarks) ── */
-.tabsContainer {
-  display: flex;
   flex-direction: row;
-  gap: 8px;
-  padding: 0 32px;
-  z-index: 2;
-  margin-bottom: -4px; /* overlap with book content border */
+  filter: drop-shadow(8px 8px 0 #1a0f08);
+  height: 85vh;
+  /* Taller */
+  max-height: 900px;
+  /* Allow it to be much taller */
+  min-height: 600px;
 }
 
-.tab {
-  flex: 1;
-  text-align: center;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
-  padding: 12px 8px 16px 8px;
-  color: #fff;
-  border-radius: 12px 12px 0 0;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-  cursor: pointer;
-  filter: brightness(0.8);
-}
-
-.activeTab {
-  filter: brightness(1);
-  padding-bottom: 24px; /* pulled out */
-  margin-top: -8px;
-  box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
-  z-index: 3;
-}
-
-/* Custom Tab Colors */
-.tabTeori { background: #fbbf24; color: #3b261b; }
-.tabKuis { background: #34d399; color: #064e3b; }
-.tabBoss { background: #a78bfa; color: #2e1065; }
-.tabReward { background: #f97316; color: #431407; }
-
-/* ── Book Content (Parchment) ── */
+/* ── Book Content (Two Pages) ── */
 .bookContent {
+  flex: 1;
   background: transparent;
   border: none;
   padding: 0;
   position: relative;
   z-index: 1;
-  height: 80vh;
-  max-height: 650px;
-  min-height: 500px;
-  overflow: hidden;
-  width: 100%;
   display: flex;
   flex-direction: row;
-  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
 }
 
-.leftPage, .rightPage {
+.leftPage,
+.rightPage {
   flex: 1;
   background: #fdf6e3;
   color: #3b261b;
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
 .leftPage {
-  border-radius: 16px 0 0 16px;
-  box-shadow: inset -15px 0 20px rgba(0,0,0,0.05);
+  border: 4px solid #fde047;
+  border-right: none;
+  border-radius: 24px 0 0 24px;
+  box-shadow: inset -15px 0 20px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.3);
 }
 
 .rightPage {
-  border-radius: 0 16px 16px 0;
-  box-shadow: inset 15px 0 20px rgba(0,0,0,0.05);
+  border: 4px solid #fde047;
+  border-left: none;
+  border-radius: 0 24px 24px 0;
+  box-shadow: inset 15px 0 20px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.3);
 }
 
 .bookSpine {
   width: 32px;
   background: linear-gradient(to right, #e5d7c5 0%, #c4af9a 30%, #a89481 50%, #c4af9a 70%, #e5d7c5 100%);
   z-index: 2;
-  box-shadow: inset 4px 0 8px rgba(0,0,0,0.1), inset -4px 0 8px rgba(0,0,0,0.1);
+  border-top: 4px solid #fde047;
+  border-bottom: 4px solid #fde047;
+  box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.1), inset -4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Tabs (Bookmarks on the right) ── */
+.tabsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 48px;
+  /* z-index removed so it doesn't form a restrictive stacking context */
+  margin-left: 0;
+  /* sit exactly outside book content border */
+  padding: 32px 0;
+  /* Keeps tabs away from the very top/bottom */
+  gap: 8px;
+  /* Slight gap between tabs looks cleaner */
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.2rem;
+  padding: 16px 8px;
+  color: #fff;
+  border-radius: 0 12px 12px 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  /* Stronger shadow */
+  cursor: pointer;
+  filter: brightness(0.7) saturate(0.8);
+  /* Dimmer and less saturated when inactive */
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border: none;
+  position: relative;
+  z-index: -1;
+  /* Sit behind the bookContent */
+}
+
+.activeTab {
+  filter: brightness(1.15) saturate(1.5);
+  /* Neon effect: brighter and highly saturated when active */
+  /* Make it much brighter when active */
+  width: 64px;
+  /* Expands to the right without detaching */
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  /* Sit ABOVE the bookContent (which is z-index 1) */
+  color: #fff;
+  border-left: none;
+}
+
+/* Custom Tab Colors */
+.tabTeori {
+  background: #0ea5e9; /* Tropical Sky Blue */
+}
+
+.tabKuis {
+  background: #22c55e; /* Lush Grass Green */
+}
+
+.tabBoss {
+  background: #f43f5e; /* Dragonfruit / Coral Red */
+}
+
+.tabReward {
+  background: #f59e0b; /* Warm Amber / Tropical Sand */
 }
 
 /* ── Card Header & Title ── */
@@ -193,7 +238,7 @@
   content: '▶';
   position: absolute;
   left: 16px;
-  top: 24px;
+  top: 28px;
   color: #047857;
   font-size: 0.8rem;
 }
@@ -218,8 +263,8 @@
 
 .optionBtn {
   text-align: left;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.1rem;
   padding: 24px;
   background: #fae1c5;
   border: 4px solid #8c5d41;
@@ -363,17 +408,19 @@
 }
 
 .dialogTitle {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.4rem;
   line-height: 1.5;
   margin: 0;
   text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
 }
 
 .dialogMessage {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.1rem;
   color: #3b261b;
-  line-height: 1.8;
+  line-height: 1.6;
   margin: 0;
+  white-space: pre-wrap;
+  /* Allows \n to render correctly */
 }
