@@ -13,6 +13,8 @@ import {
   clearUserOnboarding,
 } from '@/store/useOnboardingStore';
 
+import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
+
 if (process.env.NODE_ENV === 'production') {
   // Safety: export a no-op in production
 }
@@ -25,6 +27,7 @@ export default function DevPanel() {
 
 function DevPanelInner() {
   const [open, setOpen] = useState(false);
+  const [testLoading, setTestLoading] = useState(false);
   const { user, logout } = usePrivy();
   const store = useOnboardingStore();
 
@@ -50,6 +53,7 @@ function DevPanelInner() {
   }
 
   return (
+    <>
     <div
       style={{
         position: 'fixed',
@@ -139,10 +143,25 @@ function DevPanelInner() {
             >
               🏠 Go to Landing
             </button>
+            <button
+              onClick={() => {
+                setTestLoading(true);
+                setTimeout(() => setTestLoading(false), 5000);
+              }}
+              style={btnStyle('#1c1c3a', '#c084fc')}
+            >
+              ⏳ Test Loading Screen
+            </button>
           </section>
         </div>
       )}
     </div>
+    {testLoading && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999999 }}>
+        <GameLoadingScreen statusText="Test Loading (Auto-close 5s)..." />
+      </div>
+    )}
+    </>
   );
 }
 

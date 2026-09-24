@@ -292,7 +292,7 @@ export default function LandingPage() {
 
           {/* USER: Edit paragraf deskripsi di sini */}
           <p className={styles.growUpDesc}>
-            Pathrick hadir untuk mengubah cara kamu merencanakan masa depan. Baik kamu yang masih mencari arah jurusan, sedang menyusun tugas akhir, hingga fresh graduate yang mencari pekerjaan entry-level, sistem AI kami akan memberikan rekomendasi yang presisi. Didukung oleh teknologi blockchain, setiap pencapaianmu akan divalidasi dan tersimpan aman di Achievement Vault.          </p>
+            PathTrick hadir untuk mengubah cara kamu merencanakan masa depan. Baik kamu yang masih mencari arah jurusan, sedang menyusun tugas akhir, hingga fresh graduate yang mencari pekerjaan entry-level, sistem AI kami akan memberikan rekomendasi yang presisi. Didukung oleh teknologi blockchain, setiap pencapaianmu akan divalidasi dan tersimpan aman di Achievement Vault.          </p>
         </div>
 
         {/* Bridge with characters at the bottom */}

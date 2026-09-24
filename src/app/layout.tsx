@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Press_Start_2P, Inter, Pixelify_Sans, VT323 } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
@@ -38,17 +39,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            if (typeof window !== 'undefined') {
-              const _setAttribute = Element.prototype.setAttribute;
-              Element.prototype.setAttribute = function(name, value) {
-                if (name === 'bis_skin_checked') return;
-                _setAttribute.call(this, name, value);
-              };
-            }
-          `
-        }} />
+        <Script
+          id="block-bis-skin-checked"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                const _setAttribute = Element.prototype.setAttribute;
+                Element.prototype.setAttribute = function(name, value) {
+                  if (name === 'bis_skin_checked') return;
+                  _setAttribute.call(this, name, value);
+                };
+              }
+            `
+          }}
+        />
       </head>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
         <Providers>{children}</Providers>

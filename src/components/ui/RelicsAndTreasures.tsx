@@ -34,8 +34,8 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
           <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
             BADGES
           </h2>
-          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-            Your collection of Achievements. Complete more missions to unlock all badges!
+          <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
+            Koleksi Pencapaian kamu. Selesaikan lebih banyak misi untuk membuka semua badge!
           </p>
         </div>
       )}
