@@ -13,7 +13,8 @@ export default function LeaderboardPage() {
           SKILL BADGES & CERTIFICATES
         </h2>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
-          Tunjukkan keahlianmu kepada dunia! Kumpulkan badge ini dengan menyelesaikan modul dan jadikan portofolio Web3 kamu semakin bersinar untuk memikat para rekruter dan kampus idaman.
+          Tunjukkan keahlianmu kepada dunia! Kumpulkan badge ini dengan menyelesaikan modul<br />
+          dan jadikan portofolio Web3 kamu semakin bersinar untuk memikat para rekruter.
         </p>
       </div>
 

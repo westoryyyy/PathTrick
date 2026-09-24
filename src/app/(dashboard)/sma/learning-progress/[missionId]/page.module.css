@@ -145,7 +145,7 @@
   font-family: 'Pixelify Sans', sans-serif;
   font-size: 1.2rem;
   padding: 16px 8px;
-  color: #fff;
+  /* color defined in specific tab classes */
   border-radius: 0 12px 12px 0;
   transition: all 0.2s;
   display: flex;
@@ -154,7 +154,7 @@
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
   /* Stronger shadow */
   cursor: pointer;
-  filter: brightness(0.7) saturate(0.8);
+  filter: brightness(0.9) saturate(0.85);
   /* Dimmer and less saturated when inactive */
   writing-mode: vertical-rl;
   text-orientation: mixed;
@@ -165,33 +165,36 @@
 }
 
 .activeTab {
-  filter: brightness(1.15) saturate(1.5);
-  /* Neon effect: brighter and highly saturated when active */
+  filter: brightness(1.05) saturate(1.1);
+  /* Cozy effect: slightly brighter when active */
   /* Make it much brighter when active */
   width: 64px;
   /* Expands to the right without detaching */
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
   z-index: 2;
   /* Sit ABOVE the bookContent (which is z-index 1) */
-  color: #fff;
   border-left: none;
 }
 
 /* Custom Tab Colors */
 .tabTeori {
-  background: #0ea5e9; /* Tropical Sky Blue */
+  background: #c89f2d; /* Mustard / Gold */
+  color: #3b261b;
 }
 
 .tabKuis {
-  background: #22c55e; /* Lush Grass Green */
+  background: #33a579; /* Sea Green */
+  color: #114227;
 }
 
 .tabBoss {
-  background: #f43f5e; /* Dragonfruit / Coral Red */
+  background: #a285fc; /* Lavender / Light Purple */
+  color: #351c75;
 }
 
 .tabReward {
-  background: #f59e0b; /* Warm Amber / Tropical Sand */
+  background: #c9651c; /* Bronze / Orange */
+  color: #4a1f00;
 }
 
 /* ── Card Header & Title ── */
@@ -295,44 +298,89 @@
 /* ── Buttons ── */
 .btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  padding: 16px 24px;
-  background: #10b981;
-  border: 4px solid #064e3b;
-  color: #fff;
+  font-size: 0.65rem;
+  padding: 14px 24px;
+  background: #34d399; /* Soft cozy green */
+  color: #064e3b; /* Dark green text */
+  border: 4px solid #065f46;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
+    0 6px 0 #065f46, 
+    0 6px 4px rgba(0,0,0,0.3);
   cursor: pointer;
-  box-shadow: 4px 4px 0 #064e3b;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
-.btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+.btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: 
+    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
+    0 0 0 #065f46, 
+    0 0 4px rgba(0,0,0,0.3);
 }
 
 .btn:disabled {
-  background: #9ca3af;
-  border-color: #4b5563;
-  box-shadow: none;
-  transform: none;
+  background: #d1d5db;
+  border-color: #9ca3af;
+  color: #6b7280;
+  box-shadow: 
+    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
+    inset 0 -4px 0 rgba(0, 0, 0, 0.1), 
+    0 6px 0 #9ca3af;
   cursor: not-allowed;
 }
 
 .secondaryBtn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  padding: 16px 24px;
-  background: #8c5d41;
-  border: 4px solid #3b261b;
-  color: #fff;
+  font-size: 0.65rem;
+  padding: 14px 24px;
+  background: #d4a373; /* Warm cozy sand/brown */
+  color: #432818; /* Dark brown text */
+  border: 4px solid #5a3a29;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
+    0 6px 0 #5a3a29, 
+    0 6px 4px rgba(0,0,0,0.3);
   cursor: pointer;
-  box-shadow: 4px 4px 0 #3b261b;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.secondaryBtn:hover {
+  filter: brightness(1.1);
 }
 
 .secondaryBtn:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+  transform: translateY(6px);
+  box-shadow: 
+    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
+    0 0 0 #5a3a29, 
+    0 0 4px rgba(0,0,0,0.3);
 }
 
 /* ── Success Card (Certificate Style) ── */

@@ -147,10 +147,10 @@ export default function CareerHubPage() {
                 <span className={styles.cardTitle}>{job.company}</span>
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, marginTop: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flexGrow: 1, marginTop: '16px' }}>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fff', textShadow: '2px 2px 0 #5a3a29', lineHeight: '1.6', maxWidth: '70%' }}>{job.title}</h2>
+                  <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', textShadow: '2px 2px 0 #5a3a29', lineHeight: '1.6', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job.title}</h2>
                   
                   {/* Right-aligned Ribbon Flag */}
                   <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
@@ -172,7 +172,7 @@ export default function CareerHubPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: `2px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}`, flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: `2px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}`, flexGrow: 1 }}>
                   <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: isPerfectMatch ? '#fbbf24' : '#fff' }}>
                     {isPerfectMatch ? 'All Requirements Met! 🌟' : 'Requirement Analysis:'}
                   </h4>

@@ -152,7 +152,7 @@ export default function MissionFlowPage() {
     const genericQuizzes = Array.from({ length: bankQuizCount }).map((_, i) => ({
       question: `Pertanyaan ${i + 1}: Manakah pernyataan yang PALING BENAR mengenai ${currentChapter.name}?`,
       options: [
-        { text: `Memahami konsep fundamental adalah kunci utama penguasaan ${currentChapter.name}`, isCorrect: true, feedback: `Tepat! Fondasi yang kuat adalah kunci seorang Ksatria menguasai materi ini.` },
+        { text: `Memahami konsep fundamental adalah kunci utama penguasaan ${currentChapter.name}`, isCorrect: true, feedback: `Tepat!\n\nFondasi yang kuat adalah kunci seorang Ksatria menguasai materi ini.` },
         { text: `Menghafal semua rumus tanpa memahami artinya`, isCorrect: false, feedback: `Menghafal tanpa pemahaman tidak efektif. Kembali ke materi!` },
         { text: `Melewati latihan praktik karena tidak penting`, isCorrect: false, feedback: `Latihan adalah bagian krusial dari pembelajaran. Jangan dilewati!` },
         { text: `Tidak perlu belajar materi ini secara mendalam`, isCorrect: false, feedback: `Penguasaan mendalam sangat diperlukan untuk menjadi ahli sejati.` }
@@ -417,7 +417,7 @@ export default function MissionFlowPage() {
               )}
               {materialPage < materials.length - 1 ? (
                 <button className={styles.btn} onClick={() => setMaterialPage(p => p + 1)}>
-                  LANJUT (NEXT) ➔
+                  LANJUT ➔
                 </button>
               ) : (
                 <button
