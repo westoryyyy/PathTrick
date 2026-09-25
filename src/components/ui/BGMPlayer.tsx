@@ -17,13 +17,13 @@ export default function BGMPlayer() {
     try {
       const audio = new Audio('/HoverTombol.ogg');
       audio.volume = 0.3;
-      audio.play().catch(() => {});
-    } catch(e) {}
+      audio.play().catch(() => { });
+    } catch (e) { }
   };
 
   useEffect(() => {
     setMounted(true);
-    
+
     const removeBg = (src: string, setter: (val: string) => void): Promise<void> => {
       return new Promise((resolve) => {
         const img = new window.Image();
@@ -40,8 +40,8 @@ export default function BGMPlayer() {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
           for (let i = 0; i < data.length; i += 4) {
-            if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) {
-              data[i+3] = 0;
+            if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
+              data[i + 3] = 0;
             }
           }
           ctx.putImageData(imageData, 0, 0);
@@ -51,7 +51,7 @@ export default function BGMPlayer() {
         img.src = src;
       });
     };
-    
+
     Promise.all([
       removeBg('/music_on.jpg', setIconOn),
       removeBg('/music_off.jpg', setIconOff)
@@ -66,7 +66,7 @@ export default function BGMPlayer() {
 
   return (
     <div style={{ position: 'relative' }}>
-      <button 
+      <button
         onClick={toggle}
         style={{
           background: 'transparent',
@@ -96,15 +96,15 @@ export default function BGMPlayer() {
         }}
       >
         {processed && (
-          <Image 
-            src={isPlaying ? iconOn : iconOff} 
-            alt={isPlaying ? 'Music On' : 'Music Off'} 
-            width={48} 
-            height={48} 
-            style={{ 
-              objectFit: 'contain', 
+          <Image
+            src={isPlaying ? iconOn : iconOff}
+            alt={isPlaying ? 'Music On' : 'Music Off'}
+            width={48}
+            height={48}
+            style={{
+              objectFit: 'contain',
               imageRendering: 'pixelated'
-            }} 
+            }}
             unoptimized // Prevent Next.js from optimizing base64 data URLs
           />
         )}

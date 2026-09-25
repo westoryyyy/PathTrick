@@ -30,7 +30,7 @@ export const MAP_HEIGHT_TILES = 30;
 export const ASSET_PATHS = {
   // Main Character
   CHAR_IDLE:       '/assets/Main Chara/Idle/idle.png',
-  CHAR_WALK_DOWN:  '/assets/Main Chara/Idle/Walk(down).png',
+  CHAR_WALK_DOWN:  '/assets/Main Chara/Idle/Walk(down).png', // Left leg
   CHAR_WALK_UP:    '/assets/Main Chara/Idle/Walk(up).png',
   CHAR_WALK_LEFT:  '/assets/Main Chara/Idle/Walk(left).png',
   CHAR_WALK_RIGHT: '/assets/Main Chara/Idle/Walk(right).png',
@@ -42,16 +42,16 @@ export const ASSET_PATHS = {
   CHAR_INTERACT_3: '/assets/Main Chara/Idle/Interact 3.png',
 
   // NPC Sprites
-  NPC_GUIDE_BOY:         '/assets/NPC/NPC Guide Boy.png',
-  NPC_HIGH_SCHOOL:       '/assets/NPC/NPC High School Student.png',
-  NPC_WIZARD:            '/assets/NPC/NPC Wizard.png',
-  NPC_MENTOR:            '/assets/NPC/NPC Mentor.png',
-  NPC_AI_ENGINEER:       '/assets/NPC/NPC AI Engineer.png',
+  NPC_GUIDE_BOY:         '/NPC Guide Boy.png',
+  NPC_HIGH_SCHOOL:       '/NPC High School Student.png',
+  NPC_WIZARD:            '/NPC Wizard.png',
+  NPC_MENTOR:            '/NPC Mentor.png',
+  NPC_AI_ENGINEER:       '/NPC AI Engineer.png',
   NPC_PROFESSOR:         '/npc-professor.png',
-  NPC_SCHOLARSHIP:       '/assets/NPC/NPC Scolarship Officer.png',
-  NPC_RECRUITER:         '/assets/NPC/NPC Recruiter.png',
-  NPC_UNIVERSITY:        '/assets/NPC/NPC University Student.png',
-  NPC_STARTUP:           '/assets/NPC/NPC Startup Founder.png',
+  NPC_SCHOLARSHIP:       '/NPC Scolarship Officer.png',
+  NPC_RECRUITER:         '/NPC Recruiter.png',
+  NPC_UNIVERSITY:        '/NPC University Student.png',
+  NPC_STARTUP:           '/NPC Startup Founder.png',
 
   // Objects — Node Icons
   OBJ_CHEST:             '/chest.png',

@@ -6,8 +6,8 @@ export class PlayerCharacter {
   private cursors!: {
     up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key;
     left: Phaser.Input.Keyboard.Key; right: Phaser.Input.Keyboard.Key;
-    w: Phaser.Input.Keyboard.Key;   s: Phaser.Input.Keyboard.Key;
-    a: Phaser.Input.Keyboard.Key;   d: Phaser.Input.Keyboard.Key;
+    w: Phaser.Input.Keyboard.Key; s: Phaser.Input.Keyboard.Key;
+    a: Phaser.Input.Keyboard.Key; d: Phaser.Input.Keyboard.Key;
   };
   private facing: 'up' | 'down' | 'left' | 'right' = 'down';
   private isMoving = false;
@@ -44,11 +44,11 @@ export class PlayerCharacter {
     // We use the texture key directly and flip between idle and walk textures
     // to simulate walking motion.
     // All walk sprites: single 128x128 frame
-    anims.create({ key: 'player-walk-down',  frames: [{ key: 'walk-down' }],  frameRate: 8, repeat: -1 });
-    anims.create({ key: 'player-walk-left',  frames: [{ key: 'walk-left' }],  frameRate: 8, repeat: -1 });
+    anims.create({ key: 'player-walk-down', frames: [{ key: 'walk-down' }], frameRate: 8, repeat: -1 });
+    anims.create({ key: 'player-walk-left', frames: [{ key: 'walk-left' }], frameRate: 8, repeat: -1 });
     anims.create({ key: 'player-walk-right', frames: [{ key: 'walk-right' }], frameRate: 8, repeat: -1 });
-    anims.create({ key: 'player-walk-up',    frames: [{ key: 'walk-up' }],    frameRate: 8, repeat: -1 });
-    anims.create({ key: 'player-idle',       frames: [{ key: 'idle' }],       frameRate: 4, repeat: -1 });
+    anims.create({ key: 'player-walk-up', frames: [{ key: 'walk-up' }], frameRate: 8, repeat: -1 });
+    anims.create({ key: 'player-idle', frames: [{ key: 'idle' }], frameRate: 4, repeat: -1 });
 
     this.sprite.play('player-idle');
   }
@@ -67,14 +67,14 @@ export class PlayerCharacter {
     ]);
 
     this.cursors = {
-      up:    kb.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
-      down:  kb.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
-      left:  kb.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
+      up: kb.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
+      down: kb.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
+      left: kb.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
       right: kb.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
-      w:     kb.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      s:     kb.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-      a:     kb.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-      d:     kb.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+      w: kb.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      s: kb.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      a: kb.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      d: kb.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
   }
 
@@ -162,21 +162,36 @@ export class PlayerCharacter {
         this.walkTimer = 0;
         this.walkPhase = (this.walkPhase + 1) % 2;
       }
-      
-      const texKey = `walk-${this.facing}`;
+
+      let texKey = `walk-${this.facing}`;
+      if (this.facing === 'down' || this.facing === 'up') {
+        texKey = `walk-${this.facing}`;
+        // Flip X to simulate the other leg for up/down
+        this.sprite.setFlipX(this.walkPhase !== 0);
+      } else {
+        this.sprite.setFlipX(false);
+      }
+
       if (this.sprite.texture.key !== texKey) {
         this.sprite.setTexture(texKey);
       }
 
-      // Waddle effect
-      this.sprite.setAngle(this.walkPhase === 0 ? -3 : 3);
-      
+      // Bobbing effect for directions that don't have separate leg frames (left/right)
+      if (this.facing === 'left' || this.facing === 'right') {
+        this.sprite.setAngle(0);
+        this.sprite.setOrigin(0.5, this.walkPhase === 0 ? 0.5 : 0.53);
+      } else {
+        this.sprite.setAngle(0);
+        this.sprite.setOrigin(0.5, 0.5);
+      }
+
     } else {
       // Idle
       this.walkTimer = 0;
       this.walkPhase = 0;
       this.sprite.setAngle(0);
-      
+      this.sprite.setFlipX(false);
+
       // Only use 'idle' texture (which faces down) if actually facing down
       const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
       if (this.sprite.texture.key !== texKey) {
@@ -208,7 +223,7 @@ export class PlayerCharacter {
   autoWalkTo(targetX: number, targetY: number, duration: number, onComplete?: () => void) {
     // Disable manual input temporarily
     this.isAutoWalking = true;
-    
+
     // Determine facing direction
     const dx = targetX - this.sprite.x;
     const dy = targetY - this.sprite.y;
@@ -217,7 +232,7 @@ export class PlayerCharacter {
     } else {
       this.facing = dy > 0 ? 'down' : 'up';
     }
-    
+
     this.walkSound?.play();
 
     this.scene.tweens.add({
@@ -233,17 +248,32 @@ export class PlayerCharacter {
           this.walkTimer = 0;
           this.walkPhase = (this.walkPhase + 1) % 2;
         }
-        
-        const texKey = `walk-${this.facing}`;
+
+        let texKey = `walk-${this.facing}`;
+        if (this.facing === 'down' || this.facing === 'up') {
+          texKey = `walk-${this.facing}`;
+          this.sprite.setFlipX(this.walkPhase !== 0);
+        } else {
+          this.sprite.setFlipX(false);
+        }
+
         if (this.sprite.texture.key !== texKey) {
           this.sprite.setTexture(texKey);
         }
-        this.sprite.setAngle(this.walkPhase === 0 ? -3 : 3);
+
+        if (this.facing === 'left' || this.facing === 'right') {
+          this.sprite.setAngle(0);
+          this.sprite.setOrigin(0.5, this.walkPhase === 0 ? 0.5 : 0.53);
+        } else {
+          this.sprite.setAngle(0);
+          this.sprite.setOrigin(0.5, 0.5);
+        }
       },
       onComplete: () => {
         this.isAutoWalking = false;
         this.walkSound?.pause();
         this.sprite.setAngle(0);
+        this.sprite.setFlipX(false);
         const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
         this.sprite.setTexture(texKey);
         if (onComplete) onComplete();

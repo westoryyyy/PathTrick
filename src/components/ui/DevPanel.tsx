@@ -119,6 +119,51 @@ function DevPanelInner() {
             </div>
           </section>
 
+          {/* Quick Role Switch */}
+          <section style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ color: '#888', marginBottom: '2px' }}>── QUICK ROLE SWITCH ──</div>
+
+            <button
+              onClick={() => {
+                const s = useOnboardingStore.getState();
+                const uid = user?.id ?? 'dev-user';
+                s.setRole('mahasiswa', uid);
+                window.location.href = '/mahasiswa/dashboard';
+              }}
+              style={btnStyle('#0d2e0d', '#34d399')}
+            >
+              🎓 Play as THE CHASER (Mahasiswa)
+            </button>
+
+            <button
+              onClick={() => {
+                const s = useOnboardingStore.getState();
+                const uid = user?.id ?? 'dev-user';
+                s.setRole('sma', uid);
+                window.location.href = '/sma/dashboard';
+              }}
+              style={btnStyle('#1a1a0d', '#fbbf24')}
+            >
+              🌟 Play as THE DREAMER (SMA)
+            </button>
+
+            <div style={{ color: '#888', marginTop: '4px', marginBottom: '2px' }}>── QUICK MAP LINKS ──</div>
+
+            <button
+              onClick={() => window.location.href = '/map?role=mahasiswa'}
+              style={btnStyle('#1a0d2e', '#a78bfa')}
+            >
+              🗺️ Chaser World Map
+            </button>
+
+            <button
+              onClick={() => window.location.href = '/map?chapter=module-education-1-bab-1&role=mahasiswa'}
+              style={btnStyle('#1a0d2e', '#c084fc')}
+            >
+              ⚔️ Test Chapter Map (Education)
+            </button>
+          </section>
+
           {/* Actions */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ color: '#888', marginBottom: '2px' }}>── ACTIONS ──</div>

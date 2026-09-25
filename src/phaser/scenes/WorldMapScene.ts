@@ -3,7 +3,7 @@ import {
   TILE_SIZE, MAP_WIDTH_TILES, MAP_HEIGHT_TILES,
   ASSET_PATHS,
   NODE_ICON_MAP, MILESTONE_ICON_MAP,
-  AMBIENT_DECORATIONS,
+  AMBIENT_DECORATIONS, NPC_ASSIGNMENTS,
 } from '../config';
 import { PlayerCharacter } from '../objects/PlayerCharacter';
 import { CourseNode } from '../objects/CourseNode';
@@ -109,7 +109,9 @@ export class WorldMapScene extends Phaser.Scene {
     });
 
     // ── NPCs ──
-    this.load.image('npc-professor', ASSET_PATHS.NPC_PROFESSOR);
+    Object.values(NPC_ASSIGNMENTS).forEach(({ spriteKey, assetPath }) => {
+      this.load.image(spriteKey, assetPath);
+    });
 
     // ── Audio ──
     this.load.audio('walk-sound', '/jalanMusic.ogg');
@@ -118,14 +120,11 @@ export class WorldMapScene extends Phaser.Scene {
   }
 
   private openNodeDialog(nodeData: CourseNodeData) {
-    const spriteKey = nodeData.npcKey || 'npc-professor';
-    if (spriteKey === 'npc-professor') {
-      try {
-        const sfx = new Audio('/EntryLevel.ogg');
-        sfx.volume = 0.6;
-        sfx.play().catch(() => {});
-      } catch(e) {}
-    }
+    try {
+      const sfx = new Audio('/EntryLevel.ogg');
+      sfx.volume = 0.6;
+      sfx.play().catch(() => {});
+    } catch(e) {}
     this.game.events.emit(WORLD_MAP_EVENTS.NODE_SELECTED, nodeData);
   }
 
