@@ -166,6 +166,20 @@ export default function NodeInfoPanel({
   const isBoss = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');
   const allLinesShown = bossLineIndex >= BOSS_DIALOGUE_LINES.length - 1;
 
+  const NPC_INFO: Record<string, { name: string; image: string }> = {
+    'npc-guide-boy': { name: 'Pemandu Petualang', image: '/NPC Guide Boy.png' },
+    'npc-high-school': { name: 'Siswa SMA', image: '/NPC High School Student.png' },
+    'npc-wizard': { name: 'Grandmaster Wizard', image: '/NPC Wizard.png' },
+    'npc-mentor': { name: 'Kak Mentor', image: '/NPC Mentor.png' },
+    'npc-ai-engineer': { name: 'AI Engineer', image: '/NPC AI Engineer.png' },
+    'npc-professor': { name: 'Profesor PathTrick', image: '/npc-professor.png' },
+    'npc-scholarship': { name: 'Petugas Beasiswa', image: '/NPC Scolarship Officer.png' },
+    'npc-recruiter': { name: 'HR Recruiter', image: '/NPC Recruiter.png' },
+  };
+
+  const npcKey = displayNode.npcKey || 'npc-professor';
+  const speakerInfo = NPC_INFO[npcKey] || NPC_INFO['npc-professor'];
+
   return (
     <div className={`${styles.panel} ${isVisible ? styles.visible : styles.hidden} ${isBoss ? styles.bossMode : ''}`}>
       <div className={styles.inner}>
@@ -173,13 +187,17 @@ export default function NodeInfoPanel({
         {/* Character Portrait */}
         <div className={`${styles.portraitBox} ${isBoss ? styles.bossPortrait : ''}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/npc-professor.png" alt="Professor" />
+          <img 
+            src={speakerInfo.image} 
+            alt={speakerInfo.name} 
+            style={npcKey !== 'npc-wizard' ? { transform: 'scale(1.35) translateY(4px) translateX(-5px)' } : undefined}
+          />
         </div>
 
         {/* Dialogue Box */}
         <div className={`${styles.dialogueBox} ${isBoss ? styles.bossDialogue : ''}`}>
           <div className={`${styles.speakerName} ${isBoss ? styles.bossSpeakerName : ''}`}>
-            {isBoss ? '⚔️ Profesor PathTrick' : 'Profesor PathTrick'}
+            {isBoss ? `⚔️ ${speakerInfo.name}` : speakerInfo.name}
           </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Tutup panel">
             ✖

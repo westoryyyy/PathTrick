@@ -12,16 +12,13 @@
   z-index: 200;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
   font-family: 'Press Start 2P', monospace;
-  /* unified outer box */
-  background: #ede7c3;
-  border: 4px solid #b8922a;
-  border-radius: 6px;
-  box-shadow:
-    0 0 0 2px #7a5c1e,
-    4px 6px 0 rgba(0,0,0,0.45);
+  /* Transparent container to hold portrait and dialogue box separately */
+  background: transparent;
+  border: none;
+  box-shadow: none;
   display: flex;
-  align-items: stretch;
-  overflow: hidden;
+  align-items: flex-end;
+  overflow: visible;
 }
 
 .visible {
@@ -38,23 +35,32 @@
 
 /* ── Left: portrait column ── */
 .portraitBox {
-  width: 120px;
+  width: 140px;
   flex-shrink: 0;
-  background: #2a1a0e;
-  border-right: 4px solid #b8922a;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+  /* High z-index so the character stands IN FRONT of the blue dialogue box */
+  z-index: 30;
+  /* Shift the box to the right so it overlaps the dialogue box significantly */
+  margin-right: -40px;
 }
 
 .portraitBox img {
-  width: 125%;
+  width: 350px !important;
+  max-width: none !important;
   height: auto;
   object-fit: contain;
   object-position: bottom center;
   image-rendering: pixelated;
-  transform: translateY(6px);
+  /* Move character down slightly to anchor to the box bottom */
+  transform: translateY(10px) translateX(-20px);
+  /* Add drop shadow to separate character from map background */
+  filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.6));
   display: block;
 }
 
@@ -63,24 +69,35 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 28px 18px 14px 18px;
+  padding: 28px 18px 14px 40px; /* Increased left padding for overlapping character */
   position: relative;
   gap: 10px;
+  /* Fields of Mistria style: Blue box with white border */
+  background: #2b5784;
+  border: 4px solid #ffffff;
+  border-radius: 8px;
+  box-shadow: 
+    0 0 0 2px #1e3a5f,
+    0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Speaker name tag (top-left corner) ── */
 .speakerName {
   position: absolute;
-  top: -2px;
-  left: 0;
-  background: #b8922a;
-  color: #fff;
-  padding: 3px 14px 3px 12px;
-  font-size: 0.52rem;
+  top: -16px;
+  left: 12px;
+  background: #e5e7eb;
+  color: #1f2937;
+  padding: 6px 14px;
+  font-size: 0.6rem;
   letter-spacing: 0.04em;
-  border-bottom: 2px solid #7a5c1e;
-  border-right: 2px solid #7a5c1e;
-  border-radius: 0 0 6px 0;
+  border: 4px solid #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ── Close button ── */
@@ -99,10 +116,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
   border-radius: 3px;
 }
-.closeBtn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+.closeBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
 
 /* ── Dialogue content ── */
 .dialogueContent {
@@ -116,7 +137,8 @@
 .dialogueText {
   font-size: 0.68rem;
   line-height: 2;
-  color: #2a1a0e;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
   margin: 0;
 }
 
@@ -127,7 +149,7 @@
   align-items: center;
   flex-wrap: wrap;
   padding-top: 8px;
-  border-top: 2px solid rgba(184,146,42,0.4);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .badge {
@@ -139,13 +161,32 @@
   border: 2px solid;
   border-radius: 3px;
   text-transform: uppercase;
-  box-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.badge-purple { background: #6d28d9; border-color: #a78bfa; color: #ede9fe; }
-.badge-teal   { background: #0f766e; border-color: #5eead4; color: #ccfbf1; }
-.badge-gold   { background: #d97706; border-color: #fcd34d; color: #fef3c7; }
-.badge-green  { background: #16a34a; border-color: #86efac; color: #dcfce7; }
+.badge-purple {
+  background: #6d28d9;
+  border-color: #a78bfa;
+  color: #ede9fe;
+}
+
+.badge-teal {
+  background: #0f766e;
+  border-color: #5eead4;
+  color: #ccfbf1;
+}
+
+.badge-gold {
+  background: #d97706;
+  border-color: #fcd34d;
+  color: #fef3c7;
+}
+
+.badge-green {
+  background: #16a34a;
+  border-color: #86efac;
+  color: #dcfce7;
+}
 
 .xp {
   font-size: 0.5rem;
@@ -176,11 +217,25 @@
   border-radius: 4px;
   letter-spacing: 0.02em;
 }
-.actionBtn:hover  { background: #3a8f49; }
-.actionBtn:active { transform: translateY(2px); border-bottom-width: 2px; }
 
-.goldBtn { background: #b45309; border-color: #fde68a; border-bottom-color: #78350f; }
-.goldBtn:hover { background: #c96010; }
+.actionBtn:hover {
+  background: #3a8f49;
+}
+
+.actionBtn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.goldBtn {
+  background: #b45309;
+  border-color: #fde68a;
+  border-bottom-color: #78350f;
+}
+
+.goldBtn:hover {
+  background: #c96010;
+}
 
 .lockedMsg {
   font-size: 0.5rem;
@@ -194,34 +249,41 @@
 }
 
 /* inner wrapper (unused but kept for safety) */
-.inner { display: contents; }
+.inner {
+  display: contents;
+}
 
 /* ══════════════════════════════════════════════
    BOSS FIGHT MODE
 ══════════════════════════════════════════════ */
 
 .bossMode {
-  background: #1a0505;
+  /* No styles here anymore since panel is transparent */
+}
+
+.bossDialogue {
+  background: #2a0a0a;
   border-color: #dc2626;
   box-shadow:
     0 0 0 2px #7f1d1d,
-    4px 6px 0 rgba(0,0,0,0.6),
-    0 0 24px rgba(220,38,38,0.35);
+    0 4px 12px rgba(220, 38, 38, 0.6);
   animation: bossGlow 2s ease-in-out infinite;
 }
 
 @keyframes bossGlow {
-  0%, 100% { box-shadow: 0 0 0 2px #7f1d1d, 4px 6px 0 rgba(0,0,0,0.6), 0 0 18px rgba(220,38,38,0.3); }
-  50%       { box-shadow: 0 0 0 2px #7f1d1d, 4px 6px 0 rgba(0,0,0,0.6), 0 0 36px rgba(220,38,38,0.6); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px #7f1d1d, 0 4px 12px rgba(220, 38, 38, 0.6), 0 0 18px rgba(220, 38, 38, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 0 2px #7f1d1d, 0 4px 12px rgba(220, 38, 38, 0.6), 0 0 36px rgba(220, 38, 38, 0.6);
+  }
 }
 
 .bossPortrait {
-  background: #100202;
-  border-right-color: #dc2626;
-}
-
-.bossDialogue {
-  /* inherits from .dialogueBox */
+  background: transparent;
+  border: none;
 }
 
 .bossSpeakerName {
@@ -230,7 +292,7 @@
 }
 
 .bossMode .infoRow {
-  border-top-color: rgba(220,38,38,0.35);
+  border-top-color: rgba(220, 38, 38, 0.35);
 }
 
 /* Boss dialogue lines */
@@ -249,14 +311,21 @@
 }
 
 .dialogueFaded {
-  color: rgba(255,255,255,0.28) !important;
+  color: rgba(255, 255, 255, 0.28) !important;
   font-size: 0.54rem;
   line-height: 1.6;
 }
 
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dotProgress {
@@ -266,18 +335,20 @@
 }
 
 .dot {
-  width: 5px; height: 5px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .dotActive {
-  width: 5px; height: 5px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #dc2626;
   border: 1px solid #f87171;
-  box-shadow: 0 0 5px rgba(220,38,38,0.9);
+  box-shadow: 0 0 5px rgba(220, 38, 38, 0.9);
 }
 
 .bossXp {
@@ -297,7 +368,7 @@
 .bossWarning {
   font-size: 0.44rem;
   color: #fcd34d;
-  background: rgba(120,53,15,0.45);
+  background: rgba(120, 53, 15, 0.45);
   border: 1px solid #f59e0b;
   border-radius: 3px;
   padding: 5px 10px;
@@ -319,18 +390,32 @@
   letter-spacing: 0.04em;
   animation: bossBtnPulse 1.8s ease-in-out infinite;
 }
-.bossBtn:hover  { background: #b91c1c; }
-.bossBtn:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+.bossBtn:hover {
+  background: #b91c1c;
+}
+
+.bossBtn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
 
 @keyframes bossBtnPulse {
-  0%, 100% { box-shadow: none; }
-  50%       { box-shadow: 0 0 14px rgba(220,38,38,0.6); }
+
+  0%,
+  100% {
+    box-shadow: none;
+  }
+
+  50% {
+    box-shadow: 0 0 14px rgba(220, 38, 38, 0.6);
+  }
 }
 
 .skipBtn {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.35);
   padding: 5px 12px;
   font-family: 'Press Start 2P', monospace;
   font-size: 0.44rem;
@@ -338,4 +423,8 @@
   border-radius: 3px;
   transition: color 0.2s, border-color 0.2s;
 }
-.skipBtn:hover { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.4); }
+
+.skipBtn:hover {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.4);
+}

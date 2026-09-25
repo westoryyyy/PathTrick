@@ -130,7 +130,7 @@ function MapContent() {
           {x: 22, y: 17},  // Level 3: Depan Rumah Hijau (Tengah)
           {x: 21, y: 8},   // Level 4: Tangga Kemah (Tengah Atas)
           {x: 31, y: 11},  // Level 5: Depan Rumah Kincir (Kanan Atas)
-          {x: 32, y: 24},  // Level 6 (Boss): Depan Toko (Kanan Bawah)
+          {x: 28, y: 24},  // Level 6 (Boss): Pantai Kanan Bawah
           // Fallback coords if > 6 levels
           {x: 26, y: 28},
           {x: 10, y: 28}
@@ -148,6 +148,7 @@ function MapContent() {
           let title = `Level ${i}: Materi Praktik`;
           let badgeImage = '/book.png';
           let category: CourseNodeData['category'] = 'skill';
+          let npcKey = 'npc-professor';
           
           if (isFirst) {
             title = `Level 1: Teori Dasar`;
@@ -159,6 +160,19 @@ function MapContent() {
             category = 'milestone';
           } else {
             title = `Level ${i}: Kuis Praktik`;
+          }
+
+          if (isLast) {
+            npcKey = 'npc-wizard';
+          } else {
+            switch(i) {
+              case 1: npcKey = 'npc-mentor'; break;
+              case 2: npcKey = 'npc-recruiter'; break;
+              case 3: npcKey = 'npc-scholarship'; break;
+              case 4: npcKey = 'npc-professor'; break;
+              case 5: npcKey = 'npc-ai-engineer'; break;
+              default: npcKey = 'npc-professor'; break;
+            }
           }
           
           levels.push({
@@ -172,6 +186,7 @@ function MapContent() {
             y: coords.y,
             prerequisites: isFirst ? [] : [`${baseIdPrefix}-level-${i-1}`],
             badgeImage: badgeImage,
+            npcKey: npcKey,
           });
         }
         

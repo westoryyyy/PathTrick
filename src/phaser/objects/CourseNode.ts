@@ -37,12 +37,60 @@ export class CourseNode {
     this.data = data;
     this.onInteract = onInteract;
     this.questOrder = questOrder;
+    this.data.npcKey = this.getIconSpriteKey();
     this.create();
   }
 
   /** Resolve the correct sprite key for this node */
   private getIconSpriteKey(): string {
-    return this.data.npcKey || 'npc-professor';
+    // 1. If explicitly set
+    if (this.data.npcKey) {
+      return this.data.npcKey;
+    }
+
+    // 2. Check if it's an overview node defined in NPC_ASSIGNMENTS
+    if (cfg.NPC_ASSIGNMENTS && cfg.NPC_ASSIGNMENTS[this.data.id]) {
+      return cfg.NPC_ASSIGNMENTS[this.data.id].spriteKey;
+    }
+
+    // 3. Dynamic Assignment for ALL ROLES / HOUSES / SKILLS / BABS / LEVELS
+    let levelNum = -1;
+    let isBoss = this.data.category === 'milestone';
+
+    if (this.questOrder !== undefined) {
+      // Duolingo Mode SMA
+      levelNum = this.questOrder + 1;
+      // In SMA Mock, boss is usually the last one, or category is 'milestone'
+    } else {
+      // Mahasiswa Mode or SMA Legacy Dynamic Levels
+      const match = this.data.id.match(/-level-(\d+)/);
+      if (match) {
+        levelNum = parseInt(match[1], 10);
+      }
+    }
+
+    // Boss check fallback for IDs containing 'boss'
+    if (this.data.id.toLowerCase().includes('boss')) {
+      isBoss = true;
+    }
+
+    if (isBoss) {
+      return 'npc-wizard';
+    }
+
+    if (levelNum > 0) {
+      switch (levelNum) {
+        case 1: return 'npc-mentor';
+        case 2: return 'npc-recruiter';
+        case 3: return 'npc-scholarship';
+        case 4: return 'npc-professor';
+        case 5: return 'npc-ai-engineer';
+        default: return 'npc-professor';
+      }
+    }
+
+    // Fallback default
+    return 'npc-professor';
   }
 
   private create() {
@@ -60,7 +108,9 @@ export class CourseNode {
 
     // Pixel art icon image (replacing emoji text)
     const spriteKey = this.getIconSpriteKey();
-    this.baseScale = spriteKey === 'npc-professor' ? 0.5 : 0.35; // Slightly larger for professor
+    // Scale 256x256 down to 0.25 (Guide Boy), but Wizard needs 0.35 to compensate for the tall hat. 
+    // 128x128 to 0.5 so they appear identical in size.
+    this.baseScale = spriteKey === 'npc-wizard' ? 0.35 : (spriteKey === 'npc-guide-boy' ? 0.25 : 0.5);
     this.iconImage = this.scene.add.image(0, -10, spriteKey)
       .setOrigin(0.5)
       .setScale(this.baseScale);
