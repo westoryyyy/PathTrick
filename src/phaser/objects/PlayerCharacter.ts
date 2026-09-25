@@ -158,31 +158,45 @@ export class PlayerCharacter {
     // --- Animate: alternate walk angle to simulate stepping ---
     if (moving) {
       this.walkTimer += delta;
-      if (this.walkTimer >= this.WALK_INTERVAL) {
-        this.walkTimer = 0;
-        this.walkPhase = (this.walkPhase + 1) % 2;
-      }
-
-      let texKey = `walk-${this.facing}`;
+      
+      // Different timing or phase logic based on direction
       if (this.facing === 'down' || this.facing === 'up') {
-        texKey = `walk-${this.facing}`;
-        // Flip X to simulate the other leg for up/down
+        if (this.walkTimer >= this.WALK_INTERVAL) {
+          this.walkTimer -= this.WALK_INTERVAL;
+          this.walkPhase = (this.walkPhase + 1) % 2; // 2 phases for up/down
+        }
+        const texKey = `walk-${this.facing}`;
         this.sprite.setFlipX(this.walkPhase !== 0);
-      } else {
-        this.sprite.setFlipX(false);
-      }
-
-      if (this.sprite.texture.key !== texKey) {
-        this.sprite.setTexture(texKey);
-      }
-
-      // Bobbing effect for directions that don't have separate leg frames (left/right)
-      if (this.facing === 'left' || this.facing === 'right') {
-        this.sprite.setAngle(0);
-        this.sprite.setOrigin(0.5, this.walkPhase === 0 ? 0.5 : 0.53);
-      } else {
+        if (this.sprite.texture.key !== texKey) {
+          this.sprite.setTexture(texKey);
+          this.sprite.setScale(0.4); // Reset scale for 128x128
+        }
         this.sprite.setAngle(0);
         this.sprite.setOrigin(0.5, 0.5);
+      } else {
+        // Left/Right uses the new 4-frame sequence
+        // We set it to 150ms so each frame is clearly visible
+        const sideWalkInterval = 150; 
+        while (this.walkTimer >= sideWalkInterval) {
+          this.walkTimer -= sideWalkInterval;
+          this.walkPhase = (this.walkPhase + 1) % 4; // 4 phases for left/right
+        }
+        
+        // Map walkPhase (0,1,2,3) exactly to side frames (1,2,3,4) sequentially
+        const frameNum = this.walkPhase + 1; 
+        const texKey = `walk-side-${frameNum}`;
+        
+        // Original image faces LEFT. So flip when facing RIGHT.
+        this.sprite.setFlipX(this.facing === 'right');
+        
+        if (this.sprite.texture.key !== texKey) {
+          this.sprite.setTexture(texKey);
+          // Original is 164x188, so scale down slightly more to match 128x128 proportion
+          this.sprite.setScale(0.27); 
+        }
+        this.sprite.setAngle(0);
+        // Adjust origin so the feet stay on the ground shadow
+        this.sprite.setOrigin(0.5, 0.65);
       }
 
     } else {
@@ -193,9 +207,24 @@ export class PlayerCharacter {
       this.sprite.setFlipX(false);
 
       // Only use 'idle' texture (which faces down) if actually facing down
-      const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
+      let texKey = 'idle';
+      if (this.facing === 'up') texKey = 'walk-up';
+      
+      if (this.facing === 'left' || this.facing === 'right') {
+        texKey = 'walk-side-1'; // Frame 1 is the idle pose for side walking
+        this.sprite.setFlipX(this.facing === 'right'); // Flip if facing right
+      }
+      
       if (this.sprite.texture.key !== texKey) {
         this.sprite.setTexture(texKey);
+        
+        if (this.facing === 'left' || this.facing === 'right') {
+          this.sprite.setScale(0.27);
+          this.sprite.setOrigin(0.5, 0.65);
+        } else {
+          this.sprite.setScale(0.4);
+          this.sprite.setOrigin(0.5, 0.5);
+        }
       }
     }
 

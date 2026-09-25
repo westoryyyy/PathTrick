@@ -98,6 +98,10 @@ export class WorldMapScene extends Phaser.Scene {
     this.load.spritesheet('walk-up', ASSET_PATHS.CHAR_WALK_UP, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('walk-left', ASSET_PATHS.CHAR_WALK_LEFT, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('walk-right', ASSET_PATHS.CHAR_WALK_RIGHT, { frameWidth: 128, frameHeight: 128 });
+    this.load.image('walk-side-1', ASSET_PATHS.CHAR_WALK_SIDE_1);
+    this.load.image('walk-side-2', ASSET_PATHS.CHAR_WALK_SIDE_2);
+    this.load.image('walk-side-3', ASSET_PATHS.CHAR_WALK_SIDE_3);
+    this.load.image('walk-side-4', ASSET_PATHS.CHAR_WALK_SIDE_4);
     this.load.spritesheet('idle', ASSET_PATHS.CHAR_IDLE, { frameWidth: 128, frameHeight: 128 });
 
     // ── Node icon sprites ──
