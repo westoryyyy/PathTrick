@@ -9,12 +9,12 @@ import styles from '@/components/ui/Dashboard.module.css';
 import { AnimatePresence } from 'framer-motion';
 
 export default function MahasiswaDashboard() {
-  const { careerRank, xp, targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
+  const { targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
   const [gapData, setGapData] = useState<{ missing: string[]; possessed: string[] }>({ missing: [], possessed: [] });
   
   const { user } = usePrivy();
   const { wallets } = useWallets();
-  const { displayName: savedName } = useUserStore();
+  const { displayName: savedName, totalXP, level } = useUserStore();
   const activeWallet = wallets[0];
   const displayName = savedName 
     || user?.google?.name 
@@ -26,6 +26,10 @@ export default function MahasiswaDashboard() {
       setGapData(analyzeSkillGap());
     });
   }, [fetchProfileData, analyzeSkillGap]);
+
+  const dynamicRank = level >= 6 ? 'Senior' : level >= 3 ? 'Mid-level' : 'Junior';
+  const nextTier = level >= 6 ? 'Master' : level >= 3 ? 'Senior' : 'Mid-level';
+  const xpToNext = level * 2500;
 
   if (isLoading) {
     return (
@@ -43,7 +47,7 @@ export default function MahasiswaDashboard() {
         <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
           WELCOME BACK, {displayName}!
         </h1>
-        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
+        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', whiteSpace: 'nowrap' }}>
           AI Career Roadmap kamu sedang aktif memindai berbagai peluang terbaik.
         </p>
       </div>
@@ -59,20 +63,20 @@ export default function MahasiswaDashboard() {
             <div className={styles.rankContent}>
               <div className={styles.tierBadge}>
                 <img src="/CareerRankLogo.png" alt="Rank" className={styles.tierIcon} style={{ width: '72px', height: '72px', objectFit: 'contain', imageRendering: 'pixelated' }} />
-                <span className={styles.tierName}>{careerRank} LEVEL</span>
+                <span className={styles.tierName}>{dynamicRank} LEVEL</span>
               </div>
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                 <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                  Next Tier: Intern
+                  Next Tier: {nextTier}
                 </p>
               </div>
               <div className={styles.readinessContainer}>
                 <div className={styles.readinessLabel}>
                   <span>XP PROGRESS</span>
-                  <span style={{ color: '#34d399' }}>{xp} / 1000 XP</span>
+                  <span style={{ color: '#34d399' }}>{totalXP} / {xpToNext} XP</span>
                 </div>
                 <div className={styles.readinessBarBg} style={{ height: '32px' }}>
-                  <div className={styles.readinessBarFillBlue} style={{ width: `${(xp / 1000) * 100}%` }} />
+                  <div className={styles.readinessBarFillBlue} style={{ width: `${Math.min((totalXP / xpToNext) * 100, 100)}%` }} />
                 </div>
               </div>
             </div>

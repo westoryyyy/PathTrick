@@ -36,6 +36,7 @@ export const metadata: Metadata = {
 };
 
 import GlobalAudio from '@/components/ui/GlobalAudio';
+import LevelUpModal from '@/components/ui/LevelUpModal';
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
         <GlobalAudio />
+        <LevelUpModal />
         <Providers>{children}</Providers>
       </body>
     </html>

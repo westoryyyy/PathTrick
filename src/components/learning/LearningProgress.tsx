@@ -30,6 +30,14 @@ export default function LearningProgress() {
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
+
   const getProgressPercentage = (stages: Stage[]): number => {
     const completed = stages.filter(s => s.isCompleted).length;
     return Math.round((completed / stages.length) * 100);
@@ -101,6 +109,7 @@ export default function LearningProgress() {
                     >
                       <div
                         className={styles.retroCard}
+                        onMouseEnter={playHoverSound}
                         onClick={() => { if (!isLockedByLevel) router.push(`/house/${house.id}`); }}
                         style={{
                           padding: '0',
@@ -260,6 +269,7 @@ export default function LearningProgress() {
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      onMouseEnter={playHoverSound}
                       style={{
                         fontFamily: '"Press Start 2P"', fontSize: '0.65rem', padding: '12px 16px',
                         background: currentPage === 1 ? '#8a6040' : '#fbbf24',
@@ -280,6 +290,7 @@ export default function LearningProgress() {
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      onMouseEnter={playHoverSound}
                       style={{
                         fontFamily: '"Press Start 2P"', fontSize: '0.65rem', padding: '12px 16px',
                         background: currentPage === totalPages ? '#8a6040' : '#fbbf24',
@@ -385,6 +396,7 @@ export default function LearningProgress() {
                     }, 1200);
                   }
                 }}
+                onMouseEnter={playHoverSound}
                 style={{
                   width: '100%',
                   padding: '24px',

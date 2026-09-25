@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { BrowserProvider, Contract, formatEther } from 'ethers';
 import pathtrickSbtAbi from '../../../integration/PathtrickSBT.abi.json';
@@ -55,6 +56,9 @@ function getErrorMessage(error: unknown): string {
   }
   if (normalized.includes('signatureexpired')) {
     return 'Otorisasi mint kedaluwarsa. Otorisasi baru akan diminta saat mencoba lagi.';
+  }
+  if (normalized.includes('failed to fetch') || normalized.includes('fetch failed')) {
+    return 'Gagal terhubung ke wallet!';
   }
 
   return message || 'Mint gagal. Silakan coba lagi.';
@@ -136,6 +140,20 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
     }
 
     try {
+      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
+        // DEMO MODE: Simulate the exact UI flow without touching blockchain/backend
+        setStatus('preparing');
+        await new Promise(r => setTimeout(r, 1000));
+        setStatus('pending');
+        await new Promise(r => setTimeout(r, 1500));
+        setStatus('confirming');
+        await new Promise(r => setTimeout(r, 1000));
+        setStatus('success');
+        setSuccessMessage(`Sertifikat berhasil dicetak (Demo Mode). Tx: 0x${Math.random().toString(16).slice(2, 12)}...`);
+        onSuccess?.();
+        return;
+      }
+
       setStatus('preparing');
       setErrorMessage('');
       setSuccessMessage('');
@@ -246,19 +264,49 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
   };
 
   const isBusy = status === 'preparing' || status === 'pending' || status === 'confirming';
+
+  const getBtnStyles = () => {
+    if (status === 'error') {
+      return {
+        color: '#fee2e2',
+        background: '#dc2626',
+        border: '3px solid #991b1b',
+        boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.25), 0 5px 0 #7f1d1d, 1px 6px 0 #7f1d1d, -1px 6px 0 #7f1d1d',
+      };
+    }
+    if (status === 'success') {
+      return {
+        color: '#dcfce7',
+        background: '#16a34a',
+        border: '3px solid #14532d',
+        boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.25), 0 5px 0 #14532d, 1px 6px 0 #14532d, -1px 6px 0 #14532d',
+      };
+    }
+    return {
+      color: '#1a3d1a',
+      background: '#5cb85c',
+      border: '3px solid #2d6e2d',
+      boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.25), 0 5px 0 #1e4e1e, 1px 6px 0 #1e4e1e, -1px 6px 0 #1e4e1e',
+    };
+  };
+
+  const dynamicStyles = getBtnStyles();
+
   const buttonStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
-    fontSize: '0.65rem',
-    lineHeight: 1.6,
-    color: '#fff7ed',
-    background: status === 'success' ? '#4d7c0f' : status === 'error' ? '#b91c1c' : '#d97706',
-    border: '4px solid #3b261b',
-    borderRadius: '6px',
-    padding: '14px 20px',
+    fontFamily: '"Pixelify Sans", sans-serif',
+    fontSize: '1.3rem',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    color: dynamicStyles.color,
+    background: dynamicStyles.background,
+    border: dynamicStyles.border,
+    borderRadius: '4px',
+    padding: '14px 32px',
     cursor: isBusy || status === 'success' ? 'not-allowed' : 'pointer',
-    textShadow: '2px 2px 0 #3b261b',
-    boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.3), 0 5px 0 #3b261b',
-    imageRendering: 'pixelated',
+    textShadow: '1px 1px 0 rgba(255,255,255,0.3)',
+    boxShadow: dynamicStyles.boxShadow,
+    textTransform: 'uppercase',
+    textDecoration: 'none',
     opacity: isBusy ? 0.75 : 1,
     ...customStyle,
   };
@@ -266,6 +314,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
   if (!wallets.length) {
     return (
       <button
+        ref={buttonRef}
         onClick={handleConnectWallet}
         disabled={isConnectingWallet}
         style={{
@@ -278,48 +327,132 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
     );
   }
 
-  const label = status === 'preparing' ? 'PREPARING MINT...' :
-    status === 'pending' ? 'WAITING FOR WALLET...' :
-    status === 'confirming' ? 'CONFIRMING...' :
-    status === 'success' ? 'CERTIFICATE MINTED' :
-    status === 'error' ? 'MINT FAILED - RETRY' : 'MINT CERTIFICATE';
+  const label = status === 'preparing' ? 'MENYIAPKAN...' :
+    status === 'pending' ? 'MENUNGGU WALLET...' :
+      status === 'confirming' ? 'MENGKONFIRMASI...' :
+        status === 'success' ? 'SERTIFIKAT TERCETAK!' :
+          status === 'error' ? 'GAGAL - COBA LAGI' : 'CETAK SERTIFIKAT';
+
+  const [mounted, setMounted] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [modalCenter, setModalCenter] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if ((status === 'error' || status === 'success') && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setModalCenter({
+        x: rect.left + rect.width / 2,
+        y: window.innerHeight / 2 // Center vertically on the screen, not over the button
+      });
+    }
+  }, [status]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <button onClick={handleMint} disabled={isBusy || status === 'success'} style={buttonStyle}>
+      <button ref={buttonRef} onClick={handleMint} disabled={isBusy || status === 'success'} style={buttonStyle}>
         {label}
       </button>
-      {status === 'error' && (
-        <p role="alert" style={{
-          margin: 0,
-          padding: '10px 12px',
-          color: '#fecaca',
-          background: '#7f1d1d',
-          border: '3px solid #450a0a',
-          borderRadius: '4px',
-          fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
-          fontSize: '0.5rem',
-          lineHeight: 1.7,
-          textShadow: '1px 1px 0 #450a0a',
-        }}>
-          {errorMessage}
-        </p>
+      {mounted && status === 'error' && createPortal(
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 99999
+        }} onClick={() => setStatus('idle')}>
+          <div style={{
+            position: 'absolute',
+            left: `${modalCenter.x}px`,
+            top: `${modalCenter.y}px`,
+            transform: 'translate(-50%, -50%)',
+            padding: '24px 32px',
+            color: '#fee2e2',
+            background: '#b91c1c',
+            border: '4px solid #7f1d1d',
+            borderRadius: '4px',
+            fontFamily: '"Pixelify Sans", sans-serif',
+            fontSize: '1.2rem',
+            fontWeight: '700',
+            lineHeight: 1.5,
+            textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+            textAlign: 'center',
+            boxShadow: '0 6px 0 #7f1d1d, 0 10px 20px rgba(0,0,0,0.5)',
+            maxWidth: '400px',
+            width: 'max-content'
+          }} onClick={(e) => e.stopPropagation()}>
+            <p style={{ margin: '0 0 16px 0' }}>{errorMessage}</p>
+            <button 
+              onClick={() => setStatus('idle')}
+              style={{
+                fontFamily: '"Pixelify Sans", sans-serif',
+                fontSize: '1.1rem',
+                fontWeight: '700',
+                padding: '8px 24px',
+                background: '#fee2e2',
+                color: '#7f1d1d',
+                border: '3px solid #7f1d1d',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 0 #7f1d1d'
+              }}
+            >
+              TUTUP
+            </button>
+          </div>
+        </div>,
+        document.body
       )}
-      {status === 'success' && (
-        <p role="status" style={{
-          margin: 0,
-          padding: '10px 12px',
-          color: '#d9f99d',
-          background: '#365314',
-          border: '3px solid #1a2e05',
-          borderRadius: '4px',
-          fontFamily: 'var(--font-pixel), "Press Start 2P", monospace',
-          fontSize: '0.5rem',
-          lineHeight: 1.7,
-          textShadow: '1px 1px 0 #1a2e05',
-        }}>
-          {successMessage}
-        </p>
+      {mounted && status === 'success' && createPortal(
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 99999
+        }} onClick={() => setStatus('idle')}>
+          <div style={{
+            position: 'absolute',
+            left: `${modalCenter.x}px`,
+            top: `${modalCenter.y}px`,
+            transform: 'translate(-50%, -50%)',
+            padding: '24px 32px',
+            color: '#dcfce7',
+            background: '#16a34a',
+            border: '4px solid #14532d',
+            borderRadius: '4px',
+            fontFamily: '"Pixelify Sans", sans-serif',
+            fontSize: '1.2rem',
+            fontWeight: '700',
+            lineHeight: 1.5,
+            textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+            textAlign: 'center',
+            boxShadow: '0 6px 0 #14532d, 0 10px 20px rgba(0,0,0,0.5)',
+            maxWidth: '400px',
+            width: 'max-content'
+          }} onClick={(e) => e.stopPropagation()}>
+            <p style={{ margin: '0 0 16px 0' }}>{successMessage}</p>
+            <button 
+              onClick={() => setStatus('idle')}
+              style={{
+                fontFamily: '"Pixelify Sans", sans-serif',
+                fontSize: '1.1rem',
+                fontWeight: '700',
+                padding: '8px 24px',
+                background: '#dcfce7',
+                color: '#14532d',
+                border: '3px solid #14532d',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 0 #14532d'
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

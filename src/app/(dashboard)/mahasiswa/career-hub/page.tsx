@@ -28,7 +28,8 @@ export default function CareerHubPage() {
       const jobsWithGaps = matchedJobs.map(job => {
         const missing = job.requiredSkills.filter(skill => !earnedSBTs.includes(skill));
         const possessed = job.requiredSkills.filter(skill => earnedSBTs.includes(skill));
-        return { ...job, missing, possessed };
+        const matchPercentage = Math.round((possessed.length / job.requiredSkills.length) * 100);
+        return { ...job, missing, possessed, matchPercentage };
       });
       setAnalyzedJobs(jobsWithGaps);
     });

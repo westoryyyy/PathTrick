@@ -52,6 +52,14 @@ export default function SMALayout({
     router.push('/');
   };
 
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
+
   const isMissionPage = pathname.startsWith('/sma/learning-progress/') && pathname !== '/sma/learning-progress';
 
   if (isMissionPage) {
@@ -83,6 +91,7 @@ export default function SMALayout({
                 key={item.label}
                 href={item.href}
                 className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+                onMouseEnter={playHoverSound}
               >
                 <div className={styles.navIconTitle}>
                   <PixelIcon icon={item.icon} size={22} />
@@ -109,21 +118,16 @@ export default function SMALayout({
         {/* Top Bar Header */}
         <header className={styles.header}>
           
-          <div className={styles.searchBar}>
-            <span className={styles.searchTitle}>CATEGORIES</span>
-            <input
-              type="text"
-              placeholder="Search..."
-              className={styles.searchInput}
-            />
+          <div>
+            <BGMPlayer />
           </div>
 
           <div className={styles.headerActions}>
-            <BGMPlayer />
             <div style={{ position: 'relative' }}>
               <div 
                 className={styles.iconBtn} 
                 onClick={() => { setIsMessagesOpen(!isMessagesOpen); setIsNotificationsOpen(false); setIsDropdownOpen(false); }}
+                onMouseEnter={playHoverSound}
               >
                 ✉️
                 <span className={styles.iconBadge}>2</span>
@@ -166,6 +170,7 @@ export default function SMALayout({
               <div 
                 className={styles.iconBtn} 
                 onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsMessagesOpen(false); setIsDropdownOpen(false); }}
+                onMouseEnter={playHoverSound}
               >
                 🔔
                 <span className={styles.iconBadge}>1</span>
@@ -204,6 +209,7 @@ export default function SMALayout({
               <div 
                 className={styles.profileChip} 
                 onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }} 
+                onMouseEnter={playHoverSound}
                 style={{ cursor: 'pointer' }}
               >
                 <div className={styles.profileAvatar}>
@@ -252,9 +258,9 @@ export default function SMALayout({
                       )}
                     </div>
                   </div>
-                  <button onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
-                  <button onClick={() => router.push('/docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
-                  <button onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
+                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
+                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
+                  <button onMouseEnter={playHoverSound} onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29' }}>🚪 LOG OUT</button>
                 </div>
               )}
             </div>

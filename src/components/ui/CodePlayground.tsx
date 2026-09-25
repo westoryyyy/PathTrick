@@ -10,54 +10,64 @@ interface Props {
 
 export default function CodePlayground({ initialCode, language, onChange }: Props) {
   const [code, setCode] = useState(initialCode);
-  const [outputHtml, setOutputHtml] = useState(language === 'html' ? initialCode : '');
+  const [outputHtml, setOutputHtml] = useState(
+    language === 'html' ? `<script src="https://cdn.tailwindcss.com"></script>${initialCode}` : ''
+  );
   const [terminalOutput, setTerminalOutput] = useState<string>('');
+
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
 
   const handleRun = () => {
     if (language === 'html') {
-      setOutputHtml(code);
+      setOutputHtml(`<script src="https://cdn.tailwindcss.com"></script>${code}`);
     } else if (language === 'javascript') {
       try {
-        const lines = code.split('\n');
         let out = '';
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('console.log(') && trimmed.endsWith(')')) {
-            const content = trimmed.substring(12, trimmed.length - 1);
-            const parsed = content.replace(/^["']|["']$/g, '');
-            out += parsed + '\n';
-          } else if (trimmed.startsWith('console.log(') && trimmed.endsWith(');')) {
-            const content = trimmed.substring(12, trimmed.length - 2);
-            const parsed = content.replace(/^["']|["']$/g, '');
-            out += parsed + '\n';
-          }
-        }
+        const originalLog = console.log;
+        console.log = (...args) => {
+          out += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') + '\n';
+        };
+        // Evaluate code safely-ish to capture actual output
+        new Function(code)();
+        console.log = originalLog;
         if (out === '') out = 'Process finished with exit code 0';
         setTerminalOutput(out);
-      } catch {
-        setTerminalOutput('SyntaxError: invalid syntax');
+      } catch (err: any) {
+        setTerminalOutput('Error: ' + err.message);
       }
     } else {
-      // Mock Python execution
+      // Enhanced Python mock using JS translation
       try {
-        const lines = code.split('\n');
+        let jsCode = code
+          .replace(/print\s*\(/g, 'console.log(')
+          .replace(/#.*/g, '//$&')
+          .replace(/\bTrue\b/g, 'true')
+          .replace(/\bFalse\b/g, 'false')
+          .replace(/\bNone\b/g, 'null')
+          .replace(/f(["'])(.*?)\1/g, (match, quote, content) => {
+            return '`' + content.replace(/\{/g, '${') + '`';
+          })
+          .replace(/f(["']{3})(.*?)\1/g, (match, quote, content) => {
+             return '`' + content.replace(/\{/g, '${') + '`';
+          });
+          
         let out = '';
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('print(') && trimmed.endsWith(')')) {
-            // Very naive print extraction
-            const content = trimmed.substring(6, trimmed.length - 1);
-            // Handle basic f-strings and strings for the mock
-            let parsed = content.replace(/^f?["']|["']$/g, '');
-            // Just a naive replace for our mock specific case
-            parsed = parsed.replace('{nama}', 'Ksatria Kode');
-            out += parsed + '\n';
-          }
-        }
+        const originalLog = console.log;
+        console.log = (...args) => {
+          out += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') + '\n';
+        };
+        new Function(jsCode)();
+        console.log = originalLog;
         if (out === '') out = 'Process finished with exit code 0';
         setTerminalOutput(out);
-      } catch {
-        setTerminalOutput('SyntaxError: invalid syntax');
+      } catch (err: any) {
+        setTerminalOutput('Error: ' + err.message);
       }
     }
   };
@@ -66,7 +76,7 @@ export default function CodePlayground({ initialCode, language, onChange }: Prop
     <div className={styles.playgroundContainer}>
       <div className={styles.header}>
         <div className={styles.title}>Interactive Playground</div>
-        <button className={styles.runBtn} onClick={handleRun}>▶ RUN CODE</button>
+        <button onMouseEnter={playHoverSound} className={styles.runBtn} onClick={handleRun}>▶ RUN CODE</button>
       </div>
       <div className={styles.splitView}>
         <div className={styles.editorPane}>

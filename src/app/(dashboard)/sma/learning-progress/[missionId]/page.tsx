@@ -11,6 +11,8 @@ import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
 import { getQuizForMission } from '@/data/quizBank';
+import Image from 'next/image';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 
@@ -18,7 +20,17 @@ export default function MissionFlowPage() {
   const { missionId } = useParams();
   const router = useRouter();
   const { completeDynamicNode } = useMapStore();
-  const { addXP } = useUserStore();
+  const { addXP, triggerLevelUp, displayName: savedName } = useUserStore();
+  const { user } = usePrivy();
+  const { wallets } = useWallets();
+  const activeWallet = wallets[0];
+  const displayName = savedName
+    || user?.google?.name
+    || user?.email?.address?.split('@')[0]
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Scholar');
+  const walletShort = activeWallet
+    ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
+    : 'Not Connected';
 
   // Find the exact chapter from mock data by extracting base chapter ID
   const baseChapterId = (missionId as string)?.replace(/-level-\d+$/, '');
@@ -58,7 +70,7 @@ export default function MissionFlowPage() {
   const [materialPage, setMaterialPage] = useState(0);
   const [code, setCode] = useState(() => {
     const m = (missionId as string) || '';
-    const isTech = m.includes('python') || m.includes('data') || m.includes('javascript') || m.includes('js') || m.includes('html') || m.includes('css') || m.includes('tech');
+    const isTech = m.includes('python') || m.includes('data') || m.includes('javascript') || m.includes('js') || m.includes('html') || m.includes('css') || m.includes('tailwind') || m.includes('tech');
     if (!isTech) return '';
     if (m.includes('python') || m.includes('data')) return '# Tulis kodemu di sini\n';
     if (m.includes('javascript') || m.includes('js')) return '// Tulis kodemu di sini\n';
@@ -71,6 +83,7 @@ export default function MissionFlowPage() {
 
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [isBossMinted, setIsBossMinted] = useState(false);
 
   const setPhaseWithProgress = (p: Phase) => {
     setPhase(p);
@@ -92,6 +105,11 @@ export default function MissionFlowPage() {
   };
 
   const handleLevelComplete = () => {
+    try {
+      const audio = new Audio('/mission completed.ogg');
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    } catch (e) {}
     completeDynamicNode(missionId as string);
     setPhase('CLAIM');
   };
@@ -105,11 +123,32 @@ export default function MissionFlowPage() {
     return Math.abs(hash);
   };
 
-  // Simple animation variants
-  const variants = {
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 },
+  // 3D Page flip animation variants for Right Page
+  const rightVariants = {
+    initial: { opacity: 0, rotateY: 90, scale: 0.98, originX: 0 },
+    animate: { opacity: 1, rotateY: 0, scale: 1, originX: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    exit: { opacity: 0, rotateY: -90, scale: 0.98, originX: 0, zIndex: 10, transition: { duration: 0.5, ease: "easeIn" } },
+  };
+
+  // Simple fade for Left Page to prevent awkward double-flips
+  const leftVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.5, ease: "easeIn" } },
+  };
+
+  const playSwipeSound = () => {
+    const audio = new Audio('/BookSwipe.ogg');
+    audio.volume = 0.5;
+    audio.play().catch(console.error);
+  };
+
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
   };
 
   // Get dynamic content or generate a fallback template
@@ -121,7 +160,7 @@ export default function MissionFlowPage() {
 
     const isPython = (missionId as string).includes('python') || (missionId as string).includes('data');
     const isJs = (missionId as string).includes('javascript') || (missionId as string).includes('js');
-    const isHtml = (missionId as string).includes('html') || (missionId as string).includes('css');
+    const isHtml = (missionId as string).includes('html') || (missionId as string).includes('css') || (missionId as string).includes('tailwind');
 
     // Check if module is coding-related
     const isTech = isPython || isJs || isHtml || (missionId as string).includes('tech');
@@ -138,7 +177,7 @@ export default function MissionFlowPage() {
     const genericQuizzes = Array.from({ length: bankQuizCount }).map((_, i) => ({
       question: `Pertanyaan ${i + 1}: Manakah pernyataan yang PALING BENAR mengenai ${currentChapter.name}?`,
       options: [
-        { text: `Memahami konsep fundamental adalah kunci utama penguasaan ${currentChapter.name}`, isCorrect: true, feedback: `Tepat!\n\nFondasi yang kuat adalah kunci seorang Ksatria menguasai materi ini.` },
+        { text: `Memahami konsep fundamental adalah kunci utama penguasaan ${currentChapter.name}`, isCorrect: true, feedback: `Tepat! Fondasi yang kuat adalah kunci seorang Ksatria menguasai materi ini.` },
         { text: `Menghafal semua rumus tanpa memahami artinya`, isCorrect: false, feedback: `Menghafal tanpa pemahaman tidak efektif. Kembali ke materi!` },
         { text: `Melewati latihan praktik karena tidak penting`, isCorrect: false, feedback: `Latihan adalah bagian krusial dari pembelajaran. Jangan dilewati!` },
         { text: `Tidak perlu belajar materi ini secara mendalam`, isCorrect: false, feedback: `Penguasaan mendalam sangat diperlukan untuk menjadi ahli sejati.` }
@@ -154,67 +193,118 @@ export default function MissionFlowPage() {
 
     content = {
       materials: [
-        <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Press Start 2P", monospace' }}>
+        <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Pixelify Sans", sans-serif' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <span style={{ color: isBoss ? '#ef4444' : '#059669', fontSize: '1.2rem', flexShrink: 0 }}>{isBoss ? '⚔️' : '📖'}</span>
+            <span style={{ color: isBoss ? '#ef4444' : '#059669', fontSize: '2rem', flexShrink: 0 }}>{isBoss ? '⚔️' : '📖'}</span>
             <div>
-              <strong style={{ fontSize: '0.75rem', color: isBoss ? '#fbbf24' : '#1a2a3a', display: 'block', marginBottom: '8px', lineHeight: '1.6' }}>
+              <strong style={{ fontSize: '1.4rem', color: isBoss ? '#fbbf24' : '#1a2a3a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>
                 {currentChapter.name} — Level {levelNum} {isBoss ? '(BOSS FIGHT)' : ''}
               </strong>
-              <p style={{ fontSize: '0.65rem', color: '#57534e', lineHeight: '1.8' }}>
+              <p style={{ fontSize: '1.1rem', color: '#57534e', lineHeight: '1.6', marginBottom: '24px' }}>
                 Pahami materi dasar ini dengan saksama untuk mempersiapkan diri menghadapi tantangan.
               </p>
             </div>
           </div>
-        </div>,
-        <div key="2" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Press Start 2P", monospace' }}>
           <div>
-            <h4 style={{ fontSize: '0.65rem', color: isBoss ? '#ef4444' : '#059669', marginBottom: '12px' }}>
+            <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#8c5d41', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📋 Yang Akan Kamu Kuasai:</p>
+            <ul style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6', paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>Mengidentifikasi konsep dasar dan terminologi penting dari <strong style={{ color: '#047857' }}>{currentChapter.name}</strong></li>
+              <li>Menganalisis studi kasus dan memecahkan masalah dasar pada Level {levelNum}</li>
+              {isBoss ? <li><strong style={{ color: '#ef4444' }}>⚠️ Ujian final: Buktikan bahwa kamu telah menguasai seluruh materi bab ini!</strong></li> : <li>Menjawab simulasi skenario dunia nyata dalam Gauntlet Kuis.</li>}
+            </ul>
+          </div>
+          {!hasRealQuizzes && (
+            <div style={{ padding: '12px 0', fontSize: '0.85rem', color: '#92400e', marginTop: 'auto' }}>
+              💡 <strong>Tips Ksatria:</strong> Untuk bab {currentChapter.name}, pastikan kamu memahami konsep fundamental sebelum lanjut ke kuis!
+            </div>
+          )}
+        </div>,
+        <div key="2" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Pixelify Sans", sans-serif' }}>
+          <div>
+            <h4 style={{ fontSize: '1.1rem', color: isBoss ? '#ef4444' : '#059669', marginBottom: '12px' }}>
               {isBoss ? '⚠️ BRIEFING TERAKHIR' : '📜 TEORI DASAR'}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <p style={{ fontSize: '0.65rem', color: '#3b261b', lineHeight: '1.8' }}>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
                 {materialIntro}
               </p>
               {!isBoss && (
                 <>
-                  <p style={{ fontSize: '0.65rem', color: '#3b261b', lineHeight: '1.8' }}>
+                  <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
                     Secara fundamental, <strong>{currentChapter.name}</strong> melibatkan pemahaman mendalam terhadap prinsip-prinsip utama di bidang ini. Sebuah kesalahan umum bagi pemula adalah mengabaikan teori dasar dan langsung melompat ke praktik tingkat lanjut.
                   </p>
-                  <p style={{ fontSize: '0.65rem', color: '#3b261b', lineHeight: '1.8' }}>
+                  <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
                     Di Level {levelNum} ini, kita fokus pada komponen inti: bagaimana elemen-elemen individual berinteraksi membentuk sistem yang utuh. Setiap konsep yang kamu pelajari di sini akan terus digunakan di modul-modul berikutnya. Pastikan kamu benar-benar menguasai logika di baliknya.
+                  </p>
+                  <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                  </p>
+                  <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
                   </p>
                 </>
               )}
             </div>
           </div>
         </div>,
-        <div key="3" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Press Start 2P", monospace' }}>
+        <div key="3" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Pixelify Sans", sans-serif' }}>
           <div>
-            <p style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#8c5d41', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📋 Yang Akan Kamu Kuasai:</p>
-            <ul style={{ fontSize: '0.6rem', color: '#3b261b', lineHeight: '1.9', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <li>Mengidentifikasi konsep dasar dan terminologi penting dari <strong style={{ color: '#047857' }}>{currentChapter.name}</strong></li>
-              <li>Menganalisis studi kasus dan memecahkan masalah dasar pada Level {levelNum}</li>
-              {isBoss ? <li><strong style={{ color: '#ef4444' }}>⚠️ Ujian final: Buktikan bahwa kamu telah menguasai seluruh materi bab ini!</strong></li> : <li>Menjawab simulasi skenario dunia nyata dalam Gauntlet Kuis.</li>}
-            </ul>
-          </div>
-
-          {!hasRealQuizzes && (
-            <div style={{ padding: '12px 0', fontSize: '0.6rem', color: '#92400e' }}>
-              💡 <strong>Tips Ksatria:</strong> Untuk bab {currentChapter.name}, pastikan kamu memahami konsep fundamental sebelum lanjut ke kuis!
+            <h4 style={{ fontSize: '1.1rem', color: '#059669', marginBottom: '12px' }}>
+              📖 LANJUTAN TEORI
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Donec id justo. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu pellentesque magna erat vitae risus. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh. Quisque volutpat condimentum velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+              </p>
             </div>
-          )}
+          </div>
+        </div>,
+        <div key="4" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Pixelify Sans", sans-serif' }}>
+          <div>
+            <h4 style={{ fontSize: '1.1rem', color: '#059669', marginBottom: '12px' }}>
+              📜 PENJELASAN TAMBAHAN (SCROLL TEST)
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id sagittis nisl, non ullamcorper risus. Sed congue, neque sit amet sodales vulputate, ipsum sapien ultrices nulla, ut suscipit sapien elit nec sapien.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Phasellus interdum diam eget justo gravida, ut auctor tellus cursus. Fusce hendrerit diam in dui mattis, ut pharetra ex sagittis. Integer scelerisque nisi metus, eget dapibus dolor posuere eget. Maecenas ac erat sed ex consequat aliquet.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Vivamus non luctus ex, id eleifend turpis. Sed vitae nulla sem. Praesent dictum egestas nisl, sed facilisis mauris. Proin quis dolor eget nunc commodo tincidunt. Vivamus condimentum elit eget quam varius, sit amet hendrerit ex iaculis.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Nullam ullamcorper tellus eget lacus auctor posuere. In id mi eget orci euismod efficitur ut ut orci. Sed vulputate ante quis nisl sagittis gravida. Ut sed odio pretium, egestas ligula eu, commodo dolor.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Mauris euismod congue rhoncus. Suspendisse potenti. Nam non urna augue. Quisque sollicitudin mauris sit amet arcu condimentum, a lacinia leo pretium. Fusce interdum magna vel libero tempus tempus id vel leo.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Praesent quis enim a dolor iaculis finibus in id turpis. Duis eu leo mattis, posuere ligula efficitur, iaculis erat. Nunc vel elementum elit. Vestibulum sed felis metus. Donec sed hendrerit mauris, sed gravida magna.
+              </p>
+              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                Aliquam in cursus quam, in tristique quam. Nulla facilisi. Aenean feugiat ligula sed ligula pretium pretium. Praesent accumsan urna scelerisque dui ullamcorper tempor. Pellentesque egestas tincidunt nisi elementum rhoncus.
+              </p>
+            </div>
+          </div>
         </div>
       ],
       quiz: finalQuizzes,
-      project: {
+      project: (isBoss || isTech) ? {
         type: isTech ? 'code' : 'essay',
         instruction: (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h3 style={{ color: '#fbbf24', fontSize: '1rem', marginBottom: '8px', fontFamily: '"Press Start 2P"', lineHeight: '1.4' }}>
+            <h3 style={{ color: '#fbbf24', fontSize: '1.4rem', marginBottom: '8px', fontFamily: '"Pixelify Sans", sans-serif', lineHeight: '1.4' }}>
               {isBoss ? `⚔️ BOSS FIGHT: Penjaga ${currentChapter.name}` : `🛠 Tantangan Praktik — ${currentChapter.name} Lvl.${levelNum}`}
             </h3>
-            <p style={{ color: '#3b261b', fontSize: '0.65rem', lineHeight: '1.8', fontFamily: '"Press Start 2P", monospace' }}>
+            <p style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6', fontFamily: '"Pixelify Sans", sans-serif' }}>
               {isTech
                 ? (isBoss
                   ? `Ksatria, ini adalah momen penentu! Tuliskan kode yang mencerminkan penguasaanmu atas ${currentChapter.name}. Pastikan kodenya valid dan berjalan dengan benar.`
@@ -225,8 +315,8 @@ export default function MissionFlowPage() {
               }
             </p>
             <div style={{ background: '#fae1c5', padding: '16px', border: '2px dashed #8c5d41', borderRadius: '4px' }}>
-              <p style={{ color: '#92400e', fontSize: '0.7rem', marginBottom: '16px', fontFamily: '"Press Start 2P", monospace' }}>SYARAT KELULUSAN:</p>
-              <ul style={{ color: '#3b261b', fontSize: '0.6rem', lineHeight: '2.0', marginLeft: '20px', listStyleType: 'disc', fontFamily: '"Press Start 2P", monospace', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <p style={{ color: '#92400e', fontSize: '1.1rem', marginBottom: '16px', fontFamily: '"Pixelify Sans", sans-serif', fontWeight: 'bold' }}>SYARAT KELULUSAN:</p>
+              <ul style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6', marginLeft: '20px', listStyleType: 'disc', fontFamily: '"Pixelify Sans", sans-serif', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {isTech ? (
                   <>
                     <li>Tulis kode program menggunakan <strong style={{ color: '#047857' }}>{lang.toUpperCase()}</strong>.</li>
@@ -248,7 +338,7 @@ export default function MissionFlowPage() {
           ? (isPython ? `# Latihan: ${currentChapter.name}\n# Level ${levelNum}\n\n` : isJs ? `// Latihan: ${currentChapter.name}\n// Level ${levelNum}\n\n` : `<!-- Latihan: ${currentChapter.name} -->\n<!-- Level ${levelNum} -->\n\n`)
           : "",
         language: lang as 'html' | 'javascript' | 'python'
-      }
+      } : undefined
     };
   }
   const materials = content.materials;
@@ -257,6 +347,13 @@ export default function MissionFlowPage() {
     setIsSubmitting(true);
     // Simulate AI grading delay
     try {
+      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
+        // DEMO MODE: Simulate AI grading success
+        await new Promise(r => setTimeout(r, 1500));
+        showDialog('success', 'Jawaban yang sangat bagus! Kamu memahami konsepnya. (Demo Mode)', () => handleLevelComplete());
+        return;
+      }
+
       const response = await fetch('/api/submit-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -291,13 +388,22 @@ export default function MissionFlowPage() {
       case 'MATERIAL':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.title}>{currentChapter.name}</h2>
-              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#8c5d41', background: '#fae1c5', padding: '8px', border: '2px solid #8c5d41', whiteSpace: 'nowrap', marginLeft: '16px' }}>
-                Halaman {materialPage + 1}/{materials.length}
-              </span>
+            {materialPage === 0 && (
+              <div className={styles.cardHeader}>
+                <h2 className={styles.title} style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.4rem' }}>{currentChapter.name}</h2>
+              </div>
+            )}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: materialPage === 0 ? '20px' : '0', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
+              {materials[materialPage * 2]}
             </div>
-            <p className={styles.text} style={{ flex: 1 }}>{currentChapter.description || 'Pahami teori berikut sebelum lanjut ke tantangan selanjutnya!'}</p>
+            
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto' }}>
+              {materialPage > 0 && (
+                <button className={styles.secondaryBtn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
+                  ← SEBELUMNYA
+                </button>
+              )}
+            </div>
           </div>
         );
 
@@ -305,24 +411,24 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
             <div className={styles.cardHeader}>
-              <h2 className={styles.title}>{currentChapter.name} - KUIS</h2>
+              <h2 className={styles.title} style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.4rem' }}>{currentChapter.name} - KUIS</h2>
             </div>
-            
+
             {content.quiz ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '0.65rem', fontFamily: '"Press Start 2P"', color: '#8c5d41' }}>NYAWA KSATRIA:</span>
-                    <span style={{ color: '#ef4444', fontSize: '0.8rem', fontFamily: '"Press Start 2P"' }}>{'♥'.repeat(playerHp)}</span>
+                    <span style={{ fontSize: '0.9rem', fontFamily: '"Pixelify Sans", sans-serif', color: '#8c5d41', fontWeight: 'bold' }}>NYAWA KSATRIA:</span>
+                    <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'♥'.repeat(playerHp)}</span>
                   </div>
                   {quizArray.length > 1 && (
-                    <div style={{ marginBottom: '16px', fontSize: '0.7rem', color: '#57534e', textAlign: 'left', fontFamily: '"Press Start 2P"' }}>
+                    <div style={{ marginBottom: '16px', fontSize: '0.9rem', color: '#57534e', textAlign: 'left', fontFamily: '"Pixelify Sans", sans-serif', fontWeight: 'bold' }}>
                       SOAL {quizIndex + 1} DARI {quizArray.length}
                     </div>
                   )}
-                  <div className={styles.dialogueBox}>
+                  <div className={styles.dialogueBox} style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', lineHeight: '1.6' }}>
                     {currentQuiz.question}
                   </div>
                 </>
@@ -339,15 +445,15 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
             <div className={styles.cardHeader}>
-              <h2 className={styles.title}>{currentChapter.name} - BOSS</h2>
+              <h2 className={styles.title} style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.4rem' }}>{currentChapter.name} - BOSS</h2>
             </div>
             {content.project ? (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '0.65rem', fontFamily: '"Press Start 2P"', color: '#8c5d41' }}>NYAWA KSATRIA:</span>
-                  <span style={{ color: '#ef4444', fontSize: '0.8rem', fontFamily: '"Press Start 2P"' }}>{'♥'.repeat(playerHp)}</span>
+                  <span style={{ fontSize: '0.9rem', fontFamily: '"Pixelify Sans", sans-serif', color: '#8c5d41', fontWeight: 'bold' }}>NYAWA KSATRIA:</span>
+                  <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'♥'.repeat(playerHp)}</span>
                 </div>
-                <div className={styles.text} style={{ flex: 1 }}>
+                <div className={styles.text} style={{ flex: 1, fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.1rem', lineHeight: '1.6' }}>
                   {content.project.instruction}
                 </div>
               </>
@@ -380,42 +486,32 @@ export default function MissionFlowPage() {
     switch (phase) {
       case 'MATERIAL':
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{ flex: 1, padding: '16px 0', fontFamily: '"Press Start 2P", monospace' }}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={materialPage}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className={styles.materialContentWrap}
-                >
-                  {materials[materialPage]}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
-              {materialPage > 0 && (
-                <button className={styles.secondaryBtn} onClick={() => setMaterialPage(p => p - 1)}>
-                  ← SEBELUMNYA
-                </button>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
+              {materials[materialPage * 2 + 1] || (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8c5d41', opacity: 0.5, marginTop: '100px' }}>
+                  <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem' }}>[ Halaman Kosong ]</p>
+                </div>
               )}
-              {materialPage < materials.length - 1 ? (
-                <button className={styles.btn} onClick={() => setMaterialPage(p => p + 1)}>
+            </div>
+
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
+              {materialPage < Math.ceil(materials.length / 2) - 1 ? (
+                <button className={styles.btn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p + 1); }}>
                   LANJUT ➔
                 </button>
               ) : (
                 <button
+                  onMouseEnter={playHoverSound}
                   className={styles.btn}
                   onClick={() => {
+                    playSwipeSound();
                     if (content.quiz) setPhase('QUIZ');
                     else if (content.project) setPhase('PROJECT');
                     else handleLevelComplete();
                   }}
                 >
-                  {content.quiz ? 'SAYA PAHAM, MULAI UJIAN!' : (content.project ? 'SAYA PAHAM, MULAI TANTANGAN!' : 'SAYA PAHAM! (SELESAI)')}
+                  SAYA PAHAM!
                 </button>
               )}
             </div>
@@ -433,25 +529,36 @@ export default function MissionFlowPage() {
                 <div className={styles.quizOptions}>
                   {currentQuiz.options.map((opt, i: number) => (
                     <button
+                      onMouseEnter={playHoverSound}
                       key={i}
                       className={styles.optionBtn}
                       onClick={() => {
                         if (opt.isCorrect) {
+                          try {
+                            const audio = new Audio('/Poin.ogg');
+                            audio.volume = 0.5;
+                            audio.play().catch(() => {});
+                          } catch (e) {}
                           showDialog('success', opt.feedback, () => {
                             if (quizIndex < quizArray.length - 1) {
                               setQuizIndex(quizIndex + 1);
                             } else {
-                              if (content.project) setPhase('PROJECT');
+                              if (content.project) setPhaseWithProgress('PROJECT');
                               else handleLevelComplete();
                             }
                           });
                         } else {
                           const newHp = playerHp - 1;
+                          try {
+                            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+                            audio.volume = 0.5;
+                            audio.play().catch(() => {});
+                          } catch (e) {}
                           setPlayerHp(newHp);
                           if (newHp > 0) {
-                            showDialog('error', `${opt.feedback}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+                            showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
                           } else {
-                            showDialog('error', `GAME OVER!\n\n${opt.feedback}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
+                            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
                               setPlayerHp(3);
                               setQuizIndex(0);
                               setPhase('MATERIAL');
@@ -468,7 +575,7 @@ export default function MissionFlowPage() {
               );
             })() : (
               <div style={{ textAlign: 'center' }}>
-                <button className={styles.btn} onClick={() => setPhase('PROJECT')}>LANJUT TANTANGAN ➔</button>
+                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setPhaseWithProgress('PROJECT'); }}>LANJUT TANTANGAN ➔</button>
               </div>
             )}
           </div>
@@ -482,7 +589,7 @@ export default function MissionFlowPage() {
                 {content.project.type === 'essay' ? (
                   <textarea
                     className={styles.textarea}
-                    style={{ flex: 1, padding: '16px', background: '#1c1917', color: '#d4d4d8', border: '2px solid #5a3a29', fontFamily: 'monospace', fontSize: '1rem', resize: 'none' }}
+                    style={{ flex: 1, padding: '24px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
                     placeholder="Ketikkan analisamu di sini..."
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
@@ -497,6 +604,7 @@ export default function MissionFlowPage() {
                   </div>
                 )}
                 <button
+                  onMouseEnter={playHoverSound}
                   className={styles.btn}
                   onClick={handleBossSubmit}
                   disabled={isSubmitting}
@@ -507,7 +615,7 @@ export default function MissionFlowPage() {
               </div>
             ) : (
               <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <button className={styles.btn} onClick={handleLevelComplete}>SAYA PAHAM! (SELESAI)</button>
+                <button className={styles.btn} onMouseEnter={playHoverSound} onClick={handleLevelComplete}>SAYA PAHAM! (SELESAI)</button>
               </div>
             )}
           </div>
@@ -515,32 +623,178 @@ export default function MissionFlowPage() {
 
       case 'CLAIM':
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
-            <div style={{ textAlign: 'center', background: '#fffbeb', padding: '16px', borderRadius: '8px', border: '1px solid #fde68a' }}>
-              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>{isBossLevel ? '📜' : '💎'}</span>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#92400e', lineHeight: '1.6' }}>
-                {isBossLevel 
-                  ? 'Selamat! Kamu berhasil menaklukkan Boss Modul ini. Sekarang kamu berhak mencetak (mint) Sertifikat SBT Web3 On-Chain sebagai bukti kelulusan.'
-                  : 'Reward XP dan item telah ditambahkan ke akunmu.'}
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px', overflowY: 'auto', padding: '24px 0' }}>
+            <div style={{ textAlign: 'center', background: 'rgba(255, 251, 235, 0.95)', padding: '24px 40px', borderRadius: '12px', border: '2px dashed #10b981', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', maxWidth: '600px' }}>
+              <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>{isBossLevel ? '📜' : '💎'}</span>
+              <h2 style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.5rem', color: '#065f46', marginBottom: '16px', letterSpacing: '0.05em' }}>
+                {isBossLevel ? 'BOSS DEFEATED!' : 'LEVEL CLEAR!'}
+              </h2>
+              <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1rem', color: '#4b5563', lineHeight: '1.6', marginBottom: '24px' }}>
+                {isBossLevel
+                  ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.'
+                  : 'Sempurna! Kamu baru saja menyelesaikan tantangan ini.'}
               </p>
-            </div>
-            
-            {isBossLevel ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', width: '100%' }}>
-                <MintSBTButton courseId={generateCourseId(baseChapterId)} />
-                <button 
-                  className={styles.btn} 
-                  onClick={() => router.push('/sma/certificate')} 
-                  style={{ fontSize: '0.7rem', padding: '12px 24px', background: '#f59e0b', borderColor: '#b45309' }}
-                >
-                  LIHAT SERTIFIKAT DI VAULT →
-                </button>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
+                {isBossLevel && (
+                  <div style={{ width: '100%', maxWidth: '350px', background: '#3e2723', padding: '12px', borderRadius: '8px', border: '4px solid #1a1a1a', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.8)' }}>
+                    <div style={{
+                      border: '2px solid #5c4033',
+                      borderRadius: '4px',
+                      padding: '4px',
+                      boxShadow: '4px 4px 0 #3b1f0e, inset 0 0 0 2px #e8c98a',
+                    }}>
+                      <div style={{
+                        display: 'flex', flexDirection: 'column', gap: '12px',
+                        background: '#784626',
+                        border: '2px solid #3b1f0e',
+                        borderRadius: '2px',
+                        padding: '12px',
+                        position: 'relative'
+                      }}>
+                        {/* Certificate Image */}
+                        <div style={{
+                          position: 'relative',
+                          width: '100%',
+                          aspectRatio: '1.414',
+                          overflow: 'hidden',
+                          border: '4px solid #e8c98a',
+                          boxShadow: '0 0 0 4px #3b1f0e',
+                          backgroundColor: '#f5f5f5',
+                          filter: isBossMinted ? 'none' : 'grayscale(100%) brightness(0.6)',
+                          transition: 'filter 0.5s ease',
+                        }}>
+                          <Image
+                            src="/certificate-template.png"
+                            alt="Certificate"
+                            fill
+                            style={{ objectFit: 'cover', imageRendering: 'pixelated' }}
+                          />
+                          {/* Text overlay on certificate */}
+                          <div style={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            display: 'flex', flexDirection: 'column',
+                            justifyContent: 'center', alignItems: 'center',
+                            padding: '8%', textAlign: 'center', zIndex: 2,
+                            gap: '4px',
+                          }}>
+                            <h3 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 'clamp(0.45rem, 1.8vw, 0.85rem)', color: '#1a1a1a', textShadow: '1px 1px 0 rgba(255,255,255,0.8)', lineHeight: '1.4' }}>
+                              {currentChapter.name} MASTERY
+                            </h3>
+                            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(0.4rem, 1.2vw, 0.7rem)', color: '#333', fontWeight: 'bold', marginTop: '4px' }}>
+                              Awarded to {displayName}
+                            </p>
+                            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.35rem, 0.9vw, 0.6rem)', color: '#444', fontWeight: 'bold' }}>
+                                WALLET: {walletShort}
+                              </p>
+                              <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.35rem, 0.9vw, 0.6rem)', color: '#444', fontWeight: 'bold' }}>
+                                DATE: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                          {/* Lock overlay if not minted */}
+                          {!isBossMinted && (
+                            <div style={{
+                              position: 'absolute', top: '50%', left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              zIndex: 3, fontSize: '3.5rem',
+                              textShadow: '0px 0px 10px rgba(0,0,0,0.8)'
+                            }}>
+                              🔒
+                            </div>
+                          )}
+                        </div>
+                        {/* Status label under card */}
+                        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: isBossMinted ? '#34d399' : '#fbbf24', textAlign: 'center', lineHeight: '1.6' }}>
+                          {isBossMinted
+                            ? '✓ ON-CHAIN SBT BERHASIL DICETAK'
+                            : '🔒 SERTIFIKAT BELUM DICETAK KE BLOCKCHAIN'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Non-boss: coin reward */}
+                {!isBossLevel && (
+                  <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                    <motion.div
+                      key="coin-anim"
+                      initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
+                      animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], y: 0 } : { scale: 1, rotate: 0, opacity: 1, y: [0, -10, 0] }}
+                      transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      style={{ display: 'inline-block' }}
+                    >
+                      <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated' }} />
+                    </motion.div>
+                    <p className={styles.text} style={{ marginTop: '12px', fontSize: '0.65rem', color: '#92400e' }}>
+                      Reward XP dan item telah ditambahkan ke akunmu.
+                    </p>
+                  </div>
+                )}
+
+                {isBossLevel ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '400px' }}>
+                    {!isBossMinted ? (
+                      <>
+                        <MintSBTButton
+                          courseId={generateCourseId(baseChapterId)}
+                          customStyle={{
+                            width: '100%',
+                          }}
+                          onSuccess={() => {
+                            setIsBossMinted(true);
+                            addXP(500);
+                          }}
+                        />
+                        <button onMouseEnter={playHoverSound}
+                          className={styles.secondaryBtn}
+                          style={{ width: '100%', padding: '14px 28px', fontSize: '1.1rem', opacity: isClaiming ? 0.7 : 1 }}
+                          onClick={() => {
+                            if (!isClaiming) {
+                              setIsClaiming(true);
+                              addXP(500);
+                              setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                            }
+                          }}
+                          disabled={isClaiming}
+                        >
+                          {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
+                        </button>
+                      </>
+                    ) : (
+                      <button onMouseEnter={playHoverSound}
+                        className={styles.btn}
+                        style={{ width: '100%', padding: '18px 28px', fontSize: '1.2rem' }}
+                        onClick={() => router.push('/sma/certificate')}
+                      >
+                        LIHAT SERTIFIKAT DI VAULT
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button onMouseEnter={playHoverSound}
+                    className={styles.btn}
+                    style={{ width: '100%', maxWidth: '400px', padding: '18px 28px', fontSize: '1.2rem', opacity: isClaiming ? 0.7 : 1 }}
+                    onClick={() => {
+                      if (!isClaiming) {
+                        setIsClaiming(true);
+                        addXP(500);
+                        if (isBossLevel) {
+                          triggerLevelUp();
+                        }
+                        setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                      }
+                    }}
+                    disabled={isClaiming}
+                  >
+                    {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI'}
+                  </button>
+                )}
               </div>
-            ) : (
-              <button className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
-                KLAIM REWARD & KEMBALI KE PETA
-              </button>
-            )}
+            </div>
           </div>
         );
 
@@ -553,7 +807,7 @@ export default function MissionFlowPage() {
     <div className={styles.wrapper}>
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
+        <button className={styles.backBtn} onMouseEnter={playHoverSound} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
           ← KEMBALI KE PETA
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
@@ -561,38 +815,6 @@ export default function MissionFlowPage() {
 
       {/* ── QUEST BOOK ── */}
       <div className={styles.questBook}>
-        {/* TABS */}
-        <div className={styles.tabsContainer}>
-          <div 
-            className={`${styles.tab} ${styles.tabTeori} ${phase === 'MATERIAL' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 0) setPhaseWithProgress('MATERIAL'); }}
-            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 0 ? 1 : 0.5 }}
-          >
-            📚 TEORI
-          </div>
-          <div 
-            className={`${styles.tab} ${styles.tabKuis} ${phase === 'QUIZ' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 1) setPhaseWithProgress('QUIZ'); }}
-            style={{ cursor: highestPhaseReached >= 1 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 1 ? 1 : 0.5 }}
-          >
-            {highestPhaseReached >= 1 ? '❓' : '🔒'} KUIS
-          </div>
-          <div 
-            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 2 ? 1 : 0.5 }}
-          >
-            {highestPhaseReached >= 2 ? '⚔️' : '🔒'} BOSS
-          </div>
-          <div 
-            className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}
-            style={{ cursor: highestPhaseReached >= 3 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 3 ? 1 : 0.5 }}
-          >
-            {highestPhaseReached >= 3 ? '🏆' : '🔒'} REWARD
-          </div>
-        </div>
-
         {/* BOOK CONTENT (PARCHMENT) */}
         <div className={styles.bookContent}>
           {/* THE PHYSICAL LEFT PAGE */}
@@ -600,12 +822,11 @@ export default function MissionFlowPage() {
             {phase !== 'CLAIM' && (
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={phase + "-left"}
-                  variants={variants}
+                  key={`${phase}-${phase === 'MATERIAL' ? materialPage : phase === 'QUIZ' ? quizIndex : ''}-left`}
+                  variants={leftVariants}
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  transition={{ duration: 0.3 }}
                   style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1 }}
                 >
                   {renderLeftPage()}
@@ -613,7 +834,7 @@ export default function MissionFlowPage() {
               </AnimatePresence>
             )}
           </div>
-          
+
           <div className={styles.bookSpine}></div>
 
           {/* THE PHYSICAL RIGHT PAGE */}
@@ -621,12 +842,11 @@ export default function MissionFlowPage() {
             {phase !== 'CLAIM' && (
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={phase + (materialPage || 0) + "-right"}
-                  variants={variants}
+                  key={`${phase}-${phase === 'MATERIAL' ? materialPage : phase === 'QUIZ' ? quizIndex : ''}-right`}
+                  variants={rightVariants}
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  transition={{ duration: 0.3 }}
                   style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1 }}
                 >
                   {renderRightPage()}
@@ -641,7 +861,7 @@ export default function MissionFlowPage() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key="claim-page"
-                  variants={variants}
+                  variants={leftVariants}
                   initial="initial"
                   animate="animate"
                   exit="exit"
@@ -656,7 +876,9 @@ export default function MissionFlowPage() {
                   </p>
                   <div style={{ textAlign: 'center', padding: '24px 0' }}>
                     <motion.div
-                      animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0] } : { y: [0, -10, 0] }}
+                      key="coin-anim"
+                      initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
+                      animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], y: 0 } : { scale: 1, rotate: 0, opacity: 1, y: [0, -10, 0] }}
                       transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
                       style={{ display: 'inline-block' }}
                     >
@@ -666,14 +888,18 @@ export default function MissionFlowPage() {
                       Reward XP dan item telah ditambahkan ke akunmu.
                     </p>
                   </div>
-                  
-                  <button 
-                    className={styles.btn} 
-                    style={{ width: '100%', maxWidth: '400px', padding: '16px', fontSize: '0.7rem', opacity: isClaiming ? 0.7 : 1 }} 
+
+                  <button
+                    onMouseEnter={playHoverSound}
+                    className={styles.btn}
+                    style={{ width: '100%', maxWidth: '400px', padding: '16px', fontSize: '0.7rem', opacity: isClaiming ? 0.7 : 1 }}
                     onClick={() => {
                       if (!isClaiming) {
                         setIsClaiming(true);
                         addXP(500); // Add 500 XP for clearing a mission!
+                        if (isBossLevel) {
+                          triggerLevelUp();
+                        }
                         setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                       }
                     }}
@@ -686,14 +912,48 @@ export default function MissionFlowPage() {
             </div>
           )}
         </div>
+
+        {/* TABS */}
+        <div className={styles.tabsContainer}>
+          <div
+            className={`${styles.tab} ${styles.tabTeori} ${phase === 'MATERIAL' ? styles.activeTab : ''}`}
+            onClick={() => { if (highestPhaseReached >= 0) setPhaseWithProgress('MATERIAL'); }}
+            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 0 ? 1 : 0.5 }}
+          >
+            TEORI
+          </div>
+          <div
+            className={`${styles.tab} ${styles.tabKuis} ${phase === 'QUIZ' ? styles.activeTab : ''}`}
+            onClick={() => { if (highestPhaseReached >= 1) setPhaseWithProgress('QUIZ'); }}
+            style={{ cursor: highestPhaseReached >= 1 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 1 || phase === 'QUIZ') ? 1 : 0.6 }}
+          >
+            KUIS
+          </div>
+          <div
+            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
+            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
+            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
+          >
+            BOSS
+          </div>
+          <div
+            className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
+            onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}
+            style={{ cursor: highestPhaseReached >= 3 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 3 || phase === 'CLAIM') ? 1 : 0.6 }}
+          >
+            REWARD
+          </div>
+        </div>
       </div>
 
       {/* FULL SCREEN FLASH EFFECT ON CLAIM */}
       <AnimatePresence>
         {isClaiming && (
           <motion.div
+            key="flash-effect"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ delay: 0.5, duration: 0.7 }}
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'white', zIndex: 9999, pointerEvents: 'none' }}
           />
@@ -725,7 +985,7 @@ export default function MissionFlowPage() {
                     : 'UPS! SALAH'}
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
-              <button className={styles.btn} onClick={closeDialog}>
+              <button className={styles.btn} onMouseEnter={playHoverSound} onClick={closeDialog}>
                 {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
               </button>
             </motion.div>

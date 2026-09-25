@@ -43,6 +43,17 @@ Always follow these conventions when adding or modifying pages:
 4. **Map to Dashboard Navigation**:
    - When redirecting back to the dashboard from the Map (`src/app/(game)/map/page.tsx`), always check the current role/module and redirect to the appropriate `[role]/[page]`.
 
+5. **Cross-Role Route Matching for Missions**:
+   - When checking if a user is currently inside a mission (e.g., for muting global audio or enabling fullscreen mode), you MUST check both role paths:
+     - Mahasiswa: `pathname.includes('/mission/')`
+     - SMA: `pathname.match(/\/learning-progress\/.+/)` (Ensuring it matches a specific mission ID, not just the overview page).
+
+6. **React Event Handler Safety**:
+   - Never use block-scoped variables (e.g. `const` defined inside an `if` statement) inside global component event handlers (like `onClick`). Next.js will catch the error, but the interrupted handler will break state machines (like failing to call `router.push`), leaving users trapped in transition screens. Always declare variables at the component root if they are needed by interaction handlers.
+
+7. **Dynamic Map Node Generation**:
+   - When generating map nodes, **always strictly follow the `[chapterId]-level-[N]` format**. Boss nodes MUST be named with the `-level-[N]` suffix (e.g., `-level-6` for a 6-level module) rather than `-boss`. UI components rely on regex parsing the level number from the URL string to determine content fallback and boss status.
+
 # Tailwind v4 Configuration Rules
 This project uses **Tailwind CSS v4** (`tailwindcss: ^4.3.3`). The `tailwind.config.js` file is IGNORED by the build system.
 

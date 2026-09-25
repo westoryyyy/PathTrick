@@ -11,6 +11,7 @@ export class PlayerCharacter {
   };
   private facing: 'up' | 'down' | 'left' | 'right' = 'down';
   private isMoving = false;
+  private isAutoWalking = false;
   private moveTarget: Phaser.Math.Vector2 | null = null;
   private walkTimer = 0;
   private walkPhase = 0; // 0 = neutral, 1 = step1, 2 = neutral, 3 = step2
@@ -97,7 +98,7 @@ export class PlayerCharacter {
   }
 
   update(delta: number) {
-    if (!this.cursors) return;
+    if (!this.cursors || this.isAutoWalking) return;
 
     const speed = 100;
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
@@ -206,7 +207,7 @@ export class PlayerCharacter {
   /** Automatically walk to a specific coordinate */
   autoWalkTo(targetX: number, targetY: number, duration: number, onComplete?: () => void) {
     // Disable manual input temporarily
-    this.isMoving = true;
+    this.isAutoWalking = true;
     
     // Determine facing direction
     const dx = targetX - this.sprite.x;
@@ -240,7 +241,7 @@ export class PlayerCharacter {
         this.sprite.setAngle(this.walkPhase === 0 ? -3 : 3);
       },
       onComplete: () => {
-        this.isMoving = false;
+        this.isAutoWalking = false;
         this.walkSound?.pause();
         this.sprite.setAngle(0);
         const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;

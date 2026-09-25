@@ -12,6 +12,7 @@ import {
   useOnboardingStore,
   clearUserOnboarding,
 } from '@/store/useOnboardingStore';
+import { useUserStore } from '@/store/useUserStore';
 
 import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
 
@@ -151,6 +152,15 @@ function DevPanelInner() {
               style={btnStyle('#1c1c3a', '#c084fc')}
             >
               ⏳ Test Loading Screen
+            </button>
+            <button
+              onClick={() => {
+                const store = useUserStore.getState();
+                store.triggerLevelUp();
+              }}
+              style={btnStyle('#1c1c3a', '#f59e0b')}
+            >
+              ⭐ CHEAT: Trigger Level Up
             </button>
           </section>
         </div>

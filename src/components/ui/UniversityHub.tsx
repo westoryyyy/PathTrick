@@ -38,6 +38,14 @@ type University = (typeof MOCK_UNIVERSITIES)[number];
 export default function UniversityHub() {
   const [selectedUni, setSelectedUni] = useState<University | null>(null);
 
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       {/* Header */}
@@ -125,7 +133,8 @@ export default function UniversityHub() {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.boxShadow = '4px 4px 0 #3b261b';
               }}
-                onClick={() => setSelectedUni(uni)}
+              onMouseEnter={playHoverSound}
+              onClick={() => setSelectedUni(uni)}
               >
                 VIEW ROADMAP
               </button>
@@ -163,6 +172,7 @@ export default function UniversityHub() {
                   </div>
                   <button 
                     onClick={() => setSelectedUni(null)}
+                    onMouseEnter={playHoverSound}
                     style={{ background: '#ef4444', border: '2px solid #991b1b', color: '#fff', padding: '8px', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '2px 2px 0 #7f1d1d' }}
                   >
                     X
@@ -206,6 +216,7 @@ export default function UniversityHub() {
 
                   <button 
                     onClick={() => setSelectedUni(null)}
+                    onMouseEnter={playHoverSound}
                     style={{ background: '#10b981', border: '2px solid #064e3b', color: '#fff', padding: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '4px 4px 0 #064e3b', marginTop: '16px' }}
                   >
                     LANJUTKAN BELAJAR

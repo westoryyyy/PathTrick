@@ -208,6 +208,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
         };
       }
 
+      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
+        // DEMO MODE: Simulate API delay then succeed
+        await new Promise(r => setTimeout(r, 1500));
+        console.log('AI Assessment Result (DEMO): Success');
+        set({ isSubmitting: false });
+        return;
+      }
+
       const response = await fetch('/api/assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -11,6 +11,8 @@ import SBTBadgePopup from '@/components/ui/SBTBadgePopup';
 import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
 import { mockBackendData } from '@/data/mockBackendData';
 import type { Chapter } from '@/types/backend';
+import { useUserStore } from '@/store/useUserStore';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 // WorldMapGame must be client-only (Phaser uses window)
 const WorldMapGame = dynamic(() => import('@/components/game/WorldMapGame'), {
@@ -20,7 +22,6 @@ const WorldMapGame = dynamic(() => import('@/components/game/WorldMapGame'), {
 
 // ── Mock user data — replace with Zustand/API later ──
 const MOCK_USER = {
-  name: 'Petualang',
   xp: 4250,
   xpToNext: 5000,
   level: 2,
@@ -44,6 +45,24 @@ function MapContent() {
   const [showSBT,      setShowSBT]      = useState(false);
   const [sbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
   const [houseId,      setHouseId]      = useState<string | null>(null);
+
+  const { user } = usePrivy();
+  const { wallets } = useWallets();
+  const activeWallet = wallets[0];
+  const { displayName: savedName, level, totalXP } = useUserStore();
+  
+  const playerName = savedName 
+    || user?.google?.name 
+    || user?.email?.address?.split('@')[0] 
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Ksatria');
+
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
   
   // Dynamic nodes based on Module and Chapter
   const [dynamicNodes, setDynamicNodes] = useState<CourseNodeData[]>([]);
@@ -223,10 +242,10 @@ function MapContent() {
 
       <div style={{ position: 'relative', zIndex: 10, pointerEvents: 'none' }}>
         <PlayerHUD
-          playerName={MOCK_USER.name}
-          xp={MOCK_USER.xp}
-          xpToNext={MOCK_USER.xpToNext}
-          level={MOCK_USER.level}
+          playerName={playerName}
+          xp={totalXP}
+          xpToNext={level * 2500}
+          level={level}
           sbtCount={role === 'SMA' ? 0 : MOCK_USER.sbtCount}
           nearbyNodeTitle={nearbyNode?.title ?? null}
         />
@@ -253,6 +272,7 @@ function MapContent() {
               }
             }
           }}
+          onMouseEnter={playHoverSound}
           style={{
             position: 'absolute',
             top: 80,

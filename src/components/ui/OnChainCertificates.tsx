@@ -265,6 +265,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                     borderLeftColor: '#fde68a',
                     color: '#451a03', 
                     textShadow: '1px 1px 0 rgba(255,255,255,0.5)',
+                    boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.5), 0 5px 0 #78350f, 1px 6px 0 #78350f, -1px 6px 0 #78350f',
                     imageRendering: 'pixelated',
                   }}
                 />

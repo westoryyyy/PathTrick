@@ -13,10 +13,10 @@ import { useMapStore } from '@/store/useMapStore';
 
 // Events emitted to React
 export const WORLD_MAP_EVENTS = {
-  NODE_SELECTED:    'node:selected',
-  NODE_NEARBY:      'node:nearby',
-  NODE_LEAVE:       'node:leave',
-  PLAYER_POSITION:  'player:position',
+  NODE_SELECTED: 'node:selected',
+  NODE_NEARBY: 'node:nearby',
+  NODE_LEAVE: 'node:leave',
+  PLAYER_POSITION: 'player:position',
 } as const;
 
 /* ═══════════════════════════════════════════════
@@ -53,12 +53,12 @@ function computeQuestPositions(quests: QuestNode[]): { x: number; y: number }[] 
     if (quest.x !== 0 || quest.y !== 0) {
       return { x: quest.x, y: quest.y };
     }
-    
+
     // Generate random positions within a safe land area of the map
     // X between 300 and 950, Y between 250 and 750
     const randX = Math.floor(Math.random() * (950 - 300 + 1)) + 300;
     const randY = Math.floor(Math.random() * (750 - 250 + 1)) + 250;
-    
+
     return { x: randX, y: randY };
   });
 }
@@ -94,11 +94,11 @@ export class WorldMapScene extends Phaser.Scene {
     this.load.image('world-map-kedokteran', ASSET_PATHS.MAP_KEDOKTERAN);
 
     // ── Player character sprites ──
-    this.load.spritesheet('walk-down',  ASSET_PATHS.CHAR_WALK_DOWN,  { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('walk-up',    ASSET_PATHS.CHAR_WALK_UP,    { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('walk-left',  ASSET_PATHS.CHAR_WALK_LEFT,  { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('walk-down', ASSET_PATHS.CHAR_WALK_DOWN, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('walk-up', ASSET_PATHS.CHAR_WALK_UP, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('walk-left', ASSET_PATHS.CHAR_WALK_LEFT, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('walk-right', ASSET_PATHS.CHAR_WALK_RIGHT, { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('idle',       ASSET_PATHS.CHAR_IDLE,       { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('idle', ASSET_PATHS.CHAR_IDLE, { frameWidth: 128, frameHeight: 128 });
 
     // ── Node icon sprites ──
     Object.values(NODE_ICON_MAP).forEach(({ spriteKey, assetPath }) => {
@@ -110,11 +110,23 @@ export class WorldMapScene extends Phaser.Scene {
 
     // ── NPCs ──
     this.load.image('npc-professor', ASSET_PATHS.NPC_PROFESSOR);
-    
+
     // ── Audio ──
     this.load.audio('walk-sound', '/jalanMusic.ogg');
     this.load.audio('bgm-map', '/WorldMapMusic.ogg');
     this.load.audio('bgm-boss', '/BossFightMusic.ogg');
+  }
+
+  private openNodeDialog(nodeData: CourseNodeData) {
+    const spriteKey = nodeData.npcKey || 'npc-professor';
+    if (spriteKey === 'npc-professor') {
+      try {
+        const sfx = new Audio('/EntryLevel.ogg');
+        sfx.volume = 0.6;
+        sfx.play().catch(() => {});
+      } catch(e) {}
+    }
+    this.game.events.emit(WORLD_MAP_EVENTS.NODE_SELECTED, nodeData);
   }
 
   create() {
@@ -144,10 +156,12 @@ export class WorldMapScene extends Phaser.Scene {
     const enterKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     if (enterKey) {
       enterKey.on('down', () => {
+        if ((window as any).__isNodePanelOpen) return; // Ignore Enter key for map if UI panel is already open
+        
         if (this.nearbyNodeId) {
           const node = this.courseNodes.find(n => n.data.id === this.nearbyNodeId);
           if (node && node.data.status !== 'locked') {
-            this.game.events.emit(WORLD_MAP_EVENTS.NODE_SELECTED, node.data);
+            this.openNodeDialog(node.data);
           }
         }
       });
@@ -158,7 +172,7 @@ export class WorldMapScene extends Phaser.Scene {
       // Handle Role change or Chapter change (background switch)
       if (state.role !== prevState.role || state.activeChapterId !== prevState.activeChapterId) {
         let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
-        
+
         if (state.activeChapterId) {
           if (state.activeChapterId === 'module-health-1-bab-1') {
             textureKey = 'world-map-kedokteran';
@@ -181,7 +195,7 @@ export class WorldMapScene extends Phaser.Scene {
             textureKey = `world-map-${mapIndex}`;
           }
         }
-        
+
         this.mapImage.setTexture(textureKey);
       }
 
@@ -270,8 +284,20 @@ export class WorldMapScene extends Phaser.Scene {
         y: (positions[i].y - 16) / 32,
       };
 
-      const node = new CourseNode(this, questWithPos, (data: CourseNodeData) => {
-        this.game.events.emit(WORLD_MAP_EVENTS.NODE_SELECTED, data);
+      const node = new CourseNode(this, questWithPos, (data: CourseNodeData, worldX: number, worldY: number, spriteKey: string) => {
+        // Stop any current movement
+        if (this.player) {
+          // Walk to the node's position (slightly below the center)
+          const targetY = worldY + 30;
+          const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, worldX, targetY);
+          const duration = Math.max(500, (dist / 150) * 1000); // 150 pixels per second
+
+          this.player.autoWalkTo(worldX, targetY, duration, () => {
+            this.openNodeDialog(data);
+          });
+        } else {
+          this.openNodeDialog(data);
+        }
       }, quest.order);
       this.courseNodes.push(node);
     });
@@ -309,7 +335,7 @@ export class WorldMapScene extends Phaser.Scene {
       if (drawing) {
         gfx.lineBetween(
           x1 + nx * drawn, y1 + ny * drawn,
-          x1 + nx * end,   y1 + ny * end,
+          x1 + nx * end, y1 + ny * end,
         );
       }
 
@@ -341,8 +367,18 @@ export class WorldMapScene extends Phaser.Scene {
   private buildCourseNodes() {
     const nodes = useMapStore.getState().nodes;
     nodes.forEach(nodeData => {
-      const node = new CourseNode(this, nodeData, (data: CourseNodeData) => {
-        this.game.events.emit(WORLD_MAP_EVENTS.NODE_SELECTED, data);
+      const node = new CourseNode(this, nodeData, (data: CourseNodeData, worldX: number, worldY: number, spriteKey: string) => {
+        if (this.player) {
+          const targetY = worldY + 30;
+          const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, worldX, targetY);
+          const duration = Math.max(500, (dist / 150) * 1000);
+
+          this.player.autoWalkTo(worldX, targetY, duration, () => {
+            this.openNodeDialog(data);
+          });
+        } else {
+          this.openNodeDialog(data);
+        }
       });
       this.courseNodes.push(node);
     });
@@ -376,7 +412,7 @@ export class WorldMapScene extends Phaser.Scene {
 
   private updateBGM() {
     if (!this.sound || !this.sound.get) return; // Guard if destroyed
-    
+
     let shouldPlayBossMusic = false;
 
     // Get completed nodes from persistent store
@@ -395,15 +431,37 @@ export class WorldMapScene extends Phaser.Scene {
     }
 
     const targetBgmKey = shouldPlayBossMusic ? 'bgm-boss' : 'bgm-map';
-    
-    // Play or switch the music
-    const currentSound = this.sound.get(targetBgmKey);
-    if (!currentSound || !currentSound.isPlaying) {
-      // Stop the other music if playing
-      const otherBgmKey = targetBgmKey === 'bgm-boss' ? 'bgm-map' : 'bgm-boss';
-      this.sound.stopByKey(otherBgmKey);
-      
-      this.sound.play(targetBgmKey, { loop: true, volume: 0.4 });
+    const otherBgmKey = targetBgmKey === 'bgm-boss' ? 'bgm-map' : 'bgm-boss';
+
+    let targetSound = this.sound.get(targetBgmKey) as Phaser.Sound.WebAudioSound;
+    if (!targetSound) {
+      targetSound = this.sound.add(targetBgmKey, { loop: true, volume: 0 }) as Phaser.Sound.WebAudioSound;
+    }
+
+    // Play or switch the music with Crossfade
+    if (!targetSound.isPlaying) {
+      targetSound.setVolume(0);
+      targetSound.play();
+
+      this.tweens.add({
+        targets: targetSound,
+        volume: 0.4,
+        duration: 1500,
+        ease: 'Linear'
+      });
+    }
+
+    const otherSound = this.sound.get(otherBgmKey) as Phaser.Sound.WebAudioSound;
+    if (otherSound && otherSound.isPlaying) {
+      this.tweens.add({
+        targets: otherSound,
+        volume: 0,
+        duration: 1500,
+        ease: 'Linear',
+        onComplete: () => {
+          otherSound.stop();
+        }
+      });
     }
   }
 
@@ -430,7 +488,7 @@ export class WorldMapScene extends Phaser.Scene {
 
       if (activeCourse && activeCourse.quests.length > 0) {
         const positions = computeQuestPositions(activeCourse.quests);
-        
+
         // Default target is the first available quest
         const firstAvailable = activeCourse.quests.find(q => q.status === 'available')
           ?? activeCourse.quests[0];

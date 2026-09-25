@@ -11,6 +11,14 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
+
   const house = mockBackendData.houses.find(h => h.id === id);
 
   if (!house) {
@@ -32,6 +40,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/sma/learning-progress')}
+            onMouseEnter={playHoverSound}
             className="px-5 py-3 bg-[#3b261b] hover:bg-[#5a3a29] border-4 border-[#5a3a29] rounded-xl transition-colors text-[#fbbf24] shadow-[inset_-2px_-2px_0_rgba(0,0,0,0.5),_4px_4px_0_rgba(0,0,0,0.8)] active:translate-y-1 active:shadow-none"
           >
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem' }}>◀ KEMBALI</span>
@@ -98,6 +107,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
               {/* Module Header Button */}
               <button
                 onClick={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)}
+                onMouseEnter={playHoverSound}
                 className={`w-full bg-[#5a3a29] border-4 border-[#3b261b] p-0 text-left transition-all flex items-stretch outline-none overflow-hidden relative ${
                   expandedModule === mod.id 
                     ? 'rounded-t-[16px] z-0' 
@@ -162,6 +172,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                         <div 
                           key={chapter.id}
                           onClick={() => router.push(`/map?chapter=${chapter.id}`)}
+                          onMouseEnter={playHoverSound}
                           className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] rounded-xl p-4 cursor-pointer hover:bg-[#d4a373] transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
                         >
                           <div className="flex items-center gap-4">
@@ -197,6 +208,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       <div className="fixed bottom-6 right-6 z-40">
          <button
             onClick={() => router.push('/sma/dashboard')}
+            onMouseEnter={playHoverSound}
             className="px-6 py-4 bg-[#fbbf24] border-4 border-[#b45309] rounded-[16px] text-[#78350f] shadow-[0_6px_0_#78350f] hover:translate-y-1 hover:shadow-[0_2px_0_#78350f] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3"
          >
             <PixelIcon icon="🏠" size={24} />

@@ -55,6 +55,14 @@ export default function MahasiswaLearningProgress() {
     });
   }, [fetchProfileData, jobId, matchedJobs, earnedSBTs]);
 
+  const playHoverSound = () => {
+    try {
+      const audio = new Audio('/HoverTombol.ogg');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
+  };
+
   // Filter modules to ONLY show those that match the user's missing skills
   const activeModules = MAHASISWA_MODULES.filter(mod => missingSkills.includes(mod.id));
   const ITEMS_PER_PAGE = 4;
@@ -107,7 +115,7 @@ export default function MahasiswaLearningProgress() {
                     <div style={{ position: 'absolute', top: '100%', left: '0', width: 0, height: 0, borderTop: '12px solid #450a0a', borderLeft: '12px solid transparent', zIndex: 1 }} />
                   </div>
                   {/* Module Header (Accordion Toggle) */}
-                  <button
+                  <button onMouseEnter={playHoverSound}
                     onClick={() => setExpandedModule(isExpanded ? null : mod.id)}
                     style={{
                       width: '100%', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -166,7 +174,7 @@ export default function MahasiswaLearningProgress() {
                                   <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '0.9rem', color: '#78350f', marginTop: '4px' }}>{chapter.duration}</p>
                                 </div>
                               </div>
-                              <button
+                              <button onMouseEnter={playHoverSound}
                                 onClick={() => router.push(`/map?chapter=${chapter.id}&role=mahasiswa`)}
                                 className="bg-[#10b981] hover:bg-[#059669] text-white px-4 py-2 border-2 border-[#064e3b] transition-colors shadow-[2px_2px_0_#064e3b]"
                                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer' }}
@@ -188,7 +196,7 @@ export default function MahasiswaLearningProgress() {
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-              <button
+              <button onMouseEnter={playHoverSound}
                 disabled={currentPage === 1}
                 onClick={() => { setCurrentPage(prev => Math.max(1, prev - 1)); setExpandedModule(null); }}
                 style={{
@@ -208,7 +216,7 @@ export default function MahasiswaLearningProgress() {
                 PAGE {currentPage}/{totalPages}
               </div>
 
-              <button
+              <button onMouseEnter={playHoverSound}
                 disabled={currentPage === totalPages}
                 onClick={() => { setCurrentPage(prev => Math.min(totalPages, prev + 1)); setExpandedModule(null); }}
                 style={{
@@ -264,7 +272,7 @@ export default function MahasiswaLearningProgress() {
                     : "Selesaikan 1 modul quiz hari ini untuk mendapatkan +150 XP!")}
               </p>
 
-              <button
+              <button onMouseEnter={playHoverSound}
                 disabled={dailyBountyClaimed || isClaimingBounty}
                 onClick={async () => {
                   if (!hasCompletedQuizToday) {
@@ -304,7 +312,7 @@ export default function MahasiswaLearningProgress() {
 
               {/* HIDDEN DEV BUTTON TO SIMULATE COMPLETING QUIZ */}
               {!hasCompletedQuizToday && (
-                <button
+                <button onMouseEnter={playHoverSound}
                   onClick={() => completeQuiz()}
                   style={{ fontSize: '0.4rem', opacity: 0.1, position: 'absolute', top: 5, right: 5 }}
                   title="Dev: Simulate Quiz Completion"

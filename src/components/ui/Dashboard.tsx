@@ -169,6 +169,16 @@ export default function Dashboard() {
   return (
     <div className={styles.widgetGrid}>
       
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '8px' }}>
+        <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
+          WELCOME BACK, {displayName}!
+        </h1>
+        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', whiteSpace: 'nowrap' }}>
+          AI Education Roadmap kamu sedang aktif memindai peluang kampus dan beasiswa terbaik.
+        </p>
+      </div>
+
       {/* Profile XP Banner */}
       <div className={styles.retroCard} style={{ flexDirection: 'row', alignItems: 'center', gap: '24px' }}>
         <div style={{ background: '#d4a373', border: '4px solid #5a3a29', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

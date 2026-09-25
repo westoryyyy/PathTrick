@@ -498,14 +498,25 @@ const fetchAIRoadmapMock = async (role: 'SMA' | 'MAHASISWA', chapterId?: string)
           badgeImage: ASSET_PATHS.OBJ_SCROLL,
         },
         {
-          id: `${chapterId}-boss`,
+          id: `${chapterId}-level-5`,
+          title: `Level 5: Persiapan Ujian Akhir`,
+          description: `Tinjau kembali seluruh materi ${chapterTitle} sebelum tantangan akhir.`,
+          category: 'skill',
+          status: 'locked',
+          xp: 250,
+          x: 25, y: 24,
+          prerequisites: [`${chapterId}-level-4`],
+          badgeImage: ASSET_PATHS.BADGE_NIGHT_OWL,
+        },
+        {
+          id: `${chapterId}-level-6`,
           title: `Boss Challenge`,
           description: `Ujian akhir untuk menguasai ${chapterTitle}.`,
           category: 'milestone',
           status: 'locked',
           xp: 500,
-          x: 20, y: 24, // Boss near the bottom center for map 6
-          prerequisites: [`${chapterId}-level-4`],
+          x: 18, y: 26, // Boss near the bottom center for map 6
+          prerequisites: [`${chapterId}-level-5`],
           badge: '🏆',
           badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER,
         }

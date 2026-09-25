@@ -74,10 +74,11 @@ body {
 
 * {
   box-sizing: border-box;
+  /* Use custom pixel art cursor with hardware acceleration (0 lag) */
+  cursor: url('/Pointer_small.png') 0 0, auto !important;
 }
 
 a {
   color: inherit;
   text-decoration: none;
 }
-

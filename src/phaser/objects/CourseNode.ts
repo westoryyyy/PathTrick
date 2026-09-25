@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { CourseNodeData } from '../config';
 import { NODE_INTERACT_RADIUS, NODE_ICON_MAP, MILESTONE_ICON_MAP } from '../config';
 
-export type NodeEventCallback = (node: CourseNodeData) => void;
+export type NodeEventCallback = (node: CourseNodeData, worldX: number, worldY: number, spriteKey: string) => void;
 
 const STATUS_CONFIG = {
   locked:      { alpha: 0.6, scale: 0.85 },
@@ -146,8 +146,13 @@ export class CourseNode {
     // Only allow interaction if the node is not locked. Locked nodes are non-interactive.
     this.innerCircle.on('pointerdown', (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
       event.stopPropagation();
+      
+      const spriteKey = this.getIconSpriteKey();
+
       if (this.data.status !== 'locked') {
-        this.onInteract(this.data);
+        const worldX = this.container.x;
+        const worldY = this.container.y;
+        this.onInteract(this.data, worldX, worldY, spriteKey);
       } else {
         // Brief feedback for locked node: small scale pulse
         this.scene.tweens.add({

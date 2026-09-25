@@ -27,8 +27,10 @@
 
 .backBtn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.7rem; /* Increased size */
-  padding: 12px 24px; /* Increased padding */
+  font-size: 0.7rem;
+  /* Increased size */
+  padding: 12px 24px;
+  /* Increased padding */
   background: #3b261b;
   border: 4px solid #5a3a29;
   border-radius: 12px;
@@ -38,7 +40,8 @@
   transition: transform 0.1s, background 0.1s;
   display: flex;
   align-items: center;
-  gap: 12px; /* Add gap for the arrow */
+  gap: 12px;
+  /* Add gap for the arrow */
 }
 
 .backBtn:hover {
@@ -114,6 +117,7 @@
   border-left: none;
   border-radius: 0 24px 24px 0;
   box-shadow: inset 15px 0 20px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.3);
+  perspective: 1500px;
 }
 
 .bookSpine {
@@ -137,6 +141,27 @@
   /* Keeps tabs away from the very top/bottom */
   gap: 8px;
   /* Slight gap between tabs looks cleaner */
+}
+
+/* Custom Scrollbar for overflowing text */
+.scrollableContent::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scrollableContent::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+  background: #c4af9a;
+  border-radius: 8px;
+  border: 2px solid #fdf6e3;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb:hover {
+  background: #8c5d41;
 }
 
 .tab {
@@ -178,22 +203,26 @@
 
 /* Custom Tab Colors */
 .tabTeori {
-  background: #c89f2d; /* Mustard / Gold */
+  background: #c89f2d;
+  /* Mustard / Gold */
   color: #3b261b;
 }
 
 .tabKuis {
-  background: #33a579; /* Sea Green */
+  background: #33a579;
+  /* Sea Green */
   color: #114227;
 }
 
 .tabBoss {
-  background: #a285fc; /* Lavender / Light Purple */
+  background: #a285fc;
+  /* Lavender / Light Purple */
   color: #351c75;
 }
 
 .tabReward {
-  background: #c9651c; /* Bronze / Orange */
+  background: #c9651c;
+  /* Bronze / Orange */
   color: #4a1f00;
 }
 
@@ -295,92 +324,100 @@
   flex: 1;
 }
 
-/* ── Buttons ── */
+/* ── Buttons (Dinkum Style) ── */
 .btn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
-  padding: 14px 24px;
-  background: #34d399; /* Soft cozy green */
-  color: #064e3b; /* Dark green text */
-  border: 4px solid #065f46;
-  border-radius: 8px;
-  box-shadow: 
-    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
-    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
-    0 6px 0 #065f46, 
-    0 6px 4px rgba(0,0,0,0.3);
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 14px 32px;
+  background: #5cb85c;
+  color: #1a3d1a;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+  border: 3px solid #2d6e2d;
+  border-radius: 4px;
+  outline: none;
+  text-decoration: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    0 5px 0 #1e4e1e,
+    1px 6px 0 #1e4e1e,
+    -1px 6px 0 #1e4e1e;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  line-height: 1.6;
   text-align: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+  position: relative;
+  top: 0;
 }
 
 .btn:hover:not(:disabled) {
-  filter: brightness(1.1);
+  background: #6dcf6d;
+  border-color: #2d6e2d;
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(6px);
-  box-shadow: 
-    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
-    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
-    0 0 0 #065f46, 
-    0 0 4px rgba(0,0,0,0.3);
+  top: 5px;
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.15),
+    0 0 0 #1e4e1e;
 }
 
 .btn:disabled {
-  background: #d1d5db;
-  border-color: #9ca3af;
-  color: #6b7280;
-  box-shadow: 
-    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
-    inset 0 -4px 0 rgba(0, 0, 0, 0.1), 
-    0 6px 0 #9ca3af;
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  text-shadow: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    0 5px 0 #4b5563,
+    1px 6px 0 #4b5563,
+    -1px 6px 0 #4b5563;
   cursor: not-allowed;
 }
 
 .secondaryBtn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
-  padding: 14px 24px;
-  background: #d4a373; /* Warm cozy sand/brown */
-  color: #432818; /* Dark brown text */
-  border: 4px solid #5a3a29;
-  border-radius: 8px;
-  box-shadow: 
-    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
-    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
-    0 6px 0 #5a3a29, 
-    0 6px 4px rgba(0,0,0,0.3);
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 14px 32px;
+  background: #c9955c;
+  color: #3b1f0e;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.2);
+  border: 3px solid #7a4a20;
+  border-radius: 4px;
+  outline: none;
+  text-decoration: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    0 5px 0 #5c3110,
+    1px 6px 0 #5c3110,
+    -1px 6px 0 #5c3110;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  line-height: 1.6;
   text-align: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+  position: relative;
+  top: 0;
 }
 
 .secondaryBtn:hover {
-  filter: brightness(1.1);
+  background: #d9a870;
+  border-color: #7a4a20;
 }
 
 .secondaryBtn:active {
-  transform: translateY(6px);
-  box-shadow: 
-    inset 0 4px 0 rgba(255, 255, 255, 0.3), 
-    inset 0 -4px 0 rgba(0, 0, 0, 0.15), 
-    0 0 0 #5a3a29, 
-    0 0 4px rgba(0,0,0,0.3);
+  top: 5px;
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.15),
+    0 0 0 #5c3110;
 }
 
 /* ── Success Card (Certificate Style) ── */
@@ -445,7 +482,7 @@
   border-radius: 8px;
   padding: 32px;
   width: 90%;
-  max-width: 400px;
+  max-width: 600px;
   text-align: center;
   box-shadow: inset 0 0 20px rgba(140, 93, 65, 0.2), 0 10px 25px rgba(0, 0, 0, 0.5);
   position: relative;
