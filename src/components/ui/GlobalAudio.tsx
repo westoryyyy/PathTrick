@@ -51,7 +51,7 @@ export default function GlobalAudio() {
 
     // Check if we are in a screen where Dashboard Music should NOT play
     const isSmaMission = pathname.match(/\/learning-progress\/.+/);
-    const shouldMute = pathname === '/map' || pathname.includes('/mission/') || isSmaMission;
+    const shouldMute = pathname === '/' || pathname === '/map' || pathname.includes('/mission/') || isSmaMission;
 
     if (shouldMute) {
       // Going to Map or Mission: Fade out then pause
