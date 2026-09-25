@@ -7,6 +7,7 @@ import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
 import { useUserStore } from '@/store/useUserStore';
+import { useMapStore } from '@/store/useMapStore';
 import { useRouter } from 'next/navigation';
 
 const stageIconMap: Record<string, string> = {
@@ -38,9 +39,28 @@ export default function LearningProgress() {
     } catch(e) {}
   };
 
+  const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
+
   const getProgressPercentage = (stages: Stage[]): number => {
-    const completed = stages.filter(s => s.isCompleted).length;
-    return Math.round((completed / stages.length) * 100);
+    let totalLevels = 0;
+    let completedLevels = 0;
+
+    stages.forEach(stage => {
+      if (stage.chapters) {
+        stage.chapters.forEach(ch => {
+          const levels = parseInt(ch.duration) || 6;
+          totalLevels += levels;
+          for (let i = 1; i <= levels; i++) {
+            if (completedDynamicNodes.includes(`${ch.id}-level-${i}`)) {
+              completedLevels++;
+            }
+          }
+        });
+      }
+    });
+
+    if (totalLevels === 0) return 0;
+    return Math.floor((completedLevels / totalLevels) * 100);
   };
 
   const getStatusBadge = (status: string): React.ReactNode => {

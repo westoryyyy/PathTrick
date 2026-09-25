@@ -8,6 +8,7 @@ import { useAccount, useReadContracts } from 'wagmi';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import MintSBTButton from './MintSBTButton';
+import CertificatePreview from './CertificatePreview';
 import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS } from '@/config/pathtrick';
 
 type Props = {
@@ -100,6 +101,8 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
     window.open(`https://testnet.bscscan.com/address/${address}#tokentxnsErc1155`, '_blank');
   };
 
+  const walletShort = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'NOT CONNECTED';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%', marginBottom: '32px' }}>
       {!hideHeader && (
@@ -117,6 +120,10 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
         {!address ? (
           <div style={{ color: '#fbbf24', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             Hubungkan wallet untuk memuat sertifikat On-Chain.
+          </div>
+        ) : bossNodes.length === 0 ? (
+          <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
+            Kamu belum menaklukkan Boss Modul manapun. Mainkan Learning Mission untuk mendapatkan Sertifikat!
           </div>
         ) : isLoadingOwnership ? (
           <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
@@ -151,80 +158,13 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                 position: 'relative'
               }}>
                 {/* Certificate Image Container */}
-                <div style={{ 
-                  position: 'relative', 
-                  width: '100%', 
-                  aspectRatio: '1.414', // Landscape standard ratio
-                  borderRadius: '2px', 
-                  overflow: 'hidden',
-                  border: '4px solid #e8c98a',
-                  boxShadow: '0 0 0 4px #3b1f0e',
-                  backgroundColor: '#f5f5f5',
-                  filter: cert.isMinted ? 'none' : 'grayscale(100%) brightness(0.6)',
-                  transition: 'all 0.3s'
-                }}>
-                <Image
-                  src="/certificate-template.png" 
-                  alt="Certificate Template" 
-                  fill
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
+                <CertificatePreview
+                  userName={displayName}
+                  moduleName={cert.title}
+                  walletAddress={walletShort}
+                  date={cert.date}
+                  isMinted={cert.isMinted}
                 />
-                
-                {/* Text Overlay */}
-                <div style={{
-                  position: 'absolute', 
-                  top: 0, left: 0, width: '100%', height: '100%',
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  alignItems: 'center',
-                  padding: '10%',
-                  textAlign: 'center',
-                  zIndex: 2
-                }}>
-                  <h3 style={{ 
-                    fontFamily: '"Press Start 2P", monospace', 
-                    fontSize: 'clamp(0.6rem, 2vw, 1.2rem)', 
-                    color: '#1a1a1a', 
-                    marginBottom: '8px',
-                    textShadow: '1px 1px 0 rgba(255,255,255,0.8)'
-                  }}>
-                    {cert.title}
-                  </h3>
-                  <p style={{ 
-                    fontFamily: 'sans-serif', 
-                    fontSize: 'clamp(0.5rem, 1.5vw, 1rem)', 
-                    color: '#333', 
-                    fontWeight: 'bold' 
-                  }}>
-                    Awarded to {displayName}
-                  </p>
-                  
-                  <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.4rem, 1vw, 0.7rem)', color: '#444', fontWeight: 'bold' }}>
-                      DATE: {cert.date}
-                    </p>
-                    <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.4rem, 1vw, 0.7rem)', color: '#444', fontWeight: 'bold' }}>
-                      ISSUER: {cert.issuer}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Locked Overlay Icon */}
-                {!cert.isMinted && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 3,
-                    fontSize: '4rem',
-                    textShadow: '0px 0px 10px rgba(0,0,0,0.8)'
-                  }}>
-                    🔒
-                  </div>
-                )}
-              </div>
               
               {cert.isMinted ? (
                 <button 

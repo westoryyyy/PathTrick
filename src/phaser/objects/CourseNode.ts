@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { CourseNodeData } from '../config';
 import { NODE_INTERACT_RADIUS, NODE_ICON_MAP, MILESTONE_ICON_MAP } from '../config';
+import * as cfg from '../config';
 
 export type NodeEventCallback = (node: CourseNodeData, worldX: number, worldY: number, spriteKey: string) => void;
 

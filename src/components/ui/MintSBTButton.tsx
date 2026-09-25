@@ -118,6 +118,9 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [modalCenter, setModalCenter] = useState({ x: 0, y: 0 });
 
   const handleConnectWallet = async () => {
     try {
@@ -332,10 +335,6 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
       status === 'confirming' ? 'MENGKONFIRMASI...' :
         status === 'success' ? 'SERTIFIKAT TERCETAK!' :
           status === 'error' ? 'GAGAL - COBA LAGI' : 'CETAK SERTIFIKAT';
-
-  const [mounted, setMounted] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [modalCenter, setModalCenter] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setMounted(true);

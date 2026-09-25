@@ -6,6 +6,7 @@ import styles from '@/components/ui/Dashboard.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
 import { useUserStore } from '@/store/useUserStore';
 import { useScholarStore } from '@/store/useScholarStore';
+import { useMapStore } from '@/store/useMapStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const MAHASISWA_MODULES = [
@@ -26,6 +27,8 @@ export default function MahasiswaLearningProgress() {
   const router = useRouter();
   const { totalXP, level, dailyBountyClaimed, hasCompletedQuizToday, claimDailyBounty, completeQuiz, addXP } = useUserStore();
   const { fetchProfileData, analyzeSkillGap, earnedSBTs, matchedJobs } = useScholarStore();
+
+  const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
 
   const searchParams = useSearchParams();
   const jobId = searchParams.get('jobId');
@@ -89,8 +92,20 @@ export default function MahasiswaLearningProgress() {
           {currentModules.length === 0 ? null : (
             currentModules.map((mod, idx) => {
               const isExpanded = expandedModule === mod.id;
-              // Mock progress based on if it's earned
-              const progress = earnedSBTs.includes(mod.id) ? 100 : 0;
+              let totalLevels = 0;
+              let completedLevels = 0;
+              
+              mod.chapters.forEach(ch => {
+                const levels = parseInt(ch.duration) || 6;
+                totalLevels += levels;
+                for (let i = 1; i <= levels; i++) {
+                  if (completedDynamicNodes.includes(`${ch.id}-level-${i}`)) {
+                    completedLevels++;
+                  }
+                }
+              });
+              
+              const progress = earnedSBTs.includes(mod.id) ? 100 : totalLevels > 0 ? Math.floor((completedLevels / totalLevels) * 100) : 0;
 
               return (
                 <motion.div

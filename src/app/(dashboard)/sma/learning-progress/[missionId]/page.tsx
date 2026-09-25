@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
 import MintSBTButton from '@/components/ui/MintSBTButton';
+import CertificatePreview from '@/components/ui/CertificatePreview';
 import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -652,60 +653,14 @@ export default function MissionFlowPage() {
                         padding: '12px',
                         position: 'relative'
                       }}>
-                        {/* Certificate Image */}
-                        <div style={{
-                          position: 'relative',
-                          width: '100%',
-                          aspectRatio: '1.414',
-                          overflow: 'hidden',
-                          border: '4px solid #e8c98a',
-                          boxShadow: '0 0 0 4px #3b1f0e',
-                          backgroundColor: '#f5f5f5',
-                          filter: isBossMinted ? 'none' : 'grayscale(100%) brightness(0.6)',
-                          transition: 'filter 0.5s ease',
-                        }}>
-                          <Image
-                            src="/certificate-template.png"
-                            alt="Certificate"
-                            fill
-                            style={{ objectFit: 'cover', imageRendering: 'pixelated' }}
-                          />
-                          {/* Text overlay on certificate */}
-                          <div style={{
-                            position: 'absolute', top: 0, left: 0,
-                            width: '100%', height: '100%',
-                            display: 'flex', flexDirection: 'column',
-                            justifyContent: 'center', alignItems: 'center',
-                            padding: '8%', textAlign: 'center', zIndex: 2,
-                            gap: '4px',
-                          }}>
-                            <h3 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 'clamp(0.45rem, 1.8vw, 0.85rem)', color: '#1a1a1a', textShadow: '1px 1px 0 rgba(255,255,255,0.8)', lineHeight: '1.4' }}>
-                              {currentChapter.name} MASTERY
-                            </h3>
-                            <p style={{ fontFamily: 'sans-serif', fontSize: 'clamp(0.4rem, 1.2vw, 0.7rem)', color: '#333', fontWeight: 'bold', marginTop: '4px' }}>
-                              Awarded to {displayName}
-                            </p>
-                            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                              <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.35rem, 0.9vw, 0.6rem)', color: '#444', fontWeight: 'bold' }}>
-                                WALLET: {walletShort}
-                              </p>
-                              <p style={{ fontFamily: 'monospace', fontSize: 'clamp(0.35rem, 0.9vw, 0.6rem)', color: '#444', fontWeight: 'bold' }}>
-                                DATE: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                              </p>
-                            </div>
-                          </div>
-                          {/* Lock overlay if not minted */}
-                          {!isBossMinted && (
-                            <div style={{
-                              position: 'absolute', top: '50%', left: '50%',
-                              transform: 'translate(-50%, -50%)',
-                              zIndex: 3, fontSize: '3.5rem',
-                              textShadow: '0px 0px 10px rgba(0,0,0,0.8)'
-                            }}>
-                              🔒
-                            </div>
-                          )}
-                        </div>
+                        {/* Certificate Preview */}
+                        <CertificatePreview 
+                          userName={displayName}
+                          moduleName={currentChapter.name}
+                          walletAddress={walletShort}
+                          date={new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          isMinted={isBossMinted}
+                        />
                         {/* Status label under card */}
                         <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: isBossMinted ? '#34d399' : '#fbbf24', textAlign: 'center', lineHeight: '1.6' }}>
                           {isBossMinted
