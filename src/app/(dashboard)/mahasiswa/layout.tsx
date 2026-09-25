@@ -82,7 +82,7 @@ export default function MahasiswaLayout({
           <div className={styles.logo}>
             <Image src="/PathTrick.png" alt="PathTrick" width={180} height={40} className={styles.logoImg} priority />
           </div>
-          <span className={styles.roleBadge}>The Scholar</span>
+          <span className={styles.roleBadge}>The Chaser</span>
         </div>
 
         <nav className={styles.nav}>
