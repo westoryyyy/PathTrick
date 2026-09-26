@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
 
@@ -12,6 +12,7 @@ const MOCK_SCHOLARSHIPS = [
     coverage: 'Biaya Kuliah + Uang Saku',
     requirements: ['Leadership SBT', 'Min. Rapor 8.0'],
     url: 'https://djarumbeasiswaplus.org/',
+    coverImage: '/djarum_logo.png',
   },
   {
     id: 'bpi-kemdikbud',
@@ -22,6 +23,7 @@ const MOCK_SCHOLARSHIPS = [
     coverage: 'Full Funding',
     requirements: ['Prestasi Akademik', 'Esai Kontribusi'],
     url: 'https://beasiswa.kemdikbud.go.id/',
+    coverImage: '/Gold Ticket.png',
   },
   {
     id: 'lpdp-s1',
@@ -32,11 +34,34 @@ const MOCK_SCHOLARSHIPS = [
     coverage: 'Full Funding + Akomodasi',
     requirements: ['Medali Olimpiade', 'Bahasa Inggris'],
     url: 'https://lpdp.kemenkeu.go.id/',
+    coverImage: '/Gold Ticket.png',
   }
 ];
 
 export default function ScholarshipHub() {
+  const [scholarships, setScholarships] = useState(MOCK_SCHOLARSHIPS);
   const [selectedScholarship, setSelectedScholarship] = useState<typeof MOCK_SCHOLARSHIPS[number] | null>(null);
+
+  useEffect(() => {
+    const loadScholarships = () => {
+      const stored = localStorage.getItem('demo_scholarships');
+      if (stored) {
+        setScholarships(JSON.parse(stored));
+      }
+    };
+    
+    loadScholarships();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'demo_scholarships') {
+        loadScholarships();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       {/* Header */}
@@ -50,53 +75,58 @@ export default function ScholarshipHub() {
       </div>
 
       {/* Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
-        {MOCK_SCHOLARSHIPS.map(scholarship => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
+        {scholarships.map(scholarship => (
           <div 
             key={scholarship.id} 
             className={styles.retroCard}
             style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px', height: '100%', position: 'relative' }}
           >
+            {/* Right-aligned Ribbon Flag */}
+            <div style={{ position: 'absolute', top: '-16px', right: '-12px', zIndex: 10 }}>
+              <div style={{ 
+                background: '#047857', border: '2px solid #064e3b', color: '#fff', 
+                fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
+                whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
+              }}>
+                {scholarship.matchScore}% MATCH
+              </div>
+              {/* 3D Fold under the right ribbon */}
+              <div style={{ 
+                position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
+                borderTop: '12px solid #022c22', borderRight: '12px solid transparent', zIndex: 1 
+              }} />
+            </div>
+
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '75%' }}>
-                  <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b' }}>
+              {scholarship.coverImage && (
+                <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#2c1810', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
+                  <img src={scholarship.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: scholarship.coverImage ? '0' : '16px', position: 'relative' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                  <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b', margin: 0 }}>
                     {scholarship.title}
                   </h3>
-                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: '1.6' }}>
+                  <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                     {scholarship.provider}
                   </p>
-                </div>
-                
-                {/* Right-aligned Ribbon Flag */}
-                <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
-                  <div style={{ 
-                    background: '#047857', border: '2px solid #064e3b', color: '#fff', 
-                    fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
-                    whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
-                  }}>
-                    {scholarship.matchScore}% MATCH
-                  </div>
-                  {/* 3D Fold under the right ribbon */}
-                  <div style={{ 
-                    position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
-                    borderTop: '12px solid #022c22', borderRight: '12px solid transparent', zIndex: 1 
-                  }} />
                 </div>
               </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>💰</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>{scholarship.coverage}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{scholarship.coverage}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>⏳</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>Deadline: {scholarship.deadline}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Hourglass.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Deadline: {scholarship.deadline}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📋</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>Reqs: {scholarship.requirements.join(', ')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Reqs: {scholarship.requirements.join(', ')}</span>
                 </div>
               </div>
             </div>
@@ -174,7 +204,7 @@ export default function ScholarshipHub() {
                   <h2 style={{ margin: 0, fontFamily: '"Press Start 2P"', fontSize: '1rem', lineHeight: 1.6 }}>
                     {selectedScholarship.title}
                   </h2>
-                  <p style={{ margin: '8px 0 0', fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
+                  <p style={{ margin: '8px 0 0', fontFamily: 'system-ui, sans-serif', fontSize: '1rem', color: '#5a3a29', fontWeight: 'bold' }}>
                     {selectedScholarship.provider}
                   </p>
                 </div>
@@ -187,10 +217,19 @@ export default function ScholarshipHub() {
                   X
                 </button>
               </div>
-              <div style={{ display: 'grid', gap: '14px', marginTop: '22px', fontFamily: '"Press Start 2P"', fontSize: '0.65rem', lineHeight: 1.7 }}>
-                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>💰 COVERAGE: {selectedScholarship.coverage}</div>
-                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>⏳ DEADLINE: {selectedScholarship.deadline}</div>
-                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41' }}>📋 REQUIREMENTS: {selectedScholarship.requirements.join(' • ')}</div>
+              <div style={{ display: 'grid', gap: '14px', marginTop: '22px', fontFamily: 'system-ui, sans-serif', fontSize: '0.95rem', lineHeight: 1.7, color: '#3b261b' }}>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span>COVERAGE: {selectedScholarship.coverage}</span>
+                </div>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src="/Hourglass.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span>DEADLINE: {selectedScholarship.deadline}</span>
+                </div>
+                <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span>REQUIREMENTS: {selectedScholarship.requirements.join(' • ')}</span>
+                </div>
               </div>
               <button
                 type="button"

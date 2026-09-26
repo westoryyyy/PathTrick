@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import Image from 'next/image';
 import styles from './layout.module.css';
@@ -39,8 +39,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { logout, user } = usePrivy();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   const displayName = user?.google?.name || user?.email?.address?.split('@')[0] || 'Admin';
+
+  useEffect(() => {
+    // Play BGM when dashboard mounts
+    const audio = new Audio('/sound dashboard admin.mp3');
+    audio.loop = true;
+    audio.volume = 0.4; // Slightly lower volume so it's not overpowering
+    
+    // Autoplay policy might block this if no user interaction has occurred
+    // We catch the error silently so it doesn't break the app
+    audio.play().catch(() => {
+      // If blocked, wait for user interaction
+      const playOnInteract = () => {
+        audio.play().catch(() => {});
+        window.removeEventListener('click', playOnInteract);
+      };
+      window.addEventListener('click', playOnInteract);
+    });
+
+    bgmRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
+  const toggleMute = () => {
+    if (bgmRef.current) {
+      bgmRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -113,6 +147,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className={styles.headerActions}>
+            {/* Mute/Unmute BGM Toggle */}
+            <button 
+              onClick={toggleMute}
+              onMouseEnter={playHoverSound}
+              style={{
+                background: '#4a2410', border: '2px solid #5a3a29', color: '#fbbf24', 
+                width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', fontSize: '1.2rem'
+              }}
+              title={isMuted ? "Unmute Music" : "Mute Music"}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+
             <div style={{ position: 'relative' }}>
               <div
                 className={styles.profileChip}

@@ -15,6 +15,7 @@ interface TargetJob {
   gicsSector: GICSSectorCode;
   requiredSkills: string[];
   matchPercentage: number;
+  coverImage?: string;
 }
 
 interface ScholarState {
@@ -40,6 +41,7 @@ const MOCK_JOBS: TargetJob[] = [
     gicsSector: 'IT',
     requiredSkills: ['React', 'TypeScript', 'Framer Motion', 'Tailwind CSS'],
     matchPercentage: 90,
+    coverImage: '/Blade.png',
   },
   {
     id: 'job-2',
@@ -48,6 +50,7 @@ const MOCK_JOBS: TargetJob[] = [
     gicsSector: 'DISC',
     requiredSkills: ['Figma', 'User Research', 'Prototyping'],
     matchPercentage: 65,
+    coverImage: '/Blade.png',
   },
   {
     id: 'job-3',
@@ -56,6 +59,7 @@ const MOCK_JOBS: TargetJob[] = [
     gicsSector: 'IT',
     requiredSkills: ['React', 'Git'],
     matchPercentage: 100,
+    coverImage: '/Blade.png',
   },
   {
     id: 'job-4',
@@ -64,6 +68,7 @@ const MOCK_JOBS: TargetJob[] = [
     gicsSector: 'FIN',
     requiredSkills: ['SQL', 'Excel', 'Data Analysis', 'Python'],
     matchPercentage: 55,
+    coverImage: '/Blade.png',
   },
 ];
 
