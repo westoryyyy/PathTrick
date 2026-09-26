@@ -147,6 +147,13 @@ function DevPanelInner() {
               🌟 Play as THE DREAMER (SMA)
             </button>
 
+            <button
+              onClick={() => window.location.href = '/admin/dashboard'}
+              style={btnStyle('#0d1a12', '#34d399')}
+            >
+              ⚙ Open ADMIN DASHBOARD
+            </button>
+
             <div style={{ color: '#888', marginTop: '4px', marginBottom: '2px' }}>── QUICK MAP LINKS ──</div>
 
             <button
