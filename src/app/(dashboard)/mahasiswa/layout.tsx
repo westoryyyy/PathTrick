@@ -44,7 +44,7 @@ export default function MahasiswaLayout({
   const displayEmail = user?.google?.email 
     || user?.email?.address 
     || savedEmail
-    || (activeWallet ? activeWallet.address : '');
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : '');
 
   React.useEffect(() => {
     setRole('MAHASISWA');

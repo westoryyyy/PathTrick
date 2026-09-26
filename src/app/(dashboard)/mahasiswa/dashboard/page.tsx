@@ -7,6 +7,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import styles from '@/components/ui/Dashboard.module.css';
 import { AnimatePresence } from 'framer-motion';
+import CVUpdaterWidget from './CVUpdaterWidget';
 
 export default function MahasiswaDashboard() {
   const { targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
@@ -108,13 +109,14 @@ export default function MahasiswaDashboard() {
           </div>
         </div>
 
-        <div className={styles.topRow}>
+        {/* ── AI Job Match + CV Updater (same row, equal height) ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px', alignItems: 'stretch' }}>
           {/* ── AI Job Match Widget ── */}
-          <div className={styles.retroCard}>
+          <div className={styles.retroCard} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>AI JOB MATCH</span>
             </div>
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', justifyContent: 'space-between' }}>
+            <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'space-between' }}>
               <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                 5 suitable jobs found this week!
               </p>
@@ -149,7 +151,8 @@ export default function MahasiswaDashboard() {
             </div>
           </div>
 
-
+          {/* ── CV Updater Widget ── */}
+          <CVUpdaterWidget />
         </div>
 
       </div>

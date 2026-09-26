@@ -6,16 +6,28 @@
   --font-pixelify: var(--font-pixelify);
   --font-vt323: var(--font-vt323);
 
-  --animate-shellIn: shellIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
+  --animate-shellIn: shellIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   --animate-contentFade: contentFade 0.35s ease forwards;
 
   @keyframes shellIn {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   @keyframes contentFade {
-    from { opacity: 0; transform: translateX(12px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 }
 
@@ -24,12 +36,12 @@
   --foreground: #e2e8f0;
 
   /* Theme-aware tokens used across components */
-  --hud-bg-dark:   rgba(8, 4, 22, 0.97);
-  --hud-bg-mid:    rgba(20, 8, 45, 0.95);
-  --hud-border:    rgba(168, 85, 247, 0.6);
-  --hud-glow:      rgba(168, 85, 247, 0.25);
-  --panel-bg:      #1e1e2f;
-  --panel-border:  #e2e8f0;
+  --hud-bg-dark: rgba(8, 4, 22, 0.97);
+  --hud-bg-mid: rgba(20, 8, 45, 0.95);
+  --hud-border: rgba(168, 85, 247, 0.6);
+  --hud-glow: rgba(168, 85, 247, 0.25);
+  --panel-bg: #1e1e2f;
+  --panel-border: #e2e8f0;
 }
 
 /* ── Light theme overrides ── */
@@ -37,18 +49,20 @@
   --background: #f5ede0;
   --foreground: #1a0f08;
 
-  --hud-bg-dark:   rgba(245, 237, 224, 0.97);
-  --hud-bg-mid:    rgba(230, 215, 190, 0.95);
-  --hud-border:    rgba(168, 85, 247, 0.7);
-  --hud-glow:      rgba(168, 85, 247, 0.2);
-  --panel-bg:      #f0e6d4;
-  --panel-border:  #7c3aed;
+  --hud-bg-dark: rgba(245, 237, 224, 0.97);
+  --hud-bg-mid: rgba(230, 215, 190, 0.95);
+  --hud-border: rgba(168, 85, 247, 0.7);
+  --hud-glow: rgba(168, 85, 247, 0.2);
+  --panel-bg: #f0e6d4;
+  --panel-border: #7c3aed;
 }
 
 html {
   height: 100%;
   /* Smooth theme transitions */
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
   /* Prevent layout shift when scrollbar appears/disappears */
   scrollbar-gutter: stable;
   overflow-y: scroll;
@@ -74,8 +88,10 @@ body {
 
 * {
   box-sizing: border-box;
-  /* Use custom pixel art cursor with hardware acceleration (0 lag) */
-  cursor: url('/Pointer_small.png') 0 0, auto !important;
+  /* Slightly enlarged hand cursor for a more comfortable pointer size */
+  cursor:
+    url("/cursor-hand.png") 10 4,
+    auto !important;
 }
 
 a {

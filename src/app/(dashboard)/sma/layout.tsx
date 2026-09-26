@@ -45,7 +45,7 @@ export default function SMALayout({
   const displayEmail = user?.google?.email 
     || user?.email?.address 
     || savedEmail
-    || (activeWallet ? activeWallet.address : '');
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : '');
 
   const handleLogout = async () => {
     await logout();
