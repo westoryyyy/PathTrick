@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './page.module.css';
@@ -38,7 +38,7 @@ export default function MissionFlowPage() {
   const displayName = savedName
     || user?.google?.name
     || user?.email?.address?.split('@')[0]
-    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Scholar');
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Chaser');
   const walletShort = activeWallet
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
@@ -126,17 +126,17 @@ export default function MissionFlowPage() {
   };
 
   // 3D Page flip animation variants for Right Page
-  const rightVariants = {
+  const rightVariants: Variants = {
     initial: { opacity: 0, rotateY: 90, scale: 0.98, originX: 0 },
-    animate: { opacity: 1, rotateY: 0, scale: 1, originX: 0, transition: { duration: 0.6, ease: "easeOut" } },
-    exit: { opacity: 0, rotateY: -90, scale: 0.98, originX: 0, zIndex: 10, transition: { duration: 0.5, ease: "easeIn" } },
+    animate: { opacity: 1, rotateY: 0, scale: 1, originX: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+    exit: { opacity: 0, rotateY: -90, scale: 0.98, originX: 0, zIndex: 10, transition: { duration: 0.5, ease: 'easeIn' } },
   };
 
   // Simple fade for Left Page to prevent awkward double-flips
-  const leftVariants = {
+  const leftVariants: Variants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
-    exit: { opacity: 0, transition: { duration: 0.5, ease: "easeIn" } },
+    animate: { opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+    exit: { opacity: 0, transition: { duration: 0.5, ease: 'easeIn' } },
   };
 
   const playSwipeSound = () => {

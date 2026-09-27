@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
@@ -28,7 +28,7 @@ export default function MissionFlowPage() {
   const displayName = savedName
     || user?.google?.name
     || user?.email?.address?.split('@')[0]
-    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Scholar');
+    || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Chaser');
   const walletShort = activeWallet
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
@@ -109,8 +109,8 @@ export default function MissionFlowPage() {
     try {
       const audio = new Audio('/mission completed.ogg');
       audio.volume = 0.5;
-      audio.play().catch(() => {});
-    } catch (e) {}
+      audio.play().catch(() => { });
+    } catch (e) { }
     completeDynamicNode(missionId as string);
     setPhase('CLAIM');
   };
@@ -125,17 +125,17 @@ export default function MissionFlowPage() {
   };
 
   // 3D Page flip animation variants for Right Page
-  const rightVariants = {
+  const rightVariants: Variants = {
     initial: { opacity: 0, rotateY: 90, scale: 0.98, originX: 0 },
-    animate: { opacity: 1, rotateY: 0, scale: 1, originX: 0, transition: { duration: 0.6, ease: "easeOut" } },
-    exit: { opacity: 0, rotateY: -90, scale: 0.98, originX: 0, zIndex: 10, transition: { duration: 0.5, ease: "easeIn" } },
+    animate: { opacity: 1, rotateY: 0, scale: 1, originX: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+    exit: { opacity: 0, rotateY: -90, scale: 0.98, originX: 0, zIndex: 10, transition: { duration: 0.5, ease: 'easeIn' } },
   };
 
   // Simple fade for Left Page to prevent awkward double-flips
-  const leftVariants = {
+  const leftVariants: Variants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
-    exit: { opacity: 0, transition: { duration: 0.5, ease: "easeIn" } },
+    animate: { opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+    exit: { opacity: 0, transition: { duration: 0.5, ease: 'easeIn' } },
   };
 
   const playSwipeSound = () => {
@@ -148,8 +148,8 @@ export default function MissionFlowPage() {
     try {
       const audio = new Audio('/HoverTombol.ogg');
       audio.volume = 0.3;
-      audio.play().catch(() => {});
-    } catch(e) {}
+      audio.play().catch(() => { });
+    } catch (e) { }
   };
 
   // Get dynamic content or generate a fallback template
@@ -397,7 +397,7 @@ export default function MissionFlowPage() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: materialPage === 0 ? '20px' : '0', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
               {materials[materialPage * 2]}
             </div>
-            
+
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto' }}>
               {materialPage > 0 && (
                 <button className={styles.secondaryBtn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
@@ -538,8 +538,8 @@ export default function MissionFlowPage() {
                           try {
                             const audio = new Audio('/Poin.ogg');
                             audio.volume = 0.5;
-                            audio.play().catch(() => {});
-                          } catch (e) {}
+                            audio.play().catch(() => { });
+                          } catch (e) { }
                           showDialog('success', opt.feedback, () => {
                             if (quizIndex < quizArray.length - 1) {
                               setQuizIndex(quizIndex + 1);
@@ -553,8 +553,8 @@ export default function MissionFlowPage() {
                           try {
                             const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
                             audio.volume = 0.5;
-                            audio.play().catch(() => {});
-                          } catch (e) {}
+                            audio.play().catch(() => { });
+                          } catch (e) { }
                           setPlayerHp(newHp);
                           if (newHp > 0) {
                             showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
@@ -654,7 +654,7 @@ export default function MissionFlowPage() {
                         position: 'relative'
                       }}>
                         {/* Certificate Preview */}
-                        <CertificatePreview 
+                        <CertificatePreview
                           userName={displayName}
                           moduleName={currentChapter.name}
                           walletAddress={walletShort}
