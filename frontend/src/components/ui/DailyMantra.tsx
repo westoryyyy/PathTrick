@@ -87,6 +87,7 @@ const CSS = `
 
 export default function DailyMantra() {
   const [isOpen, setIsOpen] = useState(false);
+  const [readQuote, setReadQuote] = useState<string | null>(null);
 
   const mantra = useMemo(() => {
     const now = new Date();
@@ -95,6 +96,15 @@ export default function DailyMantra() {
     const hourOfYear = Math.floor((now.getTime() - start.getTime()) / 3600000);
     return MANTRAS[hourOfYear % MANTRAS.length];
   }, []);
+
+  const hasUnread = readQuote !== mantra.quote;
+
+  const handleToggle = () => {
+    if (!isOpen) {
+      setReadQuote(mantra.quote);
+    }
+    setIsOpen((o) => !o);
+  };
 
   return (
     <>
@@ -247,8 +257,8 @@ export default function DailyMantra() {
 
         {/* ── FLOATING WIZARD BUTTON ── */}
         <div
-          className={`dm-wizard-btn ${!isOpen ? 'dm-bounce' : ''}`}
-          onClick={() => setIsOpen(o => !o)}
+          className={`dm-wizard-btn ${(!isOpen && hasUnread) ? 'dm-bounce' : ''}`}
+          onClick={handleToggle}
           style={{
             width: '72px',
             height: '72px',
@@ -271,7 +281,7 @@ export default function DailyMantra() {
           🧙‍♂️
 
           {/* Pulsing "!" badge */}
-          {!isOpen && (
+          {!isOpen && hasUnread && (
             <div
               className="dm-badge"
               style={{
