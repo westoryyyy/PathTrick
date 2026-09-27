@@ -21,7 +21,6 @@ const NAV_ITEMS = [
     section: 'KONTEN',
     items: [
       { href: '/admin/courses', label: 'Courses', img: '/Journall.png' },
-      { href: '/admin/quizzes', label: 'Quizzes', img: '/Scroll.png' },
     ],
   },
   {

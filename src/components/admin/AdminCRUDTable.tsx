@@ -28,9 +28,9 @@ interface AdminCRUDTableProps<T extends { id: string }> {
   data: T[];
   columns: Column<T>[];
   fields: Field[];
-  onAdd: (data: Partial<T>) => void;
-  onEdit: (id: string, data: Partial<T>) => void;
-  onDelete: (id: string) => void;
+  onAdd: (data: Partial<T>) => void | Promise<void>;
+  onEdit: (id: string, data: Partial<T>) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
   searchKeys?: (keyof T)[];
   addButtonLabel?: string;
 }
@@ -75,13 +75,16 @@ import ImageCropper from './ImageCropper';
 
 function ImageInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      setIsLoading(true);
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         setImageSrc(reader.result?.toString() || null);
+        setIsLoading(false);
       });
       reader.readAsDataURL(file);
     }
@@ -89,7 +92,11 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {value ? (
+      {isLoading ? (
+        <div style={{ fontFamily: '"Pixelify Sans"', fontSize: '0.9rem', background: '#4a2410', border: '2px dashed #5a3a29', color: '#fbbf24', padding: '16px', textAlign: 'center' }}>
+          ⏳ Membaca Gambar...
+        </div>
+      ) : value ? (
         <div style={{ position: 'relative', width: '160px', height: '90px', border: '2px solid #5a3a29' }}>
           <Image src={value} alt="Preview" fill style={{ objectFit: 'cover' }} />
           <button
@@ -130,6 +137,7 @@ export default function AdminCRUDTable<T extends { id: string }>({
   const [selected, setSelected] = useState<T | null>(null);
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filtered = data.filter(row =>
     searchKeys.length === 0 || searchKeys.some(key =>
@@ -142,13 +150,30 @@ export default function AdminCRUDTable<T extends { id: string }>({
   const openDelete = (row: T) => { setSelected(row); setDeleteConfirm(''); setModal('delete'); };
   const closeModal = () => { setModal(null); setSelected(null); };
 
-  const handleSubmit = () => {
-    if (modal === 'add') onAdd(formData as Partial<T>);
-    else if (modal === 'edit' && selected) onEdit(selected.id, formData as Partial<T>);
-    closeModal();
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      if (modal === 'add') await onAdd(formData as Partial<T>);
+      else if (modal === 'edit' && selected) await onEdit(selected.id, formData as Partial<T>);
+    } finally {
+      setIsSubmitting(false);
+      closeModal();
+    }
   };
 
-  const handleDelete = () => { if (selected) onDelete(selected.id); closeModal(); };
+  const handleDelete = async () => { 
+    if (selected) {
+      setIsSubmitting(true);
+      try {
+        await onDelete(selected.id);
+      } finally {
+        setIsSubmitting(false);
+        closeModal();
+      }
+    } else {
+      closeModal();
+    }
+  };
 
   const setField = (key: string, value: unknown) => setFormData(p => ({ ...p, [key]: value }));
 
@@ -281,9 +306,9 @@ export default function AdminCRUDTable<T extends { id: string }>({
             </div>
             {/* Modal Footer */}
             <div style={{ padding: '16px 20px', borderTop: '3px dashed #5a3a29', display: 'flex', gap: '12px', justifyContent: 'flex-end', flexShrink: 0 }}>
-              <button onClick={closeModal} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: 'pointer' }}>Batal</button>
-              <button onClick={handleSubmit} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#78350f', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: 'pointer', boxShadow: '3px 3px 0 rgba(0,0,0,0.5)' }}>
-                {modal === 'add' ? 'SIMPAN' : 'PERBARUI'}
+              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
+              <button onClick={handleSubmit} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#78350f', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
+                {isSubmitting ? '⏳ MENYIMPAN...' : (modal === 'add' ? 'SIMPAN' : 'PERBARUI')}
               </button>
             </div>
           </div>
@@ -302,8 +327,10 @@ export default function AdminCRUDTable<T extends { id: string }>({
               Data yang dihapus tidak bisa dikembalikan. Yakin ingin melanjutkan?
             </div>
             <div style={{ padding: '16px 20px', borderTop: '3px dashed #5a3a29', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button onClick={closeModal} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: 'pointer' }}>Batal</button>
-              <button onClick={handleDelete} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b261b', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: 'pointer', boxShadow: '3px 3px 0 rgba(0,0,0,0.5)' }}>YA, HAPUS</button>
+              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
+              <button onClick={handleDelete} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b261b', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
+                {isSubmitting ? '⏳ MENGHAPUS...' : 'YA, HAPUS'}
+              </button>
             </div>
           </div>
         </div>
