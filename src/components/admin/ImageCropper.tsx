@@ -15,11 +15,14 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel, aspec
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const onCropCompleteInternal = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
   const getCroppedImg = async () => {
+    setIsProcessing(true);
     try {
       const canvas = document.createElement('canvas');
       const image = new Image();
@@ -47,6 +50,8 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel, aspec
       onCropComplete(base64Image);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -76,15 +81,17 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel, aspec
         />
         <button
           onClick={onCancel}
-          style={{ fontFamily: '"Pixelify Sans"', fontSize: '1rem', background: 'transparent', border: '2px solid #ef4444', color: '#ef4444', padding: '8px 16px', cursor: 'pointer' }}
+          disabled={isProcessing}
+          style={{ fontFamily: '"Pixelify Sans"', fontSize: '1rem', background: 'transparent', border: '2px solid #ef4444', color: '#ef4444', padding: '8px 16px', cursor: isProcessing ? 'not-allowed' : 'pointer', opacity: isProcessing ? 0.5 : 1 }}
         >
           Batal
         </button>
         <button
           onClick={getCroppedImg}
-          style={{ fontFamily: '"Pixelify Sans"', fontSize: '1rem', background: '#34d399', border: '2px solid #10b981', color: '#000', padding: '8px 16px', cursor: 'pointer', fontWeight: 'bold' }}
+          disabled={isProcessing}
+          style={{ fontFamily: '"Pixelify Sans"', fontSize: '1rem', background: '#34d399', border: '2px solid #10b981', color: '#000', padding: '8px 16px', cursor: isProcessing ? 'not-allowed' : 'pointer', fontWeight: 'bold', opacity: isProcessing ? 0.7 : 1 }}
         >
-          Simpan Crop
+          {isProcessing ? '⏳ Memproses...' : 'Simpan Crop'}
         </button>
       </div>
     </div>
