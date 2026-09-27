@@ -51,7 +51,7 @@ export default function GlobalAudio() {
 
     // Check if we are in a screen where Dashboard Music should NOT play
     const isSmaMission = pathname.match(/\/learning-progress\/.+/);
-    const shouldMute = pathname === '/' || pathname === '/map' || pathname.includes('/mission/') || isSmaMission;
+    const shouldMute = pathname === '/' || pathname === '/map' || pathname.includes('/mission/') || isSmaMission || pathname.startsWith('/admin');
 
     if (shouldMute) {
       // Going to Map or Mission: Fade out then pause
@@ -61,7 +61,14 @@ export default function GlobalAudio() {
         if (audio.paused) {
           // Coming back from Map or first play: Start at 0 and fade up
           audio.volume = 0;
-          audio.play().catch(() => setPlaying(false));
+          audio.play().catch(() => {
+            // Autoplay blocked: wait for user interaction instead of turning off
+            const playOnInteract = () => {
+              audio.play().catch(() => {});
+              window.removeEventListener('click', playOnInteract);
+            };
+            window.addEventListener('click', playOnInteract);
+          });
           fadeAudio(audio, 0.3); // 0.3 is the max volume for BGM
         } else {
           // Keep volume steady if already playing

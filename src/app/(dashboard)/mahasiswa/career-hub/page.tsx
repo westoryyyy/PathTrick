@@ -15,6 +15,7 @@ interface JobWithGaps {
   requiredSkills: string[];
   missing: string[];
   possessed: string[];
+  coverImage?: string;
 }
 
 export default function CareerHubPage() {
@@ -82,7 +83,7 @@ export default function CareerHubPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', paddingBottom: '64px' }}>
-      
+
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
@@ -104,7 +105,8 @@ export default function CareerHubPage() {
             color: activeFilter === null ? '#3b261b' : '#e2c99a',
             border: `2px solid ${activeFilter === null ? '#b45309' : '#8a6040'}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            height: '36px'
+            height: '36px',
+            boxSizing: 'border-box'
           }}
         >
           ALL
@@ -120,87 +122,106 @@ export default function CareerHubPage() {
               color: activeFilter === sector.code ? sector.accentColor : '#e2c99a',
               border: `2px solid ${activeFilter === sector.code ? sector.accentColor : '#8a6040'}`,
               display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center',
-              height: '36px'
+              height: '36px',
+              boxSizing: 'border-box'
             }}
           >
-            <span style={{ fontSize: '0.8rem' }}>{sector.icon}</span> 
+            <span style={{ fontSize: '0.8rem' }}>{sector.icon}</span>
             <span>{sector.nameID}</span>
           </button>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '32px', minHeight: '600px', alignContent: 'start' }}>
         {analyzedJobs
           .filter(job => activeFilter === null || job.gicsSector === activeFilter)
           .map((job) => {
-          const isPerfectMatch = job.missing.length === 0;
-          const sector = getGICSSector(job.gicsSector);
+            const isPerfectMatch = job.missing.length === 0;
+            const sector = getGICSSector(job.gicsSector);
 
-          return (
-            <div key={job.id} className={styles.retroCard} style={{ 
-              display: 'flex', flexDirection: 'column',
-              borderColor: isPerfectMatch ? '#fbbf24' : undefined,
-              boxShadow: isPerfectMatch ? '0 0 20px rgba(251,191,36,0.2)' : undefined,
-              height: '100%',
-              position: 'relative'
-            }}>
-              <div className={styles.cardHeader} style={{ background: isPerfectMatch ? '#b45309' : undefined }}>
-                <span className={styles.cardTitle}>{job.company}</span>
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flexGrow: 1, marginTop: '16px' }}>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', textShadow: '2px 2px 0 #5a3a29', lineHeight: '1.6', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job.title}</h2>
-                  
-                  {/* Right-aligned Ribbon Flag */}
-                  <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
-                    <div style={{ 
-                      background: isPerfectMatch ? '#fbbf24' : '#047857', 
-                      border: `2px solid ${isPerfectMatch ? '#b45309' : '#064e3b'}`, 
-                      color: isPerfectMatch ? '#3b261b' : '#fff', 
-                      fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
-                      whiteSpace: 'nowrap', position: 'relative', zIndex: 2
-                    }}>
-                      {job.matchPercentage}% MATCH
+            return (
+              <div key={job.id} className={styles.retroCard} style={{
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px',
+                borderColor: isPerfectMatch ? '#fbbf24' : undefined,
+                boxShadow: isPerfectMatch ? '0 0 20px rgba(251,191,36,0.2)' : undefined,
+                height: '100%',
+                position: 'relative'
+              }}>
+                {/* Right-aligned Ribbon Flag */}
+                <div style={{ position: 'absolute', top: '-16px', right: '-12px', zIndex: 10 }}>
+                  <div style={{
+                    background: isPerfectMatch ? '#fbbf24' : '#047857',
+                    border: `2px solid ${isPerfectMatch ? '#b45309' : '#064e3b'}`,
+                    color: isPerfectMatch ? '#3b261b' : '#fff',
+                    fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
+                    whiteSpace: 'nowrap', position: 'relative', zIndex: 2
+                  }}>
+                    {job.matchPercentage}% MATCH
+                  </div>
+                  {/* 3D Fold under the right ribbon */}
+                  <div style={{
+                    position: 'absolute', top: '100%', right: '0', width: 0, height: 0,
+                    borderTop: `12px solid ${isPerfectMatch ? '#78350f' : '#022c22'}`,
+                    borderRight: '12px solid transparent', zIndex: 1
+                  }} />
+                </div>
+
+                <div>
+                  {job.coverImage && (
+                    <div style={{ width: '100%', aspectRatio: '16/9', border: `3px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}`, background: '#2c1810', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
+                      <img src={job.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
                     </div>
-                    {/* 3D Fold under the right ribbon */}
-                    <div style={{ 
-                      position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
-                      borderTop: `12px solid ${isPerfectMatch ? '#78350f' : '#022c22'}`, 
-                      borderRight: '12px solid transparent', zIndex: 1 
-                    }} />
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: job.coverImage ? '0' : '16px', position: 'relative' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                      <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b', margin: 0 }}>
+                        {job.title}
+                      </h3>
+                      <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
+                        {job.company}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: `2px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}` }}>
+                    <h4 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '1.1rem', color: isPerfectMatch ? '#fbbf24' : '#fff', margin: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {isPerfectMatch && <img src="/Gold Ticket.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated' }} />}
+                      {isPerfectMatch ? 'All Requirements Met!' : 'Requirement Analysis:'}
+                    </h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 12px' }}>
+                      {job.possessed.map((skill: string) => (
+                        <div key={skill} style={{ 
+                          display: 'flex', alignItems: 'center', gap: '6px', 
+                          background: '#064e3b', padding: '6px 10px',
+                          clipPath: 'polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px)'
+                        }}>
+                          <img src="/Shield.png" alt="" style={{ width: '14px', height: '14px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                          <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.8rem', color: '#a7f3d0', lineHeight: '1', textShadow: '1px 1px 0 rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>{skill}</span>
+                        </div>
+                      ))}
+                      {job.missing.map((skill: string) => (
+                        <div key={skill} style={{ 
+                          display: 'flex', alignItems: 'center', gap: '6px', 
+                          background: '#7f1d1d', padding: '6px 10px',
+                          clipPath: 'polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px)'
+                        }}>
+                          <img src="/Sword.png" alt="" style={{ width: '14px', height: '14px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                          <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.8rem', color: '#fecaca', lineHeight: '1', textShadow: '1px 1px 0 rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>{skill}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: `2px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}`, flexGrow: 1 }}>
-                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: isPerfectMatch ? '#fbbf24' : '#fff' }}>
-                    {isPerfectMatch ? 'All Requirements Met! 🌟' : 'Requirement Analysis:'}
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {job.possessed.map((skill: string) => (
-                      <div key={skill} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontSize: '1rem' }}>✅</span>
-                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#6ee7b7', lineHeight: '1.4', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{skill}</span>
-                      </div>
-                    ))}
-                    {job.missing.map((skill: string) => (
-                      <div key={skill} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontSize: '1rem' }}>❌</span>
-                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fca5a5', lineHeight: '1.4', textShadow: '1px 1px 0 rgba(0,0,0,0.5)' }}>{skill}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ marginTop: 'auto' }}>
+                <div style={{ marginTop: '24px' }}>
                   {!isPerfectMatch ? (
                     <Link href={`/mahasiswa/learning-mission?jobId=${job.id}`} style={{
                       display: 'block',
                       width: '100%',
                       padding: '16px',
                       fontFamily: '"Press Start 2P"',
-                      fontSize: '0.8rem',
+                      fontSize: '0.65rem',
                       color: '#fff',
                       background: '#b91c1c',
                       border: '2px solid #7f1d1d',
@@ -217,7 +238,7 @@ export default function CareerHubPage() {
                       width: '100%',
                       padding: '16px',
                       fontFamily: '"Press Start 2P"',
-                      fontSize: '0.8rem',
+                      fontSize: '0.65rem',
                       color: '#3b261b',
                       background: '#fbbf24',
                       border: '2px solid #b45309',
@@ -230,11 +251,9 @@ export default function CareerHubPage() {
                     </Link>
                   )}
                 </div>
-
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Developer tool to test empty state */}

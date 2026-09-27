@@ -12,6 +12,7 @@ const MOCK_UNIVERSITIES = [
     location: 'Depok, Jawa Barat',
     acceptanceRate: '3.5%',
     requirements: ['SNBT/SIMAK', 'Portofolio IT'],
+    coverImage: '/Compass.png',
   },
   {
     id: 'itb-stei',
@@ -21,6 +22,7 @@ const MOCK_UNIVERSITIES = [
     location: 'Bandung, Jawa Barat',
     acceptanceRate: '2.8%',
     requirements: ['SNBT', 'Nilai Matematika > 85'],
+    coverImage: '/Compass.png',
   },
   {
     id: 'ugm-cs',
@@ -30,6 +32,7 @@ const MOCK_UNIVERSITIES = [
     location: 'Yogyakarta',
     acceptanceRate: '4.1%',
     requirements: ['SNBT/UM UGM'],
+    coverImage: '/Compass.png',
   }
 ];
 
@@ -59,53 +62,58 @@ export default function UniversityHub() {
       </div>
 
       {/* Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
         {MOCK_UNIVERSITIES.map(uni => (
           <div 
             key={uni.id} 
             className={styles.retroCard}
             style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px', height: '100%', position: 'relative' }}
           >
+            {/* Right-aligned Ribbon Flag */}
+            <div style={{ position: 'absolute', top: '-16px', right: '-12px', zIndex: 10 }}>
+              <div style={{ 
+                background: '#047857', border: '2px solid #064e3b', color: '#fff', 
+                fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
+                whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
+              }}>
+                {uni.matchScore}% MATCH
+              </div>
+              {/* 3D Fold under the right ribbon */}
+              <div style={{ 
+                position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
+                borderTop: '12px solid #022c22', borderRight: '12px solid transparent', zIndex: 1 
+              }} />
+            </div>
+
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '75%' }}>
-                  <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b' }}>
+              {uni.coverImage && (
+                <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#2c1810', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
+                  <img src={uni.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: uni.coverImage ? '0' : '16px', position: 'relative' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                  <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b', margin: 0 }}>
                     {uni.major}
                   </h3>
-                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: '1.6' }}>
+                  <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                     {uni.title}
                   </p>
-                </div>
-                
-                {/* Right-aligned Ribbon Flag */}
-                <div style={{ position: 'absolute', top: '16px', right: '-12px', zIndex: 10 }}>
-                  <div style={{ 
-                    background: '#047857', border: '2px solid #064e3b', color: '#fff', 
-                    fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
-                    whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
-                  }}>
-                    {uni.matchScore}% MATCH
-                  </div>
-                  {/* 3D Fold under the right ribbon */}
-                  <div style={{ 
-                    position: 'absolute', top: '100%', right: '0', width: 0, height: 0, 
-                    borderTop: '12px solid #022c22', borderRight: '12px solid transparent', zIndex: 1 
-                  }} />
                 </div>
               </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📍</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Map.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <PixelIcon icon="📊" size={20} />
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>Rate: {uni.acceptanceRate}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Journall.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Rate: {uni.acceptanceRate}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📝</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>Reqs: {uni.requirements.join(', ')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Reqs: {uni.requirements.join(', ')}</span>
                 </div>
               </div>
             </div>
@@ -166,7 +174,7 @@ export default function UniversityHub() {
                     <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b', marginBottom: '8px', lineHeight: '1.4' }}>
                       ROADMAP: {selectedUni.major}
                     </h2>
-                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#5a3a29' }}>
+                    <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '1rem', color: '#5a3a29', fontWeight: 'bold' }}>
                       {selectedUni.title}
                     </p>
                   </div>
@@ -180,7 +188,7 @@ export default function UniversityHub() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', lineHeight: '1.6' }}>
+                  <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.95rem', color: '#3b261b', lineHeight: '1.6' }}>
                     Selesaikan urutan modul berikut untuk menguasai kompetensi yang diuji di seleksi masuk {selectedUni.title}.
                   </p>
 
@@ -206,7 +214,7 @@ export default function UniversityHub() {
                           <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', marginBottom: '8px' }}>
                             {item.title}
                           </h4>
-                          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29', lineHeight: '1.4' }}>
+                          <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.85rem', color: '#5a3a29', lineHeight: '1.4', margin: 0, marginTop: '4px' }}>
                             {item.desc}
                           </p>
                         </div>
