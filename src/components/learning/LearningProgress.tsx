@@ -48,7 +48,7 @@ export default function LearningProgress() {
     stages.forEach(stage => {
       if (stage.chapters) {
         stage.chapters.forEach(ch => {
-          const levels = parseInt(ch.duration) || 6;
+          const levels = parseInt(ch.duration ?? '6') || 6;
           totalLevels += levels;
           for (let i = 1; i <= levels; i++) {
             if (completedDynamicNodes.includes(`${ch.id}-level-${i}`)) {
