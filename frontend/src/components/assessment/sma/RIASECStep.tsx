@@ -52,14 +52,6 @@ export default function RIASECStep() {
               minHeight: '180px',
             }}
           >
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <PixelIcon icon={dim.icon} size={28} className="drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
-              <h3 className="font-pixel" style={{ fontSize: '0.9rem', color: 'white', margin: 0, textShadow: '2px 2px 0 #3b261b', lineHeight: 1.4 }}>
-                {dim.label}
-              </h3>
-            </div>
-
             {/* Description */}
             <p className="font-pixel" style={{
               fontSize: '0.6rem',
@@ -116,13 +108,13 @@ export default function RIASECStep() {
                 fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                 textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
-              }}>Rendah</span>
+              }}>Sangat Tidak Suka</span>
               <span className="font-pixel" style={{
                 position: 'absolute', bottom: '5px', right: '8px',
                 fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                 textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
-              }}>Tinggi</span>
+              }}>Sangat Suka</span>
             </div>
 
             {/* Score badge */}
