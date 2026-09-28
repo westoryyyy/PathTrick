@@ -301,7 +301,7 @@ export default function DocsPage() {
                   Dalam dunia PathTrick, kami menggabungkan dua pusaka teknologi yang saling bekerja sama dengan mulus layaknya sebuah kedai petualang:
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                  
+
                   <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#3e2723', border: '3px solid #5d4037', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
                       <Image src="/PrivyLogo.jpeg" alt="Privy" width={48} height={48} style={{ objectFit: 'cover' }} />

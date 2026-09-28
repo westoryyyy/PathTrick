@@ -252,7 +252,7 @@ export default function LearningProgress() {
 
                              {house.skillsOverview && (
                                <div className="flex flex-col gap-3">
-                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="⚔️" size={16} /> SKILL YANG DIASAH</h4>
+                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29', display: 'flex', alignItems: 'center', gap: '8px' }}><PixelIcon icon="⚔️" size={16} /> SKILL YANG DIASAH</h4>
                                  <div className="flex flex-col gap-1">
                                    {house.skillsOverview.map(skill => (
                                      <div key={skill} className="flex items-start gap-2">
@@ -265,7 +265,7 @@ export default function LearningProgress() {
                              )}
                              {house.idealFor && (
                                <div className="flex flex-col gap-3">
-                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="💡" size={16} /> COCOK UNTUK</h4>
+                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29', display: 'flex', alignItems: 'center', gap: '8px' }}><PixelIcon icon="💡" size={16} /> COCOK UNTUK</h4>
                                  <div className="flex flex-col gap-1">
                                    {house.idealFor.map(ideal => (
                                      <div key={ideal} className="flex items-start gap-2">
