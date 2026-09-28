@@ -12,6 +12,7 @@ import ScholarshipHub from '@/components/ui/ScholarshipHub';
 import RelicsAndTreasures from '@/components/ui/RelicsAndTreasures';
 import PixelIcon from '@/components/ui/PixelIcon';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 import styles from './Dashboard.module.css';
 
 // ─── API CONTRACT: TYPESCRIPT INTERFACES ───
@@ -105,6 +106,7 @@ const LEADERBOARD_MOCK = [
 ];
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
@@ -118,7 +120,7 @@ export default function Dashboard() {
   const [unreadNotifs, setUnreadNotifs] = useState([{ id: 1, msg: 'Anda berhasil naik ke Level 12!' }]);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
-  const { displayName: savedName, avatarUrl } = useUserStore();
+  const { displayName: savedName, avatarUrl, totalXP, level } = useUserStore();
 
   // Real user display name - same priority as layouts
   const activeWallet = wallets[0];
@@ -172,10 +174,10 @@ export default function Dashboard() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '8px' }}>
         <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
-          WELCOME BACK, {displayName}!
+          {t('sma.dashboard.welcomeBack').replace('{name}', displayName)}
         </h1>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', whiteSpace: 'nowrap' }}>
-          AI Education Roadmap kamu sedang aktif memindai peluang kampus dan beasiswa terbaik.
+          {t('sma.dashboard.subtitle')}
         </p>
       </div>
 
@@ -189,12 +191,12 @@ export default function Dashboard() {
             <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
               {displayName}
             </h2>
-            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>{mockAiResponse.user.level}</span>
+            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>Lvl {level}</span>
           </div>
           <div className={styles.readinessContainer}>
             <div className={styles.readinessLabel}>
-              <span>XP PROGRESS</span>
-              <span>{mockAiResponse.user.totalXP} / 2000 XP</span>
+              <span>{t('sma.dashboard.xpProgress')}</span>
+              <span>{totalXP} / {level * 2000} XP</span>
             </div>
             <div className={styles.readinessBarBg} style={{ height: '32px' }}>
               <div className={styles.readinessBarFillBlue} style={{ width: `${(mockAiResponse.user.totalXP / 2000) * 100}%` }} />
@@ -209,7 +211,7 @@ export default function Dashboard() {
         {/* University Rank (Combined Concept 1 & 2) */}
         <div className={styles.retroCard}>
           <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}><PixelIcon icon="🎓" size={18} /> UNIVERSITY RANK</span>
+            <span className={styles.cardTitle}><PixelIcon icon="🎓" size={18} /> {t('sma.dashboard.universityRank')}</span>
           </div>
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
@@ -218,19 +220,19 @@ export default function Dashboard() {
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                Target: {mockAiResponse.universityTarget.name}
+                {t('sma.dashboard.target')}{mockAiResponse.universityTarget.name}
               </p>
             </div>
             <div className={styles.readinessContainer}>
               <div className={styles.readinessLabel}>
-                <span>READINESS</span>
-                <span style={{ color: '#34d399' }}>{mockAiResponse.universityTarget.matchPercentage}% MATCH</span>
+                <span>{t('sma.dashboard.readiness')}</span>
+                <span style={{ color: '#34d399' }}>{mockAiResponse.universityTarget.matchPercentage}{t('sma.dashboard.match')}</span>
               </div>
               <div className={styles.readinessBarBg}>
                 <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.universityTarget.matchPercentage}%` }} />
               </div>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
-                {mockAiResponse.universityTarget.aiFeedback}
+                {t('sma.dashboard.universityAiFeedback')}
               </p>
             </div>
           </div>
@@ -239,7 +241,7 @@ export default function Dashboard() {
         {/* Scholarship Rank (Combined Concept 1 & 2) */}
         <div className={styles.retroCard}>
           <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>📜 SCHOLARSHIP RANK</span>
+            <span className={styles.cardTitle}>📜 {t('sma.dashboard.scholarshipRank')}</span>
           </div>
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
@@ -248,19 +250,19 @@ export default function Dashboard() {
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                Target: {mockAiResponse.scholarshipTarget.name}
+                {t('sma.dashboard.target')}{mockAiResponse.scholarshipTarget.name}
               </p>
             </div>
             <div className={styles.readinessContainer}>
               <div className={styles.readinessLabel}>
-                <span>PROFILE MATCH</span>
-                <span style={{ color: '#34d399' }}>{mockAiResponse.scholarshipTarget.matchPercentage}% MATCH</span>
+                <span>{t('sma.dashboard.profileMatch')}</span>
+                <span style={{ color: '#34d399' }}>{mockAiResponse.scholarshipTarget.matchPercentage}{t('sma.dashboard.match')}</span>
               </div>
               <div className={styles.readinessBarBg}>
                 <div className={styles.readinessBarFill} style={{ width: `${mockAiResponse.scholarshipTarget.matchPercentage}%` }} />
               </div>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
-                {mockAiResponse.scholarshipTarget.aiFeedback}
+                {t('sma.dashboard.scholarshipAiFeedback')}
               </p>
             </div>
           </div>
@@ -273,7 +275,7 @@ export default function Dashboard() {
         {/* Daily Missions / Quest Log */}
         <div className={styles.retroCard}>
           <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>📜 QUEST LOG (MISSIONS)</span>
+            <span className={styles.cardTitle}>📜 {t('sma.dashboard.questLog')}</span>
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24' }}>
               {completedCount}/{bounties.length}
             </span>
@@ -302,7 +304,7 @@ export default function Dashboard() {
                           ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } 
                           : {})
                   }>
-                    {bounty.claimed ? 'CLAIMED' : (bounty.done ? 'CLAIM' : bounty.reward)}
+                    {bounty.claimed ? t('sma.dashboard.claimed') : (bounty.done ? t('sma.dashboard.claim') : bounty.reward)}
                   </span>
                 </div>
               ))}
@@ -316,7 +318,7 @@ export default function Dashboard() {
           {/* Leaderboard Preview */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>👑 WEEKLY LEADERBOARD</span>
+              <span className={styles.cardTitle}>👑 {t('sma.dashboard.weeklyLeaderboard')}</span>
             </div>
             <div className={styles.lbList}>
               {LEADERBOARD_MOCK.map((lb) => (
@@ -325,7 +327,7 @@ export default function Dashboard() {
                     <span className={styles.lbRankNum}>#{lb.rank}</span>
                     <span className={styles.lbName}>
                       {lb.rank === 2 ? displayName : lb.name}
-                      {lb.rank === 2 && <span style={{ fontSize: '0.6em', color: '#fbbf24', marginLeft: '6px' }}>(YOU)</span>}
+                      {lb.rank === 2 && <span style={{ fontSize: '0.6em', color: '#fbbf24', marginLeft: '6px' }}>{t('sma.dashboard.you')}</span>}
                     </span>
                   </div>
                   <span className={styles.lbScore}>{lb.score} XP</span>
@@ -337,12 +339,12 @@ export default function Dashboard() {
           {/* Achievement Vault Showcase */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>💎 ACHIEVEMENT VAULT</span>
+              <span className={styles.cardTitle}>💎 {t('sma.dashboard.achievementVault')}</span>
               <span 
                 onClick={() => router.push('/sma/certificate')}
                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
               >
-                VIEW ALL
+                {t('sma.dashboard.viewAll')}
               </span>
             </div>
             <div className={styles.vaultGrid}>

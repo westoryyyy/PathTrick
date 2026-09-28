@@ -12,6 +12,7 @@ import {
   getApiError,
   readApiResponse,
 } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 type MintStatus = 'idle' | 'preparing' | 'pending' | 'confirming' | 'success' | 'error';
 
@@ -92,8 +93,7 @@ function getErrorText(error: unknown): string {
 async function requestMintAuthorization(courseId: number): Promise<MintAuthorization> {
   const response = await fetch(`${API_BASE_URL}/api/certificates/prepare-mint`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ courseId: String(courseId) }),
   });
   const data = await readApiResponse(response);
@@ -247,8 +247,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
       setStatus('confirming');
       const confirmation = await fetch(`${API_BASE_URL}/api/certificates/confirm-mint`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ courseId: String(courseId), txHash: transaction.hash }),
       });
       const confirmationData = await readApiResponse(confirmation);

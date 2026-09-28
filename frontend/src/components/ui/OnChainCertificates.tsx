@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './OnChainCertificates.module.css';
 import { useMapStore } from '@/store/useMapStore';
@@ -9,7 +9,8 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import MintSBTButton from './MintSBTButton';
 import CertificatePreview from './CertificatePreview';
-import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS } from '@/config/pathtrick';
+import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS, API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 type Props = {
   hideHeader?: boolean;
@@ -25,13 +26,30 @@ const generateCourseId = (str: string) => {
 };
 
 export default function OnChainCertificates({ hideHeader = false }: Props = {}) {
-  const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
+  const [bossNodes, setBossNodes] = useState<string[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
   const { address } = useAccount();
 
-  // Find all Boss nodes
-  const bossNodes = useMemo(() => {
-    return completedDynamicNodes.filter(nodeId => nodeId.endsWith('-level-6') || nodeId.includes('boss') || nodeId === 'module-framer-bab-1-level-1');
-  }, [completedDynamicNodes]);
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/badges`, {
+          headers: { ...getAuthHeaders() }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          // Assuming courseOnChainId maps to a string like 'module-name' in the DB.
+          // Adjust logic based on the actual course ID stored in DB.
+          setBossNodes(data.badges.map((b: any) => b.courseOnChainId.toString()));
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setHasFetched(true);
+      }
+    };
+    fetchBadges();
+  }, []);
 
   const { user } = usePrivy();
   const { wallets } = useWallets();
@@ -48,7 +66,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
   // Prepare batch calls to check SBT ownership
   const contractCalls = useMemo(() => {
     if (!address || !contractAddress) return [];
-    return bossNodes.map(nodeId => {
+    return bossNodes.map((nodeId: string) => {
       const baseChapterId = nodeId.replace(/-level-\d+$/, '');
       return {
         address: contractAddress,
@@ -71,7 +89,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
 
   // Generate earned certificates dynamically based on verified ownership
   const earnedCertificates = useMemo(() => {
-    return bossNodes.map((nodeId, index) => {
+    return bossNodes.map((nodeId: string, index: number) => {
       const isMinted = sbtOwnershipResults?.[index]?.result === true;
       const baseChapterId = nodeId.replace(/-level-\d+$/, '');
       const courseId = generateCourseId(baseChapterId);
@@ -81,7 +99,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       
       // Clean up names (e.g. 'agriculture-1' -> 'Agriculture', 'html-css' -> 'HTML CSS')
       rawName = rawName.replace(/-\d+$/, '').replace(/-/g, ' ');
-      const moduleName = rawName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const moduleName = rawName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
       return {
         id: nodeId,
@@ -137,7 +155,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
             </button>
           </div>
         ) : earnedCertificates.length > 0 ? (
-          earnedCertificates.map(cert => (
+          earnedCertificates.map((cert: any) => (
             <div key={cert.id} style={{ 
               background: '#c8a96e',
               border: '4px solid #5a3520',

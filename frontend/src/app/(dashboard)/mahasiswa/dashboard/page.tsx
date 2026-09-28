@@ -8,8 +8,10 @@ import { useUserStore } from '@/store/useUserStore';
 import styles from '@/components/ui/Dashboard.module.css';
 import { AnimatePresence } from 'framer-motion';
 import CVUpdaterWidget from './CVUpdaterWidget';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function MahasiswaDashboard() {
+  const { t } = useTranslation();
   const { targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
   const [gapData, setGapData] = useState<{ missing: string[]; possessed: string[] }>({ missing: [], possessed: [] });
   
@@ -35,7 +37,7 @@ export default function MahasiswaDashboard() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: 'var(--font-pixel)', color: '#fbbf24' }}>
-        LOADING AI INSIGHTS...
+        {t('common.loadingAiInsights')}
       </div>
     );
   }
@@ -46,10 +48,10 @@ export default function MahasiswaDashboard() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h1 style={{ fontFamily: 'var(--font-pixel)', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b', textTransform: 'uppercase' }}>
-          WELCOME BACK, {displayName}!
+          {t('mahasiswa.dashboard.welcomeBack').replace('{name}', displayName)}
         </h1>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', whiteSpace: 'nowrap' }}>
-          AI Career Roadmap kamu sedang aktif memindai berbagai peluang terbaik.
+          {t('mahasiswa.dashboard.subtitle')}
         </p>
       </div>
 
@@ -59,7 +61,7 @@ export default function MahasiswaDashboard() {
           {/* ── Career Rank Widget ── */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>CAREER RANK</span>
+              <span className={styles.cardTitle}>{t('mahasiswa.dashboard.careerRank')}</span>
             </div>
             <div className={styles.rankContent}>
               <div className={styles.tierBadge}>
@@ -68,12 +70,12 @@ export default function MahasiswaDashboard() {
               </div>
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                 <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                  Next Tier: {nextTier}
-                </p>
+                    {t('mahasiswa.dashboard.nextTier').replace('{tier}', nextTier)}
+                  </p>
               </div>
               <div className={styles.readinessContainer}>
                 <div className={styles.readinessLabel}>
-                  <span>XP PROGRESS</span>
+                  <span>{t('mahasiswa.dashboard.xpProgress')}</span>
                   <span style={{ color: '#34d399' }}>{totalXP} / {xpToNext} XP</span>
                 </div>
                 <div className={styles.readinessBarBg} style={{ height: '32px' }}>
@@ -86,24 +88,24 @@ export default function MahasiswaDashboard() {
           {/* ── Progression & Stats ── */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>📈 PROGRESSION</span>
+              <span className={styles.cardTitle}>{t('mahasiswa.dashboard.progression')}</span>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Daily Mission</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.dailyMission')}</span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>1/3</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Weekly Challenge</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Active</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.weeklyChallenge')}</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.active')}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Skill Tree</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.skillTree')}</span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>12%</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>Achievement Vault</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>4 Unlocked</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.achievementVault')}</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.unlocked')}</span>
               </div>
             </div>
           </div>
@@ -114,11 +116,11 @@ export default function MahasiswaDashboard() {
           {/* ── AI Job Match Widget ── */}
           <div className={styles.retroCard} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>AI JOB MATCH</span>
+              <span className={styles.cardTitle}>{t('mahasiswa.dashboard.aiJobMatch')}</span>
             </div>
             <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'space-between' }}>
               <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                5 suitable jobs found this week!
+                {t('mahasiswa.dashboard.jobsFoundThisWeek')}
               </p>
               
               {targetJob && (
@@ -126,7 +128,7 @@ export default function MahasiswaDashboard() {
                   <h3 style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.9rem', color: '#fbbf24', lineHeight: '1.4' }}>{targetJob.title}</h3>
                   <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#fff' }}>{targetJob.company}</p>
                   <div style={{ display: 'inline-block', background: '#047857', border: '2px solid #064e3b', color: '#fff', fontSize: '0.7rem', fontFamily: 'var(--font-pixel)', padding: '8px 12px', marginTop: '8px', width: 'fit-content', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                    MATCH: {targetJob.matchPercentage}%
+                  MATCH: {targetJob.matchPercentage}%
                   </div>
                 </div>
               )}
@@ -146,7 +148,7 @@ export default function MahasiswaDashboard() {
                 textAlign: 'center',
                 textDecoration: 'none'
               }}>
-                VIEW ALL MATCHES
+                {t('mahasiswa.dashboard.viewAllMatches')}
               </Link>
             </div>
           </div>
