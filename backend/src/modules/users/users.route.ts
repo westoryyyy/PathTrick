@@ -1,4 +1,5 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { setRoleSchema } from "../auth/auth.schema";
 import { prisma } from "../../lib/prisma";
 import { requireAdmin } from "../admin/admin.middleware";
@@ -23,6 +24,37 @@ export default async function usersRoutes(fastify: FastifyInstance) {
           return reply.code(404).send({ error: "NotFound", message: "User tidak ditemukan" });
         }
         request.log.error(err, "Unexpected error di GET /api/users/me");
+        return reply.code(500).send({ error: "InternalError", message: "Terjadi kesalahan tak terduga" });
+      }
+    }
+  );
+
+  /**
+   * PUT /api/users/me
+   * Update profil pengguna saat ini (misalnya nickname dan wallet address)
+   */
+  fastify.put(
+    "/api/users/me",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const updateSchema = z.object({
+        name: z.string().optional(),
+        walletAddress: z.string().optional(),
+      });
+      const parsed = updateSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: "ValidationError", details: parsed.error.flatten() });
+      }
+
+      try {
+        const { userId } = request.user;
+        const updated = await prisma.user.update({
+          where: { id: userId },
+          data: parsed.data,
+        });
+        return reply.code(200).send(updated);
+      } catch (err: unknown) {
+        request.log.error(err, "Unexpected error di PUT /api/users/me");
         return reply.code(500).send({ error: "InternalError", message: "Terjadi kesalahan tak terduga" });
       }
     }
