@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
@@ -26,17 +28,40 @@ export default function ProfilePage() {
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const avatarOptions = ['/char_dreamer.png', '/char_chaser.png', '/char_scholar.png', '/Main Character.png'];
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSaving) return;
     
     setIsSaving(true);
-    setTimeout(() => {
-      setProfile(name, privyEmail); // Persist to Zustand (localStorage)
+    try {
+      const headers = getAuthHeaders();
+      console.log('[Profile] Saving name:', name.trim(), '| has token:', !!headers['Authorization']);
+
+      const body: Record<string, string> = { name: name.trim() };
+      // Hanya kirim walletAddress jika ada (string kosong bisa diabaikan backend)
+      if (wallets[0]?.address) body.walletAddress = wallets[0].address;
+
+      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...headers },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      console.log('[Profile] API response:', res.status, data);
+
+      if (!res.ok) {
+        console.error('[Profile] Failed to save:', data);
+      } else {
+        setProfile(name.trim(), privyEmail);
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
+      }
+    } catch (error) {
+      console.error('[Profile] Network error:', error);
+    } finally {
       setIsSaving(false);
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 2000);
-    }, 800);
+    }
   };
 
   return (

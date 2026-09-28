@@ -11,9 +11,10 @@ import { useUserStore } from '@/store/useUserStore';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import PixelIcon from '@/components/ui/PixelIcon';
 import BGMPlayer from '@/components/ui/BGMPlayer';
-import { clearAuthToken } from '@/hooks/useAuthSync';
+import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
 import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
+import { API_BASE_URL } from '@/config/pathtrick';
 
 const NAV_KEYS: { href: string; labelKey: string; icon: string; badge?: string }[] = [
   { href: '/sma/dashboard', labelKey: 'nav.sma.dashboard', icon: '📊' },
@@ -56,17 +57,56 @@ export default function SMALayout({
     router.push('/');
   };
 
-  // ── Route Guard: role dari backend harus 'sma' ──
-  const { selectedRole, savedPrivyUserId } = useOnboardingStore();
+  // ── Route Guard: verifikasi role dari BACKEND ──
+  // Zustand memberikan render cepat; backend adalah sumber kebenaran akhir.
+  const { selectedRole, savedPrivyUserId, setRole } = useOnboardingStore();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   useEffect(() => {
     if (!user) return;
-    if (!selectedRole) return; // belum selesai hydrate dari backend
-    if (savedPrivyUserId !== user.id) return; // beda user, biarkan hydrate dulu
-    if (selectedRole !== 'sma') {
-      // User ini bukan DREAMER — arahkan ke dashboard yang sesuai
-      router.replace(`/${selectedRole}/dashboard`);
+    const token = getAuthHeaders()['Authorization'];
+    if (!token) {
+      // Belum ada JWT — kemungkinan sedang proses sync, tunggu sebentar
+      setIsCheckingAuth(false);
+      return;
     }
-  }, [user, selectedRole, savedPrivyUserId, router]);
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) { router.replace('/'); return; }
+        const data = await res.json() as { role?: { name?: string } | null };
+        if (cancelled) return;
+        const roleName = data?.role?.name?.toUpperCase();
+        if (!roleName) {
+          // Tidak ada role di backend → ke select-role
+          router.replace('/select-role');
+        } else if (roleName === 'DREAMER') {
+          setRole('sma', user.id);
+          setIsCheckingAuth(false);
+        } else if (roleName === 'CHASER') {
+          setRole('mahasiswa', user.id);
+          router.replace('/mahasiswa/dashboard');
+        } else if (roleName === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace('/select-role');
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // Jika backend tidak bisa dihubungi, gunakan Zustand sebagai fallback
+        if (!selectedRole || savedPrivyUserId !== user.id) {
+          router.replace('/select-role');
+        } else if (selectedRole !== 'sma') {
+          router.replace(`/${selectedRole}/dashboard`);
+        } else {
+          setIsCheckingAuth(false);
+        }
+      });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const playHoverSound = () => {
     try {
@@ -77,6 +117,10 @@ export default function SMALayout({
   };
 
   const isMissionPage = pathname.startsWith('/sma/learning-progress/') && pathname !== '/sma/learning-progress';
+
+  // Don't render the dashboard while backend role check is in progress.
+  // This prevents flash of authenticated content before we know the user's role.
+  if (isCheckingAuth) return null;
 
   if (isMissionPage) {
     return (

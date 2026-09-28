@@ -1,0 +1,136 @@
+import { FastifyInstance } from "fastify";
+import { getCourseDetail, getCoursesForUser, submitQuiz, submitProject, getRoadmapNodes } from "./courses.service";
+import { z } from "zod";
+
+const submitQuizBodySchema = z.object({
+  answers: z
+    .array(
+      z.object({
+        questionId: z.string().min(1),
+        selectedAnswer: z.string().min(1, "selectedAnswer wajib diisi (A/B/C/D)"),
+      })
+    )
+    .min(1, "Minimal 1 jawaban harus dikirim"),
+});
+
+const submitProjectBodySchema = z.object({
+  code: z.string().min(1, 'Kode tidak boleh kosong'),
+});
+
+export default async function coursesRoutes(fastify: FastifyInstance) {
+  /**
+   * GET /api/courses
+   * List course dari roadmap aktif user (urut sesuai roadmap order).
+   * Kalau belum ada roadmap aktif → courses = [].
+   */
+  fastify.get(
+    "/api/courses",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { userId } = request.user;
+      const result = await getCoursesForUser(userId);
+      return reply.code(200).send(result);
+    }
+  );
+
+  /**
+   * GET /api/courses/:courseId
+   * Detail 1 course + sections + quiz (tanpa correctAnswer).
+   * Section yang masih terkunci ditandai `locked: true`.
+   */
+  fastify.get(
+    "/api/courses/:courseId",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { courseId } = request.params as { courseId: string };
+      const { userId } = request.user;
+
+      const course = await getCourseDetail(courseId, userId);
+      if (!course) {
+        return reply.code(404).send({ error: "NotFound", message: "Course tidak ditemukan atau belum dipublikasikan" });
+      }
+      return reply.code(200).send(course);
+    }
+  );
+
+  /**
+   * POST /api/courses/:courseId/sections/:sectionId/quiz/submit
+   * Submit jawaban quiz untuk 1 section.
+   * Body: { answers: [{ questionId, selectedAnswer }] }
+   *
+   * Response: { score, passed, passingScore, correctCount, totalQuestions, nextSectionUnlocked }
+   */
+  fastify.post(
+    "/api/courses/:courseId/sections/:sectionId/quiz/submit",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { courseId, sectionId } = request.params as { courseId: string; sectionId: string };
+      const { userId } = request.user;
+
+      const parsedBody = submitQuizBodySchema.safeParse(request.body);
+      if (!parsedBody.success) {
+        return reply.code(400).send({ error: "ValidationError", details: parsedBody.error.flatten() });
+      }
+
+      try {
+        const result = await submitQuiz({
+          userId,
+          courseId,
+          sectionId,
+          answers: parsedBody.data.answers,
+        });
+        return reply.code(200).send(result);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          if (err.message === "QUIZ_NOT_FOUND") {
+            return reply.code(404).send({ error: "NotFound", message: "Quiz tidak ditemukan untuk section ini" });
+          }
+          if (err.message === "SECTION_LOCKED") {
+            return reply.code(403).send({
+              error: "SectionLocked",
+              message: "Section ini masih terkunci — selesaikan section sebelumnya terlebih dahulu",
+            });
+          }
+        }
+        request.log.error(err, "Error di POST quiz/submit");
+        return reply.code(500).send({ error: "InternalError", message: "Terjadi kesalahan tak terduga" });
+      }
+    }
+  );
+
+/**
+   * POST /api/courses/:courseId/sections/:sectionId/project/submit
+   */
+  fastify.post(
+    '/api/courses/:courseId/sections/:sectionId/project/submit',
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { courseId, sectionId } = request.params as { courseId: string; sectionId: string };
+      const { userId } = request.user;
+      const parsedBody = submitProjectBodySchema.safeParse(request.body);
+      if (!parsedBody.success) return reply.code(400).send({ error: 'ValidationError' });
+      try {
+        const result = await submitProject({ userId, courseId, sectionId, code: parsedBody.data.code });
+        return reply.code(200).send(result);
+      } catch (err) {
+        request.log.error(err, 'Error di POST project/submit');
+        return reply.code(500).send({ error: 'InternalError' });
+      }
+    }
+  );
+
+  /**
+   * GET /api/roadmap
+
+   * Alias yang sering dipakai FE — kembalikan roadmap aktif + courses.
+   */
+  fastify.get(
+    "/api/roadmap",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { userId } = request.user;
+      const result = await getRoadmapNodes(userId);
+      return reply.code(200).send(result);
+    }
+  );
+}

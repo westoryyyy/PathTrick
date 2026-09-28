@@ -50,11 +50,11 @@ export default function DailyMantra() {
     return MANTRAS[hourOfYear % MANTRAS.length];
   }, []);
 
-  const hasUnread = readQuote !== mantra.quote;
+  const hasUnread = readQuote !== String(mantra);
 
   const handleToggle = () => {
     if (!isOpen) {
-      setReadQuote(mantra.quote);
+      setReadQuote(String(mantra));
     }
     setIsOpen((o) => !o);
   };

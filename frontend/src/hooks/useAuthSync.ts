@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
+import { useEffect, useCallback, useState } from 'react';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { API_BASE_URL, readApiResponse } from '@/config/pathtrick';
 import { loadUserOnboarding, useOnboardingStore, type UserRole } from '@/store/useOnboardingStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -50,7 +50,14 @@ function getProfileName(
     || 'Explorer';
 }
 
-async function hydrateFrontendState(appToken: string, privyUser: { id: string; email?: { address?: string | null } | null; google?: { name?: string | null; email?: string | null } | null; }): Promise<void> {
+/**
+ * Hydrates frontend state from backend after login.
+ * Returns the resolved route role (or null if no role yet).
+ */
+async function hydrateFrontendState(
+  appToken: string,
+  privyUser: { id: string; email?: { address?: string | null } | null; google?: { name?: string | null; email?: string | null } | null; }
+): Promise<{ routeRole: UserRole | 'admin' | null }> {
   const response = await fetch(`${API_BASE_URL}/api/users/me`, {
     headers: {
       Authorization: `Bearer ${appToken}`,
@@ -60,14 +67,14 @@ async function hydrateFrontendState(appToken: string, privyUser: { id: string; e
   const data = await readApiResponse(response);
   if (!response.ok) {
     console.warn('[AuthSync] Failed to hydrate /api/users/me:', response.status, data);
-    return;
+    return { routeRole: null };
   }
 
   const payload = data as BackendMeResponse;
   const backendUser = payload;
   if (!backendUser) {
     console.warn('[AuthSync] /api/users/me returned no user payload');
-    return;
+    return { routeRole: null };
   }
 
   const fallbackEmail = privyUser.email?.address ?? privyUser.google?.email ?? null;
@@ -86,10 +93,7 @@ async function hydrateFrontendState(appToken: string, privyUser: { id: string; e
 
   if (isAdminRole(backendRoleName)) {
     useOnboardingStore.setState({ savedPrivyUserId: privyUser.id, selectedRole: 'admin' });
-    if (!window.location.pathname.startsWith('/admin')) {
-      window.location.replace('/admin/dashboard');
-    }
-    return;
+    return { routeRole: 'admin' };
   }
 
   const routeRole = mapBackendRoleToRoute(backendRoleName);
@@ -105,7 +109,13 @@ async function hydrateFrontendState(appToken: string, privyUser: { id: string; e
   } else if (currentOnboarding.savedPrivyUserId !== privyUser.id) {
     useOnboardingStore.setState({ savedPrivyUserId: privyUser.id });
   }
+
+  return { routeRole };
 }
+
+// Module-level singleton: ensures sync runs only once per user per session,
+// even if useAuthSync() is mounted in multiple components simultaneously.
+let _syncedForUser: string | null = null;
 
 /**
  * Syncs the Privy session with our backend.
@@ -119,14 +129,18 @@ async function hydrateFrontendState(appToken: string, privyUser: { id: string; e
  */
 export function useAuthSync() {
   const { authenticated, ready, getAccessToken, user } = usePrivy();
-  const syncedForUser = useRef<string | null>(null);
+  const { wallets } = useWallets();
+  // isSyncing: true while the backend sync + hydrate is in progress.
+  // Exposed as reactive state so consumers can show a loading indicator.
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const syncAuth = useCallback(async () => {
     if (!authenticated || !ready || !user) return;
 
     // Don't re-sync for the same Privy user within this session
-    if (syncedForUser.current === user.id) return;
+    if (_syncedForUser === user.id) return;
 
+    setIsSyncing(true);
     try {
       const privyToken = await getAccessToken();
       if (!privyToken) {
@@ -143,6 +157,8 @@ export function useAuthSync() {
         body: JSON.stringify({
           email: user.email?.address ?? user.google?.email ?? undefined,
           name: user.google?.name ?? undefined,
+          // Kirim walletAddress dari useWallets hook (lebih reliable dari linkedAccounts)
+          walletAddress: wallets[0]?.address ?? undefined,
         }),
       });
 
@@ -155,14 +171,34 @@ export function useAuthSync() {
       const data = await response.json();
       if (data.token) {
         localStorage.setItem(TOKEN_KEY, data.token);
-        syncedForUser.current = user.id;
+        _syncedForUser = user.id;
         console.log('[AuthSync] JWT stored successfully for user:', data.user?.name ?? user.id);
-        await hydrateFrontendState(data.token, user);
+        const { routeRole } = await hydrateFrontendState(data.token, user);
+
+        // ── Post-login redirect ──
+        // Only redirect from the landing page (/) or if user has no role at all.
+        // Admin redirect is handled inside hydrateFrontendState via window.location.replace.
+        const currentPath = window.location.pathname;
+        const isOnLanding = currentPath === '/';
+
+        if (routeRole && routeRole !== 'admin') {
+          // User has a role → only redirect if on landing page
+          if (isOnLanding) {
+            window.location.replace(`/${routeRole}/dashboard`);
+          }
+        } else if (!routeRole) {
+          // No role yet → redirect to select-role from any page
+          if (!currentPath.startsWith('/select-role')) {
+            window.location.replace('/select-role');
+          }
+        }
       }
     } catch (error) {
       console.error('[AuthSync] Network error:', error);
+    } finally {
+      setIsSyncing(false);
     }
-  }, [authenticated, ready, user, getAccessToken]);
+  }, [authenticated, ready, user, wallets, getAccessToken]);
 
   useEffect(() => {
     syncAuth();
@@ -172,7 +208,9 @@ export function useAuthSync() {
     /** The stored app JWT, or null if not yet synced */
     token: typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null,
     /** Whether the sync has completed for the current user */
-    isSynced: syncedForUser.current === user?.id,
+    isSynced: _syncedForUser === user?.id,
+    /** True while the backend sync + hydrate is in progress */
+    isSyncing,
     /** Force re-sync (e.g. after role change) */
     resync: syncAuth,
   };
