@@ -13,9 +13,11 @@ const roleBorder: Record<string, string> = { MAHASISWA: '#60a5fa', SMA: '#a78bfa
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() })
+    setLoading(true);
+    fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders(), cache: 'no-store' })
       .then(r => r.json())
       .then((d: any) => {
         if (d && Array.isArray(d.users)) {
@@ -33,7 +35,7 @@ export default function UsersPage() {
       })
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -46,8 +48,17 @@ export default function UsersPage() {
             <p style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.85rem", color: 'rgba(255,255,255,0.5)', margin: '4px 0 0' }}>Read-only monitoring — {loading ? '…' : users.length} users terdaftar</p>
           </div>
         </div>
-        <div style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24', background: 'rgba(139,26,26,0.3)', border: '2px solid #5a3a29', padding: '8px 14px' }}>
-          ⚠ READ ONLY
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            onClick={() => setRefreshKey(k => k + 1)}
+            disabled={loading}
+            style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.8rem", color: '#fbbf24', background: 'rgba(59,31,10,0.8)', border: '2px solid #5a3a29', padding: '8px 14px', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+          >
+            {loading ? '⏳ Loading...' : '🔄 Refresh'}
+          </button>
+          <div style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24', background: 'rgba(139,26,26,0.3)', border: '2px solid #5a3a29', padding: '8px 14px' }}>
+            ⚠ READ ONLY
+          </div>
         </div>
       </div>
 
