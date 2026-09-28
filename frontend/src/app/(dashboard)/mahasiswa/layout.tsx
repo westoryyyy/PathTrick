@@ -12,9 +12,10 @@ import { useUserStore } from '@/store/useUserStore';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import PixelIcon from '@/components/ui/PixelIcon';
 import BGMPlayer from '@/components/ui/BGMPlayer';
-import { clearAuthToken } from '@/hooks/useAuthSync';
+import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
 import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
+import { API_BASE_URL } from '@/config/pathtrick';
 
 const NAV_KEYS = [
   { href: '/mahasiswa/dashboard', labelKey: 'nav.mahasiswa.dashboard', icon: '📊' },
@@ -37,7 +38,7 @@ export default function MahasiswaLayout({
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
-  const { setRole } = useMapStore();
+  const { setRole: setMapRole } = useMapStore();
   const { displayName: savedName, displayEmail: savedEmail, avatarUrl } = useUserStore();
 
   // Priority: 1. User-edited (Zustand), 2. Auto from Privy (Google/Email), 3. Wallet address fallback
@@ -52,8 +53,8 @@ export default function MahasiswaLayout({
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : '');
 
   React.useEffect(() => {
-    setRole('MAHASISWA');
-  }, [setRole]);
+    setMapRole('MAHASISWA');
+  }, [setMapRole]);
 
   const handleLogout = async () => {
     clearAuthToken();
@@ -61,17 +62,53 @@ export default function MahasiswaLayout({
     router.push('/');
   };
 
-  // ── Route Guard: role dari backend harus 'mahasiswa' ──
-  const { selectedRole, savedPrivyUserId } = useOnboardingStore();
+  // ── Route Guard: verifikasi role dari BACKEND ──
+  // Zustand memberikan render cepat; backend adalah sumber kebenaran akhir.
+  const { selectedRole, savedPrivyUserId, setRole: setOnboardingRole } = useOnboardingStore();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   useEffect(() => {
     if (!user) return;
-    if (!selectedRole) return; // belum selesai hydrate dari backend
-    if (savedPrivyUserId !== user.id) return; // beda user, biarkan hydrate dulu
-    if (selectedRole !== 'mahasiswa') {
-      // User ini bukan CHASER — arahkan ke dashboard yang sesuai
-      router.replace(`/${selectedRole}/dashboard`);
+    const token = getAuthHeaders()['Authorization'];
+    if (!token) {
+      setIsCheckingAuth(false);
+      return;
     }
-  }, [user, selectedRole, savedPrivyUserId, router]);
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) { router.replace('/'); return; }
+        const data = await res.json() as { role?: { name?: string } | null };
+        if (cancelled) return;
+        const roleName = data?.role?.name?.toUpperCase();
+        if (!roleName) {
+          router.replace('/select-role');
+        } else if (roleName === 'CHASER') {
+          setOnboardingRole('mahasiswa', user.id);
+          setIsCheckingAuth(false);
+        } else if (roleName === 'DREAMER') {
+          setOnboardingRole('sma', user.id);
+          router.replace('/sma/dashboard');
+        } else if (roleName === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace('/select-role');
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        if (!selectedRole || savedPrivyUserId !== user.id) {
+          router.replace('/select-role');
+        } else if (selectedRole !== 'mahasiswa') {
+          router.replace(`/${selectedRole}/dashboard`);
+        } else {
+          setIsCheckingAuth(false);
+        }
+      });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const playHoverSound = () => {
     try {
@@ -82,6 +119,9 @@ export default function MahasiswaLayout({
   };
 
   const isFullScreenPage = pathname.startsWith('/mahasiswa/learning-mission/') && pathname !== '/mahasiswa/learning-mission';
+
+  // Don't render the dashboard while backend role check is in progress.
+  if (isCheckingAuth) return null;
 
   if (isFullScreenPage) {
     return (

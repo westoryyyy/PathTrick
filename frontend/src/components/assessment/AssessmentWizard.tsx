@@ -63,9 +63,9 @@ export default function AssessmentWizard() {
     if (isLast) {
       await submitAssessment();
       if (role === 'sma') {
-        router.push('/sma');
+        router.push('/sma/dashboard');
       } else {
-        router.push('/chaser/dashboard');
+        router.push('/mahasiswa/dashboard');
       }
     } else {
       nextStep();

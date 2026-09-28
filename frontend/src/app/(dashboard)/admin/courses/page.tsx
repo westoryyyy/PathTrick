@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import AdminCRUDTable, { Column, Field } from '@/components/admin/AdminCRUDTable';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
@@ -11,11 +12,17 @@ const COLUMNS: Column<Course>[] = [
   { key: 'title', label: 'Judul Course' },
   { key: 'sections', label: 'Sections' },
   { key: 'published', label: 'Status', render: row => (
-    <span style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: row.published === 'true' ? '#065f46' : '#7f1d1d', border: `2px solid ${row.published === 'true' ? '#10b981' : '#ef4444'}`, color: '#fff', padding: '3px 8px' }}>
-      {row.published === 'true' ? '● LIVE' : '○ DRAFT'}
+    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: "0.8rem", background: row.published === 'true' ? '#065f46' : '#7f1d1d', border: `2px solid ${row.published === 'true' ? '#10b981' : '#ef4444'}`, color: '#fff', padding: '4px 10px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: '10px' }}>{row.published === 'true' ? '●' : '○'}</span>
+      {row.published === 'true' ? 'LIVE' : 'DRAFT'}
     </span>
   )},
   { key: 'description', label: 'Deskripsi' },
+  { key: 'id', label: 'Editor', render: row => (
+    <Link href={`/admin/courses/${row.id}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.8rem', background: '#7c3aed', border: '2px solid #a78bfa', color: '#fff', padding: '6px 12px', textDecoration: 'none', display: 'inline-block', whiteSpace: 'nowrap', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
+      ✏ Edit Konten
+    </Link>
+  )},
 ];
 
 const FIELDS: Field[] = [

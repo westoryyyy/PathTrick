@@ -1,4 +1,4 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma";
 import { requireAdmin } from "../admin/admin.middleware";
@@ -20,6 +20,8 @@ export default async function jobsRoutes(fastify: FastifyInstance) {
           title: true,
           company: true,
           type: true,
+          coverImageUrl: true,
+          skillsRequired: true,
         },
       });
       return reply.code(200).send({ total: jobs.length, jobs });
