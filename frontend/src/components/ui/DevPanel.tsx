@@ -128,7 +128,7 @@ function DevPanelInner() {
                 const s = useOnboardingStore.getState();
                 const uid = user?.id ?? 'dev-user';
                 s.setRole('mahasiswa', uid);
-                window.location.href = '/mahasiswa/dashboard';
+                window.location.href = '/chaser/dashboard';
               }}
               style={btnStyle('#0d2e0d', '#34d399')}
             >
@@ -140,7 +140,7 @@ function DevPanelInner() {
                 const s = useOnboardingStore.getState();
                 const uid = user?.id ?? 'dev-user';
                 s.setRole('sma', uid);
-                window.location.href = '/sma/dashboard';
+                window.location.href = '/dreamer/dashboard';
               }}
               style={btnStyle('#1a1a0d', '#fbbf24')}
             >
