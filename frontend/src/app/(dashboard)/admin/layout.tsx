@@ -6,6 +6,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import Image from 'next/image';
 import styles from './layout.module.css';
+import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
 
 const px: React.CSSProperties = { fontFamily: '"Pixelify Sans", sans-serif' };
 
@@ -36,12 +38,33 @@ const NAV_ITEMS = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout, user } = usePrivy();
+  const { logout, user, authenticated, ready } = usePrivy();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [roleChecked, setRoleChecked] = useState(false);
   const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   const displayName = user?.google?.name || user?.email?.address?.split('@')[0] || 'Admin';
+
+  // Backend role gate: only ADMIN may access this layout
+  useEffect(() => {
+    if (!ready) return;
+    if (!authenticated) {
+      router.replace('/');
+      return;
+    }
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then((data: any) => {
+        if (data?.role?.name !== 'ADMIN') {
+          router.replace('/');
+        } else {
+          setRoleChecked(true);
+        }
+      })
+      .catch(() => router.replace('/'));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated, ready]);
 
   useEffect(() => {
     // Play BGM when dashboard mounts
@@ -76,6 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const handleLogout = async () => {
+    clearAuthToken();
     await logout();
     router.push('/');
   };
@@ -92,6 +116,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     item => pathname === item.href || pathname.startsWith(item.href + '/')
   );
   const pageTitle = currentItem?.label ?? 'Admin Panel';
+
+  if (!roleChecked) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#1a0d05', color: '#fbbf24', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem' }}>
+        Memverifikasi akses...
+      </div>
+    );
+  }
 
   return (
     <div className={styles.layout}>

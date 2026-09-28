@@ -1,14 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AdminCRUDTable, { Column, Field } from '@/components/admin/AdminCRUDTable';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 interface Job { id: string; title: string; company: string; location: string; type: string; salaryRange: string; skills: string[]; coverImage: string; }
 
-const INITIAL: Job[] = [
-  { id: '1', title: 'Backend Developer', company: 'Tokopedia', location: 'Jakarta', type: 'On-site', salaryRange: '8-15 juta', skills: ['Node.js', 'PostgreSQL', 'Docker'], coverImage: '' },
-  { id: '2', title: 'Frontend Engineer', company: 'Gojek', location: 'Remote', type: 'Remote', salaryRange: '10-18 juta', skills: ['React', 'TypeScript', 'Next.js'], coverImage: '' },
-  { id: '3', title: 'AI/ML Engineer', company: 'Traveloka', location: 'Jakarta', type: 'Hybrid', salaryRange: '15-25 juta', skills: ['Python', 'TensorFlow', 'MLOps'], coverImage: '' },
-];
 
 const COLUMNS: Column<Job>[] = [
   { key: 'coverImage', label: 'Cover', width: '80px', render: row => row.coverImage ? <img src={row.coverImage} alt="" style={{ width: '60px', height: '34px', objectFit: 'cover', border: '1px solid #5a3a29' }} /> : <span style={{ color: '#5a3a29' }}>-</span> },
@@ -40,10 +37,48 @@ const FIELDS: Field[] = [
 ];
 
 export default function JobsPage() {
-  const [data, setData] = useState(INITIAL);
-  const add = (d: Partial<Job>) => setData(p => [...p, { ...d, id: Date.now().toString(), skills: (d.skills ?? []) as string[] } as Job]);
-  const edit = (id: string, d: Partial<Job>) => setData(p => p.map(r => r.id === id ? { ...r, ...d } : r));
-  const del = (id: string) => setData(p => p.filter(r => r.id !== id));
+  const [data, setData] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/api/admin/jobs`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then((d: Job[]) => setData(Array.isArray(d) ? d : []))
+      .catch(() => setData([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const add = async (d: Partial<Job>) => {
+    await fetch(`${API_BASE_URL}/api/admin/jobs`, {
+      method: 'POST', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...d, skills: d.skills ?? [] }),
+    });
+    load();
+  };
+
+  const edit = async (id: string, d: Partial<Job>) => {
+    await fetch(`${API_BASE_URL}/api/admin/jobs/${id}`, {
+      method: 'PUT', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(d),
+    });
+    load();
+  };
+
+  const del = async (id: string) => {
+    const res = await fetch(`${API_BASE_URL}/api/admin/jobs/${id}`, {
+      method: 'DELETE', headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.message || 'Gagal menghapus');
+      return;
+    }
+    load();
+  };
+
   return (
     <AdminCRUDTable title="MANAJEMEN LOWONGAN KERJA" icon="💼" data={data} columns={COLUMNS} fields={FIELDS}
       onAdd={add} onEdit={edit} onDelete={del} searchKeys={['title', 'company', 'location']} addButtonLabel="Tambah Lowongan" />

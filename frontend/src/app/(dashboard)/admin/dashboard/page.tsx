@@ -2,16 +2,17 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 import styles from './page.module.css';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
-const px = { fontFamily: '"Pixelify Sans", sans-serif' } as React.CSSProperties;
-
-const STATS = [
-  { label: 'Total Users', value: '1,284', img: '/NPC University Student.png', color: '#3b82f6', border: '#1d4ed8' },
-  { label: 'Courses', value: '32', img: '/Journall.png', color: '#f59e0b', border: '#b45309' },
-  { label: 'Beasiswa', value: '18', img: '/Gold Ticket.png', color: '#10b981', border: '#065f46' },
-  { label: 'Lowongan', value: '47', img: '/Compass.png', color: '#8b5cf6', border: '#5b21b6' },
-];
+interface Stats {
+  users: number;
+  courses: number;
+  scholarships: number;
+  jobs: number;
+}
 
 const QUICK_LINKS = [
   { href: '/admin/universities', label: 'Manajemen Universitas', img: '/Compass.png', desc: 'Tambah, edit, hapus data kampus & jurusan' },
@@ -21,17 +22,25 @@ const QUICK_LINKS = [
   { href: '/admin/users', label: 'Data Pengguna', img: '/NPC University Student.png', desc: 'Monitor progres & data seluruh user' },
 ];
 
-const RECENT_ACTIVITY = [
-  { time: '5 menit lalu', action: 'Beasiswa LPDP 2026 ditambahkan', type: 'add' },
-  { time: '1 jam lalu', action: 'Course "React Advanced" diperbarui', type: 'edit' },
-  { time: '3 jam lalu', action: 'Lowongan Backend Developer dihapus', type: 'delete' },
-  { time: '1 hari lalu', action: '12 user baru mendaftar', type: 'info' },
-];
-
-const typeColor: Record<string, string> = { add: '#10b981', edit: '#f59e0b', delete: '#ef4444', info: '#3b82f6' };
-const typeLabel: Record<string, string> = { add: '+', edit: '~', delete: 'x', info: 'i' };
-
 export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/admin/stats`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then((data: Stats) => setStats(data))
+      .catch(() => {/* non-critical */})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const STAT_CARDS = [
+    { label: 'Total Users', value: stats?.users ?? 0, img: '/NPC University Student.png', color: '#3b82f6', border: '#1d4ed8' },
+    { label: 'Courses', value: stats?.courses ?? 0, img: '/Journall.png', color: '#f59e0b', border: '#b45309' },
+    { label: 'Beasiswa', value: stats?.scholarships ?? 0, img: '/Gold Ticket.png', color: '#10b981', border: '#065f46' },
+    { label: 'Lowongan', value: stats?.jobs ?? 0, img: '/Compass.png', color: '#8b5cf6', border: '#5b21b6' },
+  ];
+
   return (
     <div className={styles.page}>
 
@@ -48,13 +57,15 @@ export default function AdminDashboardPage() {
 
       {/* ── Stats ── */}
       <div className={styles.statsGrid}>
-        {STATS.map((stat) => (
+        {STAT_CARDS.map((stat) => (
           <div key={stat.label} className={styles.statCard} style={{ borderColor: stat.border }}>
             <div className={styles.statIcon} style={{ background: `${stat.color}22`, border: `3px solid ${stat.color}` }}>
               <Image src={stat.img} alt="" width={28} height={28} style={{ imageRendering: 'pixelated', objectFit: 'contain', width: '28px', height: '28px' }} />
             </div>
             <div className={styles.statInfo}>
-              <span className={styles.statValue} style={{ color: stat.color }}>{stat.value}</span>
+              <span className={styles.statValue} style={{ color: stat.color }}>
+                {loading ? '…' : stat.value.toLocaleString()}
+              </span>
               <span className={styles.statLabel}>{stat.label}</span>
             </div>
           </div>
@@ -81,26 +92,21 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
-        {/* ── Recent Activity ── */}
+        {/* ── Recent Activity: no audit log table in DB — unsupported ── */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionTitle}>Aktivitas Terbaru</span>
           </div>
           <div className={styles.activityList}>
-            {RECENT_ACTIVITY.map((act, i) => (
-              <div key={i} className={styles.activityItem}>
-                <div className={styles.activityDot} style={{ background: typeColor[act.type], color: '#fff' }}>
-                  {typeLabel[act.type]}
-                </div>
-                <div className={styles.activityContent}>
-                  <span className={styles.activityAction}>{act.action}</span>
-                  <span className={styles.activityTime}>{act.time}</span>
-                </div>
-              </div>
-            ))}
+            <div style={{ padding: '24px 16px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '0.85rem' }}>
+              Log aktivitas belum tersedia (fitur audit log belum diimplementasikan).
+            </div>
           </div>
         </section>
       </div>
     </div>
   );
 }
+
+
+
