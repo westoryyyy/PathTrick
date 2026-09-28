@@ -9,7 +9,7 @@ import { ClassifiedSkill } from '@/data/wefSkillData';
    Type Definitions
    ═══════════════════════════════════════════════ */
 
-export type UserRole = 'sma' | 'mahasiswa';
+export type UserRole = 'sma' | 'mahasiswa' | 'admin';
 
 /** RIASEC dimension scores (1–5 each) */
 export interface RIASECScores {
@@ -122,6 +122,7 @@ const DEFAULT_MAHASISWA: MahasiswaAssessmentState = {
 const STEP_COUNTS: Record<UserRole, number> = {
   sma: 3,        // RIASEC → Budget → Preferences
   mahasiswa: 2,  // CV Upload → Work Interest
+  admin: 0,
 };
 
 /* ═══════════════════════════════════════════════
@@ -309,3 +310,10 @@ export function saveUserOnboarding(privyUserId: string) {
 export function clearUserOnboarding(privyUserId: string) {
   localStorage.removeItem(getUserStorageKey(privyUserId));
 }
+
+// Subscribe to changes and save automatically
+useOnboardingStore.subscribe((state) => {
+  if (state.savedPrivyUserId) {
+    saveUserOnboarding(state.savedPrivyUserId);
+  }
+});

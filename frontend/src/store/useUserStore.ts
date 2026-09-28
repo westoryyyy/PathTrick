@@ -18,14 +18,15 @@ interface UserState {
   setProfile: (name: string, email: string) => void;
   setAvatar: (avatarUrl: string) => void;
   clearLevelUpFlag: () => void;
+  hydrateUser: (xp: number, level: number, name: string, email: string) => void;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      totalXP: mockBackendData.user.totalXP,
-      level: mockBackendData.user.level,
-      dailyBountyClaimed: mockBackendData.user.dailyBounty.isClaimed,
+      totalXP: 0,
+      level: 1,
+      dailyBountyClaimed: false,
       hasCompletedQuizToday: false,
       displayName: '',
       displayEmail: '',
@@ -41,6 +42,7 @@ export const useUserStore = create<UserState>()(
       setProfile: (name, email) => set({ displayName: name, displayEmail: email }),
       setAvatar: (avatarUrl) => set({ avatarUrl }),
       clearLevelUpFlag: () => set({ hasJustLeveledUp: false }),
+      hydrateUser: (xp: number, level: number, name: string, email: string) => set({ totalXP: xp, level, displayName: name, displayEmail: email }),
     }),
     {
       name: 'pathtrick-user-storage-v2',

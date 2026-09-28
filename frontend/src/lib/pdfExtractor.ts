@@ -3,7 +3,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Wajib set workerSrc agar tidak error di browser
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 /**
  * Ekstrak teks dari file PDF.
