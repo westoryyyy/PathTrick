@@ -8,6 +8,8 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import styles from './page.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
+import LanguageToggle from '@/components/ui/LanguageToggle';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /* ─── Feature icon cards ─── */
 const FEATURE_ICONS = [
@@ -34,37 +36,39 @@ const HEROES = [
   { avatar: '/npc 6.png', name: 'Pau', wallet: '0x8B39Ba6a701c668B...', title: 'Collage Student', badgeIcon: '🧠', badgeText: 'Quick Learner' },
 ];
 
-const STATS = [
-  { value: '10.5K', label: 'Active Learners' },
-  { value: '40K', label: 'Quests Cleared' },
-  { value: '98%', label: 'Satisfaction' },
-  { value: '3 Min', label: 'Avg. To Start' },
+// Stats values are fixed numbers, only labels are translated (done inside the component)
+const STAT_KEYS = [
+  { value: '10.5K', labelKey: 'landing.stats.activeLearners' },
+  { value: '40K', labelKey: 'landing.stats.questsCleared' },
+  { value: '98%', labelKey: 'landing.stats.satisfaction' },
+  { value: '3 Min', labelKey: 'landing.stats.avgToStart' },
 ];
 
-const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'Docs', href: '/docs' },
+// Nav links use translation keys too
+const NAV_LINK_KEYS = [
+  { labelKey: 'landing.nav.features', href: '#features' },
+  { labelKey: 'landing.nav.docs', href: '/docs' },
 ];
 
 export default function LandingPage() {
   const { login, ready, authenticated } = usePrivy();
+  const { t } = useTranslation();
   const router = useRouter();
   const { selectedRole } = useOnboardingStore();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
 
-  // After Privy OAuth completes, redirect to /select-role.
-  // The select-role page handles returning users (with saved role) → dashboard.
-  React.useEffect(() => {
-    if (ready && authenticated) {
-      router.push('/select-role');
-    }
-  }, [ready, authenticated, router]);
+  // No longer auto-redirecting to /select-role when authenticated.
+  // The user will stay on the landing page until they click a button.
 
   const handleStart = () => {
     if (!ready) return;
     if (authenticated) {
-      router.push('/select-role');
+      if (selectedRole) {
+        router.push(`/${selectedRole}/dashboard`);
+      } else {
+        router.push('/select-role');
+      }
     } else {
       login();
     }
@@ -76,7 +80,7 @@ export default function LandingPage() {
         audioRef.current.play().catch(e => console.log('Autoplay blocked by browser:', e));
       }
     };
-    
+
     // Coba putar langsung saat halaman dibuka
     playAudio();
 
@@ -107,7 +111,7 @@ export default function LandingPage() {
 
   return (
     <div className={styles.page}>
-      
+
       {/* ════════ AUDIO BACKGROUND ════════ */}
       <audio ref={audioRef} src="/music%20for%20Landing%20Page.ogg" autoPlay loop preload="auto" />
 
@@ -126,27 +130,50 @@ export default function LandingPage() {
             />
           </Link>
           <div className={styles.navLinks}>
-            {NAV_LINKS.map(l => (
+            {NAV_LINK_KEYS.map(l => (
               <Link
-                key={l.label}
+                key={l.labelKey}
                 href={l.href}
                 className={styles.navLink}
                 onClick={(e) => handleNavClick(e, l.href)}
               >
-                {l.label}
+                {t(l.labelKey)}
               </Link>
             ))}
           </div>
           <div className={styles.navRight}>
+            <LanguageToggle />
             <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <Image
-                src="/Sign Up.png"
-                alt="Sign Up"
-                width={120}
-                height={36}
-                unoptimized
-                style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
-              />
+              {authenticated ? (
+                <span style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '120px',
+                  height: '36px',
+                  color: 'white', 
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '0.45rem',
+                  backgroundColor: '#DD1A21',
+                  border: '2px solid white',
+                  borderRadius: '4px',
+                  boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.2)',
+                  textTransform: 'capitalize',
+                  textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
+                  lineHeight: 1
+                }}>
+                  Dashboard
+                </span>
+              ) : (
+                <Image
+                  src="/Sign Up.png"
+                  alt="Sign Up"
+                  width={120}
+                  height={36}
+                  unoptimized
+                  style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+                />
+              )}
             </button>
           </div>
         </div>
@@ -178,7 +205,7 @@ export default function LandingPage() {
         </div>
 
         <div className={styles.scrollHint}>
-          <span className={styles.scrollPixel}>Scroll to explore</span>
+          <span className={styles.scrollPixel}>{t('landing.hero.scrollToExplore')}</span>
         </div>
       </section>
 
@@ -204,7 +231,7 @@ export default function LandingPage() {
       <section className={styles.coursesSection}>
         <div className={styles.coursesSectionInner}>
           <div className={styles.coursesSectionHeader}>
-            <h2 className={styles.coursesTitle}>FEATURED COURSES</h2>
+            <h2 className={styles.coursesTitle}>{t('landing.courses.sectionTitle')}</h2>
           </div>
           <div className={styles.courseCards}>
             {COURSES.map((c, i) => {
@@ -227,17 +254,17 @@ export default function LandingPage() {
           <div className={styles.exploreAllWrap}>
             {/* ════════ WALKING GIF (Static) ════════ */}
             <div className={styles.staticGifWrap}>
-              <Image 
-                src="/Walking_transparent_v2.gif" 
-                alt="Walking character" 
-                width={80} 
-                height={80} 
-                unoptimized 
-                style={{ imageRendering: 'pixelated' }} 
+              <Image
+                src="/Walking_transparent_v2.gif"
+                alt="Walking character"
+                width={80}
+                height={80}
+                unoptimized
+                style={{ imageRendering: 'pixelated' }}
                 className={styles.staticGifImg}
               />
             </div>
-            
+
             <button onClick={handleStart} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
               <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
             </button>
@@ -248,11 +275,9 @@ export default function LandingPage() {
       {/* ════════ JOURNEY + WORLD MAP ════════ */}
       <section className={styles.journeySection}>
         <div className={styles.journeySectionInner}>
-          <h2 className={styles.journeyTitle}>YOUR JOURNEY TO A FUTURE STARTS HERE</h2>
+          <h2 className={styles.journeyTitle}>{t('landing.journey.title')}</h2>
           <p className={styles.journeyDesc}>
-            Jelajahi Career Base kamu, dari Study Desk hingga Innovation Campus.
-            Selesaikan Daily Mission dan Weekly Challenge untuk memperluas Skill Tree kamu.
-            Setiap langkah yang kamu ambil akan membuka peluang internship atau pekerjaan impianmu melalui AI Career Finder.
+            {t('landing.journey.desc')}
           </p>
           <div className={styles.worldMapWrap}>
             <div className={styles.worldMapInner}>
@@ -285,14 +310,15 @@ export default function LandingPage() {
         {/* Text Content */}
         <div className={styles.growUpContent}>
           {/* USER: Edit teks "GROW UP WITH" dan logo di bawah ini */}
-          <h2 className={styles.growUpSubtitle}>GROW UP WITH</h2>
+          <h2 className={styles.growUpSubtitle}>{t('landing.growUp.subtitle')}</h2>
           <div className={styles.growUpLogoWrap}>
             <span className={styles.growUpLogoText}>Path<span className={styles.logoAccent}>trick</span></span>
           </div>
 
           {/* USER: Edit paragraf deskripsi di sini */}
           <p className={styles.growUpDesc}>
-            PathTrick hadir untuk mengubah cara kamu merencanakan masa depan. Baik kamu yang masih mencari arah jurusan, sedang menyusun tugas akhir, hingga fresh graduate yang mencari pekerjaan entry-level, sistem AI kami akan memberikan rekomendasi yang presisi. Didukung oleh teknologi blockchain, setiap pencapaianmu akan divalidasi dan tersimpan aman di Achievement Vault.          </p>
+            {t('landing.growUp.desc')}
+          </p>
         </div>
 
         {/* Bridge with characters at the bottom */}
@@ -307,19 +333,19 @@ export default function LandingPage() {
       <section className={styles.hallSection}>
         <div className={styles.hallInner}>
           <h2 className={styles.hallTitle}>
-            <span className={styles.hallTitlePrefix}>Wall Of</span><br />
-            Hero<span className={styles.hallTitleAccent}>es</span>
+            <span className={styles.hallTitlePrefix}>{t('landing.hall.wallOf')}</span><br />
+            {t('landing.hall.heroes').slice(0, -2)}<span className={styles.hallTitleAccent}>{t('landing.hall.heroes').slice(-2)}</span>
           </h2>
 
           {/* Stats row */}
           <div className={styles.statsRow}>
-            {STATS.map((s, i) => (
+            {STAT_KEYS.map((s, i) => (
               <React.Fragment key={i}>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>{s.label}</span>
+                  <span className={styles.statLabel}>{t(s.labelKey)}</span>
                   <span className={styles.statValue}>{s.value}</span>
                 </div>
-                {i < STATS.length - 1 && <span className={styles.statDivider}>/</span>}
+                {i < STAT_KEYS.length - 1 && <span className={styles.statDivider}>/</span>}
               </React.Fragment>
             ))}
           </div>
@@ -354,12 +380,12 @@ export default function LandingPage() {
         <img className={styles.portalGem} src="/red-gem.png" alt="" aria-hidden="true" />
 
         <div className={styles.portalInner}>
-          <p className={styles.portalEyebrow}>Ready to Forge Your Path?</p>
+          <p className={styles.portalEyebrow}>{t('landing.cta.eyebrow')}</p>
           <h2 className={styles.portalTitle}>
-            The portals are <span className={styles.portalOpen}>open</span>
+            {t('landing.cta.title')} <span className={styles.portalOpen}>{t('landing.cta.titleOpen')}</span>
           </h2>
           <p className={styles.portalClaim}>
-            <span className={styles.portalClaimAccent}>Claim</span> your achievement today!
+            <span className={styles.portalClaimAccent}>{t('landing.cta.claimAccent')}</span> {t('landing.cta.claim')}
           </p>
         </div>
       </section>
@@ -384,7 +410,7 @@ export default function LandingPage() {
             <Image src="/PathTrick.png" alt="PathTrick" width={249} height={75} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
           </div>
 
-          <p className={styles.footerTagline}>Embark on an epic journey through pixel realms</p>
+          <p className={styles.footerTagline}>{t('landing.footer.tagline')}</p>
 
           {/* Social icons */}
           <div className={styles.footerSocials}>
@@ -401,10 +427,10 @@ export default function LandingPage() {
 
           {/* Copyright bar */}
           <div className={styles.footerCopyBar}>
-            <span>© 2025 Pathtrick. All rights reserved.</span>
-            <a href="#" className={styles.footerLink}>Privacy Policy</a>
-            <a href="#" className={styles.footerLink}>Term Of Service</a>
-            <a href="#" className={styles.footerLink}>Cookie Settings</a>
+            <span>{t('landing.footer.copyright')}</span>
+            <a href="#" className={styles.footerLink}>{t('landing.footer.privacyPolicy')}</a>
+            <a href="#" className={styles.footerLink}>{t('landing.footer.termOfService')}</a>
+            <a href="#" className={styles.footerLink}>{t('landing.footer.cookieSettings')}</a>
           </div>
         </div>
       </footer>

@@ -1,14 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AdminCRUDTable, { Column, Field } from '@/components/admin/AdminCRUDTable';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 interface Course { id: string; title: string; description: string; published: string; sections: number; }
 
-const INITIAL: Course[] = [
-  { id: '1', title: 'React untuk Pemula', description: 'Dasar-dasar React JS dari nol', published: 'true', sections: 12 },
-  { id: '2', title: 'TypeScript Fundamentals', description: 'Pengenalan TypeScript dan type system', published: 'true', sections: 8 },
-  { id: '3', title: 'SQL & Database Design', description: 'Desain database relasional dan query SQL', published: 'false', sections: 15 },
-];
 
 const COLUMNS: Column<Course>[] = [
   { key: 'title', label: 'Judul Course' },
@@ -30,10 +27,50 @@ const FIELDS: Field[] = [
 ];
 
 export default function CoursesPage() {
-  const [data, setData] = useState(INITIAL);
-  const add = (d: Partial<Course>) => setData(p => [...p, { ...d, id: Date.now().toString(), sections: 0 } as Course]);
-  const edit = (id: string, d: Partial<Course>) => setData(p => p.map(r => r.id === id ? { ...r, ...d } : r));
-  const del = (id: string) => setData(p => p.filter(r => r.id !== id));
+  const [data, setData] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/api/admin/courses`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then((d: Course[]) => setData(Array.isArray(d) ? d : []))
+      .catch(() => setData([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Note: Full course editor (chapters/sections/quiz) is not yet implemented.
+  // Add/Edit here only updates top-level course metadata.
+  const add = async (d: Partial<Course>) => {
+    await fetch(`${API_BASE_URL}/api/admin/courses`, {
+      method: 'POST', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...d, isPublished: d.published === 'true' }),
+    });
+    load();
+  };
+
+  const edit = async (id: string, d: Partial<Course>) => {
+    await fetch(`${API_BASE_URL}/api/admin/courses/${id}`, {
+      method: 'PUT', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...d, isPublished: d.published === 'true' }),
+    });
+    load();
+  };
+
+  const del = async (id: string) => {
+    const res = await fetch(`${API_BASE_URL}/api/admin/courses/${id}`, {
+      method: 'DELETE', headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.message || 'Gagal menghapus');
+      return;
+    }
+    load();
+  };
+
   return (
     <AdminCRUDTable title="MANAJEMEN COURSES" icon="📚" data={data} columns={COLUMNS} fields={FIELDS}
       onAdd={add} onEdit={edit} onDelete={del} searchKeys={['title']} addButtonLabel="Tambah Course" />

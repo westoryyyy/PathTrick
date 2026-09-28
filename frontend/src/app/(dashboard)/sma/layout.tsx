@@ -2,23 +2,25 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import Image from 'next/image';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
+import { useOnboardingStore } from '@/store/useOnboardingStore';
 import PixelIcon from '@/components/ui/PixelIcon';
 import BGMPlayer from '@/components/ui/BGMPlayer';
+import { clearAuthToken } from '@/hooks/useAuthSync';
+import LanguageToggle from '@/components/ui/LanguageToggle';
+import { useTranslation } from '@/hooks/useTranslation';
 
-type NavItem = { href: string; label: string; icon: string; badge?: string };
-
-const NAV_ITEMS: NavItem[] = [
-  { href: '/sma/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/sma/learning-progress', label: 'Learning Progress', icon: '🎯' },
-  { href: '/sma/university-hub', label: 'University Hub', icon: '🎓' },
-  { href: '/sma/scholarship-hub', label: 'Scholarship Hub', icon: '📜' },
-  { href: '/sma/certificate', label: 'Relics & Treasures', icon: '🏆' },
+const NAV_KEYS: { href: string; labelKey: string; icon: string; badge?: string }[] = [
+  { href: '/sma/dashboard', labelKey: 'nav.sma.dashboard', icon: '📊' },
+  { href: '/sma/learning-progress', labelKey: 'nav.sma.learningProgress', icon: '🎯' },
+  { href: '/sma/university-hub', labelKey: 'nav.sma.universityHub', icon: '🎓' },
+  { href: '/sma/scholarship-hub', labelKey: 'nav.sma.scholarshipHub', icon: '📜' },
+  { href: '/sma/certificate', labelKey: 'nav.sma.relicsAndTreasures', icon: '🏆' },
 ];
 
 export default function SMALayout({
@@ -26,6 +28,7 @@ export default function SMALayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,9 +51,22 @@ export default function SMALayout({
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : '');
 
   const handleLogout = async () => {
+    clearAuthToken();
     await logout();
     router.push('/');
   };
+
+  // ── Route Guard: role dari backend harus 'sma' ──
+  const { selectedRole, savedPrivyUserId } = useOnboardingStore();
+  useEffect(() => {
+    if (!user) return;
+    if (!selectedRole) return; // belum selesai hydrate dari backend
+    if (savedPrivyUserId !== user.id) return; // beda user, biarkan hydrate dulu
+    if (selectedRole !== 'sma') {
+      // User ini bukan DREAMER — arahkan ke dashboard yang sesuai
+      router.replace(`/${selectedRole}/dashboard`);
+    }
+  }, [user, selectedRole, savedPrivyUserId, router]);
 
   const playHoverSound = () => {
     try {
@@ -79,29 +95,24 @@ export default function SMALayout({
           <div className={styles.logo}>
             <Image src="/PathTrick.png" alt="PathTrick" width={180} height={40} className={styles.logoImg} priority />
           </div>
-          <span className={styles.roleBadge}>The Dreamer</span>
+          <span className={styles.roleBadge}>{t('nav.sma.roleBadge')}</span>
         </div>
 
         <nav className={styles.nav}>
-          {NAV_ITEMS.map((item) => {
+          {NAV_KEYS.map((item) => {
             const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/sma/dashboard' && item.href !== '/sma');
 
             return (
               <Link
-                key={item.label}
+                key={item.href}
                 href={item.href}
                 className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
                 onMouseEnter={playHoverSound}
               >
                 <div className={styles.navIconTitle}>
                   <PixelIcon icon={item.icon} size={22} />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                 </div>
-                {item.badge && (
-                  <span className={`${styles.navBadge} ${item.badge === 'Peta' ? styles.navBadgeBlue : ''}`}>
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             );
           })}
@@ -118,8 +129,9 @@ export default function SMALayout({
         {/* Top Bar Header */}
         <header className={styles.header}>
           
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <BGMPlayer />
+            <LanguageToggle />
           </div>
 
           <div className={styles.headerActions}>
@@ -150,16 +162,16 @@ export default function SMALayout({
                   padding: '12px'
                 }}>
                   <div style={{ borderBottom: '2px dashed #5a3a29', paddingBottom: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>INBOX</span>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>{t('common.inbox')}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>AI Career Coach</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>Your personal roadmap is ready! Let&apos;s explore.</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>{t('common.aiCareerCoach')}</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>{t('common.roadmapReady')}</p>
                     </div>
                     <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>PathTrick Sys</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>A new scholarship matching your profile was found.</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>{t('common.pathTrickSys')}</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>{t('common.scholarshipFound')}</p>
                     </div>
                   </div>
                 </div>
@@ -193,12 +205,12 @@ export default function SMALayout({
                   padding: '12px'
                 }}>
                   <div style={{ borderBottom: '2px dashed #5a3a29', paddingBottom: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>ALERTS</span>
+                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>{t('common.alerts')}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ background: '#3b261b', padding: '10px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontSize: '0.55rem', color: '#fbbf24', lineHeight: '1.4', fontFamily: '"Press Start 2P"' }}>Naik Kelas!</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d1d5db', marginTop: '6px' }}>Kamu sekarang Level 2.</p>
+                      <p style={{ fontSize: '0.55rem', color: '#fbbf24', lineHeight: '1.4', fontFamily: '"Press Start 2P"' }}>{t('sma.notifications.levelUp')}</p>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d1d5db', marginTop: '6px' }}>{t('sma.notifications.reachedLevel2')}</p>
                     </div>
                   </div>
                 </div>
@@ -242,25 +254,25 @@ export default function SMALayout({
                   padding: '8px'
                 }}>
                   <div style={{ padding: '12px', borderBottom: '2px dashed #5a3a29' }}>
-                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fbbf24', marginBottom: '8px' }}>Web3 Wallet Address:</p>
+                    <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fbbf24', marginBottom: '8px' }}>{t('common.walletAddress')}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#d1d5db', wordBreak: 'break-all', background: '#3b261b', padding: '8px', borderRadius: '4px', border: '1px solid #5a3a29', flex: 1, margin: 0 }}>
-                        {activeWallet ? activeWallet.address : 'Auto-created on Mint'}
+                        {activeWallet ? activeWallet.address : t('common.autoCreatedOnMint')}
                       </p>
                       {activeWallet && (
                         <button 
                           onClick={() => navigator.clipboard.writeText(activeWallet.address)}
                           style={{ background: '#5cb85c', border: '2px solid #224a22', color: '#fff', padding: '6px', cursor: 'pointer', borderRadius: '4px' }}
-                          title="Copy Address"
+                          title={t('common.copyAddress')}
                         >
                           📋
                         </button>
                       )}
                     </div>
                   </div>
-                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Edit Profile</button>
-                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>Docs</button>
-                  <button onMouseEnter={playHoverSound} onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}><span>LOG OUT</span> <Image src="/exit icon.png" alt="Logout" width={20} height={20} style={{ imageRendering: 'pixelated' }} /></button>
+                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/profile')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>{t('common.editProfile')}</button>
+                  <button onMouseEnter={playHoverSound} onClick={() => router.push('/docs')} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b', cursor: 'pointer' }}>{t('common.docs')}</button>
+                  <button onMouseEnter={playHoverSound} onClick={handleLogout} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#b91c1c', cursor: 'pointer', borderTop: '2px dashed #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}><span>{t('common.logout')}</span> <Image src="/exit icon.png" alt="Logout" width={20} height={20} style={{ imageRendering: 'pixelated' }} /></button>
                 </div>
               )}
             </div>

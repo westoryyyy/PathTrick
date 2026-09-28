@@ -1,0 +1,205 @@
+{
+  "common": {
+    "logout": "\ud83d\udeaa LOG OUT",
+    "editProfile": "Edit Profile",
+    "docs": "Docs",
+    "inbox": "INBOX",
+    "alerts": "ALERTS",
+    "walletAddress": "Web3 Wallet Address:",
+    "autoCreatedOnMint": "Auto-created on Mint",
+    "copyAddress": "Copy Address",
+    "loadingAiInsights": "LOADING AI INSIGHTS...",
+    "loadingDashboard": "LOADING DASHBOARD...",
+    "loadingMissionData": "LOADING MISSION DATA...",
+    "levelUp": "Level Up!",
+    "reachedLevel2": "You reached Level 2.",
+    "aiRecruiter": "AI Recruiter",
+    "aiRecruiterMsg": "I found 5 new jobs matching your skills!",
+    "pathTrickSys": "PathTrick Sys",
+    "sqlBadgeMinted": "Your SQL badge has been minted on-chain.",
+    "aiCareerCoach": "AI Career Coach",
+    "roadmapReady": "Your personal roadmap is ready! Let's explore.",
+    "scholarshipFound": "A new scholarship matching your profile was found."
+  },
+  "nav": {
+    "mahasiswa": {
+      "dashboard": "Dashboard",
+      "learningMission": "Learning Mission",
+      "careerHub": "Career Hub",
+      "skillBadges": "Skill Badges",
+      "roleBadge": "The Chaser"
+    },
+    "sma": {
+      "dashboard": "Dashboard",
+      "learningProgress": "Learning Progress",
+      "universityHub": "University Hub",
+      "scholarshipHub": "Scholarship Hub",
+      "relicsAndTreasures": "Relics & Treasures",
+      "roleBadge": "The Dreamer"
+    }
+  },
+  "mahasiswa": {
+    "dashboard": {
+      "welcomeBack": "WELCOME BACK, {name}!",
+      "subtitle": "Your AI Career Roadmap is actively scanning the best opportunities for you.",
+      "careerRank": "CAREER RANK",
+      "nextTier": "Next Tier: {tier}",
+      "xpProgress": "XP PROGRESS",
+      "progression": "PROGRESSION",
+      "dailyMission": "Daily Mission",
+      "weeklyChallenge": "Weekly Challenge",
+      "skillTree": "Skill Tree",
+      "achievementVault": "Achievement Vault",
+      "unlocked": "4 Unlocked",
+      "active": "Active",
+      "aiJobMatch": "AI JOB MATCH",
+      "jobsFoundThisWeek": "5 suitable jobs found this week!",
+      "viewAllMatches": "VIEW ALL MATCHES"
+    },
+    "applications": {
+      "title": "JOB APPLICATIONS",
+      "subtitle": "Track your zero-knowledge SBT applications here.",
+      "applicationSuccessful": "APPLICATION SUCCESSFUL",
+      "statusUnderReview": "Status: UNDER REVIEW (Smart Contract Escrow)",
+      "backToCareerHub": "BACK TO CAREER HUB"
+    },
+    "careerHub": {
+      "title": "AI CAREER HUB",
+      "subtitle": "The AI system compares your on-chain SBT portfolio against industry qualifications in real-time. Here is your match percentage and skill gap analysis.",
+      "skillLevelTooLow": "SKILL LEVEL TOO LOW",
+      "noSkillsMsg": "Your Web3 wallet has no earned Skill Badges (SBTs). The AI cannot accurately match you with verified job positions until you complete fundamental training.",
+      "goToLearningMission": "GO TO LEARNING MISSION",
+      "resetDemoState": "[Reset Demo State]",
+      "allFilter": "ALL",
+      "allRequirementsMet": "All Requirements Met!",
+      "requirementAnalysis": "Requirement Analysis:",
+      "trainMissingSkills": "TRAIN MISSING SKILLS",
+      "oneClickApply": "ONE-CLICK APPLY",
+      "simulateEmptyProfile": "Simulate Empty Profile (Zero SBTs)"
+    },
+    "leaderboard": {
+      "title": "SKILL BADGES & CERTIFICATES",
+      "subtitle": "Show off your skills to the world! Collect these badges by completing modules and make your Web3 portfolio shine to attract recruiters.",
+      "badgesUnlocked": "BADGES UNLOCKED"
+    }
+  },
+  "sma": {
+    "dashboard": {
+      "welcomeBack": "WELCOME BACK, {name}!",
+      "subtitle": "Your AI Education Roadmap is actively scanning for the best university and scholarship opportunities.",
+      "xpProgress": "XP PROGRESS",
+      "universityRank": "UNIVERSITY RANK",
+      "target": "Target: ",
+      "readiness": "READINESS",
+      "match": "% MATCH",
+      "scholarshipRank": "SCHOLARSHIP RANK",
+      "profileMatch": "PROFILE MATCH",
+      "questLog": "QUEST LOG (MISSIONS)",
+      "claimed": "CLAIMED",
+      "claim": "CLAIM",
+      "weeklyLeaderboard": "WEEKLY LEADERBOARD",
+      "you": "(YOU)",
+      "achievementVault": "ACHIEVEMENT VAULT",
+      "viewAll": "VIEW ALL",
+      "universityAiFeedback": "Complete 2 more courses to reach 100% readiness!",
+      "scholarshipAiFeedback": "Perfect match for your RIASEC profile & financial needs.",
+      "mantras": {
+        "0": "You doubt yourself, yet secretly many admire your progress. Stop being your own harshest critic.",
+        "1": "Feeling like an impostor because you're not an expert yet? It's not a sign of weakness. It means you dared to step into a room bigger than your comfort zone.",
+        "2": "Your level has gone up, but mentally you still feel like you're at level one. Acknowledge today's achievements, no matter how small.",
+        "3": "Being smart doesn't mean never being confused. It means having the courage to keep seeking answers even when you feel like the dumbest person in the room.",
+        "4": "This room might feel too big for you right now. But that's okay, soon you will grow to fill every corner of it.",
+        "5": "Having too many paths makes you stand still. Close your eyes, pick one skill today. Getting lost while trying is much better than freezing at the starting line.",
+        "6": "Your head is too noisy thinking about next year's worst-case scenarios. Take a breath. Your only job today is to finish what is right in front of you.",
+        "7": "You panic because the final destination isn't visible yet. But did you realize? The small steps you take every day are automatically paving that path.",
+        "8": "Don't let an unwritten future steal today's peace. Complete one small task, then rest.",
+        "9": "The failure scenarios in your head are just fiction. In reality, you are much tougher than you imagine.",
+        "10": "No one sees how many times you repeated, deleted, and tried again last night. But believe me, those quiet nights are what will mold you into an expert.",
+        "11": "You're tired because today's efforts didn't yield instant results. Don't be fooled. A strong foundation is always built underground, invisible at first.",
+        "12": "Sometimes it feels very lonely struggling alone to understand something new. But remember, the deadliest weapons are always forged in silent rooms.",
+        "13": "Your computer screen is the silent witness to how many times you refused to give up. Be proud of that persistence.",
+        "14": "The final result is what's displayed to the world, but the messy behind-the-scenes process is what truly matures you.",
+        "15": "Constantly peeking at other people's screens will only make you blind to your own map. You are not behind, you are carving your own shortcut.",
+        "16": "Anxious seeing those who have soared far ahead? They have their own cheat codes, and you have your own tricks. Don't use someone else's ruler to measure your success.",
+        "17": "Being envious of their final results is human. But you forget, you never saw how broken they were when they first started.",
+        "18": "Blooming at a different time doesn't mean you failed to bloom. Your time will come when your roots are ready.",
+        "19": "They run fast on a track. You are climbing a mountain. Of course your speeds are different. Just enjoy the climb.",
+        "20": "You are waiting for the '100% ready' moment that will never arrive. Just jump. You will learn how to land while you're falling.",
+        "21": "Afraid of choosing the wrong role or skill? The biggest mistake isn't picking the wrong path, it's not having the courage to choose at all.",
+        "22": "Behind every fear of starting, there is a future version of you who is thankful that today you dared to press the start button.",
+        "23": "The 'start' button is indeed the hardest to press. But believe me, once pressed, your greatest fear has been surpassed.",
+        "24": "It is far better to fail from trying to step forward, than to regret spending your whole life watching from the sidelines.",
+        "25": "If today feels too heavy, just surviving and closing your eyes is also a victory. Rest, tomorrow we start again.",
+        "26": "Even the most advanced systems need a restart. You are human, not a machine. Allow yourself to rest without guilt.",
+        "27": "Crying when hitting a dead end is normal. Let it all out, then look at your screen again later with a clearer mind.",
+        "28": "You don't have to know the answer right now. What's important is you're willing to find out. That is more than enough.",
+        "29": "Your exam scores do not measure your worth. Believe that.",
+        "30": "There are moments when you will feel this is too hard. That is exactly when your growth is happening.",
+        "31": "The best teacher you've ever had is your own curiosity. Don't kill it.",
+        "32": "It's not the smartest one who will succeed. It's the one most willing to learn.",
+        "33": "Everyone you admire was once in the exact same position you are right now.",
+        "34": "If today feels heavy, it's not a sign you are weak. It's a sign you are carrying something meaningful.",
+        "35": "You are allowed to be scared. But stepping forward despite the fear, that's called bravery.",
+        "36": "Mistakes are not your enemy. Mistakes are your best way to learn what isn't taught in any book.",
+        "37": "Don't compare your chapter 1 to someone else's chapter 20.",
+        "38": "The knowledge you gain today is something no one can ever take from you. Forever.",
+        "39": "You are not wasting time. You are building the foundation that will later support everything.",
+        "40": "A love for learning is not an innate talent. It is something you discover when you find the right thing.",
+        "41": "One consistent small step beats a giant leap that only happens once.",
+        "42": "You are more capable than you think. Seriously. People out there sometimes see it more clearly than you do.",
+        "43": "Even vague dreams are worth fighting for. Later along the way, the map will become clearer.",
+        "44": "Nothing you learn is ever wasted, even if it feels irrelevant right now."
+      },
+      "clickToClose": "click to close",
+      "pathtrickWisdom": "PathTrick Wisdom"
+    },
+    "notifications": {
+      "levelUp": "Level Up!",
+      "reachedLevel2": "You reached Level 2."
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "docs": "Docs"
+    },
+    "hero": {
+      "scrollToExplore": "Scroll to explore"
+    },
+    "courses": {
+      "sectionTitle": "FEATURED COURSES"
+    },
+    "journey": {
+      "title": "YOUR JOURNEY TO A FUTURE STARTS HERE",
+      "desc": "Explore your Career Base, from Study Desk to Innovation Campus. Complete Daily Missions and Weekly Challenges to expand your Skill Tree. Every step you take will unlock internship or dream job opportunities through AI Career Finder."
+    },
+    "growUp": {
+      "subtitle": "GROW UP WITH",
+      "desc": "PathTrick is here to change the way you plan your future. Whether you are still looking for a major direction, working on your thesis, or a fresh graduate seeking entry-level work, our AI system will provide precise recommendations. Backed by blockchain technology, every achievement is validated and safely stored in your Achievement Vault."
+    },
+    "hall": {
+      "wallOf": "Wall Of",
+      "heroes": "Heroes"
+    },
+    "stats": {
+      "activeLearners": "Active Learners",
+      "questsCleared": "Quests Cleared",
+      "satisfaction": "Satisfaction",
+      "avgToStart": "Avg. To Start"
+    },
+    "cta": {
+      "eyebrow": "Ready to Forge Your Path?",
+      "title": "The portals are",
+      "titleOpen": "open",
+      "claim": "your achievement today!",
+      "claimAccent": "Claim"
+    },
+    "footer": {
+      "tagline": "Embark on an epic journey through pixel realms",
+      "copyright": "2025 Pathtrick. All rights reserved.",
+      "privacyPolicy": "Privacy Policy",
+      "termOfService": "Term Of Service",
+      "cookieSettings": "Cookie Settings"
+    }
+  }
+}

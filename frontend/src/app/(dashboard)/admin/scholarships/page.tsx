@@ -1,6 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AdminCRUDTable, { Column, Field } from '@/components/admin/AdminCRUDTable';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 interface Scholarship { id: string; title: string; provider: string; matchScore: number; deadline: string; coverage: string; requirements: string[]; url: string; coverImage?: string; }
 
@@ -67,25 +69,46 @@ const FIELDS: Field[] = [
 
 export default function ScholarshipsPage() {
   const [data, setData] = useState<Scholarship[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('demo_scholarships');
-    if (stored) {
-      setData(JSON.parse(stored));
-    } else {
-      setData(MOCK_SCHOLARSHIPS);
-      localStorage.setItem('demo_scholarships', JSON.stringify(MOCK_SCHOLARSHIPS));
-    }
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/api/admin/scholarships`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then((d: Scholarship[]) => setData(Array.isArray(d) ? d : []))
+      .catch(() => setData([]))
+      .finally(() => setLoading(false));
   }, []);
 
-  const saveToLocal = (newData: Scholarship[]) => {
-    setData(newData);
-    localStorage.setItem('demo_scholarships', JSON.stringify(newData));
+  useEffect(() => { load(); }, [load]);
+
+  const add = async (d: Partial<Scholarship>) => {
+    await fetch(`${API_BASE_URL}/api/admin/scholarships`, {
+      method: 'POST', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(d),
+    });
+    load();
   };
 
-  const add = (d: Partial<Scholarship>) => saveToLocal([...data, { ...d, id: Date.now().toString(), matchScore: Number(d.matchScore) || 50, requirements: d.requirements || [] } as Scholarship]);
-  const edit = (id: string, d: Partial<Scholarship>) => saveToLocal(data.map(r => r.id === id ? { ...r, ...d, matchScore: Number(d.matchScore) || r.matchScore } : r));
-  const del = (id: string) => saveToLocal(data.filter(r => r.id !== id));
+  const edit = async (id: string, d: Partial<Scholarship>) => {
+    await fetch(`${API_BASE_URL}/api/admin/scholarships/${id}`, {
+      method: 'PUT', headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(d),
+    });
+    load();
+  };
+
+  const del = async (id: string) => {
+    const res = await fetch(`${API_BASE_URL}/api/admin/scholarships/${id}`, {
+      method: 'DELETE', headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.message || 'Gagal menghapus');
+      return;
+    }
+    load();
+  };
 
   return (
     <AdminCRUDTable title="MANAJEMEN BEASISWA" icon="💰" data={data} columns={COLUMNS} fields={FIELDS}

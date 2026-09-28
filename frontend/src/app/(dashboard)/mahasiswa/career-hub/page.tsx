@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useScholarStore } from '@/store/useScholarStore';
 import { GICS_SECTORS, GICSSectorCode, getGICSSector } from '@/data/gicsData';
 import styles from '@/components/ui/Dashboard.module.css';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface JobWithGaps {
   id: string;
@@ -19,6 +20,7 @@ interface JobWithGaps {
 }
 
 export default function CareerHubPage() {
+  const { t } = useTranslation();
   const { matchedJobs, earnedSBTs, fetchProfileData, isLoading, clearSkills } = useScholarStore();
   const [analyzedJobs, setAnalyzedJobs] = useState<JobWithGaps[]>([]);
   const [activeFilter, setActiveFilter] = useState<GICSSectorCode | null>(null);
@@ -39,7 +41,7 @@ export default function CareerHubPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: '"Press Start 2P"', color: '#fbbf24' }}>
-        LOADING AI INSIGHTS...
+        {t('common.loadingAiInsights')}
       </div>
     );
   }
@@ -50,11 +52,11 @@ export default function CareerHubPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center', marginTop: '64px' }}>
         <div className={styles.retroCard} style={{ maxWidth: '600px', width: '100%' }}>
           <div className={styles.cardHeader} style={{ background: '#7f1d1d' }}>
-            <span className={styles.cardTitle}>SKILL LEVEL TOO LOW</span>
+            <span className={styles.cardTitle}>{t('mahasiswa.careerHub.skillLevelTooLow')}</span>
           </div>
           <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', textAlign: 'center' }}>
             <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.8' }}>
-              Your Web3 wallet has no earned Skill Badges (SBTs). The AI cannot accurately match you with verified job positions until you complete fundamental training.
+              {t('mahasiswa.careerHub.noSkillsMsg')}
             </p>
             <Link href="/mahasiswa/learning-mission" style={{
               display: 'block',
@@ -69,11 +71,11 @@ export default function CareerHubPage() {
               cursor: 'pointer',
               textDecoration: 'none'
             }}>
-              GO TO LEARNING MISSION
+              {t('mahasiswa.careerHub.goToLearningMission')}
             </Link>
 
             <button onClick={() => window.location.reload()} style={{ marginTop: '16px', background: 'none', border: 'none', color: '#a3a3a3', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer', textDecoration: 'underline' }}>
-              [Reset Demo State]
+              {t('mahasiswa.careerHub.resetDemoState')}
             </button>
           </div>
         </div>
@@ -87,10 +89,10 @@ export default function CareerHubPage() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          AI CAREER HUB
+          {t('mahasiswa.careerHub.title')}
         </h1>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
-          Sistem AI membandingkan portofolio SBT on-chain kamu dengan kualifikasi industri secara real-time. Berikut adalah persentase kecocokan dan skill gap kamu.
+          {t('mahasiswa.careerHub.subtitle')}
         </p>
       </div>
 
@@ -109,7 +111,7 @@ export default function CareerHubPage() {
             boxSizing: 'border-box'
           }}
         >
-          ALL
+          {t('mahasiswa.careerHub.allFilter')}
         </button>
         {GICS_SECTORS.map(sector => (
           <button
@@ -187,7 +189,7 @@ export default function CareerHubPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: `2px solid ${isPerfectMatch ? '#fbbf24' : '#5a3a29'}` }}>
                     <h4 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '1.1rem', color: isPerfectMatch ? '#fbbf24' : '#fff', margin: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {isPerfectMatch && <img src="/Gold Ticket.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated' }} />}
-                      {isPerfectMatch ? 'All Requirements Met!' : 'Requirement Analysis:'}
+                      {isPerfectMatch ? t('mahasiswa.careerHub.allRequirementsMet') : t('mahasiswa.careerHub.requirementAnalysis')}
                     </h4>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 12px' }}>
                       {job.possessed.map((skill: string) => (
@@ -230,7 +232,7 @@ export default function CareerHubPage() {
                       textAlign: 'center',
                       textDecoration: 'none'
                     }}>
-                      TRAIN MISSING SKILLS
+                      {t('mahasiswa.careerHub.trainMissingSkills')}
                     </Link>
                   ) : (
                     <Link href="/mahasiswa/applications" style={{
@@ -247,7 +249,7 @@ export default function CareerHubPage() {
                       textAlign: 'center',
                       textDecoration: 'none'
                     }}>
-                      ONE-CLICK APPLY ⚡
+                      {t('mahasiswa.careerHub.oneClickApply')}
                     </Link>
                   )}
                 </div>
@@ -260,7 +262,7 @@ export default function CareerHubPage() {
       <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', border: '2px dashed #5a3a29' }}>
         <span style={{ fontSize: '1.2rem' }}>🛠️</span>
         <button onClick={clearSkills} style={{ background: 'none', color: '#d4a373', border: 'none', cursor: 'pointer', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', textDecoration: 'underline' }}>
-          Simulate Empty Profile (Zero SBTs)
+          {t('mahasiswa.careerHub.simulateEmptyProfile')}
         </button>
       </div>
     </div>

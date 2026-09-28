@@ -6,10 +6,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { wagmiConfig } from "@/config/wagmi";
 import DevPanel from "@/components/ui/DevPanel";
+import { useAuthSync } from "@/hooks/useAuthSync";
 
 import { bscTestnet } from "viem/chains";
 
 const queryClient = new QueryClient();
+
+// Must be inside PrivyProvider to call usePrivy hooks
+function AuthSyncMounter() {
+  useAuthSync();
+  return null;
+}
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -33,8 +40,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig}>
-          {children}
-          <DevPanel />
+          <>
+            <AuthSyncMounter />
+            {children}
+            <DevPanel />
+          </>
         </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>

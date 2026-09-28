@@ -12,7 +12,21 @@ import {
   isLocalRoleFallbackEnabled,
   readApiResponse,
 } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
+
+/**
+ * Bridge: backend role id/name → frontend route slug.
+ * Satu-satunya tempat yang perlu diupdate kalau nama route berubah.
+ */
+const ROLE_TO_ROUTE: Record<string, UserRole> = {
+  // by id (dari seed)
+  'role-dreamer': 'sma',
+  'role-chaser': 'mahasiswa',
+  // by name (fallback)
+  'DREAMER': 'sma',
+  'CHASER': 'mahasiswa',
+};
 import PixelIcon from '@/components/ui/PixelIcon';
 import styles from './page.module.css';
 
@@ -49,7 +63,7 @@ export default function SelectRolePage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${API_BASE_URL}/api/roles`, { credentials: 'include' })
+    fetch(`${API_BASE_URL}/api/roles`, { headers: { ...getAuthHeaders() } })
       .then(async (response) => {
         const data = await readApiResponse(response);
         if (!response.ok) throw new Error(getApiError(data, 'Gagal memuat role.'));
@@ -63,7 +77,7 @@ export default function SelectRolePage() {
           typeof role.description === 'string' &&
           Array.isArray(role.perks) &&
           role.perks.every((perk: unknown) => typeof perk === 'string') &&
-          typeof role.imageUrl === 'string'
+          typeof role.iconUrl === 'string'
         );
         if (!validRoles.length) throw new Error('Backend tidak mengembalikan role yang valid.');
         if (!cancelled) setRoles(validRoles);
@@ -129,28 +143,46 @@ export default function SelectRolePage() {
     }
     try {
       setEntering(true);
+
+      // Detect ADMIN role (id atau name)
+      const selectedRole = roles.find(r => r.id === selected);
+      const roleName = (selectedRole as any)?.name ?? '';
+      const routeSlug = ROLE_TO_ROUTE[selected] ?? ROLE_TO_ROUTE[roleName];
+      if (selected === 'role-admin' || roleName === 'ADMIN') {
+        // Admin tidak perlu assessment — langsung ke panel admin
+        await fetch(`${API_BASE_URL}/api/users/me/role`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ roleId: selected }),
+        });
+        router.push('/admin/dashboard');
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/users/me/role`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ roleId: selected }),
       });
       const data = await readApiResponse(response);
       if (!response.ok) throw new Error(getApiError(data, 'Role gagal disimpan.'));
-      if (selected !== 'sma' && selected !== 'mahasiswa') {
+      if (!routeSlug) {
         throw new Error('Role dari backend belum memiliki halaman yang tersedia.');
       }
-      setRole(selected as UserRole, user?.id);
+      setRole(routeSlug, user?.id);
       router.push('/assessment');
     } catch (error) {
       console.warn('Role API unavailable:', error);
-      if (selected !== 'sma' && selected !== 'mahasiswa') {
+      const selectedRole = roles.find(r => r.id === selected);
+      const roleName = (selectedRole as any)?.name ?? '';
+      const routeSlug = ROLE_TO_ROUTE[selected] ?? ROLE_TO_ROUTE[roleName];
+      if (!routeSlug) {
         setRolesError(error instanceof Error ? error.message : 'Role gagal disimpan.');
         setEntering(false);
         return;
       }
       if (isLocalRoleFallbackEnabled()) {
-        setRole(selected as UserRole, user?.id);
+        setRole(routeSlug, user?.id);
         router.push('/assessment');
       } else {
         setRolesError('Role gagal disimpan. Coba lagi atau hubungi administrator.');
@@ -373,7 +405,7 @@ export default function SelectRolePage() {
                   </div>
                   <div className={styles.panelBody}>
                     <Image
-                      src={role.imageUrl || '/PathTrick.png'}
+                      src={role.iconUrl || '/PathTrick.png'}
                       alt={role.displayName}
                       width={160}
                       height={160}
