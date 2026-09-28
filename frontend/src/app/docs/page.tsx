@@ -39,8 +39,8 @@ export default function DocsPage() {
     { key: 'overview', label: '1. Overview', group: 'GENERAL' },
     { key: 'background', label: '2. Background', group: '' },
     { key: 'web3_infra', label: '3. Web3 Infrastructure', group: '' },
-    { key: 'feature_sma', label: '4. Feature: SMA', group: 'FEATURES' },
-    { key: 'feature_mahasiswa', label: '5. Feature: Mahasiswa', group: '' },
+    { key: 'feature_sma', label: '4. Feature: The Dreamer', group: 'FEATURES' },
+    { key: 'feature_mahasiswa', label: '5. Feature: The Chaser', group: '' },
     { key: 'eight_houses', label: '6. The 8 Houses', group: '' },
     { key: 'smart_contract', label: '7. Smart Contract', group: 'BLOCKCHAIN' },
     { key: 'ai_riasec', label: '8. AI: RIASEC Engine', group: 'AI ENGINE' },
@@ -355,7 +355,7 @@ export default function DocsPage() {
           {/* ── 4. FEATURE SMA ── */}
           {activeSection === 'feature_sma' && (
             <>
-              <h2 className={styles.docTitle}>FEATURE: SISWA SMA</h2>
+              <h2 className={styles.docTitle}>FEATURE: THE DREAMER</h2>
               <div className={styles.separator} />
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Persona: "The Dreamer"</h3>
@@ -364,11 +364,11 @@ export default function DocsPage() {
                 </p>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>User Flow SMA</h3>
-                <Image src="/user-flow-sma-v2.png" alt="User Flow SMA" width={1024} height={576} className={styles.pixelImage} />
+                <h3 className={styles.sectionTitle}>User Flow The Dreamer</h3>
+                <Image src="/user-flow-sma-v2.png" alt="User Flow The Dreamer" width={1024} height={576} className={styles.pixelImage} />
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Fitur Utama Dashboard SMA</h3>
+                <h3 className={styles.sectionTitle}>Fitur Utama Dashboard The Dreamer</h3>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
@@ -381,29 +381,38 @@ export default function DocsPage() {
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
-                      <Image src="/readiness_logo.jpg" alt="Readiness" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
-                      <div className={styles.cardTitle}>Readiness Meter</div>
+                      <Image src="/bounty_logo.jpg" alt="Learning Progress" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <div className={styles.cardTitle}>Learning Progress</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Ini adalah kompas penunjuk arah mereka. Indikator kesiapan ini akan terus merangkak naik setiap kali mereka berhasil menuntaskan quest. Saksikan bagaimana mereka berevolusi dari seorang Explorer pemula hingga menjelma menjadi Future Maba yang siap bertempur.
+                      Melalui daftar quest harian dan tantangan mingguan yang epik, The Dreamer dapat melacak indikator kesiapan (Readiness Meter) mereka. Sistem mekanik ini sengaja dirancang untuk menjaga api semangat belajar agar tidak pernah padam di tengah petualangan.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
-                      <Image src="/radar_logo.jpg" alt="Radar" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
-                      <div className={styles.cardTitle}>Scholarship Radar</div>
+                      <Image src="/readiness_logo.jpg" alt="University Hub" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <div className={styles.cardTitle}>University Hub</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Tidak ada mimpi yang boleh padam hanya karena biaya. Sistem radar kita secara aktif mencocokkan profil sang petualang dengan lautan database beasiswa secara real-time. Mereka akan merangkak dari seorang Scholarship Hunter hingga bersinar sebagai Awardee Material.
+                      Ruang khusus bagi The Dreamer untuk mengeksplorasi informasi detail kampus dan program studi. Di sini mereka bisa memetakan dan menentukan target masa depan dengan lebih konkret sesuai dengan hasil asesmen mereka.
                     </div>
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
-                      <Image src="/bounty_logo.jpg" alt="Bounty" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
-                      <div className={styles.cardTitle}>Bounty & Boss</div>
+                      <Image src="/radar_logo.jpg" alt="Scholarship Hub" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <div className={styles.cardTitle}>Scholarship Hub</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Konsistensi adalah kunci kemenangan. Melalui daftar quest harian dan tantangan mingguan yang epik, mereka akan berburu bonus XP tambahan. Sistem mekanik ini sengaja dirancang untuk menjaga api semangat belajar agar tidak pernah padam di tengah petualangan.
+                      Tidak ada mimpi yang boleh padam hanya karena biaya. Sistem ini secara aktif mencocokkan profil sang petualang dengan lautan database beasiswa secara real-time, mengubah mereka dari Scholarship Hunter menjadi Awardee Material.
+                    </div>
+                  </div>
+                  <div className={styles.featureCard}>
+                    <div className={styles.cardHeader}>
+                      <Image src="/vault_logo.jpg" alt="Relics & Treasures" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <div className={styles.cardTitle}>Relics & Treasures</div>
+                    </div>
+                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
+                      Sebuah ruang harta karun untuk menyimpan setiap sertifikat atau pencapaian on-chain yang berhasil didapatkan. Ini menjadi bukti langkah-langkah nyata mereka dalam mempersiapkan masa depan.
                     </div>
                   </div>
                 </div>
@@ -414,7 +423,7 @@ export default function DocsPage() {
           {/* ── 5. FEATURE MAHASISWA ── */}
           {activeSection === 'feature_mahasiswa' && (
             <>
-              <h2 className={styles.docTitle}>FEATURE: MAHASISWA</h2>
+              <h2 className={styles.docTitle}>FEATURE: THE CHASER</h2>
               <div className={styles.separator} />
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Persona: "The Chaser"</h3>
@@ -423,11 +432,11 @@ export default function DocsPage() {
                 </p>
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>User Flow Mahasiswa</h3>
-                <Image src="/docs-flow-mahasiswa-v2.jpg" alt="User Flow Mahasiswa" width={900} height={394} className={styles.gameImage} />
+                <h3 className={styles.sectionTitle}>User Flow The Chaser</h3>
+                <Image src="/docs-flow-mahasiswa-v2.jpg" alt="User Flow The Chaser" width={900} height={394} className={styles.gameImage} />
               </section>
               <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>Fitur Utama Dashboard Mahasiswa</h3>
+                <h3 className={styles.sectionTitle}>Fitur Utama Dashboard The Chaser</h3>
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
@@ -458,11 +467,11 @@ export default function DocsPage() {
                   </div>
                   <div className={styles.featureCard}>
                     <div className={styles.cardHeader}>
-                      <Image src="/vault_logo.jpg" alt="The Vault" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
-                      <div className={styles.cardTitle}>The Vault (Treasures)</div>
+                      <Image src="/vault_logo.jpg" alt="Skill Badges" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <div className={styles.cardTitle}>Skill Badges</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Inilah ruang harta karun kebanggaan sang petualang. Sebuah galeri tempat menyimpan seluruh sertifikat berharga yang kapan saja bisa dibagikan sebagai tautan publik kepada rekruter. Tautan ini membuktikan langsung di atas jaringan blockchain bahwa kemampuan mereka adalah nyata.
+                      Inilah ruang galeri kebanggaan sang petualang. Sebuah tempat memajang Skill Badges dan sertifikat berharga yang telah diraih. Pencapaian ini kapan saja bisa dibagikan sebagai tautan publik kepada rekruter untuk membuktikan langsung di atas jaringan blockchain bahwa kemampuan mereka adalah nyata.
                     </div>
                   </div>
                 </div>
