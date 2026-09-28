@@ -278,6 +278,7 @@ model Scholarship {
   scope             String   // "dalam_negeri" | "luar_negeri" | "keduanya"
   provider          String?
   amount            String?
+  officialUrl       String?
   coverImageUrl     String?
   createdByUserId   String?
   createdByUser     User?    @relation("ScholarshipCreatedBy", fields: [createdByUserId], references: [id])

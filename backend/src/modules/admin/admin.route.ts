@@ -255,6 +255,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
           amount: true,
           scope: true,
           requirements: true,
+          officialUrl: true,
           coverImageUrl: true,
         },
       });
@@ -264,10 +265,12 @@ export default async function adminRoutes(fastify: FastifyInstance) {
         id: s.id,
         title: s.name,         // DB: name -> frontend: title
         provider: s.provider,
-        deadline: s.deadline,
+        // Return ISO string of deadline so FE can format as needed
+        deadline: s.deadline ? s.deadline.toISOString() : null,
         coverage: s.amount,    // DB: amount -> frontend: coverage
         scope: s.scope,
         requirements: s.requirements ? s.requirements.split(',').map(r => r.trim()).filter(Boolean) : [],
+        url: s.officialUrl ?? '',  // DB: officialUrl -> frontend: url
         coverImage: s.coverImageUrl,
       }));
       return reply.send(mapped);
