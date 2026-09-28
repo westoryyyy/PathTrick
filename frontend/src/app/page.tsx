@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import { useAuthSync } from '@/hooks/useAuthSync';
 import styles from './page.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
 import LanguageToggle from '@/components/ui/LanguageToggle';
@@ -55,19 +56,20 @@ export default function LandingPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { selectedRole } = useOnboardingStore();
+  const { isSyncing } = useAuthSync();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
 
-  // No longer auto-redirecting to /select-role when authenticated.
-  // The user will stay on the landing page until they click a button.
+  // No longer auto-redirecting here — redirect is handled inside useAuthSync
+  // after backend sync completes (see hooks/useAuthSync.ts).
 
   const handleStart = () => {
-    if (!ready) return;
+    if (!ready || isSyncing) return;
     if (authenticated) {
       if (selectedRole) {
-        router.push(`/${selectedRole}/dashboard`);
+        router.replace(`/${selectedRole}/dashboard`);
       } else {
-        router.push('/select-role');
+        router.replace('/select-role');
       }
     } else {
       login();
@@ -143,7 +145,7 @@ export default function LandingPage() {
           </div>
           <div className={styles.navRight}>
             <LanguageToggle />
-            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} disabled={!ready || isSyncing}>
               {authenticated ? (
                 <span style={{ 
                   display: 'flex',
@@ -162,7 +164,7 @@ export default function LandingPage() {
                   textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
                   lineHeight: 1
                 }}>
-                  Dashboard
+                  {isSyncing ? '...' : selectedRole ? 'Dashboard' : 'LANJUTKAN SETUP'}
                 </span>
               ) : (
                 <Image

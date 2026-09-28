@@ -26,17 +26,21 @@ export default function CareerHubPage() {
   const [activeFilter, setActiveFilter] = useState<GICSSectorCode | null>(null);
 
   useEffect(() => {
-    fetchProfileData().then(() => {
-      // Analyze gaps for all matched jobs
-      const jobsWithGaps = matchedJobs.map(job => {
-        const missing = job.requiredSkills.filter(skill => !earnedSBTs.includes(skill));
-        const possessed = job.requiredSkills.filter(skill => earnedSBTs.includes(skill));
-        const matchPercentage = Math.round((possessed.length / job.requiredSkills.length) * 100);
-        return { ...job, missing, possessed, matchPercentage };
-      });
-      setAnalyzedJobs(jobsWithGaps);
+    // Hanya fetch data sekali saat komponen dimount
+    fetchProfileData();
+  }, [fetchProfileData]);
+
+  useEffect(() => {
+    // Analisis ulang gap saat matchedJobs atau earnedSBTs berubah
+    const jobsWithGaps = matchedJobs.map(job => {
+      const missing = job.requiredSkills.filter(skill => !earnedSBTs.includes(skill));
+      const possessed = job.requiredSkills.filter(skill => earnedSBTs.includes(skill));
+      const total = job.requiredSkills.length;
+      const matchPercentage = total > 0 ? Math.round((possessed.length / total) * 100) : 100;
+      return { ...job, missing, possessed, matchPercentage };
     });
-  }, [fetchProfileData, matchedJobs, earnedSBTs]);
+    setAnalyzedJobs(jobsWithGaps);
+  }, [matchedJobs, earnedSBTs]);
 
   if (isLoading) {
     return (
