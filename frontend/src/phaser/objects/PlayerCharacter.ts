@@ -1,5 +1,9 @@
 import Phaser from 'phaser';
 
+// Force every character sprite (regardless of native texture size) to
+// render at this exact pixel size, so up/down/left/right look identical.
+const CHAR_SIZE = 51; // pixels — matches 128px sprite at scale 0.4
+
 export class PlayerCharacter {
   private scene: Phaser.Scene;
   public sprite: Phaser.Physics.Arcade.Sprite;
@@ -14,18 +18,17 @@ export class PlayerCharacter {
   private isAutoWalking = false;
   private moveTarget: Phaser.Math.Vector2 | null = null;
   private walkTimer = 0;
-  private walkPhase = 0; // 0 = neutral, 1 = step1, 2 = neutral, 3 = step2
+  private walkPhase = 0;
   private readonly WALK_INTERVAL = 150; // ms per walk phase
   private walkSound?: Phaser.Sound.BaseSound;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
-    // Start with idle (down-facing)
     this.sprite = scene.physics.add.sprite(x, y, 'idle');
     this.sprite.setCollideWorldBounds(true);
     this.sprite.setDepth(10);
-    this.sprite.setScale(0.4);
+    this.sprite.setDisplaySize(CHAR_SIZE, CHAR_SIZE);
 
     this.setupAnimations();
     this.setupInput();
@@ -40,10 +43,6 @@ export class PlayerCharacter {
     const anims = this.scene.anims;
     if (anims.exists('player-walk-down')) return;
 
-    // Walk animations — each PNG is a single frame, so frameRate doesn't matter much
-    // We use the texture key directly and flip between idle and walk textures
-    // to simulate walking motion.
-    // All walk sprites: single 128x128 frame
     anims.create({ key: 'player-walk-down', frames: [{ key: 'walk-down' }], frameRate: 8, repeat: -1 });
     anims.create({ key: 'player-walk-left', frames: [{ key: 'walk-left' }], frameRate: 8, repeat: -1 });
     anims.create({ key: 'player-walk-right', frames: [{ key: 'walk-right' }], frameRate: 8, repeat: -1 });
@@ -79,7 +78,6 @@ export class PlayerCharacter {
   }
 
   private addShadow() {
-    // Subtle ellipse shadow under the character
     const shadow = this.scene.add.ellipse(
       this.sprite.x, this.sprite.y + 22,
       30, 10, 0x000000, 0.3
@@ -95,6 +93,38 @@ export class PlayerCharacter {
     this.scene.events.on('update', () => {
       shadow.setPosition(this.sprite.x, this.sprite.y + 22);
     });
+  }
+
+  /** Apply the correct texture + origin + flip based on facing & movement state.
+   *  Always forces displaySize = CHAR_SIZE so every texture appears the same size. */
+  private applyWalkFrame(moving: boolean) {
+    if (moving) {
+      if (this.facing === 'down' || this.facing === 'up') {
+        const texKey = `walk-${this.facing}`;
+        this.sprite.setFlipX(this.walkPhase !== 0);
+        if (this.sprite.texture.key !== texKey) this.sprite.setTexture(texKey);
+      } else {
+        // Left/Right: 4-frame walk-side sequence
+        const frameNum = this.walkPhase + 1;
+        const texKey = `walk-side-${frameNum}`;
+        this.sprite.setFlipX(this.facing === 'right');
+        if (this.sprite.texture.key !== texKey) this.sprite.setTexture(texKey);
+      }
+    } else {
+      // Idle
+      this.sprite.setFlipX(false);
+      let texKey = 'idle';
+      if (this.facing === 'up') texKey = 'walk-up';
+      if (this.facing === 'left' || this.facing === 'right') {
+        texKey = 'walk-side-1';
+        this.sprite.setFlipX(this.facing === 'right');
+      }
+      if (this.sprite.texture.key !== texKey) this.sprite.setTexture(texKey);
+    }
+    // Always force same display size and reset angle/origin
+    this.sprite.setDisplaySize(CHAR_SIZE, CHAR_SIZE);
+    this.sprite.setAngle(0);
+    this.sprite.setOrigin(0.5, 0.5);
   }
 
   update(delta: number) {
@@ -155,78 +185,21 @@ export class PlayerCharacter {
       body.velocity.normalize().scale(speed);
     }
 
-    // --- Animate: alternate walk angle to simulate stepping ---
+    // Advance walk timer
     if (moving) {
       this.walkTimer += delta;
-      
-      // Different timing or phase logic based on direction
-      if (this.facing === 'down' || this.facing === 'up') {
-        if (this.walkTimer >= this.WALK_INTERVAL) {
-          this.walkTimer -= this.WALK_INTERVAL;
-          this.walkPhase = (this.walkPhase + 1) % 2; // 2 phases for up/down
-        }
-        const texKey = `walk-${this.facing}`;
-        this.sprite.setFlipX(this.walkPhase !== 0);
-        if (this.sprite.texture.key !== texKey) {
-          this.sprite.setTexture(texKey);
-          this.sprite.setScale(0.4); // Reset scale for 128x128
-        }
-        this.sprite.setAngle(0);
-        this.sprite.setOrigin(0.5, 0.5);
-      } else {
-        // Left/Right uses the new 4-frame sequence
-        // We set it to 150ms so each frame is clearly visible
-        const sideWalkInterval = 150; 
-        while (this.walkTimer >= sideWalkInterval) {
-          this.walkTimer -= sideWalkInterval;
-          this.walkPhase = (this.walkPhase + 1) % 4; // 4 phases for left/right
-        }
-        
-        // Map walkPhase (0,1,2,3) exactly to side frames (1,2,3,4) sequentially
-        const frameNum = this.walkPhase + 1; 
-        const texKey = `walk-side-${frameNum}`;
-        
-        // Original image faces LEFT. So flip when facing RIGHT.
-        this.sprite.setFlipX(this.facing === 'right');
-        
-        if (this.sprite.texture.key !== texKey) {
-          this.sprite.setTexture(texKey);
-          // Original is 164x188, so scale down slightly more to match 128x128 proportion
-          this.sprite.setScale(0.27); 
-        }
-        this.sprite.setAngle(0);
-        // Adjust origin so the feet stay on the ground shadow
-        this.sprite.setOrigin(0.5, 0.65);
+      const interval = (this.facing === 'left' || this.facing === 'right') ? 200 : this.WALK_INTERVAL;
+      const phases  = (this.facing === 'left' || this.facing === 'right') ? 4 : 2;
+      while (this.walkTimer >= interval) {
+        this.walkTimer -= interval;
+        this.walkPhase = (this.walkPhase + 1) % phases;
       }
-
     } else {
-      // Idle
       this.walkTimer = 0;
       this.walkPhase = 0;
-      this.sprite.setAngle(0);
-      this.sprite.setFlipX(false);
-
-      // Only use 'idle' texture (which faces down) if actually facing down
-      let texKey = 'idle';
-      if (this.facing === 'up') texKey = 'walk-up';
-      
-      if (this.facing === 'left' || this.facing === 'right') {
-        texKey = 'walk-side-1'; // Frame 1 is the idle pose for side walking
-        this.sprite.setFlipX(this.facing === 'right'); // Flip if facing right
-      }
-      
-      if (this.sprite.texture.key !== texKey) {
-        this.sprite.setTexture(texKey);
-        
-        if (this.facing === 'left' || this.facing === 'right') {
-          this.sprite.setScale(0.27);
-          this.sprite.setOrigin(0.5, 0.65);
-        } else {
-          this.sprite.setScale(0.4);
-          this.sprite.setOrigin(0.5, 0.5);
-        }
-      }
     }
+
+    this.applyWalkFrame(moving);
 
     if (moving && !this.isMoving) {
       this.walkSound?.play();
@@ -250,10 +223,8 @@ export class PlayerCharacter {
 
   /** Automatically walk to a specific coordinate */
   autoWalkTo(targetX: number, targetY: number, duration: number, onComplete?: () => void) {
-    // Disable manual input temporarily
     this.isAutoWalking = true;
 
-    // Determine facing direction
     const dx = targetX - this.sprite.x;
     const dy = targetY - this.sprite.y;
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -262,6 +233,8 @@ export class PlayerCharacter {
       this.facing = dy > 0 ? 'down' : 'up';
     }
 
+    this.walkTimer = 0;
+    this.walkPhase = 0;
     this.walkSound?.play();
 
     this.scene.tweens.add({
@@ -271,40 +244,24 @@ export class PlayerCharacter {
       duration: duration,
       ease: 'Linear',
       onUpdate: () => {
-        // Update walk animation manually during tween
-        this.walkTimer += this.scene.game.loop.delta;
-        if (this.walkTimer >= this.WALK_INTERVAL) {
-          this.walkTimer = 0;
-          this.walkPhase = (this.walkPhase + 1) % 2;
+        const delta = this.scene.game.loop.delta;
+        this.walkTimer += delta;
+
+        const interval = (this.facing === 'left' || this.facing === 'right') ? 200 : this.WALK_INTERVAL;
+        const phases  = (this.facing === 'left' || this.facing === 'right') ? 4 : 2;
+        while (this.walkTimer >= interval) {
+          this.walkTimer -= interval;
+          this.walkPhase = (this.walkPhase + 1) % phases;
         }
 
-        let texKey = `walk-${this.facing}`;
-        if (this.facing === 'down' || this.facing === 'up') {
-          texKey = `walk-${this.facing}`;
-          this.sprite.setFlipX(this.walkPhase !== 0);
-        } else {
-          this.sprite.setFlipX(false);
-        }
-
-        if (this.sprite.texture.key !== texKey) {
-          this.sprite.setTexture(texKey);
-        }
-
-        if (this.facing === 'left' || this.facing === 'right') {
-          this.sprite.setAngle(0);
-          this.sprite.setOrigin(0.5, this.walkPhase === 0 ? 0.5 : 0.53);
-        } else {
-          this.sprite.setAngle(0);
-          this.sprite.setOrigin(0.5, 0.5);
-        }
+        this.applyWalkFrame(true);
       },
       onComplete: () => {
         this.isAutoWalking = false;
         this.walkSound?.pause();
-        this.sprite.setAngle(0);
-        this.sprite.setFlipX(false);
-        const texKey = this.facing === 'down' ? 'idle' : `walk-${this.facing}`;
-        this.sprite.setTexture(texKey);
+        this.walkTimer = 0;
+        this.walkPhase = 0;
+        this.applyWalkFrame(false);
         if (onComplete) onComplete();
       }
     });
