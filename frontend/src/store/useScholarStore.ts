@@ -5,6 +5,8 @@ import {
   classifySkills, calculateCareerRank,
   CareerRank,
 } from '@/data/wefSkillData'; // Note: we kept the filename wefSkillData.ts but its content is simplified
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 export type { CareerRank };
 
@@ -95,7 +97,28 @@ export const useScholarStore = create<ScholarState>((set, get) => ({
 
   fetchProfileData: async () => {
     set({ isLoading: true });
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/jobs`, { headers: getAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        const jobsList = data.jobs || [];
+        if (jobsList.length > 0) {
+          const mappedJobs = jobsList.map((j: any) => ({
+            id: j.id,
+            title: j.title,
+            company: j.company,
+            // Fallback ke IT karena DB Job tidak punya field gicsSector
+            gicsSector: 'IT' as GICSSectorCode, 
+            requiredSkills: j.skillsRequired || [],
+            matchPercentage: 0,
+            coverImage: j.coverImageUrl || '/Blade.png',
+          }));
+          set({ matchedJobs: mappedJobs, targetJob: mappedJobs[0] });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch jobs', e);
+    }
     set({ isLoading: false });
   },
 

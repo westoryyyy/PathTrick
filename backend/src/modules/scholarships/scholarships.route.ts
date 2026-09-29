@@ -1,4 +1,4 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma";
 import { requireAdmin } from "../admin/admin.middleware";
@@ -30,7 +30,13 @@ export default async function scholarshipsRoutes(fastify: FastifyInstance) {
           deadline: true,
           facultyTags: true,
           scope: true,
+          provider: true,
+          amount: true,          // coverage / jumlah bantuan
+          requirements: true,
+          officialUrl: true,     // link daftar beasiswa — wajib ada untuk Dreamer
+          coverImageUrl: true,
         },
+        orderBy: { deadline: 'asc' },
       });
 
       return reply.code(200).send({ total: scholarships.length, scholarships });

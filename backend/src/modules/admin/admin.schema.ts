@@ -22,6 +22,8 @@ export const scholarshipSchema = z.object({
   // requirements can be string[] (from tags input) or plain string
   requirements: z.union([z.array(z.string()), z.string()]).optional(),
   coverImage: z.string().optional(),
+  // Link pendaftaran beasiswa — disimpan ke officialUrl di DB
+  url: z.string().url("URL tidak valid").optional().or(z.literal('')),
 }).refine(data => data.title || data.name, {
   message: "Nama beasiswa wajib diisi",
   path: ["title"],

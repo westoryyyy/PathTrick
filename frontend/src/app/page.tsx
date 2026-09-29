@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import { useAuthSync } from '@/hooks/useAuthSync';
 import styles from './page.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
 import LanguageToggle from '@/components/ui/LanguageToggle';
@@ -21,10 +22,10 @@ const FEATURE_ICONS = [
 
 /* ─── Featured courses ─── */
 const COURSES = [
-  { img: '/perancangan.png', title: '', titleColor: '#4fc3f7', desc: '' },
-  { img: '/ai rendering.png', title: '', titleColor: '#86efac', desc: '' },
-  { img: '/web3.png', title: '', titleColor: '#fbbf24', desc: '' },
-  { img: '/beasiswa.png', title: '', titleColor: '#fb923c', desc: '' },
+  { img: '/perancangan.png', img_en: '/perancangan_en.png', title: '', titleColor: '#4fc3f7', desc: '' },
+  { img: '/ai rendering.png', img_en: '/ai_rendering_en.png', title: '', titleColor: '#86efac', desc: '' },
+  { img: '/web3.png', img_en: '/web3_en.png', title: '', titleColor: '#fbbf24', desc: '' },
+  { img: '/beasiswa.png', img_en: '/beasiswa_en.png', title: '', titleColor: '#fb923c', desc: '' },
 ];
 
 const HEROES = [
@@ -52,22 +53,23 @@ const NAV_LINK_KEYS = [
 
 export default function LandingPage() {
   const { login, ready, authenticated } = usePrivy();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const { selectedRole } = useOnboardingStore();
+  const { isSyncing } = useAuthSync();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
 
-  // No longer auto-redirecting to /select-role when authenticated.
-  // The user will stay on the landing page until they click a button.
+  // No longer auto-redirecting here — redirect is handled inside useAuthSync
+  // after backend sync completes (see hooks/useAuthSync.ts).
 
   const handleStart = () => {
-    if (!ready) return;
+    if (!ready || isSyncing) return;
     if (authenticated) {
       if (selectedRole) {
-        router.push(`/${selectedRole}/dashboard`);
+        router.replace(`/${selectedRole}/dashboard`);
       } else {
-        router.push('/select-role');
+        router.replace('/select-role');
       }
     } else {
       login();
@@ -143,27 +145,16 @@ export default function LandingPage() {
           </div>
           <div className={styles.navRight}>
             <LanguageToggle />
-            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} disabled={!ready || isSyncing}>
               {authenticated ? (
-                <span style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '120px',
-                  height: '36px',
-                  color: 'white', 
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '0.45rem',
-                  backgroundColor: '#DD1A21',
-                  border: '2px solid white',
-                  borderRadius: '4px',
-                  boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.2)',
-                  textTransform: 'capitalize',
-                  textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
-                  lineHeight: 1
-                }}>
-                  Dashboard
-                </span>
+                <Image
+                  src="/dashboard-button.png"
+                  alt={isSyncing ? "..." : selectedRole ? "Dashboard" : "LANJUTKAN SETUP"}
+                  width={120}
+                  height={36}
+                  unoptimized
+                  style={{ objectFit: 'contain', imageRendering: 'pixelated', opacity: isSyncing ? 0.7 : 1 }}
+                />
               ) : (
                 <Image
                   src="/Sign Up.png"
@@ -239,7 +230,7 @@ export default function LandingPage() {
               return (
                 <div key={i} className={`${styles.courseCard} ${!hasText ? styles.courseCardNoText : ''}`} id={`course-${i}`}>
                   <div className={hasText ? styles.courseCardImg : styles.courseCardImgNoText}>
-                    <Image src={c.img} alt={c.title || 'Course'} fill style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
+                    <Image src={locale === 'en' && c.img_en ? c.img_en : c.img} alt={c.title || 'Course'} fill style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
                   </div>
                   {hasText && (
                     <div className={styles.courseCardBody}>

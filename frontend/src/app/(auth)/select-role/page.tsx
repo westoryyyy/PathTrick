@@ -49,18 +49,71 @@ export default function SelectRolePage() {
   const [rolesError, setRolesError] = useState('');
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [entering, setEntering] = useState(false);
+  // True while we're verifying role from backend on first load.
+  // Prevents flash of role-selector UI when user actually has a role.
+  const [isVerifyingRole, setIsVerifyingRole] = useState(true);
 
-  const hasName = !!(savedName || user?.google?.name || user?.email?.address);
+  // hasName hanya true jika user punya nama NYATA dari Privy (Google/email)
+  // Sengaja TIDAK pakai savedName dari Zustand karena bisa berisi "Explorer" (fallback)
+  // yang menyebabkan popup nickname tidak pernah muncul untuk wallet user
+  const hasPrivyName = !!(user?.google?.name || user?.email?.address);
   const isWalletOnly = !user?.google && !user?.email && wallets.length > 0;
-  const needsNicknameSetup = isWalletOnly && !hasName;
+  const needsNicknameSetup = isWalletOnly && !hasPrivyName;
   const isGoogleLogin = !!user?.google;
   const needsWalletConnection = isGoogleLogin && wallets.length === 0;
 
-  const [showGate, setShowGate] = useState(needsNicknameSetup);
+  const [showGate, setShowGate] = useState(false); // diset via useEffect saat wallet terdeteksi
   const [nickname, setNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
+  // Munculkan pop-up nickname saat kondisi terpenuhi (reaktif terhadap wallet detection)
+  useEffect(() => {
+    if (needsNicknameSetup && !isVerifyingRole) {
+      setShowGate(true);
+    }
+  }, [needsNicknameSetup, isVerifyingRole]);
+
+  // ── Verify role from BACKEND on first load ──
+  // This is the primary guard. It fetches /api/users/me to check whether
+  // the backend already has a role for this user, handling cases where:
+  // - Zustand store is stale (different account, corrupt data)
+  // - User closed the tab before completing role selection
+  useEffect(() => {
+    if (!user) return; // wait for Privy to report the current user
+    const token = getAuthHeaders()['Authorization'];
+    if (!token) {
+      // No JWT yet — cannot verify against backend; fall through to Zustand guard
+      setIsVerifyingRole(false);
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+      .then(async (res) => {
+        if (!res.ok || cancelled) { setIsVerifyingRole(false); return; }
+        const data = await res.json() as { role?: { name?: string } | null };
+        if (cancelled) return;
+        const roleName = data?.role?.name?.toUpperCase();
+        if (roleName === 'DREAMER') {
+          setRole('sma', user.id);
+          router.replace('/sma/dashboard');
+        } else if (roleName === 'CHASER') {
+          setRole('mahasiswa', user.id);
+          router.replace('/mahasiswa/dashboard');
+        } else if (roleName === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          // No role in backend — clear any stale store data and show role selector
+          if (selectedRole && savedPrivyUserId === user.id) resetOnboarding();
+          setIsVerifyingRole(false);
+        }
+      })
+      .catch(() => { if (!cancelled) setIsVerifyingRole(false); });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // ── Load available roles from backend ──
   useEffect(() => {
     let cancelled = false;
     fetch(`${API_BASE_URL}/api/roles`, { headers: { ...getAuthHeaders() } })
@@ -100,10 +153,11 @@ export default function SelectRolePage() {
     return () => { cancelled = true; };
   }, []);
 
-  // If user already has a role AND it belongs to the current user → go to their dashboard
-  // If it's a different user → clear stale data and show role selection
+  // ── Zustand guard (secondary) ──
+  // Runs only after backend verification is done to avoid race conditions.
+  // Handles the case where the sync already ran before this page mounted.
   useEffect(() => {
-    if (!user || entering) return; // wait for Privy to load user, and don't redirect if currently picking a role
+    if (isVerifyingRole || !user || entering) return;
     const currentUserId = user.id;
     if (selectedRole && savedPrivyUserId === currentUserId) {
       router.replace(`/${selectedRole}/dashboard`);
@@ -111,16 +165,37 @@ export default function SelectRolePage() {
       // Different user logged in — clear stale role data
       resetOnboarding();
     }
-  }, [user, selectedRole, savedPrivyUserId, router, resetOnboarding, entering]);
+  }, [isVerifyingRole, user, selectedRole, savedPrivyUserId, router, resetOnboarding, entering]);
 
-  const handleNicknameConfirm = () => {
+  const handleNicknameConfirm = async () => {
     if (!nickname.trim()) return;
     setIsSavingNickname(true);
-    setTimeout(() => {
+
+    try {
+      // Tunggu JWT tersedia (max ~5 detik) — token disimpan oleh useAuthSync
+      // yang mungkin belum selesai saat pop-up ini muncul pertama kali
+      let headers = getAuthHeaders();
+      for (let i = 0; i < 20 && !headers['Authorization']; i++) {
+        await new Promise(r => setTimeout(r, 250));
+        headers = getAuthHeaders();
+      }
+
+      if (headers['Authorization']) {
+        await fetch(`${API_BASE_URL}/api/users/me`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...headers },
+          body: JSON.stringify({ name: nickname.trim(), walletAddress: wallets[0]?.address || '' }),
+        });
+      } else {
+        console.warn('[Nickname] JWT belum tersedia setelah 5 detik, lewatkan sync backend');
+      }
+    } catch (error) {
+      console.error('[Nickname] Gagal sync ke backend:', error);
+    } finally {
       setProfile(nickname.trim(), wallets[0]?.address || '');
       setShowGate(false);
       setIsSavingNickname(false);
-    }, 600);
+    }
   };
 
   const handleConnectWallet = async () => {
@@ -155,7 +230,7 @@ export default function SelectRolePage() {
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({ roleId: selected }),
         });
-        router.push('/admin/dashboard');
+        router.replace('/admin/dashboard');
         return;
       }
 
@@ -190,6 +265,18 @@ export default function SelectRolePage() {
       }
     }
   };
+
+  // Show loading state while backend role verification is in progress.
+  // Uses the existing page/boardContainer structure to avoid layout shift.
+  if (isVerifyingRole) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.boardContainer}>
+          <p>Memverifikasi sesi...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>

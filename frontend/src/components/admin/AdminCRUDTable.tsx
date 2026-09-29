@@ -20,6 +20,8 @@ export interface Field {
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
+  /** Teks bantuan kecil di bawah field */
+  helpText?: string;
 }
 
 interface AdminCRUDTableProps<T extends { id: string }> {
@@ -38,7 +40,10 @@ interface AdminCRUDTableProps<T extends { id: string }> {
    * Gunakan untuk konversi tipe data (mis. ISO date → YYYY-MM-DD).
    */
   normalizeForEdit?: (row: T) => Partial<T>;
+<<<<<<< HEAD
   isLoading?: boolean;
+=======
+>>>>>>> e0af7411bea4f3fe352042eb9d828479969e0b02
 }
 
 // ───────────────────────────
@@ -136,7 +141,11 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
 // Main Component
 // ───────────────────────────
 export default function AdminCRUDTable<T extends { id: string }>({
+<<<<<<< HEAD
   title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit, isLoading = false,
+=======
+  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit,
+>>>>>>> e0af7411bea4f3fe352042eb9d828479969e0b02
 }: AdminCRUDTableProps<T>) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState<null | 'add' | 'edit' | 'delete'>(null);
@@ -152,7 +161,13 @@ export default function AdminCRUDTable<T extends { id: string }>({
   );
 
   const openAdd = () => { setFormData({}); setModal('add'); };
-  const openEdit = (row: T) => { setSelected(row); setFormData({ ...row }); setModal('edit'); };
+  const openEdit = (row: T) => {
+    // Gunakan normalizeForEdit jika tersedia untuk pre-populate form dengan benar
+    const normalized = normalizeForEdit ? normalizeForEdit(row) : { ...row };
+    setSelected(row);
+    setFormData(normalized as Record<string, unknown>);
+    setModal('edit');
+  };
   const openDelete = (row: T) => { setSelected(row); setDeleteConfirm(''); setModal('delete'); };
   const closeModal = () => { setModal(null); setSelected(null); };
 
@@ -190,13 +205,13 @@ export default function AdminCRUDTable<T extends { id: string }>({
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ fontSize: '1.5rem' }}>{icon}</span>
           <div>
-            <h1 style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24', margin: 0, textShadow: '2px 2px 0 #000' }}>{title}</h1>
-            <p style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: 'rgba(255,255,255,0.5)', margin: '4px 0 0' }}>{filtered.length} item ditemukan</p>
+            <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '1rem', color: '#fbbf24', margin: 0, textShadow: '2px 2px 0 #000', letterSpacing: '0.05em' }}>{title}</h1>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: '4px 0 0' }}>{filtered.length} item ditemukan</p>
           </div>
         </div>
         <button
           onClick={openAdd}
-          style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#78350f', border: '3px solid #fbbf24', color: '#fff', padding: '10px 20px', cursor: 'pointer', boxShadow: '3px 3px 0 #3b261b', display: 'flex', alignItems: 'center', gap: '8px', transition: 'transform 0.1s' }}
+          style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.85rem', background: '#78350f', border: '3px solid #fbbf24', color: '#fff', padding: '10px 20px', cursor: 'pointer', boxShadow: '3px 3px 0 #3b261b', display: 'flex', alignItems: 'center', gap: '8px', transition: 'transform 0.1s' }}
           onMouseDown={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none'; }}
           onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #3b261b'; }}
         >
@@ -212,7 +227,7 @@ export default function AdminCRUDTable<T extends { id: string }>({
             placeholder="Cari data..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#4a2410', border: '2px solid #5a3a29', color: '#fff', padding: '10px 16px', outline: 'none', width: '300px' }}
+            style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', background: '#4a2410', border: '2px solid #5a3a29', color: '#fff', padding: '10px 16px', outline: 'none', width: '300px' }}
           />
         </div>
       )}
@@ -223,11 +238,11 @@ export default function AdminCRUDTable<T extends { id: string }>({
           <thead>
             <tr style={{ background: 'rgba(139,26,26,0.4)', borderBottom: '3px solid #5a3a29' }}>
               {columns.map(col => (
-                <th key={String(col.key)} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24', padding: '12px 16px', textAlign: 'left', textShadow: '1px 1px 0 #000', whiteSpace: 'nowrap', width: col.width }}>
+                <th key={String(col.key)} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.82rem', color: '#fbbf24', padding: '12px 16px', textAlign: 'left', textShadow: '1px 1px 0 #000', whiteSpace: 'nowrap', width: col.width, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   {col.label}
                 </th>
               ))}
-              <th style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24', padding: '12px 16px', textAlign: 'center', width: '120px' }}>AKSI</th>
+              <th style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.82rem', color: '#fbbf24', padding: '12px 16px', textAlign: 'center', width: '120px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>AKSI</th>
             </tr>
           </thead>
           <tbody>
@@ -243,7 +258,7 @@ export default function AdminCRUDTable<T extends { id: string }>({
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '40px', fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: 'rgba(255,255,255,0.3)' }}>
+                <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '40px', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: 'rgba(255,255,255,0.3)' }}>
                   Tidak ada data
                 </td>
               </tr>
@@ -251,14 +266,14 @@ export default function AdminCRUDTable<T extends { id: string }>({
               filtered.map((row, i) => (
                 <tr key={row.id} style={{ borderBottom: '1px solid rgba(139,26,26,0.3)', background: i % 2 === 0 ? 'transparent' : 'rgba(139,26,26,0.07)' }}>
                   {columns.map(col => (
-                    <td key={String(col.key)} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fff', padding: '12px 16px', lineHeight: '1.6' }}>
+                    <td key={String(col.key)} style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', color: '#f5f5f5', padding: '12px 16px', lineHeight: '1.6' }}>
                       {col.render ? col.render(row) : String((row as Record<string, unknown>)[String(col.key)] ?? '-')}
                     </td>
                   ))}
                   <td style={{ padding: '10px 16px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                      <button onClick={() => openEdit(row)} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#b45309', border: '2px solid #fbbf24', color: '#fff', padding: '5px 10px', cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>Edit</button>
-                      <button onClick={() => openDelete(row)} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b261b', border: '2px solid #ef4444', color: '#fff', padding: '5px 10px', cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>Del</button>
+                      <button onClick={() => openEdit(row)} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.8rem', background: '#b45309', border: '2px solid #fbbf24', color: '#fff', padding: '5px 12px', cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>Edit</button>
+                      <button onClick={() => openDelete(row)} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.8rem', background: '#3b261b', border: '2px solid #ef4444', color: '#fff', padding: '5px 12px', cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>Hapus</button>
                     </div>
                   </td>
                 </tr>
@@ -284,8 +299,8 @@ export default function AdminCRUDTable<T extends { id: string }>({
             <div style={{ padding: '20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {fields.map(field => (
                 <div key={field.key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24' }}>
-                    {field.label}{field.required && <span style={{ color: '#fbbf24' }}> *</span>}
+                  <label style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '0.03em' }}>
+                    {field.label}{field.required && <span style={{ color: '#f87171', marginLeft: '4px' }}>*</span>}
                   </label>
                   {field.type === 'textarea' ? (
                     <textarea
@@ -314,16 +329,22 @@ export default function AdminCRUDTable<T extends { id: string }>({
                       value={String(formData[field.key] ?? '')}
                       onChange={e => setField(field.key, e.target.value)}
                       placeholder={field.placeholder}
-                      style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b1f0a', border: '2px solid #5a3a29', color: '#fff', padding: '10px 12px', outline: 'none', colorScheme: 'dark' }}
+                      style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', background: '#3b1f0a', border: '2px solid #5a3a29', color: '#fff', padding: '10px 12px', outline: 'none', colorScheme: 'dark', width: '100%', boxSizing: 'border-box' }}
                     />
+                  )}
+                  {/* Help text */}
+                  {field.helpText && (
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                      {field.helpText}
+                    </p>
                   )}
                 </div>
               ))}
             </div>
             {/* Modal Footer */}
             <div style={{ padding: '16px 20px', borderTop: '3px dashed #5a3a29', display: 'flex', gap: '12px', justifyContent: 'flex-end', flexShrink: 0 }}>
-              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
-              <button onClick={handleSubmit} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#78350f', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
+              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.875rem', background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
+              <button onClick={handleSubmit} disabled={isSubmitting} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', background: '#78350f', border: '3px solid #ef4444', color: '#fff', padding: '10px 24px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
                 {isSubmitting ? '⏳ MENYIMPAN...' : (modal === 'add' ? 'SIMPAN' : 'PERBARUI')}
               </button>
             </div>
@@ -337,14 +358,14 @@ export default function AdminCRUDTable<T extends { id: string }>({
           onClick={e => e.target === e.currentTarget && closeModal()}>
           <div style={{ background: '#4a2410', border: '4px solid #ef4444', boxShadow: '6px 6px 0 rgba(0,0,0,0.8)', maxWidth: '400px', width: '100%' }}>
             <div style={{ background: 'rgba(239,68,68,0.2)', borderBottom: '4px solid #ef4444', padding: '16px 20px' }}>
-              <span style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: '#fbbf24' }}>⚠ HAPUS DATA?</span>
+              <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#fbbf24' }}>⚠ HAPUS DATA?</span>
             </div>
-            <div style={{ padding: '20px', fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: 'rgba(255,255,255,0.8)', lineHeight: 2 }}>
-              Data yang dihapus tidak bisa dikembalikan. Yakin ingin melanjutkan?
+            <div style={{ padding: '20px', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.8 }}>
+              Data yang dihapus <strong>tidak bisa dikembalikan</strong>. Yakin ingin melanjutkan?
             </div>
             <div style={{ padding: '16px 20px', borderTop: '3px dashed #5a3a29', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
-              <button onClick={handleDelete} disabled={isSubmitting} style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b261b', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
+              <button onClick={closeModal} disabled={isSubmitting} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.875rem', background: 'transparent', border: '2px solid #5a3a29', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.5 : 1 }}>Batal</button>
+              <button onClick={handleDelete} disabled={isSubmitting} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', background: '#3b261b', border: '3px solid #ef4444', color: '#fff', padding: '10px 20px', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: isSubmitting ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)', opacity: isSubmitting ? 0.7 : 1 }}>
                 {isSubmitting ? '⏳ MENGHAPUS...' : 'YA, HAPUS'}
               </button>
             </div>
