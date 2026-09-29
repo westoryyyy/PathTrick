@@ -189,17 +189,17 @@ export default function MissionFlowPage() {
 
     // Build topic-specific material description
     const materialIntro = isBoss
-      ? `ðŸ° Ksatria! Penjaga Relic bab ini telah menantimu. Sebelum pertempuran final dimulai, pastikan kamu telah memahami semua konsep ${currentChapter.name} yang telah dipelajari di level-level sebelumnya.`
+      ? `🏰 Ksatria! Penjaga Relic bab ini telah menantimu. Sebelum pertempuran final dimulai, pastikan kamu telah memahami semua konsep ${currentChapter.name} yang telah dipelajari di level-level sebelumnya.`
       : `Selamat datang Ksatria! Di Level ${levelNum} bab **${currentChapter.name}**, kamu akan memperdalam pemahamanmu. Baca materi berikut dengan seksama sebelum menghadapi Gauntlet Kuis!`;
 
     content = {
       materials: [
         <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-vt323), sans-serif' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <span style={{ color: isBoss ? '#ef4444' : '#059669', fontSize: '1.2rem', flexShrink: 0 }}>{isBoss ? 'âš”ï¸' : 'ðŸ“–'}</span>
+            <span style={{ color: isBoss ? '#ef4444' : '#059669', fontSize: '1.2rem', flexShrink: 0 }}>{isBoss ? '⚔️' : '📖'}</span>
             <div>
               <strong style={{ fontSize: '1rem', color: isBoss ? '#fbbf24' : '#1a2a3a', display: 'block', marginBottom: '4px', lineHeight: '1.3' }}>
-                {currentChapter.name} â€” Level {levelNum} {isBoss ? '(BOSS FIGHT)' : ''}
+                {currentChapter.name} — Level {levelNum} {isBoss ? '(BOSS FIGHT)' : ''}
               </strong>
               <p style={{ fontSize: '1rem', color: '#57534e', lineHeight: '1.5', marginBottom: '8px' }}>
                 Pahami materi dasar ini dengan saksama untuk mempersiapkan diri menghadapi tantangan.
@@ -207,23 +207,23 @@ export default function MissionFlowPage() {
             </div>
           </div>
           <div>
-            <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#8c5d41', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ðŸ“‹ Yang Akan Kamu Kuasai:</p>
+            <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#8c5d41', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📋 Yang Akan Kamu Kuasai:</p>
             <ul style={{ fontSize: '1rem', color: '#3b261b', lineHeight: '1.5', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <li>Mengidentifikasi konsep dasar dan terminologi penting dari <strong style={{ color: '#047857' }}>{currentChapter.name}</strong></li>
               <li>Menganalisis studi kasus dan memecahkan masalah dasar pada Level {levelNum}</li>
-              {isBoss ? <li><strong style={{ color: '#ef4444' }}>âš ï¸ Ujian final: Buktikan bahwa kamu telah menguasai seluruh materi bab ini!</strong></li> : <li>Menjawab simulasi skenario dunia nyata dalam Gauntlet Kuis.</li>}
+              {isBoss ? <li><strong style={{ color: '#ef4444' }}>⚠️ Ujian final: Buktikan bahwa kamu telah menguasai seluruh materi bab ini!</strong></li> : <li>Menjawab simulasi skenario dunia nyata dalam Gauntlet Kuis.</li>}
             </ul>
           </div>
           {!hasRealQuizzes && (
             <div style={{ padding: '6px 0', fontSize: '0.8rem', color: '#92400e', marginTop: 'auto' }}>
-              ðŸ’¡ <strong>Tips Ksatria:</strong> Untuk bab {currentChapter.name}, pastikan kamu memahami konsep fundamental sebelum lanjut ke kuis!
+              💡 <strong>Tips Ksatria:</strong> Untuk bab {currentChapter.name}, pastikan kamu memahami konsep fundamental sebelum lanjut ke kuis!
             </div>
           )}
         </div>,
         <div key="2" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-vt323), sans-serif' }}>
           <div>
             <h4 style={{ fontSize: '1.05rem', color: isBoss ? '#ef4444' : '#059669', marginBottom: '6px' }}>
-              {isBoss ? 'âš ï¸ BRIEFING TERAKHIR' : 'ðŸ“œ TEORI DASAR'}
+              {isBoss ? '⚠️ BRIEFING TERAKHIR' : '📜 TEORI DASAR'}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <p style={{ fontSize: '1rem', color: '#3b261b', lineHeight: '1.5' }}>
@@ -251,7 +251,7 @@ export default function MissionFlowPage() {
         <div key="3" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-vt323), sans-serif' }}>
           <div>
             <h4 style={{ fontSize: '1.05rem', color: '#059669', marginBottom: '6px' }}>
-              ðŸ“– LANJUTAN TEORI
+              📖 LANJUTAN TEORI
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <p style={{ fontSize: '1rem', color: '#3b261b', lineHeight: '1.5' }}>
@@ -269,7 +269,7 @@ export default function MissionFlowPage() {
         <div key="4" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-vt323), sans-serif' }}>
           <div>
             <h4 style={{ fontSize: '1.05rem', color: '#059669', marginBottom: '6px' }}>
-              ðŸ“œ PENJELASAN TAMBAHAN (SCROLL TEST)
+              📜 PENJELASAN TAMBAHAN (SCROLL TEST)
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <p style={{ fontSize: '1rem', color: '#3b261b', lineHeight: '1.5' }}>
@@ -303,7 +303,7 @@ export default function MissionFlowPage() {
         instruction: (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <h3 style={{ color: '#fbbf24', fontSize: '1rem', marginBottom: '4px', fontFamily: 'var(--font-vt323), sans-serif', lineHeight: '1.3' }}>
-              {isBoss ? `âš”ï¸ BOSS FIGHT: Penjaga ${currentChapter.name}` : `ðŸ›  Tantangan Praktik â€” ${currentChapter.name} Lvl.${levelNum}`}
+              {isBoss ? `⚔️ BOSS FIGHT: Penjaga ${currentChapter.name}` : `🛠️ Tantangan Praktik — ${currentChapter.name} Lvl.${levelNum}`}
             </h3>
             <p style={{ color: '#3b261b', fontSize: '1rem', lineHeight: '1.5', fontFamily: 'var(--font-vt323), sans-serif' }}>
               {isTech
@@ -368,7 +368,7 @@ export default function MissionFlowPage() {
         const newHp = playerHp - 1;
         setPlayerHp(newHp);
         if (newHp > 0) {
-          showDialog('error', `${data.message}\n\nSisa nyawamu: ${'â™¥'.repeat(newHp)}`);
+          showDialog('error', `${data.message}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
         } else {
           showDialog('error', `GAME OVER!\n\n${data.message}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
             setPlayerHp(3);
@@ -401,7 +401,7 @@ export default function MissionFlowPage() {
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto' }}>
               {materialPage > 0 && (
                 <button className={styles.secondaryBtn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
-                  â† SEBELUMNYA
+                  ← SEBELUMNYA
                 </button>
               )}
             </div>
@@ -422,7 +422,7 @@ export default function MissionFlowPage() {
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <span style={{ fontSize: '1.05rem', fontFamily: 'var(--font-vt323), sans-serif', color: '#8c5d41', fontWeight: 'bold' }}>NYAWA KSATRIA:</span>
-                    <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'â™¥'.repeat(playerHp)}</span>
+                    <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'♥'.repeat(playerHp)}</span>
                   </div>
                   {quizArray.length > 1 && (
                     <div style={{ marginBottom: '16px', fontSize: '1.05rem', color: '#57534e', textAlign: 'left', fontFamily: 'var(--font-vt323), sans-serif', fontWeight: 'bold' }}>
@@ -452,7 +452,7 @@ export default function MissionFlowPage() {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <span style={{ fontSize: '1.05rem', fontFamily: 'var(--font-vt323), sans-serif', color: '#8c5d41', fontWeight: 'bold' }}>NYAWA KSATRIA:</span>
-                  <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'â™¥'.repeat(playerHp)}</span>
+                  <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'♥'.repeat(playerHp)}</span>
                 </div>
                 <div className={styles.text} style={{ flex: 1, fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6' }}>
                   {content.project.instruction}
@@ -499,7 +499,7 @@ export default function MissionFlowPage() {
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
               {materialPage < Math.ceil(materials.length / 2) - 1 ? (
                 <button className={styles.btn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p + 1); }}>
-                  LANJUT âž”
+                  LANJUT ➔
                 </button>
               ) : (
                 <button
@@ -557,9 +557,9 @@ export default function MissionFlowPage() {
                           } catch (e) { }
                           setPlayerHp(newHp);
                           if (newHp > 0) {
-                            showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'â™¥'.repeat(newHp)}`);
+                            showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
                           } else {
-                            showDialog('error', `â˜ ï¸ GAME OVER â˜ ï¸\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+                            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
                               setPlayerHp(3);
                               setQuizIndex(0);
                               setPhase('MATERIAL');
@@ -576,7 +576,7 @@ export default function MissionFlowPage() {
               );
             })() : (
               <div style={{ textAlign: 'center' }}>
-                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setPhaseWithProgress('PROJECT'); }}>LANJUT TANTANGAN âž”</button>
+                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setPhaseWithProgress('PROJECT'); }}>LANJUT TANTANGAN ➔</button>
               </div>
             )}
           </div>
@@ -611,7 +611,7 @@ export default function MissionFlowPage() {
                   disabled={isSubmitting}
                   style={{ alignSelf: 'flex-end', marginTop: '16px' }}
                 >
-                  {isSubmitting ? 'AI SEDANG MENILAI...' : (content.project.type === 'essay' ? 'KUMPULKAN ESAI' : 'âš”ï¸ SERANG BOSS (SUBMIT)')}
+                {isSubmitting ? 'AI SEDANG MENILAI...' : (content.project.type === 'essay' ? 'KUMPULKAN ESAI' : '⚔️ SERANG BOSS (SUBMIT)')}
                 </button>
               </div>
             ) : (
@@ -626,7 +626,7 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px', overflowY: 'auto', padding: '24px 0' }}>
             <div style={{ textAlign: 'center', background: 'rgba(255, 251, 235, 0.95)', padding: '24px 40px', borderRadius: '12px', border: '2px dashed #10b981', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', maxWidth: '600px' }}>
-              <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>{isBossLevel ? 'ðŸ“œ' : 'ðŸ’Ž'}</span>
+              <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>{isBossLevel ? '📜' : '💎'}</span>
               <h2 style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.5rem', color: '#065f46', marginBottom: '16px', letterSpacing: '0.05em' }}>
                 {isBossLevel ? 'BOSS DEFEATED!' : 'LEVEL CLEAR!'}
               </h2>
@@ -664,8 +664,8 @@ export default function MissionFlowPage() {
                         {/* Status label under card */}
                         <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: isBossMinted ? '#34d399' : '#fbbf24', textAlign: 'center', lineHeight: '1.6' }}>
                           {isBossMinted
-                            ? 'âœ“ ON-CHAIN SBT BERHASIL DICETAK'
-                            : 'ðŸ”’ SERTIFIKAT BELUM DICETAK KE BLOCKCHAIN'}
+                            ? '✓ ON-CHAIN SBT BERHASIL DICETAK'
+                            : '🔒 SERTIFIKAT BELUM DICETAK KE BLOCKCHAIN'}
                         </p>
                       </div>
                     </div>
@@ -760,15 +760,15 @@ export default function MissionFlowPage() {
 
   return (
     <div className={styles.wrapper}>
-      {/* â”€â”€ TOP BAR â”€â”€ */}
+      {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button className={styles.backBtn} onMouseEnter={playHoverSound} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
-          â† KEMBALI KE PETA
+            ← KEMBALI KE PETA
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
       </div>
 
-      {/* â”€â”€ QUEST BOOK â”€â”€ */}
+      {/* ── QUEST BOOK ── */}
       <div className={styles.questBook}>
         {/* BOOK CONTENT (PARCHMENT) */}
         <div className={styles.bookContent}>
@@ -915,7 +915,7 @@ export default function MissionFlowPage() {
         )}
       </AnimatePresence>
 
-      {/* â”€â”€ CUSTOM DIALOG OVERLAY â”€â”€ */}
+      {/* ── CUSTOM DIALOG OVERLAY ── */}
       <AnimatePresence>
         {dialogState.isOpen && (
           <motion.div
@@ -941,7 +941,7 @@ export default function MissionFlowPage() {
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
               <button className={styles.btn} onMouseEnter={playHoverSound} onClick={closeDialog}>
-                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT âž”') : 'TUTUP'}
+                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
               </button>
             </motion.div>
           </motion.div>

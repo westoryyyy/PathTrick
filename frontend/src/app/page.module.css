@@ -179,13 +179,15 @@
   z-index: 0;
   overflow: hidden;
   animation: bgBreathing 20s ease-in-out infinite alternate;
-  transform-origin: right center; /* Fokus zoomnya agak ke pulau utama di kanan */
+  transform-origin: right center;
+  /* Fokus zoomnya agak ke pulau utama di kanan */
 }
 
 @keyframes bgBreathing {
   0% {
     transform: scale(1.0);
   }
+
   100% {
     transform: scale(1.05);
   }
@@ -265,9 +267,12 @@
 }
 
 @keyframes titleFloat {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-12px);
   }
@@ -351,12 +356,14 @@
 
 /* ════════ STATIC GIF (Atas Button) ════════ */
 .staticGifWrap {
-  margin-bottom: -15px; /* Biar kakinya nempel di atas button */
+  margin-bottom: -15px;
+  /* Biar kakinya nempel di atas button */
   z-index: 10;
 }
 
 .staticGifImg {
-  filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); /* Nambah efek bayangan biar nyatu sama pulau */
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+  /* Nambah efek bayangan biar nyatu sama pulau */
 }
 
 /* ════════════════════════════
@@ -1266,7 +1273,7 @@
   font-family: var(--pixel);
   font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.95);
-  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 4px rgba(0, 0, 0, 0.8);
   text-decoration: none;
   letter-spacing: 0.06em;
 }
