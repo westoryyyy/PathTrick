@@ -43,12 +43,12 @@ export default function MahasiswaLayout({
 
   // Priority: 1. User-edited (Zustand), 2. Auto from Privy (Google/Email), 3. Wallet address fallback
   const displayName = savedName
-    || user?.google?.name 
-    || user?.email?.address?.split('@')[0] 
+    || user?.google?.name
+    || user?.email?.address?.split('@')[0]
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Explorer');
-  
-  const displayEmail = user?.google?.email 
-    || user?.email?.address 
+
+  const displayEmail = user?.google?.email
+    || user?.email?.address
     || savedEmail
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : '');
 
@@ -107,15 +107,15 @@ export default function MahasiswaLayout({
         }
       });
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const playHoverSound = () => {
     try {
       const audio = new Audio('/HoverTombol.ogg');
       audio.volume = 0.3;
-      audio.play().catch(() => {});
-    } catch(e) {}
+      audio.play().catch(() => { });
+    } catch (e) { }
   };
 
   const isFullScreenPage = pathname.startsWith('/mahasiswa/learning-mission/') && pathname !== '/mahasiswa/learning-mission';
@@ -133,7 +133,7 @@ export default function MahasiswaLayout({
 
   return (
     <div className={styles.layout}>
-      
+
       {/* ─── LEFT SIDEBAR (RETRO PIXEL) ─── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
@@ -173,10 +173,10 @@ export default function MahasiswaLayout({
 
       {/* ─── MAIN CONTENT AREA ─── */}
       <main className={styles.mainArea}>
-        
+
         {/* Top Bar Header */}
         <header className={styles.header}>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <BGMPlayer />
             <LanguageToggle />
@@ -184,15 +184,15 @@ export default function MahasiswaLayout({
 
           <div className={styles.headerActions}>
             <div style={{ position: 'relative' }}>
-              <div 
-                className={styles.iconBtn} 
+              <div
+                className={styles.iconBtn}
                 onClick={() => { setIsMessagesOpen(!isMessagesOpen); setIsNotificationsOpen(false); setIsDropdownOpen(false); }}
                 onMouseEnter={playHoverSound}
               >
                 <img src="/inboxLogo.png" alt="Inbox" style={{ width: '32px', height: '32px', objectFit: 'contain', imageRendering: 'pixelated' }} />
                 <span className={styles.iconBadge}>2</span>
               </div>
-              
+
               {isMessagesOpen && (
                 <div style={{
                   position: 'absolute',
@@ -227,15 +227,15 @@ export default function MahasiswaLayout({
             </div>
 
             <div style={{ position: 'relative' }}>
-              <div 
-                className={styles.iconBtn} 
+              <div
+                className={styles.iconBtn}
                 onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsMessagesOpen(false); setIsDropdownOpen(false); }}
                 onMouseEnter={playHoverSound}
               >
                 🔔
                 <span className={styles.iconBadge}>1</span>
               </div>
-              
+
               {isNotificationsOpen && (
                 <div style={{
                   position: 'absolute',
@@ -266,9 +266,9 @@ export default function MahasiswaLayout({
             </div>
 
             <div style={{ position: 'relative' }}>
-              <div 
-                className={styles.profileChip} 
-                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }} 
+              <div
+                className={styles.profileChip}
+                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }}
                 onMouseEnter={playHoverSound}
                 style={{ cursor: 'pointer' }}
               >
@@ -308,7 +308,7 @@ export default function MahasiswaLayout({
                         {activeWallet ? activeWallet.address : t('common.autoCreatedOnMint')}
                       </p>
                       {activeWallet && (
-                        <button 
+                        <button
                           onClick={() => navigator.clipboard.writeText(activeWallet.address)}
                           style={{ background: '#5cb85c', border: '2px solid #224a22', color: '#fff', padding: '6px', cursor: 'pointer', borderRadius: '4px' }}
                           title={t('common.copyAddress')}

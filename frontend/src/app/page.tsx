@@ -23,7 +23,7 @@ const FEATURE_ICONS = [
 /* ─── Featured courses ─── */
 const COURSES = [
   { img: '/perancangan.png', img_en: '/perancangan_en.png', title: '', titleColor: '#4fc3f7', desc: '' },
-  { img: '/ai rendering.png', img_en: '/ai_rendering_en.png', title: '', titleColor: '#86efac', desc: '' },
+  { img: '/ai_rendering.png', img_en: '/ai_rendering_en.png', title: '', titleColor: '#86efac', desc: '' },
   { img: '/web3.png', img_en: '/web3_en.png', title: '', titleColor: '#fbbf24', desc: '' },
   { img: '/beasiswa.png', img_en: '/beasiswa_en.png', title: '', titleColor: '#fb923c', desc: '' },
 ];

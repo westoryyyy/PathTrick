@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
       })
       .catch(() => router.replace('/'));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated, ready]);
 
   useEffect(() => {
@@ -71,13 +71,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const audio = new Audio('/sound dashboard admin.mp3');
     audio.loop = true;
     audio.volume = 0.4; // Slightly lower volume so it's not overpowering
-    
+
     // Autoplay policy might block this if no user interaction has occurred
     // We catch the error silently so it doesn't break the app
     audio.play().catch(() => {
       // If blocked, wait for user interaction
       const playOnInteract = () => {
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
         window.removeEventListener('click', playOnInteract);
       };
       window.addEventListener('click', playOnInteract);
@@ -179,11 +179,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className={styles.headerActions}>
             {/* Mute/Unmute BGM Toggle */}
-            <button 
+            <button
               onClick={toggleMute}
               onMouseEnter={playHoverSound}
               style={{
-                background: '#4a2410', border: '2px solid #5a3a29', color: '#fbbf24', 
+                background: '#4a2410', border: '2px solid #5a3a29', color: '#fbbf24',
                 width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', fontSize: '1.2rem'
               }}

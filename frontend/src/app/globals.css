@@ -14,16 +14,19 @@
       opacity: 0;
       transform: translateY(18px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
   @keyframes contentFade {
     from {
       opacity: 0;
       transform: translateX(12px);
     }
+
     to {
       opacity: 1;
       transform: translateX(0);
@@ -97,4 +100,24 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Custom scrollbar for FlipBook */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e5d7c5;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a89481;
+  border-radius: 8px;
+  border: 2px solid #e5d7c5;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #8c7763;
 }
