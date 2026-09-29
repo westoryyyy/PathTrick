@@ -19,7 +19,29 @@
     "sqlBadgeMinted": "Badge SQL kamu telah dicetak di blockchain.",
     "aiCareerCoach": "AI Career Coach",
     "roadmapReady": "Peta jalur pribadimu sudah siap! Ayo jelajahi.",
-    "scholarshipFound": "Beasiswa baru yang cocok dengan profilmu ditemukan."
+    "scholarshipFound": "Beasiswa baru yang cocok dengan profilmu ditemukan.",
+    "quizDailyQuest": "Selesaikan 1 modul quiz hari ini untuk mendapatkan +150 XP!",
+    "aiSkillGapAnalysis": "Berdasarkan analisis AI, berikut adalah skill gap Anda. Selesaikan modul pelatihan ini untuk memenuhi kualifikasi industri.",
+    "noNewNotifications": "Tidak ada notifikasi baru.",
+    "bountyClaimedMsg": "Kamu telah mengklaim hadiah hari ini! Kembali besok.",
+    "quizCompletedMsg": "Kuis selesai! Ambil hadiahmu sekarang!",
+    "playQuizBtn": "KERJAKAN QUIZ ▶",
+    "claimingBtn": "MENGKLAIM...",
+    "claimedBtn": "DIKLAIM",
+    "claimXpBtn": "KLAIM +150 XP",
+    "uploadCvPrompt": "Punya skill baru? Upload CV terbaru kamu agar AI memperbarui profil & rekomendasi karir kamu.",
+    "achievementsDesc": "Koleksi Pencapaian kamu. Selesaikan lebih banyak misi untuk membuka semua badge!",
+    "noCertificatesDesc": "Kamu belum menaklukkan Boss Modul manapun. Mainkan Learning Mission untuk mendapatkan Sertifikat!"
+  },
+  "badges": {
+    "missionCompleter": "Selesai 1 Misi",
+    "earlyBird": "Login Sebelum Pagi",
+    "streakWarrior": "Login 7 Hari",
+    "quizMaster": "Kuis Sempurna",
+    "quickLearner": "Tamat Cepat",
+    "courseMaster": "Tamat 1 Course",
+    "firstStep": "Mulai Perjalanan",
+    "nightOwl": "Belajar Malam"
   },
   "nav": {
     "mahasiswa": {
@@ -27,7 +49,7 @@
       "learningMission": "Misi Belajar",
       "careerHub": "Pusat Karir",
       "skillBadges": "Lencana Skill",
-      "roleBadge": "Sang Pengejar"
+      "roleBadge": "The Chaser"
     },
     "sma": {
       "dashboard": "Dasbor",
@@ -35,7 +57,7 @@
       "universityHub": "Pusat Universitas",
       "scholarshipHub": "Pusat Beasiswa",
       "relicsAndTreasures": "Relik dan Harta Karun",
-      "roleBadge": "Sang Pemimpi"
+      "roleBadge": "The Dreamer"
     }
   },
   "mahasiswa": {
@@ -50,7 +72,7 @@
       "weeklyChallenge": "Tantangan Mingguan",
       "skillTree": "Pohon Skill",
       "achievementVault": "Brankas Prestasi",
-      "unlocked": "4 Terbuka",
+      "unlocked": "Terbuka",
       "active": "Aktif",
       "aiJobMatch": "KECOCOKAN KERJA AI",
       "jobsFoundThisWeek": "5 pekerjaan cocok ditemukan minggu ini!",

@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../lib/prisma";
 import { requireAdmin } from "./admin.middleware";
+import { updateKnowledgeEmbedding } from "../../lib/embedding";
 import { jobSchema, scholarshipSchema, universitySchema } from "./admin.schema";
 import {
   createJob,
@@ -392,6 +393,80 @@ export default async function adminRoutes(fastify: FastifyInstance) {
         });
       }
       await prisma.job.delete({ where: { id } });
+      return reply.send({ success: true });
+    }
+  );
+
+  // === KNOWLEDGE BASE ===
+  fastify.get(
+    "/api/admin/knowledge",
+    { preHandler: [fastify.authenticate, requireAdmin] },
+    async (request, reply) => {
+      const items = await prisma.courseKnowledge.findMany({
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          facultyTag: true,
+          title: true,
+          content: true,
+          chunkIndex: true,
+          updatedAt: true,
+          createdAt: true,
+          // Jangan select embedding, terlalu berat
+        }
+      });
+      return reply.send({ data: items });
+    }
+  );
+
+  fastify.post(
+    "/api/admin/knowledge",
+    { preHandler: [fastify.authenticate, requireAdmin] },
+    async (request, reply) => {
+      const { facultyTag, title, content } = request.body as { facultyTag: string, title: string, content: string };
+      try {
+        const doc = await prisma.courseKnowledge.create({
+          data: { facultyTag, title, content, chunkIndex: 0 },
+        });
+        
+        // Background process to generate embedding
+        updateKnowledgeEmbedding(doc.id, content).catch(console.error);
+
+        return reply.code(201).send(doc);
+      } catch (err: any) {
+        return reply.code(400).send({ error: "Bad Request", message: err.message });
+      }
+    }
+  );
+
+  fastify.put(
+    "/api/admin/knowledge/:id",
+    { preHandler: [fastify.authenticate, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const { facultyTag, title, content } = request.body as { facultyTag: string, title: string, content: string };
+      try {
+        const doc = await prisma.courseKnowledge.update({
+          where: { id },
+          data: { facultyTag, title, content },
+        });
+
+        // Background process to regenerate embedding
+        updateKnowledgeEmbedding(doc.id, content).catch(console.error);
+
+        return reply.send(doc);
+      } catch (err: any) {
+        return reply.code(400).send({ error: "Bad Request", message: err.message });
+      }
+    }
+  );
+
+  fastify.delete(
+    "/api/admin/knowledge/:id",
+    { preHandler: [fastify.authenticate, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      await prisma.courseKnowledge.delete({ where: { id } });
       return reply.send({ success: true });
     }
   );

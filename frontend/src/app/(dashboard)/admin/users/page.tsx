@@ -88,7 +88,15 @@ export default function UsersPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontFamily: '"Pixelify Sans"' }}>Memuat data…</td></tr>
+              <tr>
+                <td colSpan={5} style={{ textAlign: 'center', padding: '40px', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '24px', height: '24px', border: '3px solid #fbbf24', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Sedang memuat data...
+                  </div>
+                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                </td>
+              </tr>
             ) : users.length === 0 ? (
               <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontFamily: '"Pixelify Sans"' }}>Tidak ada user ditemukan</td></tr>
             ) : users.map((user, i) => (
