@@ -17,11 +17,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { API_BASE_URL } from '@/config/pathtrick';
 
 const NAV_KEYS: { href: string; labelKey: string; icon: string; badge?: string }[] = [
-  { href: '/sma/dashboard', labelKey: 'nav.sma.dashboard', icon: '📊' },
-  { href: '/sma/learning-progress', labelKey: 'nav.sma.learningProgress', icon: '🎯' },
-  { href: '/sma/university-hub', labelKey: 'nav.sma.universityHub', icon: '🎓' },
-  { href: '/sma/scholarship-hub', labelKey: 'nav.sma.scholarshipHub', icon: '📜' },
-  { href: '/sma/certificate', labelKey: 'nav.sma.relicsAndTreasures', icon: '🏆' },
+  { href: '/dreamer/dashboard', labelKey: 'nav.sma.dashboard', icon: '📊' },
+  { href: '/dreamer/learning-progress', labelKey: 'nav.sma.learningProgress', icon: '🎯' },
+  { href: '/dreamer/university-hub', labelKey: 'nav.sma.universityHub', icon: '🎓' },
+  { href: '/dreamer/scholarship-hub', labelKey: 'nav.sma.scholarshipHub', icon: '📜' },
+  { href: '/dreamer/certificate', labelKey: 'nav.sma.relicsAndTreasures', icon: '🏆' },
 ];
 
 export default function SMALayout({
@@ -113,11 +113,11 @@ export default function SMALayout({
           // Tidak ada role di backend → ke select-role
           router.replace('/select-role');
         } else if (roleName === 'DREAMER') {
-          setRole('sma', user.id);
+          setRole('dreamer', user.id);
           setIsCheckingAuth(false);
         } else if (roleName === 'CHASER') {
-          setRole('mahasiswa', user.id);
-          router.replace('/mahasiswa/dashboard');
+          setRole('chaser', user.id);
+          router.replace('/chaser/dashboard');
         } else if (roleName === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
@@ -129,7 +129,7 @@ export default function SMALayout({
         // Jika backend tidak bisa dihubungi, gunakan Zustand sebagai fallback
         if (!selectedRole || savedPrivyUserId !== user.id) {
           router.replace('/select-role');
-        } else if (selectedRole !== 'sma') {
+        } else if (selectedRole !== 'dreamer') {
           router.replace(`/${selectedRole}/dashboard`);
         } else {
           setIsCheckingAuth(false);
@@ -147,7 +147,7 @@ export default function SMALayout({
     } catch (_) { }
   };
 
-  const isMissionPage = pathname.startsWith('/sma/learning-progress/') && pathname !== '/sma/learning-progress';
+  const isMissionPage = pathname.startsWith('/dreamer/learning-progress/') && pathname !== '/dreamer/learning-progress';
 
   // Don't render the dashboard while backend role check is in progress.
   // This prevents flash of authenticated content before we know the user's role.
@@ -177,7 +177,7 @@ export default function SMALayout({
 
         <nav className={styles.nav}>
           {NAV_KEYS.map((item) => {
-            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/sma/dashboard' && item.href !== '/sma');
+            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/dreamer/dashboard' && item.href !== '/dreamer');
 
             return (
               <Link

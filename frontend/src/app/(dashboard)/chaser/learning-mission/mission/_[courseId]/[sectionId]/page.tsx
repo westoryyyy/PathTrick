@@ -1,27 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
-import MintSBTButton from '@/components/ui/MintSBTButton';
-import CertificatePreview from '@/components/ui/CertificatePreview';
 import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
 import { getQuizForMission } from '@/data/quizBank';
-import Image from 'next/image';
+import MintSBTButton from '@/components/ui/MintSBTButton';
+import CertificatePreview from '@/components/ui/CertificatePreview';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+
+const generateCourseId = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+};
 
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 
 export default function MissionFlowPage() {
-  const { missionId } = useParams();
+  const { courseId, sectionId } = useParams();
   const router = useRouter();
   const { completeDynamicNode } = useMapStore();
-  const { addXP, triggerLevelUp, displayName: savedName } = useUserStore();
+  const { addXP, triggerLevelUp, completeQuiz, displayName: savedName } = useUserStore();
   const { user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
@@ -33,35 +43,55 @@ export default function MissionFlowPage() {
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
 
-  // Find the exact chapter from mock data by extracting base chapter ID
-  const baseChapterId = (missionId as string)?.replace(/-level-\d+$/, '');
-  const allChapters = mockBackendData.houses.flatMap(h => h.stages).flatMap(s => s.chapters || []);
-  const currentChapter = allChapters.find(c => c.id === baseChapterId) || {
-    name: 'Materi Pembelajaran',
-    description: 'Selamat datang! Persiapkan dirimu untuk menerima ilmu baru.',
-    duration: '6 Levels'
-  };
+  const missionId = sectionId as string;
+  const baseChapterId = 'chapter-unknown'; // Fallback
+  // We'll define currentChapter below when data is fetched.
 
-  // Determine level type based on dynamic ID
-  let baseLevelType: Phase = 'MATERIAL';
-  const match = (missionId as string)?.match(/^(.*?)-level-(\d+)$/);
+
+  // We'll replace dynamic ID parsing with real backend data fetch
+  const [courseData, setCourseData] = useState<any>(null);
+  const [sectionData, setSectionData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+        const { API_BASE_URL } = await import('@/config/pathtrick');
+        const res = await fetch(`${API_BASE_URL}/api/courses/${courseId}`, { headers: getAuthHeaders() });
+        if (res.ok) {
+          const data = await res.json();
+          setCourseData(data);
+          
+          let foundSection = null;
+          for (const ch of data.chapters) {
+            for (const s of ch.sections) {
+              if (s.id === sectionId) {
+                foundSection = s;
+                break;
+              }
+            }
+          }
+          setSectionData(foundSection);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (courseId) fetchData();
+  }, [courseId, sectionId]);
+
+  const currentChapter = courseData?.chapters?.find((ch: any) => ch.sections.some((s: any) => s.id === sectionId));
 
   let isBossLevel = false;
-  if (match) {
-    const levelNum = parseInt(match[2]);
-    const numLevelsMatch = currentChapter.duration ? currentChapter.duration.match(/\d+/) : null;
-    const totalLevels = numLevelsMatch ? parseInt(numLevelsMatch[0]) : 6;
+  let baseLevelType: Phase = 'MATERIAL';
 
-    // Always start at MATERIAL for story/intro, even for Boss!
-    baseLevelType = 'MATERIAL';
-
-    if (levelNum === totalLevels) {
-      isBossLevel = true;
-    }
-  } else {
-    // Fallback for legacy IDs
-    if ((missionId as string)?.includes('quiz')) baseLevelType = 'QUIZ';
-    else if ((missionId as string)?.match(/(lab|project|boss)/)) {
+  // We can dynamically decide phase based on section title or type
+  if (sectionData) {
+    if (sectionData.title?.toLowerCase().includes('quiz') || sectionData.quiz) baseLevelType = 'QUIZ';
+    else if (sectionData.title?.toLowerCase().includes('project') || sectionData.title?.toLowerCase().includes('boss')) {
       baseLevelType = 'PROJECT';
       isBossLevel = true;
     }
@@ -69,22 +99,18 @@ export default function MissionFlowPage() {
 
   const [phase, setPhase] = useState<Phase>(baseLevelType);
   const [materialPage, setMaterialPage] = useState(0);
+  const [isBossMinted, setIsBossMinted] = useState(false);
   const [code, setCode] = useState(() => {
-    const m = (missionId as string) || '';
-    const isTech = m.includes('python') || m.includes('data') || m.includes('javascript') || m.includes('js') || m.includes('html') || m.includes('css') || m.includes('tailwind') || m.includes('tech');
-    if (!isTech) return '';
-    if (m.includes('python') || m.includes('data')) return '# Tulis kodemu di sini\n';
-    if (m.includes('javascript') || m.includes('js')) return '// Tulis kodemu di sini\n';
-    return '<!-- Tulis Kodemu di Sini -->\n';
+    return '// Tulis kodemu di sini\n';
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [playerHp, setPlayerHp] = useState(3);
   const [quizIndex, setQuizIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<{questionId: string, selectedAnswer: string}[]>([]);
   const [dialogState, setDialogState] = useState<{ isOpen: boolean; type: 'success' | 'error'; message: string; onConfirm?: () => void }>({ isOpen: false, type: 'success', message: '' });
 
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [isBossMinted, setIsBossMinted] = useState(false);
 
   const setPhaseWithProgress = (p: Phase) => {
     setPhase(p);
@@ -109,19 +135,10 @@ export default function MissionFlowPage() {
     try {
       const audio = new Audio('/mission completed.ogg');
       audio.volume = 0.5;
-      audio.play().catch(() => { });
-    } catch (e) { }
+      audio.play().catch(() => {});
+    } catch (e) {}
     completeDynamicNode(missionId as string);
     setPhase('CLAIM');
-  };
-
-  // Helper to convert chapter ID string to uint256-compatible number for SBT Minting
-  const generateCourseId = (str: string) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash);
   };
 
   // 3D Page flip animation variants for Right Page
@@ -148,8 +165,8 @@ export default function MissionFlowPage() {
     try {
       const audio = new Audio('/HoverTombol.ogg');
       audio.volume = 0.3;
-      audio.play().catch(() => { });
-    } catch (e) { }
+      audio.play().catch(() => {});
+    } catch(e) {}
   };
 
   // Get dynamic content or generate a fallback template
@@ -179,9 +196,9 @@ export default function MissionFlowPage() {
       question: `Pertanyaan ${i + 1}: Manakah pernyataan yang PALING BENAR mengenai ${currentChapter.name}?`,
       options: [
         { text: `Memahami konsep fundamental adalah kunci utama penguasaan ${currentChapter.name}`, isCorrect: true, feedback: `Tepat! Fondasi yang kuat adalah kunci seorang Ksatria menguasai materi ini.` },
-        { text: `Menghafal semua rumus tanpa memahami artinya`, isCorrect: false, feedback: `Menghafal tanpa pemahaman tidak efektif. Kembali ke materi!` },
-        { text: `Melewati latihan praktik karena tidak penting`, isCorrect: false, feedback: `Latihan adalah bagian krusial dari pembelajaran. Jangan dilewati!` },
-        { text: `Tidak perlu belajar materi ini secara mendalam`, isCorrect: false, feedback: `Penguasaan mendalam sangat diperlukan untuk menjadi ahli sejati.` }
+        { text: `Menghafal semua rumus tanpa memahami artinya`, isCorrect: false, feedback: `Menghafal tanpa pemahaman tidak efektif.\nKembali ke materi!` },
+        { text: `Melewati latihan praktik karena tidak penting`, isCorrect: false, feedback: `Latihan adalah bagian krusial dari pembelajaran.\nJangan dilewati!` },
+        { text: `Tidak perlu belajar materi ini secara mendalam`, isCorrect: false, feedback: `Penguasaan mendalam sangat diperlukan untuk menjadi ahli sejati.\nKembali ke materi!` }
       ]
     }));
 
@@ -243,6 +260,9 @@ export default function MissionFlowPage() {
                   <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
                     Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
                   </p>
+                  <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
+                    Donec id justo. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu pellentesque magna erat vitae risus. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh. Quisque volutpat condimentum velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                  </p>
                 </>
               )}
             </div>
@@ -269,29 +289,20 @@ export default function MissionFlowPage() {
         <div key="4" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"Pixelify Sans", sans-serif' }}>
           <div>
             <h4 style={{ fontSize: '1.1rem', color: '#059669', marginBottom: '12px' }}>
-              📜 PENJELASAN TAMBAHAN (SCROLL TEST)
+              📚 MATERI EKSTRA (HALAMAN KANAN)
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id sagittis nisl, non ullamcorper risus. Sed congue, neque sit amet sodales vulputate, ipsum sapien ultrices nulla, ut suscipit sapien elit nec sapien.
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
               </p>
               <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Phasellus interdum diam eget justo gravida, ut auctor tellus cursus. Fusce hendrerit diam in dui mattis, ut pharetra ex sagittis. Integer scelerisque nisi metus, eget dapibus dolor posuere eget. Maecenas ac erat sed ex consequat aliquet.
+                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.
               </p>
               <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Vivamus non luctus ex, id eleifend turpis. Sed vitae nulla sem. Praesent dictum egestas nisl, sed facilisis mauris. Proin quis dolor eget nunc commodo tincidunt. Vivamus condimentum elit eget quam varius, sit amet hendrerit ex iaculis.
+                Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.
               </p>
               <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Nullam ullamcorper tellus eget lacus auctor posuere. In id mi eget orci euismod efficitur ut ut orci. Sed vulputate ante quis nisl sagittis gravida. Ut sed odio pretium, egestas ligula eu, commodo dolor.
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Mauris euismod congue rhoncus. Suspendisse potenti. Nam non urna augue. Quisque sollicitudin mauris sit amet arcu condimentum, a lacinia leo pretium. Fusce interdum magna vel libero tempus tempus id vel leo.
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Praesent quis enim a dolor iaculis finibus in id turpis. Duis eu leo mattis, posuere ligula efficitur, iaculis erat. Nunc vel elementum elit. Vestibulum sed felis metus. Donec sed hendrerit mauris, sed gravida magna.
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#3b261b', lineHeight: '1.6' }}>
-                Aliquam in cursus quam, in tristique quam. Nulla facilisi. Aenean feugiat ligula sed ligula pretium pretium. Praesent accumsan urna scelerisque dui ullamcorper tempor. Pellentesque egestas tincidunt nisi elementum rhoncus.
+                Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.
               </p>
             </div>
           </div>
@@ -301,11 +312,11 @@ export default function MissionFlowPage() {
       project: (isBoss || isTech) ? {
         type: isTech ? 'code' : 'essay',
         instruction: (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h3 style={{ color: '#fbbf24', fontSize: '1.4rem', marginBottom: '8px', fontFamily: '"Pixelify Sans", sans-serif', lineHeight: '1.4' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: '"Pixelify Sans", sans-serif' }}>
+            <h3 style={{ color: isBoss ? '#ef4444' : '#d97706', fontSize: '1.4rem', marginBottom: '8px', lineHeight: '1.4' }}>
               {isBoss ? `⚔️ BOSS FIGHT: Penjaga ${currentChapter.name}` : `🛠 Tantangan Praktik — ${currentChapter.name} Lvl.${levelNum}`}
             </h3>
-            <p style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6', fontFamily: '"Pixelify Sans", sans-serif' }}>
+            <p style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6' }}>
               {isTech
                 ? (isBoss
                   ? `Ksatria, ini adalah momen penentu! Tuliskan kode yang mencerminkan penguasaanmu atas ${currentChapter.name}. Pastikan kodenya valid dan berjalan dengan benar.`
@@ -316,8 +327,8 @@ export default function MissionFlowPage() {
               }
             </p>
             <div style={{ background: '#fae1c5', padding: '16px', border: '2px dashed #8c5d41', borderRadius: '4px' }}>
-              <p style={{ color: '#92400e', fontSize: '1.1rem', marginBottom: '16px', fontFamily: '"Pixelify Sans", sans-serif', fontWeight: 'bold' }}>SYARAT KELULUSAN:</p>
-              <ul style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6', marginLeft: '20px', listStyleType: 'disc', fontFamily: '"Pixelify Sans", sans-serif', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <p style={{ color: '#92400e', fontSize: '1.1rem', marginBottom: '16px', fontWeight: 'bold' }}>SYARAT KELULUSAN:</p>
+              <ul style={{ color: '#3b261b', fontSize: '1.1rem', lineHeight: '1.6', marginLeft: '24px', listStyleType: 'disc', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {isTech ? (
                   <>
                     <li>Tulis kode program menggunakan <strong style={{ color: '#047857' }}>{lang.toUpperCase()}</strong>.</li>
@@ -355,22 +366,28 @@ export default function MissionFlowPage() {
         return;
       }
 
-      const response = await fetch('/api/submit-task', {
+      const response = await fetch(`/api/courses/${courseId}/sections/${sectionId}/project/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, missionId })
+        body: JSON.stringify({ code })
       });
       const data = await response.json();
 
-      if (data.passed) {
-        showDialog('success', data.message, () => handleLevelComplete());
+      if (data.passed || data.status === 'completed') {
+        showDialog('success', data.message || 'Berhasil!', () => handleLevelComplete());
       } else {
         const newHp = playerHp - 1;
+        try {
+          const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+          audio.volume = 0.5;
+          audio.play().catch(() => {});
+        } catch (e) {}
+        
         setPlayerHp(newHp);
         if (newHp > 0) {
-          showDialog('error', `${data.message}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+          showDialog('error', `Tebakanmu meleset!\n${data.message || 'Coba lagi!'}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
         } else {
-          showDialog('error', `GAME OVER!\n\n${data.message}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
+          showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
             setPlayerHp(3);
             setPhase('MATERIAL');
             setMaterialPage(0);
@@ -379,6 +396,54 @@ export default function MissionFlowPage() {
       }
     } catch {
       showDialog('error', 'Gagal menghubungi AI backend.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleQuizSubmit = async (finalAnswers: {questionId: string, selectedAnswer: string}[]) => {
+    setIsSubmitting(true);
+    try {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const response = await fetch(`${API_BASE_URL}/api/courses/${courseId}/sections/${sectionId}/quiz/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ answers: finalAnswers })
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.passed) {
+        showDialog('success', `Kuis berhasil diselesaikan!\nNilai kamu: ${data.score}%`, () => {
+          if (content.project || sectionData?.title?.toLowerCase().includes('project') || sectionData?.title?.toLowerCase().includes('boss')) {
+            setPhaseWithProgress('PROJECT');
+          } else {
+            handleLevelComplete();
+          }
+        });
+      } else {
+        const newHp = playerHp - 1;
+        setPlayerHp(newHp);
+        if (newHp > 0) {
+          showDialog('error', `Jawaban belum memuaskan!\nNilai kamu: ${data.score || 0}%\nCoba lagi! Sisa nyawa: ${'♥'.repeat(newHp)}`, () => {
+            setQuizAnswers([]);
+            setQuizIndex(0);
+          });
+        } else {
+          showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nPelajari ulang materi.`, () => {
+            setPlayerHp(3);
+            setQuizAnswers([]);
+            setQuizIndex(0);
+            setPhase('MATERIAL');
+            setMaterialPage(0);
+          });
+        }
+      }
+    } catch (e) {
+      showDialog('error', 'Gagal menghubungi server.');
     } finally {
       setIsSubmitting(false);
     }
@@ -397,10 +462,10 @@ export default function MissionFlowPage() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: materialPage === 0 ? '20px' : '0', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
               {materials[materialPage * 2]}
             </div>
-
+            
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto' }}>
               {materialPage > 0 && (
-                <button className={styles.secondaryBtn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
+                <button onMouseEnter={playHoverSound} className={styles.secondaryBtn} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
                   ← SEBELUMNYA
                 </button>
               )}
@@ -498,17 +563,16 @@ export default function MissionFlowPage() {
 
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
               {materialPage < Math.ceil(materials.length / 2) - 1 ? (
-                <button className={styles.btn} onMouseEnter={playHoverSound} onClick={() => { playSwipeSound(); setMaterialPage(p => p + 1); }}>
+                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setMaterialPage(p => p + 1); }}>
                   LANJUT ➔
                 </button>
               ) : (
-                <button
-                  onMouseEnter={playHoverSound}
+                <button onMouseEnter={playHoverSound}
                   className={styles.btn}
                   onClick={() => {
                     playSwipeSound();
-                    if (content.quiz) setPhase('QUIZ');
-                    else if (content.project) setPhase('PROJECT');
+                    if (content.quiz) setPhaseWithProgress('QUIZ');
+                    else if (content.project) setPhaseWithProgress('PROJECT');
                     else handleLevelComplete();
                   }}
                 >
@@ -523,23 +587,42 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ height: '48px', marginBottom: '16px' }}></div>
-            {content.quiz ? (() => {
+            {sectionData?.quiz?.questions ? (() => {
+              const quizArray = sectionData.quiz.questions;
+              const currentQuiz = quizArray[quizIndex];
+              return (
+                <div className={styles.quizOptions}>
+                  {currentQuiz.options.map((opt: any, i: number) => (
+                    <button onMouseEnter={playHoverSound}
+                      key={i}
+                      className={styles.optionBtn}
+                      onClick={() => {
+                        const newAnswers = [...quizAnswers, { questionId: currentQuiz.id, selectedAnswer: opt.id }];
+                        setQuizAnswers(newAnswers);
+                        if (quizIndex < quizArray.length - 1) {
+                           setQuizIndex(quizIndex + 1);
+                        } else {
+                           handleQuizSubmit(newAnswers);
+                        }
+                      }}
+                      disabled={isSubmitting}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+              );
+            })() : content.quiz ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
                 <div className={styles.quizOptions}>
-                  {currentQuiz.options.map((opt, i: number) => (
-                    <button
-                      onMouseEnter={playHoverSound}
+                  {currentQuiz.options.map((opt: any, i: number) => (
+                    <button onMouseEnter={playHoverSound}
                       key={i}
                       className={styles.optionBtn}
                       onClick={() => {
                         if (opt.isCorrect) {
-                          try {
-                            const audio = new Audio('/Poin.ogg');
-                            audio.volume = 0.5;
-                            audio.play().catch(() => { });
-                          } catch (e) { }
                           showDialog('success', opt.feedback, () => {
                             if (quizIndex < quizArray.length - 1) {
                               setQuizIndex(quizIndex + 1);
@@ -550,21 +633,11 @@ export default function MissionFlowPage() {
                           });
                         } else {
                           const newHp = playerHp - 1;
-                          try {
-                            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
-                            audio.volume = 0.5;
-                            audio.play().catch(() => { });
-                          } catch (e) { }
                           setPlayerHp(newHp);
                           if (newHp > 0) {
-                            showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+                            showDialog('error', `Salah!\n${opt.feedback}\nSisa: ${'♥'.repeat(newHp)}`);
                           } else {
-                            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
-                              setPlayerHp(3);
-                              setQuizIndex(0);
-                              setPhase('MATERIAL');
-                              setMaterialPage(0);
-                            });
+                            showDialog('error', `GAME OVER`, () => { setPlayerHp(3); setQuizIndex(0); setPhase('MATERIAL'); });
                           }
                         }
                       }}
@@ -604,8 +677,7 @@ export default function MissionFlowPage() {
                     />
                   </div>
                 )}
-                <button
-                  onMouseEnter={playHoverSound}
+                <button onMouseEnter={playHoverSound}
                   className={styles.btn}
                   onClick={handleBossSubmit}
                   disabled={isSubmitting}
@@ -616,7 +688,7 @@ export default function MissionFlowPage() {
               </div>
             ) : (
               <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <button className={styles.btn} onMouseEnter={playHoverSound} onClick={handleLevelComplete}>SAYA PAHAM! (SELESAI)</button>
+                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={handleLevelComplete}>SAYA PAHAM! (SELESAI)</button>
               </div>
             )}
           </div>
@@ -624,132 +696,16 @@ export default function MissionFlowPage() {
 
       case 'CLAIM':
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px', overflowY: 'auto', padding: '24px 0' }}>
-            <div style={{ textAlign: 'center', background: 'rgba(255, 251, 235, 0.95)', padding: '24px 40px', borderRadius: '12px', border: '2px dashed #10b981', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', maxWidth: '600px' }}>
-              <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>{isBossLevel ? '📜' : '💎'}</span>
-              <h2 style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.5rem', color: '#065f46', marginBottom: '16px', letterSpacing: '0.05em' }}>
-                {isBossLevel ? 'BOSS DEFEATED!' : 'LEVEL CLEAR!'}
-              </h2>
-              <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1rem', color: '#4b5563', lineHeight: '1.6', marginBottom: '24px' }}>
-                {isBossLevel
-                  ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.'
-                  : 'Sempurna! Kamu baru saja menyelesaikan tantangan ini.'}
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
+            <div style={{ textAlign: 'center', background: '#fffbeb', padding: '16px', borderRadius: '8px', border: '1px solid #fde68a' }}>
+              <span style={{ display: 'block', marginBottom: '8px' }}>REWARD</span>
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#92400e', lineHeight: '1.6' }}>
+                Reward XP dan item telah ditambahkan ke akunmu.
               </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
-                {isBossLevel && (
-                  <div style={{ width: '100%', maxWidth: '350px', background: '#3e2723', padding: '12px', borderRadius: '8px', border: '4px solid #1a1a1a', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.8)' }}>
-                    <div style={{
-                      border: '2px solid #5c4033',
-                      borderRadius: '4px',
-                      padding: '4px',
-                      boxShadow: '4px 4px 0 #3b1f0e, inset 0 0 0 2px #e8c98a',
-                    }}>
-                      <div style={{
-                        display: 'flex', flexDirection: 'column', gap: '12px',
-                        background: '#784626',
-                        border: '2px solid #3b1f0e',
-                        borderRadius: '2px',
-                        padding: '12px',
-                        position: 'relative'
-                      }}>
-                        {/* Certificate Preview */}
-                        <CertificatePreview
-                          userName={displayName}
-                          moduleName={currentChapter.name}
-                          walletAddress={walletShort}
-                          date={new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                          isMinted={isBossMinted}
-                        />
-                        {/* Status label under card */}
-                        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: isBossMinted ? '#34d399' : '#fbbf24', textAlign: 'center', lineHeight: '1.6' }}>
-                          {isBossMinted
-                            ? '✓ ON-CHAIN SBT BERHASIL DICETAK'
-                            : '🔒 SERTIFIKAT BELUM DICETAK KE BLOCKCHAIN'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Non-boss: coin reward */}
-                {!isBossLevel && (
-                  <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                    <motion.div
-                      key="coin-anim"
-                      initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
-                      animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], y: 0 } : { scale: 1, rotate: 0, opacity: 1, y: [0, -10, 0] }}
-                      transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                      style={{ display: 'inline-block' }}
-                    >
-                      <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated' }} />
-                    </motion.div>
-                    <p className={styles.text} style={{ marginTop: '12px', fontSize: '0.65rem', color: '#92400e' }}>
-                      Reward XP dan item telah ditambahkan ke akunmu.
-                    </p>
-                  </div>
-                )}
-
-                {isBossLevel ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '400px' }}>
-                    {!isBossMinted ? (
-                      <>
-                        <MintSBTButton
-                          courseId={generateCourseId(baseChapterId)}
-                          customStyle={{
-                            width: '100%',
-                          }}
-                          onSuccess={() => {
-                            setIsBossMinted(true);
-                            addXP(500);
-                          }}
-                        />
-                        <button onMouseEnter={playHoverSound}
-                          className={styles.secondaryBtn}
-                          style={{ width: '100%', padding: '14px 28px', fontSize: '1.1rem', opacity: isClaiming ? 0.7 : 1 }}
-                          onClick={() => {
-                            if (!isClaiming) {
-                              setIsClaiming(true);
-                              addXP(500);
-                              setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
-                            }
-                          }}
-                          disabled={isClaiming}
-                        >
-                          {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
-                        </button>
-                      </>
-                    ) : (
-                      <button onMouseEnter={playHoverSound}
-                        className={styles.btn}
-                        style={{ width: '100%', padding: '18px 28px', fontSize: '1.2rem' }}
-                        onClick={() => router.push('/sma/certificate')}
-                      >
-                        LIHAT SERTIFIKAT DI VAULT
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <button onMouseEnter={playHoverSound}
-                    className={styles.btn}
-                    style={{ width: '100%', maxWidth: '400px', padding: '18px 28px', fontSize: '1.2rem', opacity: isClaiming ? 0.7 : 1 }}
-                    onClick={() => {
-                      if (!isClaiming) {
-                        setIsClaiming(true);
-                        addXP(500);
-                        if (isBossLevel) {
-                          triggerLevelUp();
-                        }
-                        setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
-                      }
-                    }}
-                    disabled={isClaiming}
-                  >
-                    {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI'}
-                  </button>
-                )}
-              </div>
             </div>
+            <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
+              KLAIM REWARD & KEMBALI KE PETA
+            </button>
           </div>
         );
 
@@ -762,7 +718,7 @@ export default function MissionFlowPage() {
     <div className={styles.wrapper}>
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onMouseEnter={playHoverSound} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
+        <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
           ← KEMBALI KE PETA
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
@@ -823,57 +779,141 @@ export default function MissionFlowPage() {
                   transition={{ duration: 0.3 }}
                   style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', background: '#fdf6e3', border: '4px dashed #059669', padding: '48px 32px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
                 >
-                  <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontSize: '1.2rem', lineHeight: '1.6' }}>
-                    MISSION CLEARED!
+                  <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.4rem', lineHeight: '1.6' }}>
+                    {isBossLevel ? 'BOSS DEFEATED!' : 'MISSION CLEARED!'}
                   </h2>
-                  <p className={styles.text} style={{ textAlign: 'center', fontSize: '0.75rem', lineHeight: '1.8' }}>
-                    Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.
+                  <p className={styles.text} style={{ textAlign: 'center', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                    {isBossLevel
+                      ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.'
+                      : 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di misi ini.'}
                   </p>
-                  <div style={{ textAlign: 'center', padding: '24px 0' }}>
-                    <motion.div
-                      key="coin-anim"
-                      initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
-                      animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], y: 0 } : { scale: 1, rotate: 0, opacity: 1, y: [0, -10, 0] }}
-                      transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                      style={{ display: 'inline-block' }}
-                    >
-                      <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }} />
-                    </motion.div>
-                    <p className={styles.text} style={{ marginTop: '16px', fontSize: '0.65rem', color: '#92400e' }}>
-                      Reward XP dan item telah ditambahkan ke akunmu.
-                    </p>
-                  </div>
+                  {/* ─── CERTIFICATE CARD (same style as OnChainCertificates) ─── */}
+                  {isBossLevel && (
+                    <div style={{
+                      width: '100%', maxWidth: '360px',
+                      background: '#c8a96e',
+                      border: '4px solid #5a3520',
+                      borderRadius: '4px',
+                      padding: '4px',
+                      boxShadow: '4px 4px 0 #3b1f0e, inset 0 0 0 2px #e8c98a',
+                    }}>
+                      <div style={{
+                        display: 'flex', flexDirection: 'column', gap: '12px',
+                        background: '#784626',
+                        border: '2px solid #3b1f0e',
+                        borderRadius: '2px',
+                        padding: '12px',
+                        position: 'relative'
+                      }}>
+                        {/* Certificate Preview */}
+                        <CertificatePreview 
+                          userName={displayName}
+                          moduleName={currentChapter.name}
+                          walletAddress={walletShort}
+                          date={new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          isMinted={isBossMinted}
+                        />
+                        {/* Status label under card */}
+                        <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: isBossMinted ? '#34d399' : '#fbbf24', textAlign: 'center', lineHeight: '1.6' }}>
+                          {isBossMinted
+                            ? '✓ ON-CHAIN SBT BERHASIL DICETAK'
+                            : '🔒 SERTIFIKAT BELUM DICETAK KE BLOCKCHAIN'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
-                  <button
-                    onMouseEnter={playHoverSound}
-                    className={styles.btn}
-                    style={{ width: '100%', maxWidth: '400px', padding: '16px', fontSize: '0.7rem', opacity: isClaiming ? 0.7 : 1 }}
-                    onClick={() => {
-                      if (!isClaiming) {
-                        setIsClaiming(true);
-                        addXP(500); // Add 500 XP for clearing a mission!
-                        if (isBossLevel) {
-                          triggerLevelUp();
+                  {/* Non-boss: coin reward */}
+                  {!isBossLevel && (
+                    <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                      <motion.div
+                        key="coin-anim"
+                        initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
+                        animate={isClaiming ? { scale: [1, 1.5, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], y: 0 } : { scale: 1, rotate: 0, opacity: 1, y: [0, -10, 0] }}
+                        transition={isClaiming ? { duration: 0.8, ease: "easeInOut" } : { repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        style={{ display: 'inline-block' }}
+                      >
+                        <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated' }} />
+                      </motion.div>
+                      <p className={styles.text} style={{ marginTop: '12px', fontSize: '0.65rem', color: '#92400e' }}>
+                        Reward XP dan item telah ditambahkan ke akunmu.
+                      </p>
+                    </div>
+                  )}
+
+                  {isBossLevel ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '400px' }}>
+                      {!isBossMinted ? (
+                        <>
+                          <MintSBTButton
+                            courseId={generateCourseId(baseChapterId)}
+                            customStyle={{
+                              width: '100%',
+                            }}
+                            onSuccess={() => {
+                              setIsBossMinted(true);
+                              addXP(500);
+                              completeQuiz();
+                            }}
+                          />
+                          <button onMouseEnter={playHoverSound}
+                            className={styles.secondaryBtn}
+                            style={{ width: '100%', padding: '14px 28px', fontSize: '1.1rem', opacity: isClaiming ? 0.7 : 1 }}
+                            onClick={() => {
+                              if (!isClaiming) {
+                                setIsClaiming(true);
+                                addXP(500);
+                                completeQuiz();
+                                setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                              }
+                            }}
+                            disabled={isClaiming}
+                          >
+                            {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
+                          </button>
+                        </>
+                      ) : (
+                        <button onMouseEnter={playHoverSound}
+                          className={styles.btn}
+                          style={{ width: '100%', padding: '18px 28px', fontSize: '1.2rem' }}
+                          onClick={() => router.push('/chaser/leaderboard#relics')}
+                        >
+                          LIHAT DI RELICS & TREASURES
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <button onMouseEnter={playHoverSound}
+                      className={styles.btn}
+                      style={{ width: '100%', maxWidth: '400px', padding: '18px 28px', fontSize: '1.2rem', opacity: isClaiming ? 0.7 : 1 }}
+                      onClick={() => {
+                        if (!isClaiming) {
+                          setIsClaiming(true);
+                          addXP(500);
+                          if (isBossLevel) {
+                            triggerLevelUp();
+                          }
+                          completeQuiz();
+                          setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                         }
-                        setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
-                      }
-                    }}
-                    disabled={isClaiming}
-                  >
-                    {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI KE PETA'}
-                  </button>
+                      }}
+                      disabled={isClaiming}
+                    >
+                      {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI KE PETA'}
+                    </button>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
           )}
         </div>
 
-        {/* TABS */}
+        {/* TABS (Now on the right) */}
         <div className={styles.tabsContainer}>
           <div
             className={`${styles.tab} ${styles.tabTeori} ${phase === 'MATERIAL' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 0) setPhaseWithProgress('MATERIAL'); }}
-            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed', opacity: highestPhaseReached >= 0 ? 1 : 0.5 }}
+            style={{ cursor: highestPhaseReached >= 0 ? 'pointer' : 'not-allowed' }}
           >
             TEORI
           </div>
@@ -933,15 +973,11 @@ export default function MissionFlowPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className={styles.dialogTitle} style={{ color: dialogState.type === 'success' ? '#059669' : '#ef4444' }}>
-                {dialogState.type === 'success'
-                  ? 'BERHASIL!'
-                  : dialogState.message.startsWith('GAME OVER!')
-                    ? 'GAME OVER'
-                    : 'UPS! SALAH'}
+                {dialogState.type === 'success' ? 'BERHASIL!' : 'UPS! SALAH'}
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
-              <button className={styles.btn} onMouseEnter={playHoverSound} onClick={closeDialog}>
-                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
+              <button onMouseEnter={playHoverSound} className={styles.btn} onClick={closeDialog}>
+                {dialogState.type === 'success' && dialogState.onConfirm ? 'LANJUT ➔' : 'TUTUP'}
               </button>
             </motion.div>
           </motion.div>

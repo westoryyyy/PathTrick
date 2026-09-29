@@ -145,7 +145,7 @@ export default function MahasiswaDashboard() {
                 </div>
               )}
               
-              <Link href="/mahasiswa/career-hub" style={{
+              <Link href="/chaser/career-hub" style={{
                 display: 'block',
                 marginTop: 'auto',
                 width: '100%',

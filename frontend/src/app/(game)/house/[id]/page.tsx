@@ -39,7 +39,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       <header className="sticky top-0 z-50 bg-[#3b261b] border-b-4 border-[#291a13] px-6 py-4 flex items-center justify-between shadow-[0_4px_0_rgba(0,0,0,0.2)]">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push('/sma/learning-progress')}
+            onClick={() => router.push('/dreamer/learning-progress')}
             onMouseEnter={playHoverSound}
             className="px-5 py-3 bg-[#3b261b] hover:bg-[#5a3a29] border-4 border-[#5a3a29] rounded-xl transition-colors text-[#fbbf24] shadow-[inset_-2px_-2px_0_rgba(0,0,0,0.5),_4px_4px_0_rgba(0,0,0,0.8)] active:translate-y-1 active:shadow-none"
           >
@@ -207,7 +207,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       {/* ─── Floating Dashboard Button ─── */}
       <div className="fixed bottom-6 right-6 z-40">
          <button
-            onClick={() => router.push('/sma/dashboard')}
+            onClick={() => router.push('/dreamer/dashboard')}
             onMouseEnter={playHoverSound}
             className="px-6 py-4 bg-[#fbbf24] border-4 border-[#b45309] rounded-[16px] text-[#78350f] shadow-[0_6px_0_#78350f] hover:translate-y-1 hover:shadow-[0_2px_0_#78350f] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3"
          >

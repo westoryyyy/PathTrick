@@ -151,7 +151,7 @@ export default function ProfilePage() {
             <input 
               type="text" 
               className={styles.input} 
-              value={role === 'sma' ? 'Siswa SMA (The Dreamer)' : role === 'mahasiswa' ? 'Mahasiswa (The Chaser)' : 'Belum dipilih'}
+              value={role === 'dreamer' ? 'Siswa SMA (The Dreamer)' : role === 'chaser' ? 'Mahasiswa (The Chaser)' : 'Belum dipilih'}
               disabled
               style={{ opacity: 0.7, cursor: 'not-allowed' }}
             />

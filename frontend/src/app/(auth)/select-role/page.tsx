@@ -21,11 +21,11 @@ import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
  */
 const ROLE_TO_ROUTE: Record<string, UserRole> = {
   // by id (dari seed)
-  'role-dreamer': 'sma',
-  'role-chaser': 'mahasiswa',
+  'role-dreamer': 'dreamer',
+  'role-chaser': 'chaser',
   // by name (fallback)
-  'DREAMER': 'sma',
-  'CHASER': 'mahasiswa',
+  'DREAMER': 'dreamer',
+  'CHASER': 'chaser',
 };
 import PixelIcon from '@/components/ui/PixelIcon';
 import styles from './page.module.css';
@@ -88,8 +88,8 @@ export default function SelectRolePage() {
         const roleName = data?.role?.name?.toUpperCase();
         
         let slug: string | null = null;
-        if (roleName === 'DREAMER') slug = 'sma';
-        else if (roleName === 'CHASER') slug = 'mahasiswa';
+        if (roleName === 'DREAMER') slug = 'dreamer';
+        else if (roleName === 'CHASER') slug = 'chaser';
         else if (roleName === 'ADMIN') slug = 'admin';
 
         const backendName = data?.name;
@@ -102,7 +102,7 @@ export default function SelectRolePage() {
           return;
         }
 
-        if (slug === 'sma' || slug === 'mahasiswa') {
+        if (slug === 'dreamer' || slug === 'chaser') {
           setRole(slug, user.id);
           router.replace(`/${slug}/dashboard`);
         } else if (slug === 'admin') {

@@ -18,10 +18,10 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { API_BASE_URL } from '@/config/pathtrick';
 
 const NAV_KEYS = [
-  { href: '/mahasiswa/dashboard', labelKey: 'nav.mahasiswa.dashboard', icon: '📊' },
-  { href: '/mahasiswa/learning-mission', labelKey: 'nav.mahasiswa.learningMission', icon: '🎯' },
-  { href: '/mahasiswa/career-hub', labelKey: 'nav.mahasiswa.careerHub', icon: '💼' },
-  { href: '/mahasiswa/leaderboard', labelKey: 'nav.mahasiswa.skillBadges', icon: '🏆' },
+  { href: '/chaser/dashboard', labelKey: 'nav.mahasiswa.dashboard', icon: '📊' },
+  { href: '/chaser/learning-mission', labelKey: 'nav.mahasiswa.learningMission', icon: '🎯' },
+  { href: '/chaser/career-hub', labelKey: 'nav.mahasiswa.careerHub', icon: '💼' },
+  { href: '/chaser/leaderboard', labelKey: 'nav.mahasiswa.skillBadges', icon: '🏆' },
 ];
 
 export default function MahasiswaLayout({
@@ -116,11 +116,11 @@ export default function MahasiswaLayout({
         if (!roleName) {
           router.replace('/select-role');
         } else if (roleName === 'CHASER') {
-          setOnboardingRole('mahasiswa', user.id);
+          setOnboardingRole('chaser', user.id);
           setIsCheckingAuth(false);
         } else if (roleName === 'DREAMER') {
-          setOnboardingRole('sma', user.id);
-          router.replace('/sma/dashboard');
+          setOnboardingRole('dreamer', user.id);
+          router.replace('/dreamer/dashboard');
         } else if (roleName === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
@@ -131,7 +131,7 @@ export default function MahasiswaLayout({
         if (cancelled) return;
         if (!selectedRole || savedPrivyUserId !== user.id) {
           router.replace('/select-role');
-        } else if (selectedRole !== 'mahasiswa') {
+        } else if (selectedRole !== 'chaser') {
           router.replace(`/${selectedRole}/dashboard`);
         } else {
           setIsCheckingAuth(false);
@@ -149,7 +149,7 @@ export default function MahasiswaLayout({
     } catch (_) { }
   };
 
-  const isFullScreenPage = pathname.startsWith('/mahasiswa/learning-mission/') && pathname !== '/mahasiswa/learning-mission';
+  const isFullScreenPage = pathname.startsWith('/chaser/learning-mission/') && pathname !== '/chaser/learning-mission';
 
   // Don't render the dashboard while backend role check is in progress.
   if (isCheckingAuth) return null;
@@ -178,7 +178,7 @@ export default function MahasiswaLayout({
 
         <nav className={styles.nav}>
           {NAV_KEYS.map((item) => {
-            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/mahasiswa/dashboard');
+            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/chaser/dashboard');
 
             return (
               <Link

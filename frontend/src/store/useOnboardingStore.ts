@@ -9,7 +9,7 @@ import { ClassifiedSkill } from '@/data/wefSkillData';
    Type Definitions
    ═══════════════════════════════════════════════ */
 
-export type UserRole = 'sma' | 'mahasiswa' | 'admin';
+export type UserRole = 'dreamer' | 'chaser' | 'admin';
 
 /** RIASEC dimension scores (1–5 each) */
 export interface RIASECScores {
@@ -193,7 +193,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
     try {
       let requestBody: any = { role: selectedRole, data: smaAssessment };
       
-      if (selectedRole === 'mahasiswa') {
+      if (selectedRole === 'chaser') {
         const gicsNames = mahasiswaAssessment.preferredGICS.join(', ');
         const workTypes = mahasiswaAssessment.workInterests.join(', ');
         const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`;

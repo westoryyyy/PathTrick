@@ -42,7 +42,7 @@ export default function ModuleChaptersPage({ params }: { params: Promise<{ modul
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <button 
-          onClick={() => router.push('/mahasiswa/learning-mission')}
+          onClick={() => router.push('/chaser/learning-mission')}
           style={{ 
             fontFamily: '"Press Start 2P"', 
             fontSize: '0.6rem', 

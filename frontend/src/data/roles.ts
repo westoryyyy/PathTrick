@@ -9,7 +9,7 @@ export interface RoleOption {
 
 export const LOCAL_ROLES: RoleOption[] = [
   {
-    id: 'sma',
+    id: 'dreamer',
     name: 'The Dreamer',
     displayName: 'The Dreamer',
     description: 'Masih SMA & bingung mau kuliah apa? Temukan jurusan dan karier sesuai bakatmu.',
@@ -17,7 +17,7 @@ export const LOCAL_ROLES: RoleOption[] = [
     iconUrl: '/NPC High School Student.png',
   },
   {
-    id: 'mahasiswa',
+    id: 'chaser',
     name: 'The Chaser',
     displayName: 'The Chaser',
     description: 'Mahasiswa atau baru lulus? Upload CV-mu dan buat roadmap kariermu.',

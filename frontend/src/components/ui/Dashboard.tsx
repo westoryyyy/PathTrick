@@ -377,7 +377,7 @@ export default function Dashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>💎 {t('sma.dashboard.achievementVault')}</span>
               <span 
-                onClick={() => router.push('/sma/certificate')}
+                onClick={() => router.push('/dreamer/certificate')}
                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
               >
                 {t('sma.dashboard.viewAll')}

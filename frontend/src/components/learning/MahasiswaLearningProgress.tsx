@@ -194,7 +194,7 @@ export default function MahasiswaLearningProgress() {
                                 </div>
                               </div>
                               <button onMouseEnter={playHoverSound}
-                                onClick={() => router.push(`/map?chapter=${chapter.id}&role=mahasiswa`)}
+                                onClick={() => router.push(`/map?chapter=${chapter.id}&role=chaser`)}
                                 className="bg-[#10b981] hover:bg-[#059669] text-white px-4 py-2 border-2 border-[#064e3b] transition-colors shadow-[2px_2px_0_#064e3b]"
                                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer' }}
                               >
@@ -296,7 +296,7 @@ export default function MahasiswaLearningProgress() {
                 onClick={async () => {
                   if (!hasCompletedQuizToday) {
                     // Not completed yet, route to map
-                    router.push('/map?role=mahasiswa');
+                    router.push('/map?role=chaser');
                     return;
                   }
 

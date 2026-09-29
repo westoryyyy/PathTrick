@@ -3,11 +3,11 @@
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import AssessmentShell from './AssessmentShell';
-import RIASECStep, { isRIASECComplete } from './sma/RIASECStep';
-import BudgetStep from './sma/BudgetStep';
-import PreferencesStep from './sma/PreferencesStep';
-import CVUploadStep from './mahasiswa/CVUploadStep';
-import WorkInterestStep from './mahasiswa/WorkInterestStep';
+import RIASECStep, { isRIASECComplete } from './dreamer/RIASECStep';
+import BudgetStep from './dreamer/BudgetStep';
+import PreferencesStep from './dreamer/PreferencesStep';
+import CVUploadStep from './chaser/CVUploadStep';
+import WorkInterestStep from './chaser/WorkInterestStep';
 import { useRouter } from 'next/navigation';
 
 const SMA_STEPS = [
@@ -39,13 +39,13 @@ export default function AssessmentWizard() {
 
   if (!role) return null;
 
-  const steps = role === 'sma' ? SMA_STEPS : MAHASISWA_STEPS;
+  const steps = role === 'dreamer' ? SMA_STEPS : MAHASISWA_STEPS;
   const step = steps[currentStep];
   const isLast = currentStep === totalSteps - 1;
 
   // Next Button Logic
   let canNext = false;
-  if (role === 'sma') {
+  if (role === 'dreamer') {
     switch (currentStep) {
       case 0: canNext = isRIASECComplete(riasec); break;
       case 1: canNext = budget !== ''; break;
@@ -62,10 +62,10 @@ export default function AssessmentWizard() {
     if (!canNext) return;
     if (isLast) {
       await submitAssessment();
-      if (role === 'sma') {
-        router.push('/sma/dashboard');
+      if (role === 'dreamer') {
+        router.push('/dreamer/dashboard');
       } else {
-        router.push('/mahasiswa/dashboard');
+        router.push('/chaser/dashboard');
       }
     } else {
       nextStep();
@@ -73,7 +73,7 @@ export default function AssessmentWizard() {
   };
 
   const renderStepContent = () => {
-    if (role === 'sma') {
+    if (role === 'dreamer') {
       switch (currentStep) {
         case 0: return <RIASECStep />;
         case 1: return <BudgetStep />;
@@ -101,7 +101,7 @@ export default function AssessmentWizard() {
       totalSteps={totalSteps}
       stepTitle={step.title}
       stepDescription={step.desc}
-      optionalFrom={role === 'sma' ? 2 : undefined}
+      optionalFrom={role === 'dreamer' ? 2 : undefined}
       canNext={canNext}
       nextLabel={isLast ? 'Mulai Petualangan' : undefined}
       onNext={handleNext}

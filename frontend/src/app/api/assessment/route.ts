@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     
     // Analyze role and return appropriate mock data
-    if (data.role === 'sma') {
+    if (data.role === 'dreamer') {
       return NextResponse.json({
         success: true,
         message: 'Assessment completed by AI.',

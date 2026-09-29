@@ -62,7 +62,7 @@ export default function CareerHubPage() {
             <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.8' }}>
               {t('mahasiswa.careerHub.noSkillsMsg')}
             </p>
-            <Link href="/mahasiswa/learning-mission" style={{
+            <Link href="/chaser/learning-mission" style={{
               display: 'block',
               width: '100%',
               padding: '16px',
@@ -222,7 +222,7 @@ export default function CareerHubPage() {
 
                 <div style={{ marginTop: '24px' }}>
                   {!isPerfectMatch ? (
-                    <Link href={`/mahasiswa/learning-mission?jobId=${job.id}`} style={{
+                    <Link href={`/chaser/learning-mission?jobId=${job.id}`} style={{
                       display: 'block',
                       width: '100%',
                       padding: '16px',
@@ -239,7 +239,7 @@ export default function CareerHubPage() {
                       {t('mahasiswa.careerHub.trainMissingSkills')}
                     </Link>
                   ) : (
-                    <Link href="/mahasiswa/applications" style={{
+                    <Link href="/chaser/applications" style={{
                       display: 'block',
                       width: '100%',
                       padding: '16px',

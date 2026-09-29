@@ -27,9 +27,9 @@ type BackendMeResponse = {
 function mapBackendRoleToRoute(roleName?: string | null): UserRole | null {
   switch (roleName?.toUpperCase()) {
     case 'DREAMER':
-      return 'sma';
+      return 'dreamer';
     case 'CHASER':
-      return 'mahasiswa';
+      return 'chaser';
     default:
       return null;
   }

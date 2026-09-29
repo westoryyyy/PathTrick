@@ -68,12 +68,12 @@ function MapContent() {
   const [dynamicNodes, setDynamicNodes] = useState<CourseNodeData[]>([]);
 
   useEffect(() => {
-    if (roleQuery === 'mahasiswa') {
+    if (roleQuery === 'chaser') {
       useMapStore.setState({ role: 'MAHASISWA' });
     }
 
     if (chapterId) {
-      if (roleQuery === 'mahasiswa' || role === 'MAHASISWA') {
+      if (roleQuery === 'chaser' || role === 'MAHASISWA') {
         useMapStore.setState({ activeChapterId: chapterId });
         fetchRoadmap(chapterId).then(() => {
           const fetchedNodes = useMapStore.getState().nodes;
@@ -234,9 +234,9 @@ function MapContent() {
     setSelectedNode(null);
 
     if (role === 'SMA') {
-      router.push(`/sma/learning-progress/${node.missionId || node.id}`);
+      router.push(`/dreamer/learning-progress/${node.missionId || node.id}`);
     } else {
-      router.push(`/mahasiswa/learning-mission/mission/${node.missionId || node.id}`);
+      router.push(`/chaser/learning-mission/mission/${node.missionId || node.id}`);
     }
   }, [role, router]);
 
@@ -274,15 +274,15 @@ function MapContent() {
               if (houseId) {
                 router.push(`/house/${houseId}`);
               } else {
-                router.push('/sma/dashboard');
+                router.push('/dreamer/dashboard');
               }
             } else {
               if (houseId) {
-                router.push(`/mahasiswa/learning-mission/house/${houseId}`);
+                router.push(`/chaser/learning-mission/house/${houseId}`);
               } else if (moduleId) {
-                router.push(`/mahasiswa/learning-mission/${moduleId}`);
+                router.push(`/chaser/learning-mission/${moduleId}`);
               } else {
-                router.push('/mahasiswa/learning-mission');
+                router.push('/chaser/learning-mission');
               }
             }
           }}

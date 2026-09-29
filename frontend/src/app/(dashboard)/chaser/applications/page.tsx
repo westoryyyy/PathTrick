@@ -37,7 +37,7 @@ export default function ApplicationsPage() {
         </div>
       </div>
 
-      <Link href="/mahasiswa/career-hub" style={{
+      <Link href="/chaser/career-hub" style={{
         marginTop: '32px',
         display: 'inline-block',
         padding: '16px 24px',
