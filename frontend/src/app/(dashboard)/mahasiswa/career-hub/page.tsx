@@ -53,7 +53,7 @@ export default function CareerHubPage() {
   // Exception Path: Empty Profile / No Skills
   if (earnedSBTs.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center', marginTop: '64px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 120px)' }}>
         <div className={styles.retroCard} style={{ maxWidth: '600px', width: '100%' }}>
           <div className={styles.cardHeader} style={{ background: '#7f1d1d' }}>
             <span className={styles.cardTitle}>{t('mahasiswa.careerHub.skillLevelTooLow')}</span>
@@ -78,7 +78,7 @@ export default function CareerHubPage() {
               {t('mahasiswa.careerHub.goToLearningMission')}
             </Link>
 
-            <button onClick={() => window.location.reload()} style={{ marginTop: '16px', background: 'none', border: 'none', color: '#a3a3a3', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer', textDecoration: 'underline' }}>
+            <button onClick={() => window.location.reload()} style={{ marginTop: '16px', background: 'none', border: 'none', color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer', textDecoration: 'underline' }}>
               {t('mahasiswa.careerHub.resetDemoState')}
             </button>
           </div>

@@ -233,11 +233,10 @@ function MapContent() {
   const handleStartCourse = useCallback(async (node: CourseNodeData) => {
     setSelectedNode(null);
 
-    // Dynamic module/chapter mode or Legacy Mahasiswa mode
     if (role === 'SMA') {
-      router.push(`/sma/learning-progress/${node.id}`);
+      router.push(`/sma/learning-progress/${node.missionId || node.id}`);
     } else {
-      router.push(`/mahasiswa/learning-mission/mission/${node.id}`);
+      router.push(`/mahasiswa/learning-mission/mission/${node.missionId || node.id}`);
     }
   }, [role, router]);
 
@@ -261,7 +260,7 @@ function MapContent() {
           xp={totalXP}
           xpToNext={level * 2500}
           level={level}
-          sbtCount={role === 'SMA' ? 0 : MOCK_USER.sbtCount}
+          sbtCount={0}
           nearbyNodeTitle={nearbyNode?.title ?? null}
         />
 

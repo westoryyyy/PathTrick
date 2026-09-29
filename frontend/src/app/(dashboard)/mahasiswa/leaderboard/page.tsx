@@ -8,7 +8,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 export default function LeaderboardPage() {
   const { t } = useTranslation();
   return (
-    <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Header Khusus Mahasiswa Leaderboard / Skill Badges */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>

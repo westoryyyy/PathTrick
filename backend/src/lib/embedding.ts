@@ -111,11 +111,8 @@ export async function searchKnowledge(
     where: {
       ...(facultyTag ? { facultyTag } : {}),
       // Prisma DbNull = SQL NULL (kolom belum diisi sama sekali).
-      // Prisma JsonNull = JSON literal `null` (beda!).
-      // Dokumen yang belum di-embed isinya DbNull, bukan JsonNull.
-      // Salah pakai JsonNull → filter tidak menyaring → docs null ikut masuk
-      // → cosineSimilarity(queryEmbedding, null) → TypeError crash.
-      NOT: { embedding: { equals: Prisma.DbNull } },
+      // Prisma 6 mengubah penempatan tipe ini, jadi kita gunakan type cast.
+      NOT: { embedding: { equals: (Prisma as any).DbNull } },
     },
     select: {
       id: true,
@@ -130,7 +127,7 @@ export async function searchKnowledge(
 
   // Hitung similarity & urutkan
   const scored = docs
-    .map((doc) => {
+    .map((doc: any) => {
       const embeddingArray = doc.embedding as number[];
       return {
         id: doc.id,

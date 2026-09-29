@@ -14,6 +14,7 @@ export default function MahasiswaDashboard() {
   const { t } = useTranslation();
   const { targetJob, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
   const [gapData, setGapData] = useState<{ missing: string[]; possessed: string[] }>({ missing: [], possessed: [] });
+  const [gamification, setGamification] = useState<{xp: number, completedCourses: number, achievements: any[]}>({ xp: 0, completedCourses: 0, achievements: [] });
   
   const { user } = usePrivy();
   const { wallets } = useWallets();
@@ -25,9 +26,20 @@ export default function MahasiswaDashboard() {
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'The Chaser');
 
   useEffect(() => {
-    fetchProfileData().then(() => {
+    async function fetchData() {
+      await fetchProfileData();
       setGapData(analyzeSkillGap());
-    });
+
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/gamification`, { headers: getAuthHeaders() });
+        if (res.ok) {
+          setGamification(await res.json());
+        }
+      } catch (e) {}
+    }
+    fetchData();
   }, [fetchProfileData, analyzeSkillGap]);
 
   const dynamicRank = level >= 6 ? 'Senior' : level >= 3 ? 'Mid-level' : 'Junior';
@@ -93,19 +105,19 @@ export default function MahasiswaDashboard() {
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.dailyMission')}</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>1/3</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>0/3</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.weeklyChallenge')}</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.active')}</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>0 Active</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px' }}>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.skillTree')}</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>12%</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{gamification.completedCourses * 5}%</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#f8fafc', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.achievementVault')}</span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{t('mahasiswa.dashboard.unlocked')}</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fcd34d', textShadow: '2px 2px 0px rgba(0,0,0,0.7)' }}>{gamification.achievements.length} {t('mahasiswa.dashboard.unlocked')}</span>
               </div>
             </div>
           </div>

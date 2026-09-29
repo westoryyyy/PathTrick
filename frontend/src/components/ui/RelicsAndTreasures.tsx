@@ -6,6 +6,7 @@ import { useMapStore } from '@/store/useMapStore';
 import Image from 'next/image';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type Props = {
   hideHeader?: boolean;
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'BADGES UNLOCKED' }: Props = {}) {
+  const { t } = useTranslation();
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
   const [unlockedKeys, setUnlockedKeys] = useState<string[]>([]);
   
@@ -35,15 +37,14 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
   
 
   const VAULT_SBTS = [
-    { id: 1, name: 'Mission Completer', desc: 'Selesai 1 Misi', earned: unlockedKeys.includes('mission_completer'), icon: '/Mission Completer.png' },
-    { id: 2, name: 'Early Bird', desc: 'Login Sebelum Pagi', earned: unlockedKeys.includes('early_bird'), icon: '/Early Bird.png' },
-    { id: 3, name: 'Streak Warrior', desc: 'Login 7 Hari', earned: unlockedKeys.includes('streak_warrior'), icon: '/Streak Warrior copy.png' },
-    { id: 4, name: 'Quiz Master', desc: 'Kuis Sempurna', earned: unlockedKeys.includes('quiz_master'), icon: '/Quiz Master copy.png' },
-    { id: 5, name: 'Quick Learner', desc: 'Tamat Cepat', earned: unlockedKeys.includes('quick_learner'), icon: '/Quick Learner copy.png' },
-    { id: 6, name: 'Course Master', desc: 'Tamat 1 Course', earned: unlockedKeys.includes('course_master'), icon: '/course-master.png' },
-    { id: 7, name: 'Community Helper', desc: 'Bantu Teman', earned: unlockedKeys.includes('community_helper'), icon: '/Community Helper.png' },
-    { id: 8, name: 'First Step', desc: 'Mulai Perjalanan', earned: unlockedKeys.includes('first_step'), icon: '/First Step.png' },
-    { id: 9, name: 'Night Owl', desc: 'Belajar Malam', earned: unlockedKeys.includes('night_owl'), icon: '/Night Owl copy.png' },
+    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: '/Mission Completer.png' },
+    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: '/Early Bird.png' },
+    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: '/Streak Warrior copy.png' },
+    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '/Quiz Master copy.png' },
+    { id: 5, name: 'Quick Learner', desc: t('badges.quickLearner'), earned: unlockedKeys.includes('quick_learner'), icon: '/Quick Learner copy.png' },
+    { id: 6, name: 'Course Master', desc: t('badges.courseMaster'), earned: unlockedKeys.includes('course_master'), icon: '/course-master.png' },
+    { id: 8, name: 'First Step', desc: t('badges.firstStep'), earned: unlockedKeys.includes('first_step'), icon: '/First Step.png' },
+    { id: 9, name: 'Night Owl', desc: t('badges.nightOwl'), earned: unlockedKeys.includes('night_owl'), icon: '/Night Owl copy.png' },
   ];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
@@ -54,7 +55,7 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
             BADGES
           </h2>
           <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
-            Koleksi Pencapaian kamu. Selesaikan lebih banyak misi untuk membuka semua badge!
+            {t('common.achievementsDesc')}
           </p>
         </div>
       )}

@@ -89,8 +89,8 @@ const MOCK_CLASSIFIED_SKILLS: ClassifiedSkill[] = [
 export const useScholarStore = create<ScholarState>((set, get) => ({
   careerRank: 'Junior',
   xp: 450,
-  earnedSBTs: ['React', 'TypeScript', 'Git Basics'],
-  classifiedSkills: MOCK_CLASSIFIED_SKILLS,
+  earnedSBTs: [],
+  classifiedSkills: [],
   targetJob: MOCK_JOBS[0],
   matchedJobs: MOCK_JOBS,
   isLoading: false,

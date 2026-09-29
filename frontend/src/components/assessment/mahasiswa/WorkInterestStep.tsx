@@ -3,6 +3,7 @@
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import { GICS_SECTORS, GICSSectorCode } from '@/data/gicsData';
 import PixelIcon from '@/components/ui/PixelIcon';
+import { useTranslation } from '@/hooks/useTranslation';
 
 function toggleInArray<T>(arr: T[], value: T): T[] {
   return arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value];
@@ -11,6 +12,7 @@ function toggleInArray<T>(arr: T[], value: T): T[] {
 const MAX_SECTORS = 3;
 
 export default function WorkInterestStep() {
+  const { locale } = useTranslation();
   const extractedData  = useOnboardingStore(s => s.mahasiswaAssessment.cvExtractedData);
   const preferredGICS  = useOnboardingStore(s => s.mahasiswaAssessment.preferredGICS);
   const workInterests  = useOnboardingStore(s => s.mahasiswaAssessment.workInterests);
@@ -95,7 +97,7 @@ export default function WorkInterestStep() {
                 disabled={isDisabled}
               >
                 <PixelIcon icon={sector.icon} size={40} />
-                <span className={`font-pixel text-[0.5rem] text-white tracking-[0.05em] text-center leading-[1.4] drop-shadow-[1px_1px_0_#3b261b] whitespace-pre-line ${isSelected ? 'text-white' : ''}`}>{sector.nameID}</span>
+                <span className={`font-pixel text-[0.5rem] text-white tracking-[0.05em] text-center leading-[1.4] drop-shadow-[1px_1px_0_#3b261b] whitespace-pre-line ${isSelected ? 'text-white' : ''}`}>{locale === 'en' ? sector.nameEN : sector.nameID}</span>
                 {isSelected && <span className="absolute top-1.5 right-2 font-pixel text-[0.55rem] text-[color:var(--ind-color)] animate-[checkPop_0.25s_cubic-bezier(0.22,1,0.36,1)]">✓</span>}
                 
                 {/* Custom RPG Tooltip */}

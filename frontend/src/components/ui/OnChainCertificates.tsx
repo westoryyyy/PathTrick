@@ -11,6 +11,7 @@ import MintSBTButton from './MintSBTButton';
 import CertificatePreview from './CertificatePreview';
 import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS, API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type Props = {
   hideHeader?: boolean;
@@ -26,6 +27,7 @@ const generateCourseId = (str: string) => {
 };
 
 export default function OnChainCertificates({ hideHeader = false }: Props = {}) {
+  const { t } = useTranslation();
   const [bossNodes, setBossNodes] = useState<string[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { address } = useAccount();
@@ -141,7 +143,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
           </div>
         ) : bossNodes.length === 0 ? (
           <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
-            Kamu belum menaklukkan Boss Modul manapun. Mainkan Learning Mission untuk mendapatkan Sertifikat!
+            {t('common.noCertificatesDesc')}
           </div>
         ) : isLoadingOwnership ? (
           <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>

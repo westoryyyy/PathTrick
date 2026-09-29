@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '@/components/ui/Dashboard.module.css';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const MAX_SIZE_MB = 10;
 const ACCEPTED_TYPES = [
@@ -16,6 +17,7 @@ const MOCK_MISSING_SKILLS = ['Kubernetes', 'GraphQL', 'CI/CD Pipeline'];
 const MOCK_XP_GAIN = 350;
 
 export default function CVUpdaterWidget() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'uploading' | 'extracting' | 'done' | 'error'>('idle');
   const [fileName, setFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -147,7 +149,7 @@ export default function CVUpdaterWidget() {
         <div style={{ flex: status === 'done' ? '0 0 320px' : 1, display: 'flex', flexDirection: 'column', gap: '12px', transition: 'flex 0.3s ease' }}>
           {status !== 'done' && (
             <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.65rem', color: '#d4d4d8', lineHeight: '1.7', margin: 0 }}>
-              Punya skill baru? Upload CV terbaru kamu agar AI memperbarui profil &amp; rekomendasi karir kamu.
+              {t('common.uploadCvPrompt')}
             </p>
           )}
 
