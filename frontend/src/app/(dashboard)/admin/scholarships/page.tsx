@@ -111,7 +111,18 @@ export default function ScholarshipsPage() {
   };
 
   return (
-    <AdminCRUDTable title="MANAJEMEN BEASISWA" icon="💰" data={data} columns={COLUMNS} fields={FIELDS}
-      onAdd={add} onEdit={edit} onDelete={del} searchKeys={['title', 'provider']} addButtonLabel="Tambah Beasiswa" />
+    <AdminCRUDTable
+      title="MANAJEMEN BEASISWA"
+      icon="💰"
+      data={data}
+      columns={COLUMNS}
+      fields={FIELDS}
+      onAdd={add}
+      onEdit={edit}
+      onDelete={del}
+      searchKeys={['title', 'provider']}
+      addButtonLabel="Tambah Beasiswa"
+      isLoading={loading}
+    />
   );
 }

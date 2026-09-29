@@ -73,6 +73,6 @@ export default function CoursesPage() {
 
   return (
     <AdminCRUDTable title="MANAJEMEN COURSES" icon="📚" data={data} columns={COLUMNS} fields={FIELDS}
-      onAdd={add} onEdit={edit} onDelete={del} searchKeys={['title']} addButtonLabel="Tambah Course" />
+      onAdd={add} onEdit={edit} onDelete={del} searchKeys={['title']} addButtonLabel="Tambah Course" isLoading={loading} />
   );
 }

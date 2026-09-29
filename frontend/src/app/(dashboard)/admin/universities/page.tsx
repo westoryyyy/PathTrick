@@ -81,6 +81,6 @@ export default function UniversitiesPage() {
 
   return (
     <AdminCRUDTable title="MANAJEMEN UNIVERSITAS" icon="🎓" data={data} columns={COLUMNS} fields={FIELDS}
-      onAdd={add} onEdit={edit} onDelete={del} searchKeys={['name', 'location']} addButtonLabel="Tambah Jurusan" />
+      onAdd={add} onEdit={edit} onDelete={del} searchKeys={['name', 'location']} addButtonLabel="Tambah Jurusan" isLoading={loading} />
   );
 }

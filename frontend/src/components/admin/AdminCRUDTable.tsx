@@ -33,6 +33,12 @@ interface AdminCRUDTableProps<T extends { id: string }> {
   onDelete: (id: string) => void | Promise<void>;
   searchKeys?: (keyof T)[];
   addButtonLabel?: string;
+  /**
+   * Opsional: normalisasi row data sebelum dimasukkan ke form edit.
+   * Gunakan untuk konversi tipe data (mis. ISO date → YYYY-MM-DD).
+   */
+  normalizeForEdit?: (row: T) => Partial<T>;
+  isLoading?: boolean;
 }
 
 // ───────────────────────────
@@ -130,7 +136,7 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
 // Main Component
 // ───────────────────────────
 export default function AdminCRUDTable<T extends { id: string }>({
-  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru',
+  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit, isLoading = false,
 }: AdminCRUDTableProps<T>) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState<null | 'add' | 'edit' | 'delete'>(null);
@@ -225,7 +231,17 @@ export default function AdminCRUDTable<T extends { id: string }>({
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '40px', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '24px', height: '24px', border: '3px solid #fbbf24', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Sedang memuat data...
+                  </div>
+                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                </td>
+              </tr>
+            ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '40px', fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", color: 'rgba(255,255,255,0.3)' }}>
                   Tidak ada data
