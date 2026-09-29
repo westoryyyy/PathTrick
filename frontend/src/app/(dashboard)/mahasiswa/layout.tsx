@@ -33,13 +33,44 @@ export default function MahasiswaLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
   const { setRole: setMapRole } = useMapStore();
   const { displayName: savedName, displayEmail: savedEmail, avatarUrl } = useUserStore();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const res = await fetch(`${API_BASE_URL}/api/notifications`, { headers: getAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      }
+    } catch (_) {}
+  };
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => fetchNotifications(), 0);
+    }
+  }, [user]);
+
+  const handleMarkAllRead = async () => {
+    try {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      await fetch(`${API_BASE_URL}/api/notifications/read-all`, { method: 'POST', headers: getAuthHeaders() });
+      setUnreadCount(0);
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (_) {}
+  };
 
   // Priority: 1. User-edited (Zustand), 2. Auto from Privy (Google/Email), 3. Wallet address fallback
   const displayName = savedName
@@ -115,7 +146,7 @@ export default function MahasiswaLayout({
       const audio = new Audio('/HoverTombol.ogg');
       audio.volume = 0.3;
       audio.play().catch(() => { });
-    } catch (e) { }
+    } catch (_) { }
   };
 
   const isFullScreenPage = pathname.startsWith('/mahasiswa/learning-mission/') && pathname !== '/mahasiswa/learning-mission';
@@ -186,56 +217,19 @@ export default function MahasiswaLayout({
 
           <div className={styles.headerActions}>
             <div style={{ position: 'relative' }}>
-              <div
-                className={styles.iconBtn}
-                onClick={() => { setIsMessagesOpen(!isMessagesOpen); setIsNotificationsOpen(false); setIsDropdownOpen(false); }}
-                onMouseEnter={playHoverSound}
-              >
-                <img src="/inboxLogo.png" alt="Inbox" style={{ width: '32px', height: '32px', objectFit: 'contain', imageRendering: 'pixelated' }} />
-                <span className={styles.iconBadge}>2</span>
-              </div>
-
-              {isMessagesOpen && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '12px',
-                  background: '#bc8f65',
-                  border: '4px solid #5a3a29',
-                  borderRadius: '16px',
-                  boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.3), 4px 4px 0 rgba(0,0,0,0.8)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '280px',
-                  zIndex: 100,
-                  padding: '12px'
-                }}>
-                  <div style={{ borderBottom: '2px dashed #5a3a29', paddingBottom: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>{t('common.inbox')}</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>{t('common.aiRecruiter')}</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>{t('common.aiRecruiterMsg')}</p>
-                    </div>
-                    <div style={{ background: '#a87b51', padding: '8px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#3b261b', marginBottom: '4px' }}>{t('common.pathTrickSys')}</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#fff', lineHeight: '1.4' }}>{t('common.sqlBadgeMinted')}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div style={{ position: 'relative' }}>
-              <div
-                className={styles.iconBtn}
-                onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsMessagesOpen(false); setIsDropdownOpen(false); }}
+              <div 
+                className={styles.iconBtn} 
+                onClick={() => { 
+                  if (!isNotificationsOpen) {
+                    handleMarkAllRead();
+                  }
+                  setIsNotificationsOpen(!isNotificationsOpen); 
+                  setIsDropdownOpen(false); 
+                }}
                 onMouseEnter={playHoverSound}
               >
                 🔔
-                <span className={styles.iconBadge}>1</span>
+                {unreadCount > 0 && <span className={styles.iconBadge}>{unreadCount}</span>}
               </div>
 
               {isNotificationsOpen && (
@@ -251,6 +245,8 @@ export default function MahasiswaLayout({
                   display: 'flex',
                   flexDirection: 'column',
                   width: '280px',
+                  maxHeight: '400px',
+                  overflowY: 'auto',
                   zIndex: 100,
                   padding: '12px'
                 }}>
@@ -258,10 +254,18 @@ export default function MahasiswaLayout({
                     <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>{t('common.alerts')}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ background: '#3b261b', padding: '10px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
-                      <p style={{ fontSize: '0.55rem', color: '#fbbf24', lineHeight: '1.4', fontFamily: '"Press Start 2P"' }}>{t('common.levelUp')}</p>
-                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d1d5db', marginTop: '6px' }}>{t('common.reachedLevel2')}</p>
-                    </div>
+                    {notifications.length === 0 ? (
+                      <div style={{ background: '#3b261b', padding: '10px', border: '2px solid #5a3a29', borderRadius: '8px' }}>
+                        <p style={{ fontSize: '0.55rem', color: '#fbbf24', lineHeight: '1.4', fontFamily: '"Press Start 2P"' }}>{t('common.noNewNotifications')}</p>
+                      </div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} style={{ background: '#3b261b', padding: '10px', border: '2px solid #5a3a29', borderRadius: '8px', opacity: n.isRead ? 0.7 : 1 }}>
+                          <p style={{ fontSize: '0.55rem', color: '#fbbf24', lineHeight: '1.4', fontFamily: '"Press Start 2P"' }}>{n.title}</p>
+                          <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d1d5db', marginTop: '6px' }}>{n.body}</p>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -270,7 +274,7 @@ export default function MahasiswaLayout({
             <div style={{ position: 'relative' }}>
               <div
                 className={styles.profileChip}
-                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsMessagesOpen(false); setIsNotificationsOpen(false); }}
+                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); }}
                 onMouseEnter={playHoverSound}
                 style={{ cursor: 'pointer' }}
               >

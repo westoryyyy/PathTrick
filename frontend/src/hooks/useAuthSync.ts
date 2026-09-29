@@ -208,8 +208,33 @@ export function useAuthSync() {
   }, [authenticated, ready, user, wallets, getAccessToken]);
 
   useEffect(() => {
-    syncAuth();
+    setTimeout(() => void syncAuth(), 0);
   }, [syncAuth]);
+
+  // Separate effect to ensure we capture the wallet address,
+  // since Privy sometimes populates `wallets` a few moments *after* authentication.
+  useEffect(() => {
+    if (!authenticated || !wallets[0]?.address) return;
+    const appToken = localStorage.getItem(TOKEN_KEY);
+    if (!appToken) return;
+
+    const walletKey = `synced_wallet_${user?.id}`;
+    if (sessionStorage.getItem(walletKey) === wallets[0].address) return;
+
+    fetch(`${API_BASE_URL}/api/users/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${appToken}`,
+      },
+      body: JSON.stringify({ walletAddress: wallets[0].address }),
+    }).then(res => {
+      if (res.ok) {
+        sessionStorage.setItem(walletKey, wallets[0].address);
+        console.log('[AuthSync] Wallet synced to backend:', wallets[0].address);
+      }
+    });
+  }, [authenticated, wallets, user?.id]);
 
   return {
     /** The stored app JWT, or null if not yet synced */
