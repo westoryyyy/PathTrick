@@ -182,12 +182,19 @@ export function useAuthSync() {
         const isOnLanding = currentPath === '/';
 
         if (routeRole && routeRole !== 'admin') {
-          // User has a role → only redirect if on landing page
-          if (isOnLanding) {
+          // User has a role and is on landing page → do NOT auto-redirect.
+          // They navigated here intentionally (e.g. clicked the logo) or landed here
+          // for the first time. The Dashboard button is visible; let them choose.
+          // Only redirect automatically if they came from a fresh login action
+          // (detected by the 'pt_fresh_login' flag set by handleStart on login).
+          const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
+          if (isFreshLogin) {
+            sessionStorage.removeItem('pt_fresh_login');
             window.location.replace(`/${routeRole}/dashboard`);
           }
+          // Otherwise: stay on landing page, button will show "Dashboard".
         } else if (!routeRole) {
-          // No role yet → redirect to select-role from any page
+          // No role yet → must go through onboarding
           if (!currentPath.startsWith('/select-role')) {
             window.location.replace('/select-role');
           }

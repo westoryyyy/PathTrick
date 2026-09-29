@@ -132,7 +132,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logo}>
-            <Image src="/PathTrick.png" alt="PathTrick" width={160} height={36} className={styles.logoImg} priority />
+            <Link href="/">
+              <Image src="/PathTrick.png" alt="PathTrick" width={160} height={36} className={styles.logoImg} priority />
+            </Link>
           </div>
           <div className={styles.roleBadge}>
             <Image src="/Shield.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated' }} />

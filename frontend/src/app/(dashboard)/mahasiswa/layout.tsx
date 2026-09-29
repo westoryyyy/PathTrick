@@ -138,7 +138,9 @@ export default function MahasiswaLayout({
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logo}>
-            <Image src="/PathTrick.png" alt="PathTrick" width={180} height={40} className={styles.logoImg} priority />
+            <Link href="/" onMouseEnter={playHoverSound} onClick={() => sessionStorage.setItem('pt_stay_on_landing', '1')}>
+              <Image src="/PathTrick.png" alt="PathTrick" width={180} height={40} className={styles.logoImg} priority />
+            </Link>
           </div>
           <span className={styles.roleBadge}>{t('nav.mahasiswa.roleBadge')}</span>
         </div>

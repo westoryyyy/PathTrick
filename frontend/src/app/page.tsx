@@ -59,6 +59,17 @@ export default function LandingPage() {
   const { isSyncing } = useAuthSync();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [clientMounted, setClientMounted] = React.useState(false);
+  const [hasStoredToken, setHasStoredToken] = React.useState(false);
+
+  // Read localStorage only after client mounts (avoid SSR hydration mismatch)
+  React.useEffect(() => {
+    setHasStoredToken(!!localStorage.getItem('pathtrick_token'));
+    setClientMounted(true);
+  }, []);
+
+  // Optimistic auth: show Dashboard immediately if token exists, before Privy loads
+  const isLikelyAuthenticated = authenticated || hasStoredToken;
 
   // No longer auto-redirecting here — redirect is handled inside useAuthSync
   // after backend sync completes (see hooks/useAuthSync.ts).
@@ -72,6 +83,8 @@ export default function LandingPage() {
         router.replace('/select-role');
       }
     } else {
+      // Mark this as a fresh login so useAuthSync redirects to dashboard after sync
+      sessionStorage.setItem('pt_fresh_login', '1');
       login();
     }
   };
@@ -145,27 +158,32 @@ export default function LandingPage() {
           </div>
           <div className={styles.navRight}>
             <LanguageToggle />
-            <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} disabled={!ready || isSyncing}>
-              {authenticated ? (
-                <Image
-                  src="/dashboard-button.png"
-                  alt={isSyncing ? "..." : selectedRole ? "Dashboard" : "LANJUTKAN SETUP"}
-                  width={120}
-                  height={36}
-                  unoptimized
-                  style={{ objectFit: 'contain', imageRendering: 'pixelated', opacity: isSyncing ? 0.7 : 1 }}
-                />
-              ) : (
-                <Image
-                  src="/Sign Up.png"
-                  alt="Sign Up"
-                  width={120}
-                  height={36}
-                  unoptimized
-                  style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
-                />
-              )}
-            </button>
+            {/* Auth button: show placeholder during SSR to avoid flash, then correct button after client mounts */}
+            {!clientMounted ? (
+              <div style={{ width: 120, height: 36 }} />
+            ) : (
+              <button onClick={handleStart} className={styles.signUpBtn} id="nav-signup-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} disabled={!ready || isSyncing}>
+                {isLikelyAuthenticated ? (
+                  <Image
+                    src="/dashboard-button.png"
+                    alt={isSyncing ? "..." : selectedRole ? "Dashboard" : "LANJUTKAN SETUP"}
+                    width={120}
+                    height={36}
+                    unoptimized
+                    style={{ objectFit: 'contain', imageRendering: 'pixelated', opacity: (!ready || isSyncing) ? 0.7 : 1 }}
+                  />
+                ) : (
+                  <Image
+                    src="/Sign Up.png"
+                    alt="Sign Up"
+                    width={120}
+                    height={36}
+                    unoptimized
+                    style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+                  />
+                )}
+              </button>
+            )}
           </div>
         </div>
       </nav>

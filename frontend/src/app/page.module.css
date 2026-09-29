@@ -1196,7 +1196,7 @@
 
 .footerTagline {
   font-family: var(--pixel);
-  font-size: 0.38rem;
+  font-size: 0.8rem;
   color: #3a5a6a;
   letter-spacing: 0.06em;
   line-height: 2;
@@ -1264,14 +1264,15 @@
 .footerCopyBar span,
 .footerLink {
   font-family: var(--pixel);
-  font-size: 0.3rem;
-  color: rgba(26, 42, 58, 0.55);
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.8);
   text-decoration: none;
   letter-spacing: 0.06em;
 }
 
 .footerLink:hover {
-  color: #1a2a3a;
+  color: #ffffff;
   text-decoration: underline;
 }
 
