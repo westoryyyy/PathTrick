@@ -558,6 +558,7 @@ export async function getRoadmapNodes(userId: string) {
                       id: true,
                       order: true,
                       title: true,
+                      missionId: true,
                     }
                   }
                 }
@@ -597,6 +598,7 @@ export async function getRoadmapNodes(userId: string) {
           courseId: course.id,
           chapterId: chapter.id,
           sectionId: section.id,
+          missionId: section.missionId,
           order: section.order,
           title: section.title,
           locked: isLocked,
@@ -607,4 +609,66 @@ export async function getRoadmapNodes(userId: string) {
     }
   }
   return nodes;
+}
+
+export async function getMissionBySectionSlug(missionId: string, userId: string) {
+  const section = await prisma.courseSection.findUnique({
+    where: { missionId },
+    include: {
+      courseChapter: true
+    }
+  });
+
+  if (!section) return null;
+
+  // We can reuse getCourseDetail to get the properly formatted structure
+  const courseData = await getCourseDetail(section.courseChapter.courseId, userId);
+  
+  if (!courseData) return null;
+
+  // Find the specific chapter and section from the formatted data to inherit its 'locked' status
+  let foundSection = null;
+  for (const chapter of courseData.chapters) {
+    if (chapter.id === section.courseChapterId) {
+      foundSection = chapter.sections.find((s: any) => s.id === section.id);
+      break;
+    }
+  }
+
+  return {
+    ...foundSection,
+    courseId: section.courseChapter.courseId
+  };
+}
+
+export async function submitQuizByMissionId(params: { userId: string; missionId: string; answers: Array<any> }) {
+  const section = await prisma.courseSection.findUnique({
+    where: { missionId: params.missionId },
+    include: { courseChapter: true }
+  });
+
+  if (!section) throw new Error("MISSION_NOT_FOUND");
+
+  return submitQuiz({
+    userId: params.userId,
+    courseId: section.courseChapter.courseId,
+    sectionId: section.id,
+    answers: params.answers
+  });
+}
+
+export async function submitProjectByMissionId(params: { userId: string; missionId: string; code: string }) {
+  const section = await prisma.courseSection.findUnique({
+    where: { missionId: params.missionId },
+    include: { courseChapter: true }
+  });
+
+  if (!section) throw new Error("MISSION_NOT_FOUND");
+
+  return submitProject({
+    userId: params.userId,
+    courseId: section.courseChapter.courseId,
+    sectionId: section.id,
+    code: params.code
+  });
 }

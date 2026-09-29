@@ -1,4 +1,4 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma";
 import { requireAdmin } from "../admin/admin.middleware";
@@ -149,7 +149,8 @@ export default async function adminCoursesRoutes(fastify: FastifyInstance) {
     mapPositionX: z.number().int().optional(),
     mapPositionY: z.number().int().optional(),
     codeTemplate: z.string().optional(),
-    expectedKeywords: z.array(z.string()).optional()
+    expectedKeywords: z.array(z.string()).optional(),
+    missionId: z.string().optional().nullable()
   });
 
   fastify.post(
@@ -177,7 +178,7 @@ export default async function adminCoursesRoutes(fastify: FastifyInstance) {
     { preHandler: [fastify.authenticate, requireAdmin] },
     async (request, reply) => {
       const { sectionId } = request.params as { sectionId: string };
-      const parsedBody = adminSectionSchema.safeParse(request.body);
+      const parsedBody = adminSectionSchema.partial().safeParse(request.body);
       if (!parsedBody.success) {
         return reply.code(400).send({ error: "ValidationError", details: parsedBody.error.flatten() });
       }
