@@ -8,23 +8,15 @@ import { useUserStore } from '@/store/useUserStore';
 import { useScholarStore } from '@/store/useScholarStore';
 import { useMapStore } from '@/store/useMapStore';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const MAHASISWA_MODULES = [
-  { id: 'React', title: 'React Mastery', desc: 'Arsitektur komponen tingkat lanjut dan React Hooks.', icon: '⚛️', chapters: [{ id: 'module-react-bab-1', name: 'BAB 1: Component & JSX', duration: '6 Levels' }, { id: 'module-react-bab-2', name: 'BAB 2: Hooks', duration: '6 Levels' }] },
-  { id: 'TypeScript', title: 'TypeScript Pro', desc: 'Pengetikan statis untuk aplikasi frontend yang tangguh.', icon: '🟦', chapters: [{ id: 'module-ts-bab-1', name: 'BAB 1: Type Fundamentals', duration: '6 Levels' }, { id: 'module-ts-bab-2', name: 'BAB 2: Advanced Types', duration: '6 Levels' }] },
-  { id: 'Framer Motion', title: 'Framer Motion Animation', desc: 'Animasi dinamis dan gestur interaktif pada React.', icon: '✨', chapters: [{ id: 'module-framer-bab-1', name: 'BAB 1: Basic Animations', duration: '6 Levels' }] },
-  { id: 'Tailwind CSS', title: 'Tailwind CSS Fundamentals', desc: 'Teknik styling utility-first untuk antarmuka UI modern.', icon: '🎨', chapters: [{ id: 'module-tailwind-bab-1', name: 'BAB 1: Utility Classes', duration: '6 Levels' }] },
-  { id: 'SQL', title: 'SQL & Database Design', desc: 'Desain arsitektur database relasional (RDBMS).', icon: '💾', chapters: [{ id: 'module-sql-bab-1', name: 'BAB 1: Queries', duration: '6 Levels' }] },
-  { id: 'Excel', title: 'Advanced Excel', desc: 'Pemodelan data dan fungsi formula tingkat lanjut.', icon: '📊', chapters: [{ id: 'module-excel-bab-1', name: 'BAB 1: Functions', duration: '6 Levels' }] },
-  { id: 'Data Analysis', title: 'Data Analysis with Python', desc: 'Analisis data, manipulasi (Pandas), dan visualisasi.', icon: '📈', chapters: [{ id: 'module-data-bab-1', name: 'BAB 1: Pandas', duration: '6 Levels' }] },
-  { id: 'Figma', title: 'UI/UX Design with Figma', desc: 'Pembuatan wireframe, prototipe, dan sistem desain.', icon: '🖌️', chapters: [{ id: 'module-figma-bab-1', name: 'BAB 1: UI Basics', duration: '6 Levels' }] },
-  { id: 'User Research', title: 'User Research Methods', desc: 'Metode riset pengguna dan wawancara yang efektif.', icon: '👥', chapters: [{ id: 'module-research-bab-1', name: 'BAB 1: Interviews', duration: '6 Levels' }] },
-  { id: 'Prototyping', title: 'Rapid Prototyping', desc: 'Validasi ide produk secara cepat menggunakan prototipe.', icon: '🚀', chapters: [{ id: 'module-proto-bab-1', name: 'BAB 1: Wireframing', duration: '6 Levels' }] },
-  { id: 'Git', title: 'Git & Version Control', desc: 'Menguasai workflow kolaborasi kode dan version control.', icon: '🐙', chapters: [{ id: 'module-git-bab-1', name: 'BAB 1: Basics', duration: '6 Levels' }] },
-];
+// Removed hardcoded MAHASISWA_MODULES
 
 export default function MahasiswaLearningProgress() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { totalXP, level, dailyBountyClaimed, hasCompletedQuizToday, claimDailyBounty, completeQuiz, addXP } = useUserStore();
   const { fetchProfileData, analyzeSkillGap, earnedSBTs, matchedJobs } = useScholarStore();
 
@@ -38,23 +30,42 @@ export default function MahasiswaLearningProgress() {
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    fetchProfileData().then(() => {
-      // Calculate missing skills based on jobId if provided
-      if (jobId) {
-        const job = matchedJobs.find(j => j.id === jobId);
-        if (job) {
-          const missing = job.requiredSkills.filter(skill => !earnedSBTs.includes(skill));
-          setMissingSkills(missing);
-          return;
-        }
-      }
+  const [activeModules, setActiveModules] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-      // If no jobId or job not found, combine all missing skills across all matched jobs
+  useEffect(() => {
+    fetchProfileData().then(async () => {
+      // Calculate missing skills
       const allRequired = new Set<string>();
       matchedJobs.forEach(job => job.requiredSkills.forEach(s => allRequired.add(s)));
       const missing = Array.from(allRequired).filter(skill => !earnedSBTs.includes(skill));
       setMissingSkills(missing);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/courses`, { headers: getAuthHeaders() });
+        if (res.ok) {
+          const data = await res.json();
+          // Map backend courses to UI format
+          const mappedCourses = data.courses.map((c: any) => ({
+            id: c.id,
+            title: c.title,
+            desc: c.description || c.reasonRecommended || 'Materi khusus yang direkomendasikan untuk Anda.',
+            icon: '📚', // Use default icon or mapping if preferred
+            targetSkills: c.skills?.map((s: any) => s.name) || [],
+            chapters: c.chapters.map((ch: any, idx: number) => ({
+              id: ch.id,
+              name: `BAB ${idx + 1}`,
+              duration: `${ch._count.sections} Levels`
+            })),
+            progressObj: c.progress
+          }));
+          setActiveModules(mappedCourses);
+        }
+      } catch (e) {
+        console.error('Failed to fetch courses:', e);
+      } finally {
+        setIsLoading(false);
+      }
     });
   }, [fetchProfileData, jobId, matchedJobs, earnedSBTs]);
 
@@ -66,8 +77,6 @@ export default function MahasiswaLearningProgress() {
     } catch(e) {}
   };
 
-  // Filter modules to ONLY show those that match the user's missing skills
-  const activeModules = MAHASISWA_MODULES.filter(mod => missingSkills.includes(mod.id));
   const ITEMS_PER_PAGE = 4;
   const totalPages = Math.ceil(activeModules.length / ITEMS_PER_PAGE);
   const currentModules = activeModules.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -80,7 +89,7 @@ export default function MahasiswaLearningProgress() {
           PROFESSIONAL TRAINING
         </h1>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
-          Berdasarkan analisis AI, berikut adalah skill gap Anda. Selesaikan modul pelatihan ini untuk memenuhi kualifikasi industri.
+          {t('common.aiSkillGapAnalysis')}
         </p>
       </div>
 
@@ -92,21 +101,16 @@ export default function MahasiswaLearningProgress() {
           {currentModules.length === 0 ? null : (
             currentModules.map((mod, idx) => {
               const isExpanded = expandedModule === mod.id;
-              let totalLevels = 0;
-              let completedLevels = 0;
               
-              mod.chapters.forEach(ch => {
-                const levels = parseInt(ch.duration) || 6;
-                totalLevels += levels;
-                for (let i = 1; i <= levels; i++) {
-                  if (completedDynamicNodes.includes(`${ch.id}-level-${i}`)) {
-                    completedLevels++;
-                  }
-                }
-              });
-              
-              const progress = earnedSBTs.includes(mod.id) ? 100 : totalLevels > 0 ? Math.floor((completedLevels / totalLevels) * 100) : 0;
-
+              // Calculate progress directly from backend if available
+              let progress = 0;
+              if (mod.progressObj?.status === 'COMPLETED') {
+                progress = 100;
+              } else if (mod.progressObj) {
+                // estimate based on chapter/section order vs total
+                const chOrder = mod.progressObj.currentChapterOrder || 1;
+                progress = Math.min(99, Math.floor(((chOrder - 1) / Math.max(1, mod.chapters.length)) * 100));
+              }
               return (
                 <motion.div
                   key={mod.id}
@@ -143,7 +147,7 @@ export default function MahasiswaLearningProgress() {
                       </div>
                       <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', textShadow: '1px 1px 0 #3b261b', marginTop: '4px' }}>
-                          SKILL PATH: {mod.id.toUpperCase()}
+                          COURSE: {mod.title.toUpperCase()}
                         </h3>
                         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1rem', color: '#5a3a29', lineHeight: '1.6' }}>
                           {mod.desc}
@@ -177,7 +181,7 @@ export default function MahasiswaLearningProgress() {
                         <div style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           <div style={{ height: '2px', background: '#5a3a29', width: '100%', marginBottom: '8px' }} />
 
-                          {mod.chapters.map((chapter) => (
+                          {mod.chapters.map((chapter: any) => (
                             <div
                               key={chapter.id}
                               className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] p-4 group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
@@ -281,10 +285,10 @@ export default function MahasiswaLearningProgress() {
               <span style={{ fontSize: '3rem', filter: dailyBountyClaimed ? 'grayscale(100%)' : 'none' }}>📦</span>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.6' }}>
                 {dailyBountyClaimed
-                  ? "You've claimed today's bounty! Come back tomorrow."
+                  ? t('common.bountyClaimedMsg')
                   : (hasCompletedQuizToday
-                    ? "Kuis selesai! Ambil hadiahmu sekarang!"
-                    : "Selesaikan 1 modul quiz hari ini untuk mendapatkan +150 XP!")}
+                    ? t('common.quizCompletedMsg')
+                    : t('common.quizDailyQuest'))}
               </p>
 
               <button onMouseEnter={playHoverSound}
@@ -321,8 +325,8 @@ export default function MahasiswaLearningProgress() {
                 }}
               >
                 {!hasCompletedQuizToday
-                  ? 'KERJAKAN QUIZ ▶'
-                  : (isClaimingBounty ? 'CLAIMING...' : (dailyBountyClaimed ? 'CLAIMED' : 'CLAIM +150 XP'))}
+                  ? t('common.playQuizBtn')
+                  : (isClaimingBounty ? t('common.claimingBtn') : (dailyBountyClaimed ? t('common.claimedBtn') : t('common.claimXpBtn')))}
               </button>
 
               {/* HIDDEN DEV BUTTON TO SIMULATE COMPLETING QUIZ */}
