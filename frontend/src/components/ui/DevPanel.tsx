@@ -182,7 +182,7 @@ function DevPanelInner() {
               🗑 Clear ALL pathtrick Storage
             </button>
             <button onClick={handleForceLogout} style={btnStyle('#1c1c3a', '#fbbf24')}>
-              🚪 Reset + Logout
+              Reset + Logout
             </button>
             <button
               onClick={() => window.location.href = '/select-role'}

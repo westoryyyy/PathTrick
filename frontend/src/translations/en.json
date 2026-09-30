@@ -1,6 +1,6 @@
 {
   "common": {
-    "logout": "\ud83d\udeaa LOG OUT",
+    "logout": "LOG OUT",
     "editProfile": "Edit Profile",
     "docs": "Docs",
     "inbox": "INBOX",
