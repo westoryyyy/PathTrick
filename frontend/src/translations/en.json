@@ -1,6 +1,6 @@
 {
   "common": {
-    "logout": "\ud83d\udeaa LOG OUT",
+    "logout": "LOG OUT",
     "editProfile": "Edit Profile",
     "docs": "Docs",
     "inbox": "INBOX",
@@ -218,7 +218,7 @@
     },
     "footer": {
       "tagline": "Embark on an epic journey through pixel realms",
-      "copyright": "2025 Pathtrick. All rights reserved.",
+      "copyright": "2026 Pathtrick. All rights reserved.",
       "privacyPolicy": "Privacy Policy",
       "termOfService": "Term Of Service",
       "cookieSettings": "Cookie Settings"
