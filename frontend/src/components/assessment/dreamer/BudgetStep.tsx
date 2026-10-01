@@ -12,8 +12,8 @@ const BUDGET_OPTIONS = [
 ];
 
 export default function BudgetStep() {
-  const budget = useOnboardingStore((s) => s.smaAssessment.budgetPreference);
-  const setField = useOnboardingStore((s) => s.setSMAField);
+  const budget = useOnboardingStore((s) => s.dreamerAssessment.budgetPreference);
+  const setField = useOnboardingStore((s) => s.setDreamerField);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[500px] mx-auto">

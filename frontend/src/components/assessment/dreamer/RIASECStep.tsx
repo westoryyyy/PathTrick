@@ -21,7 +21,7 @@ const DIMENSIONS: {
 const GEMS = [1, 2, 3, 4, 5];
 
 export default function RIASECStep() {
-  const riasec = useOnboardingStore((s) => s.smaAssessment.riasec);
+  const riasec = useOnboardingStore((s) => s.dreamerAssessment.riasec);
   const setScore = useOnboardingStore((s) => s.setRIASECScore);
 
   return (

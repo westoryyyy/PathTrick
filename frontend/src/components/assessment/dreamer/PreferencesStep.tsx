@@ -48,9 +48,9 @@ function toggleInArray(arr: string[], value: string): string[] {
 }
 
 export default function PreferencesStep() {
-  const faculties = useOnboardingStore((s) => s.smaAssessment.facultyPreferences);
-  const countries = useOnboardingStore((s) => s.smaAssessment.countryPreferences);
-  const setField  = useOnboardingStore((s) => s.setSMAField);
+  const faculties = useOnboardingStore((s) => s.dreamerAssessment.facultyPreferences);
+  const countries = useOnboardingStore((s) => s.dreamerAssessment.countryPreferences);
+  const setField  = useOnboardingStore((s) => s.setDreamerField);
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-[600px] mx-auto">

@@ -21,8 +21,8 @@ export interface RIASECScores {
   conventional: number;
 }
 
-/** SMA assessment form state */
-export interface SMAAssessmentState {
+/** Dreamer assessment form state */
+export interface DreamerAssessmentState {
   riasec: RIASECScores;
   budgetPreference: string;        // required
   facultyPreferences: string[];    // optional, multi-select
@@ -36,8 +36,8 @@ export interface CVExtractedData {
   education: string;
 }
 
-/** Mahasiswa assessment form state */
-export interface MahasiswaAssessmentState {
+/** Chaser assessment form state */
+export interface ChaserAssessmentState {
   cvFile: File | null;             // required
   cvFileName: string;
   cvExtractionStatus: 'idle' | 'uploading' | 'extracting' | 'done' | 'error';
@@ -67,14 +67,14 @@ interface OnboardingStore {
   prevStep: () => void;
   goToStep: (step: number) => void;
 
-  /* ── SMA Assessment ── */
-  smaAssessment: SMAAssessmentState;
-  setSMAField: <K extends keyof SMAAssessmentState>(key: K, value: SMAAssessmentState[K]) => void;
+  /* ── Dreamer Assessment ── */
+  dreamerAssessment: DreamerAssessmentState;
+  setDreamerField: <K extends keyof DreamerAssessmentState>(key: K, value: DreamerAssessmentState[K]) => void;
   setRIASECScore: (dimension: keyof RIASECScores, score: number) => void;
 
-  /* ── Mahasiswa Assessment ── */
-  mahasiswaAssessment: MahasiswaAssessmentState;
-  setMahasiswaField: <K extends keyof MahasiswaAssessmentState>(key: K, value: MahasiswaAssessmentState[K]) => void;
+  /* ── Chaser Assessment ── */
+  chaserAssessment: ChaserAssessmentState;
+  setChaserField: <K extends keyof ChaserAssessmentState>(key: K, value: ChaserAssessmentState[K]) => void;
   setCVExtractedData: (data: CVExtractedData | null) => void;
 
   /* ── Submission ── */
@@ -98,14 +98,14 @@ const DEFAULT_RIASEC: RIASECScores = {
   conventional: 0,
 };
 
-const DEFAULT_SMA: SMAAssessmentState = {
+const DEFAULT_DREAMER: DreamerAssessmentState = {
   riasec: { ...DEFAULT_RIASEC },
   budgetPreference: '',
   facultyPreferences: [],
   countryPreferences: [],
 };
 
-const DEFAULT_MAHASISWA: MahasiswaAssessmentState = {
+const DEFAULT_CHASER: ChaserAssessmentState = {
   cvFile: null,
   cvFileName: '',
   cvExtractionStatus: 'idle',
@@ -120,8 +120,8 @@ const DEFAULT_MAHASISWA: MahasiswaAssessmentState = {
 
 /** Step counts per role */
 const STEP_COUNTS: Record<UserRole, number> = {
-  sma: 3,        // RIASEC → Budget → Preferences
-  mahasiswa: 2,  // CV Upload → Work Interest
+  dreamer: 3,        // RIASEC → Budget → Preferences
+  chaser: 2,  // CV Upload → Work Interest
   admin: 0,
 };
 
@@ -156,32 +156,32 @@ export const useOnboardingStore = create<OnboardingStore>()(
   },
   goToStep: (step) => set({ currentStep: step }),
 
-  /* ── SMA ── */
-  smaAssessment: { ...DEFAULT_SMA },
-  setSMAField: (key, value) =>
+  /* ── Dreamer ── */
+  dreamerAssessment: { ...DEFAULT_DREAMER },
+  setDreamerField: (key, value) =>
     set((s) => ({
-      smaAssessment: { ...s.smaAssessment, [key]: value },
+      dreamerAssessment: { ...s.dreamerAssessment, [key]: value },
     })),
   setRIASECScore: (dimension, score) =>
     set((s) => ({
-      smaAssessment: {
-        ...s.smaAssessment,
-        riasec: { ...s.smaAssessment.riasec, [dimension]: score },
+      dreamerAssessment: {
+        ...s.dreamerAssessment,
+        riasec: { ...s.dreamerAssessment.riasec, [dimension]: score },
       },
     })),
 
-  /* ── Mahasiswa ── */
-  mahasiswaAssessment: { ...DEFAULT_MAHASISWA },
-  setMahasiswaField: (key, value) =>
+  /* ── Chaser ── */
+  chaserAssessment: { ...DEFAULT_CHASER },
+  setChaserField: (key, value) =>
     set((s) => ({
-      mahasiswaAssessment: { ...s.mahasiswaAssessment, [key]: value },
+      chaserAssessment: { ...s.chaserAssessment, [key]: value },
     })),
   setCVExtractedData: (data) =>
     set((s) => ({
-      mahasiswaAssessment: {
-        ...s.mahasiswaAssessment,
+      chaserAssessment: {
+        ...s.chaserAssessment,
         cvExtractedData: data,
-        cvExtractionStatus: data ? 'done' : s.mahasiswaAssessment.cvExtractionStatus === 'error' ? 'idle' : s.mahasiswaAssessment.cvExtractionStatus,
+        cvExtractionStatus: data ? 'done' : s.chaserAssessment.cvExtractionStatus === 'error' ? 'idle' : s.chaserAssessment.cvExtractionStatus,
       },
     })),
 
@@ -189,33 +189,26 @@ export const useOnboardingStore = create<OnboardingStore>()(
   isSubmitting: false,
   submitAssessment: async () => {
     set({ isSubmitting: true });
-    const { selectedRole, smaAssessment, mahasiswaAssessment } = get();
+    const { selectedRole, dreamerAssessment, chaserAssessment } = get();
     try {
-      let requestBody: any = { role: selectedRole, data: smaAssessment };
+      let requestBody: any = { role: selectedRole, data: dreamerAssessment };
       
       if (selectedRole === 'chaser') {
-        const gicsNames = mahasiswaAssessment.preferredGICS.join(', ');
-        const workTypes = mahasiswaAssessment.workInterests.join(', ');
+        const gicsNames = chaserAssessment.preferredGICS.join(', ');
+        const workTypes = chaserAssessment.workInterests.join(', ');
         const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`;
         
         requestBody = {
           type: "SCHOLAR_PROFILE",
           payload: {
-            cvText: mahasiswaAssessment.cvText || "",
-            portfolioText: mahasiswaAssessment.portfolioText || null,
+            cvText: chaserAssessment.cvText || "",
+            portfolioText: chaserAssessment.portfolioText || null,
             major: "Lulusan S1/Sederajat", // Fallback karena belum ada input jurusan di UI
             jobPreference: jobPreferenceStr,
           }
         };
       }
 
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate API delay then succeed
-        await new Promise(r => setTimeout(r, 1500));
-        console.log('AI Assessment Result (DEMO): Success');
-        set({ isSubmitting: false });
-        return;
-      }
 
       const response = await fetch('/api/assessment', {
         method: 'POST',
@@ -240,8 +233,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
       savedPrivyUserId: null,
       currentStep: 0,
       totalSteps: 0,
-      smaAssessment: { ...DEFAULT_SMA, riasec: { ...DEFAULT_RIASEC } },
-      mahasiswaAssessment: { ...DEFAULT_MAHASISWA, preferredGICS: [], workInterests: [] },
+      dreamerAssessment: { ...DEFAULT_DREAMER, riasec: { ...DEFAULT_RIASEC } },
+      chaserAssessment: { ...DEFAULT_CHASER, preferredGICS: [], workInterests: [] },
       isSubmitting: false,
     }),
     }),
@@ -294,9 +287,9 @@ export function saveUserOnboarding(privyUserId: string) {
     savedPrivyUserId: state.savedPrivyUserId,
     currentStep: state.currentStep,
     totalSteps: state.totalSteps,
-    smaAssessment: state.smaAssessment,
-    mahasiswaAssessment: {
-      ...state.mahasiswaAssessment,
+    dreamerAssessment: state.dreamerAssessment,
+    chaserAssessment: {
+      ...state.chaserAssessment,
       cvFile: null,
       portfolioFile: null,
     },

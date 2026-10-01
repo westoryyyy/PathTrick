@@ -13,10 +13,10 @@ const MAX_SECTORS = 3;
 
 export default function WorkInterestStep() {
   const { locale } = useTranslation();
-  const extractedData  = useOnboardingStore(s => s.mahasiswaAssessment.cvExtractedData);
-  const preferredGICS  = useOnboardingStore(s => s.mahasiswaAssessment.preferredGICS);
-  const workInterests  = useOnboardingStore(s => s.mahasiswaAssessment.workInterests);
-  const setField       = useOnboardingStore(s => s.setMahasiswaField);
+  const extractedData  = useOnboardingStore(s => s.chaserAssessment.cvExtractedData);
+  const preferredGICS  = useOnboardingStore(s => s.chaserAssessment.preferredGICS);
+  const workInterests  = useOnboardingStore(s => s.chaserAssessment.workInterests);
+  const setField       = useOnboardingStore(s => s.setChaserField);
 
   /* ── Skill editing ── */
   const handleRemoveSkill = (skillName: string) => {

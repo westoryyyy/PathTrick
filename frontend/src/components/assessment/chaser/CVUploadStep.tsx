@@ -37,8 +37,8 @@ async function mockExtractCV() {
 export default function CVUploadStep() {
   const store = useOnboardingStore();
   const {
-    mahasiswaAssessment: mState,
-    setMahasiswaField,
+    chaserAssessment: cState,
+    setChaserField,
     setCVExtractedData,
   } = store;
 
@@ -63,32 +63,32 @@ export default function CVUploadStep() {
     }
     setValidationError('');
 
-    setMahasiswaField('cvFile', file);
-    setMahasiswaField('cvFileName', file.name);
-    setMahasiswaField('cvExtractionStatus', 'uploading');
+    setChaserField('cvFile', file);
+    setChaserField('cvFileName', file.name);
+    setChaserField('cvExtractionStatus', 'uploading');
 
     try {
-      setMahasiswaField('cvExtractionStatus', 'extracting');
+      setChaserField('cvExtractionStatus', 'extracting');
 
       // Ekstrak teks dari PDF di frontend (Client-Side)
       const text = await extractTextFromPDF(file, 8000);
       
       if (text.length < 50) {
         setValidationError('PDF tidak dapat dibaca (mungkin hasil scan). Coba PDF dari Word/Google Docs.');
-        setMahasiswaField('cvExtractionStatus', 'error');
+        setChaserField('cvExtractionStatus', 'error');
         return;
       }
 
-      setMahasiswaField('cvText', text);
+      setChaserField('cvText', text);
       
       // Untuk sementara waktu, kita mock data extracted agar UI tidak rusak sampai integrasi backend selesai
       const data = await mockExtractCV();
       setCVExtractedData(data);
       
-      setMahasiswaField('cvExtractionStatus', 'done');
+      setChaserField('cvExtractionStatus', 'done');
     } catch (err) {
       console.error(err);
-      setMahasiswaField('cvExtractionStatus', 'error');
+      setChaserField('cvExtractionStatus', 'error');
       setValidationError('Gagal membaca PDF. Pastikan file tidak rusak.');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,12 +117,12 @@ export default function CVUploadStep() {
   const handlePortfolioChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setMahasiswaField('portfolioFile', file);
-      setMahasiswaField('portfolioFileName', file.name);
+      setChaserField('portfolioFile', file);
+      setChaserField('portfolioFileName', file.name);
       
       try {
         const text = await extractTextFromPDF(file, 4000);
-        setMahasiswaField('portfolioText', text);
+        setChaserField('portfolioText', text);
       } catch (err) {
         console.error('Failed to extract portfolio PDF', err);
       }
@@ -131,14 +131,14 @@ export default function CVUploadStep() {
 
   /* ── Reset CV ── */
   const handleRetry = () => {
-    setMahasiswaField('cvFile', null);
-    setMahasiswaField('cvFileName', '');
-    setMahasiswaField('cvExtractionStatus', 'idle');
+    setChaserField('cvFile', null);
+    setChaserField('cvFileName', '');
+    setChaserField('cvExtractionStatus', 'idle');
     setCVExtractedData(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const status = mState.cvExtractionStatus;
+  const status = cState.cvExtractionStatus;
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-[600px] mx-auto">
@@ -184,7 +184,7 @@ export default function CVUploadStep() {
               <span className="block w-9 h-9 border-4 border-[#4c1d95] border-t-[#a855f7] animate-[spin_0.8s_steps(4)_infinite]" />
             </div>
             <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">Mengunggah...</p>
-            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{mState.cvFileName}</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{cState.cvFileName}</p>
             <div className="w-[250px] h-4 bg-[#1e1b4b] border-4 border-[#4c1d95] shadow-[inset_4px_4px_0_rgba(0,0,0,0.4)] relative">
               <div className="h-full bg-[#a855f7] transition-[width] duration-500 ease-[steps(10)]" style={{ width: '60%' }} />
             </div>
@@ -199,7 +199,7 @@ export default function CVUploadStep() {
               <div className="absolute left-0 right-0 h-1 bg-[#2dd4bf] shadow-[0_0_16px_#2dd4bf] animate-[scanMove_1.5s_steps(10)_infinite]" />
             </div>
             <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">AI SEDANG MENGANALISIS SCROLL-MU...</p>
-            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{mState.cvFileName}</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{cState.cvFileName}</p>
             <div className="flex gap-1.5">
               <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite]" />
               <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite] [animation-delay:0.2s]" />
@@ -209,13 +209,13 @@ export default function CVUploadStep() {
         )}
 
         {/* ── DONE STATE ── */}
-        {status === 'done' && mState.cvExtractedData && (
+        {status === 'done' && cState.cvExtractedData && (
           <div className="flex flex-col gap-4.5 p-6 sm:p-3.5 w-full text-left">
             <div className="flex items-center gap-4">
               <Image src="/Healing Potions.png" alt="" width={48} height={48} className="shrink-0 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
               <div>
                 <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">CV Berhasil Dianalisis!</p>
-                <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{mState.cvFileName}</p>
+                <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{cState.cvFileName}</p>
               </div>
               <button
                 type="button"
@@ -230,7 +230,7 @@ export default function CVUploadStep() {
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
               <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
               <div className="flex flex-wrap gap-2.5">
-                {(mState.cvExtractedData?.skills ?? []).map((skill, i) => (
+                {(cState.cvExtractedData?.skills ?? []).map((skill, i) => (
                   <span key={i} className="font-pixel text-[0.55rem] text-white bg-[#4c1d95] border-2 border-[#a855f7] shadow-[2px_2px_0_rgba(0,0,0,0.5)] px-2.5 py-1.5 animate-[tagIn_0.35s_steps(4)_both]" style={{ animationDelay: `${i * 0.08}s` }}>
                     {skill.name} <span className="text-[#34d399]">Lv.{skill.level}</span>
                   </span>
@@ -242,7 +242,7 @@ export default function CVUploadStep() {
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
               <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pengalaman</p>
               <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
-                {mState.cvExtractedData.experience.map((exp, i) => (
+                {cState.cvExtractedData.experience.map((exp, i) => (
                   <li key={i} className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] pl-5 relative leading-[1.8] animate-[tagIn_0.35s_steps(4)_both] before:content-['>'] before:absolute before:left-0 before:text-[#34d399]" style={{ animationDelay: `${0.5 + i * 0.1}s` }}>{exp}</li>
                 ))}
               </ul>
@@ -251,7 +251,7 @@ export default function CVUploadStep() {
             {/* Extracted Education */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
               <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pendidikan</p>
-              <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] m-0 leading-[1.8]">{mState.cvExtractedData.education}</p>
+              <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] m-0 leading-[1.8]">{cState.cvExtractedData.education}</p>
             </div>
           </div>
         )}
@@ -293,8 +293,8 @@ export default function CVUploadStep() {
             className="hidden"
             aria-label="Upload Portfolio"
           />
-          {mState.portfolioFileName ? (
-            <p className="font-pixel text-[0.6rem] text-[#34d399] m-0 drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">📄 {mState.portfolioFileName}</p>
+          {cState.portfolioFileName ? (
+            <p className="font-pixel text-[0.6rem] text-[#34d399] m-0 drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">📄 {cState.portfolioFileName}</p>
           ) : (
             <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">Klik untuk upload portfolio (PDF ONLY)</p>
           )}

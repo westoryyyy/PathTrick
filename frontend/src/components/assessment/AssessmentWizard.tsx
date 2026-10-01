@@ -10,13 +10,13 @@ import CVUploadStep from './chaser/CVUploadStep';
 import WorkInterestStep from './chaser/WorkInterestStep';
 import { useRouter } from 'next/navigation';
 
-const SMA_STEPS = [
+const DREAMER_STEPS = [
   { title: 'Asesmen RIASEC',           desc: 'Kenali minat dan bakatmu lewat 6 dimensi kepribadian RIASEC.' },
   { title: 'Preferensi Budget',         desc: 'Pilih rentang biaya kuliah yang sesuai dengan rencana keluargamu.' },
   { title: 'Preferensi Jurusan & Negara', desc: 'Tambahkan preferensi jurusan dan negara tujuan (opsional).' },
 ];
 
-const MAHASISWA_STEPS = [
+const CHASER_STEPS = [
   { title: 'Upload CV',              desc: 'Upload CV-mu dan biarkan AI menganalisis skill & pengalamanmu.' },
   { title: 'Minat Kerja',            desc: 'Konfirmasi skill-mu dan pilih industri yang kamu minati.' },
 ];
@@ -32,14 +32,14 @@ export default function AssessmentWizard() {
   const submitAssessment = useOnboardingStore((s) => s.submitAssessment);
 
   // Form State
-  const riasec = useOnboardingStore((s) => s.smaAssessment.riasec);
-  const budget = useOnboardingStore((s) => s.smaAssessment.budgetPreference);
-  const cvStatus = useOnboardingStore((s) => s.mahasiswaAssessment.cvExtractionStatus);
-  const preferredGICS = useOnboardingStore((s) => s.mahasiswaAssessment.preferredGICS);
+  const riasec = useOnboardingStore((s) => s.dreamerAssessment.riasec);
+  const budget = useOnboardingStore((s) => s.dreamerAssessment.budgetPreference);
+  const cvStatus = useOnboardingStore((s) => s.chaserAssessment.cvExtractionStatus);
+  const preferredGICS = useOnboardingStore((s) => s.chaserAssessment.preferredGICS);
 
   if (!role) return null;
 
-  const steps = role === 'dreamer' ? SMA_STEPS : MAHASISWA_STEPS;
+  const steps = role === 'dreamer' ? DREAMER_STEPS : CHASER_STEPS;
   const step = steps[currentStep];
   const isLast = currentStep === totalSteps - 1;
 
