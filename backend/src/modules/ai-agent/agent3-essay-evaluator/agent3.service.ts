@@ -1,4 +1,4 @@
-import { getGroqClient } from "../../../lib/groq";
+import { getGroqClient, AGENT_MODEL } from "../../../lib/groq";
 
 export async function evaluateEssay(promptQuestion: string, expectedAnswer: string, userAnswer: string): Promise<boolean> {
   try {
@@ -13,7 +13,7 @@ Jawab HANYA dengan 1 kata: "LULUS" jika benar/cukup tepat, atau "GAGAL" jika san
 
     const completion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "llama3-8b-8192", // Model ringan & cepat
+      model: AGENT_MODEL,
       temperature: 0.1,
       max_tokens: 10,
     });
@@ -22,7 +22,6 @@ Jawab HANYA dengan 1 kata: "LULUS" jika benar/cukup tepat, atau "GAGAL" jika san
     return aiResponse.includes("LULUS");
   } catch (error) {
     console.error("AI Evaluator error:", error);
-    // Fallback darurat jika limit / network mati saat presentasi
-    return true; 
+    throw new Error("AiEvaluatorError");
   }
 }

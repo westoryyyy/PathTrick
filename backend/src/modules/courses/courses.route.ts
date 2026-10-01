@@ -110,6 +110,7 @@ export default async function coursesRoutes(fastify: FastifyInstance) {
               message: "Section ini masih terkunci — selesaikan section sebelumnya terlebih dahulu",
             });
           }
+          if (err.message === "AiEvaluatorError") return reply.code(503).send({ error: "AiEvaluatorError", message: "Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat." });
         }
         request.log.error(err, "Error di POST quiz/submit");
         return reply.code(500).send({ error: "InternalError", message: "Terjadi kesalahan tak terduga" });
@@ -184,6 +185,7 @@ export default async function coursesRoutes(fastify: FastifyInstance) {
           if (err.message === 'MISSION_NOT_FOUND') return reply.code(404).send({ error: 'NotFound', message: `Mission '${missionId}' tidak ditemukan` });
           if (err.message === 'QUIZ_NOT_FOUND') return reply.code(404).send({ error: 'NotFound', message: 'Quiz tidak ditemukan untuk mission ini' });
           if (err.message === 'SECTION_LOCKED') return reply.code(403).send({ error: 'SectionLocked', message: 'Mission ini masih terkunci' });
+          if (err.message === 'AiEvaluatorError') return reply.code(503).send({ error: 'AiEvaluatorError', message: 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat.' });
         }
         request.log.error(err, 'Error di POST missions quiz/submit');
         return reply.code(500).send({ error: 'InternalError' });
@@ -206,7 +208,10 @@ export default async function coursesRoutes(fastify: FastifyInstance) {
       try {
         const result = await submitProjectByMissionId({ userId, missionId, code: parsedBody.data.code });
         return reply.code(200).send(result);
-      } catch (err) {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message === 'AiEvaluatorError') {
+          return reply.code(503).send({ error: 'AiEvaluatorError', message: 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat.' });
+        }
         request.log.error(err, 'Error di POST missions project/submit');
         return reply.code(500).send({ error: 'InternalError' });
       }

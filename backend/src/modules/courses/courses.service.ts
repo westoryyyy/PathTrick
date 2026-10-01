@@ -490,40 +490,44 @@ export async function submitProject(params: {
 
   let passed = false;
   let message = '';
-  const cleanCode = params.code.replace('<!-- Tulis kodemu di bawah ini -->', '').replace('<!-- Tulis kodemu di sini -->', '').trim().toLowerCase();
-  const openBrackets = cleanCode.split('<').length - 1;
-  const closeBrackets = cleanCode.split('>').length - 1;
-
-  if (!cleanCode) {
+  const userText = (params.code || "").toLowerCase();
+  
+  const expectedKeywords = (section.expectedKeywords as string[]) || [];
+  let keywordScore = 0;
+  for (const kw of expectedKeywords) {
+    if (userText.includes(kw.toLowerCase())) keywordScore++;
+  }
+  
+  const threshold = expectedKeywords.length > 0 ? Math.ceil(expectedKeywords.length * 0.5) : 0;
+  
+  if (!userText.trim()) {
     passed = false;
-    message = 'Kode masih kosong atau belum diubah. Silakan kerjakan tantangan ini!';
-  } else if (openBrackets !== closeBrackets) {
-    passed = false;
-    message = 'Sintaks Error! Sepertinya ada tag HTML yang tidak ditutup dengan benar (kekurangan karakter "<" atau ">"). Harap lebih teliti ya, Ksatria!';
-  } else {
-    
-    const expectedKeywords = section.expectedKeywords as string[];
-    if (expectedKeywords && Array.isArray(expectedKeywords) && expectedKeywords.length > 0) {
-      let missingKeywords = [];
-      for (const kw of expectedKeywords) {
-        if (!cleanCode.includes(kw.toLowerCase())) {
-          missingKeywords.push(kw);
-        }
-      }
-      
-      if (missingKeywords.length === 0) {
+    message = 'Jawaban tidak boleh kosong. Silakan tuliskan analisamu!';
+  } else if (expectedKeywords.length > 0 && keywordScore >= threshold) {
+    passed = true;
+    message = 'Analisis kasusmu sangat tepat sasaran dan menggunakan kata kunci yang relevan!';
+  } else if (userText.length > 10) {
+    // Fallback AI Evaluator
+    const prompt = section.content || "Tugas essay";
+    const expectedText = expectedKeywords.join(", ");
+    try {
+      const isCorrect = await evaluateEssay(prompt, expectedText, params.code);
+      if (isCorrect) {
         passed = true;
-        message = 'Tantangan berhasil diselesaikan!';
+        message = 'Jawabanmu benar dan telah disetujui oleh Sistem Evaluator AI!';
       } else {
         passed = false;
-        message = 'Hampir! Sepertinya kodemu kurang keyword berikut: ' + missingKeywords.join(', ');
+        message = 'Sepertinya analisamu masih kurang tepat. Coba perbaiki lagi!';
       }
-    } else {
-      // Default fallback jika admin tidak set expectedKeywords
-      passed = true;
-      message = 'Tantangan berhasil diselesaikan (No keywords set).';
+    } catch (err) {
+      if (err instanceof Error && err.message === 'AiEvaluatorError') {
+        throw err;
+      }
+      throw new Error('AiEvaluatorError'); // Ensure it gets thrown if unhandled
     }
-
+  } else {
+    passed = false;
+    message = 'Jawabanmu terlalu singkat. Coba jelaskan lebih detail!';
   }
 
   if (passed) {
