@@ -107,6 +107,7 @@ export default function MissionFlowPage() {
   const [playerHp, setPlayerHp] = useState(3);
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<{questionId: string, selectedAnswer: string}[]>([]);
+  const [essayAnswer, setEssayAnswer] = useState('');
   const [dialogState, setDialogState] = useState<{ isOpen: boolean; type: 'success' | 'error'; message: string; onConfirm?: () => void }>({ isOpen: false, type: 'success', message: '' });
 
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
@@ -590,7 +591,34 @@ export default function MissionFlowPage() {
             {sectionData?.quiz?.questions ? (() => {
               const quizArray = sectionData.quiz.questions;
               const currentQuiz = quizArray[quizIndex];
-              return (
+              return currentQuiz.type === 'ESSAY' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '0 16px' }}>
+                  <textarea
+                    className={styles.textarea}
+                    style={{ flex: 1, padding: '24px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
+                    placeholder="Ketikkan analisamu di sini..."
+                    value={essayAnswer}
+                    onChange={(e) => setEssayAnswer(e.target.value)}
+                  />
+                  <button onMouseEnter={playHoverSound}
+                    className={styles.btn}
+                    disabled={isSubmitting || !essayAnswer.trim()}
+                    style={{ alignSelf: 'flex-end', marginTop: '16px' }}
+                    onClick={() => {
+                      const newAnswers = [...quizAnswers, { questionId: currentQuiz.id, selectedAnswer: essayAnswer }];
+                      setQuizAnswers(newAnswers);
+                      setEssayAnswer(''); // reset
+                      if (quizIndex < quizArray.length - 1) {
+                        setQuizIndex(quizIndex + 1);
+                      } else {
+                        handleQuizSubmit(newAnswers);
+                      }
+                    }}
+                  >
+                    KIRIM JAWABAN
+                  </button>
+                </div>
+              ) : (
                 <div className={styles.quizOptions}>
                   {currentQuiz.options.map((opt: any, i: number) => (
                     <button onMouseEnter={playHoverSound}

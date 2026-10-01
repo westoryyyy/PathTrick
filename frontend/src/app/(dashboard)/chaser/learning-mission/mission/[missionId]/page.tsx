@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
 import { mockBackendData } from '@/data/mockBackendData';
@@ -95,6 +96,21 @@ export default function MissionFlowPage() {
 
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [dbSection, setDbSection] = useState<any>(null);
+
+  useEffect(() => {
+    if (MISSION_CONTENT[missionId as string]) return;
+    import('@/hooks/useAuthSync').then(({ getAuthHeaders }) => {
+      import('@/config/pathtrick').then(({ API_BASE_URL }) => {
+        fetch(`${API_BASE_URL}/api/missions/${missionId as string}`, { headers: getAuthHeaders() })
+          .then(res => res.json())
+          .then(data => {
+             if (data && !data.error) setDbSection(data);
+          })
+          .catch(() => {});
+      });
+    });
+  }, [missionId]);
 
   const setPhaseWithProgress = (p: Phase) => {
     setPhase(p);
@@ -154,7 +170,39 @@ export default function MissionFlowPage() {
   };
 
   // Get dynamic content or generate a fallback template
-  let content = MISSION_CONTENT[missionId as string];
+  let content = dbSection ? {
+    materials: [
+      <div key="1" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-vt323), sans-serif' }}>
+        <h4 style={{ fontSize: '1.05rem', color: '#059669', marginBottom: '6px', textTransform: 'uppercase' }}>
+          {dbSection.title}
+        </h4>
+        <div style={{ fontSize: '1rem', color: '#3b261b', lineHeight: '1.5' }} className="prose-content">
+          <ReactMarkdown>{dbSection.content || ''}</ReactMarkdown>
+        </div>
+      </div>
+    ],
+    quiz: dbSection.quiz?.questions?.map((q: any, i: number) => ({
+      question: `Pertanyaan ${i + 1}: ${q.pertanyaan || q.question}`,
+      options: (q.pilihan || q.options || []).map((opt: any) => {
+        const isCorrect = (opt.id === q.jawabanBenar) || opt.isCorrect === true;
+        return {
+          text: (opt.id ? `${opt.id}. ` : '') + (opt.teks || opt.text),
+          isCorrect,
+          feedback: isCorrect ? 'Benar! Kerja bagus.' : 'Masih kurang tepat. Coba ingat lagi materinya.'
+        };
+      })
+    })) || [],
+    project: dbSection.expectedKeywords ? {
+      instruction: `Praktikkan materi ini. Sistem akan mengecek pemahamanmu secara otomatis.`,
+      codeValidation: (c: string) => {
+        const kws = Array.isArray(dbSection.expectedKeywords) ? dbSection.expectedKeywords : [dbSection.expectedKeywords];
+        return kws.some((kw: string) => c.toLowerCase().includes(kw.toLowerCase()));
+      },
+      successMsg: `Luar biasa, pemahamanmu terbukti!`,
+      errorMsg: `Hasil karyamu masih kurang tepat. Ingat konsep utamanya!`,
+    } : null
+  } : MISSION_CONTENT[missionId as string];
+
   if (!content) {
     const levelNumStr = (missionId as string)?.match(/-level-(\d+)$/)?.[1] || '1';
     const levelNum = parseInt(levelNumStr);
