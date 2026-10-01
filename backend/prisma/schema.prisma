@@ -416,6 +416,7 @@ model Course {
   createdByUser    User?    @relation("CourseCreatedBy", fields: [createdByUserId], references: [id])
   isPublished      Boolean  @default(true)
   isFallback       Boolean  @default(false)
+  order            Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

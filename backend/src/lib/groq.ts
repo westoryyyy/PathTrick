@@ -30,7 +30,7 @@ export const groq = new Proxy({} as Groq, {
 // Kalau nanti P95 latency di AIInteractionLog.latencyMs kelihatan mepet ke
 // limit pas demo, turunkan ke "llama-3.1-8b-instant" (lebih cepat, reasoning
 // lebih sederhana) — putuskan berdasar data log itu, jangan tebak-tebak.
-export const AGENT_MODEL = "llama-3.3-70b-versatile";
+export const AGENT_MODEL = "qwen/qwen3.8-27b";
 
 // Dipakai bersama Agent 1, 2 & 3 supaya konsisten kalau nanti mau diubah sekaligus.
 export const AGENT_TEMPERATURE = 0.4; // rendah — ini tugas terstruktur/scoring, bukan tugas kreatif
