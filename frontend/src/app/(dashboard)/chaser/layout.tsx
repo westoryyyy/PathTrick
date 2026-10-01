@@ -110,8 +110,14 @@ export default function MahasiswaLayout({
       .then(async (res) => {
         if (cancelled) return;
         if (!res.ok) { router.replace('/'); return; }
-        const data = await res.json() as { role?: { name?: string } | null };
+        const data = await res.json() as any;
         if (cancelled) return;
+        
+        if (data.gamification) {
+          const calculatedLevel = Math.max(1, Math.floor(data.gamification.xp / 1000) + 1);
+          useUserStore.getState().hydrateUser(data.gamification.xp, calculatedLevel, data.name || '', data.email || '');
+        }
+        
         const roleName = data?.role?.name?.toUpperCase();
         if (!roleName) {
           router.replace('/select-role');

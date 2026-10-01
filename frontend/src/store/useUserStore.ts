@@ -32,7 +32,14 @@ export const useUserStore = create<UserState>()(
       displayEmail: '',
       avatarUrl: '/char_dreamer.png',
       hasJustLeveledUp: false,
-      addXP: (amount) => set((state) => ({ totalXP: state.totalXP + amount })),
+      addXP: (amount) => set((state) => {
+        const newXP = state.totalXP + amount;
+        const newLevel = Math.max(1, Math.floor(newXP / 1000) + 1);
+        if (newLevel > state.level) {
+          return { totalXP: newXP, level: newLevel, hasJustLeveledUp: true };
+        }
+        return { totalXP: newXP };
+      }),
       triggerLevelUp: () => set((state) => ({
         level: state.level + 1,
         hasJustLeveledUp: true

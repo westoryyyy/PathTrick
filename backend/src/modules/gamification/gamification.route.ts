@@ -118,4 +118,31 @@ export default async function gamificationRoutes(fastify: FastifyInstance) {
       });
     }
   );
+
+  /**
+   * POST /api/gamification/add-xp
+   * Menambahkan XP ke profil user (misal dari daily bounty).
+   */
+  fastify.post(
+    "/api/gamification/add-xp",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { userId } = request.user;
+      const body = request.body as { amount: number };
+
+      if (!body?.amount || typeof body.amount !== "number") {
+        return reply.code(400).send({ error: "BadRequest", message: "amount (number) wajib diisi" });
+      }
+
+      const updated = await prisma.gamification.update({
+        where: { userId },
+        data: { xp: { increment: body.amount } },
+      });
+
+      return reply.code(200).send({
+        success: true,
+        newTotalXp: updated.xp,
+      });
+    }
+  );
 }
