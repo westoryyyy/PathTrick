@@ -69,6 +69,7 @@ interface MapState {
   error: string | null;
   completedDynamicNodes: string[];
   activeChapterId?: string;
+  houseId?: string;
 
   /* ── Actions ── */
   setRole: (role: 'SMA' | 'MAHASISWA') => void;
@@ -86,6 +87,7 @@ interface MapState {
   completeNode: (nodeId: string) => Promise<void>;
   unlockDependentNodes: (completedNodeId: string) => void;
   completeDynamicNode: (nodeId: string) => void;
+  setHouseId: (houseId: string | undefined) => void;
 }
 
 /* ═══════════════════════════════════════════════
@@ -576,6 +578,8 @@ export const useMapStore = create<MapState>()(
       get().fetchRecommendedCourses();
     }
   },
+
+  setHouseId: (houseId) => set({ houseId }),
 
   /* ═══════════════════════════════════════════
      SMA Actions

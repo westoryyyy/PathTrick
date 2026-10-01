@@ -1,15 +1,42 @@
 'use client';
 
-import React, { use, useState } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockBackendData } from '@/data/mockBackendData';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelIcon from '@/components/ui/PixelIcon';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const [house, setHouse] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchHouse() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/houses/${id}`, {
+          headers: getAuthHeaders(),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setHouse(data);
+        } else {
+          const mockHouse = mockBackendData.houses.find(h => h.id === id);
+          setHouse(mockHouse);
+        }
+      } catch (err) {
+        const mockHouse = mockBackendData.houses.find(h => h.id === id);
+        setHouse(mockHouse);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHouse();
+  }, [id]);
 
   const playHoverSound = () => {
     try {
@@ -19,7 +46,13 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
     } catch(e) {}
   };
 
-  const house = mockBackendData.houses.find(h => h.id === id);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f4]">
+        <div style={{ fontFamily: '"Press Start 2P"', color: '#3b261b' }} className="animate-pulse">LOADING HOUSE...</div>
+      </div>
+    );
+  }
 
   if (!house) {
     return (
@@ -171,7 +204,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                       {mod.chapters?.map((chapter, chapIdx) => (
                         <div 
                           key={chapter.id}
-                          onClick={() => router.push(`/map?chapter=${chapter.id}`)}
+                          onClick={() => router.push(`/map?chapter=${chapter.id}&house=${id}`)}
                           onMouseEnter={playHoverSound}
                           className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] rounded-xl p-4 cursor-pointer hover:bg-[#d4a373] transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
                         >
@@ -181,7 +214,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                               {chapter.name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 flex-shrink-0 ml-4">
                             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29' }}>{chapter.duration}</span>
                             <button className="px-4 py-2 bg-[#fbbf24] border-2 border-[#b45309] text-[#78350f] rounded-lg shadow-[0_4px_0_#78350f] group-hover:translate-y-1 group-hover:shadow-[0_0_0_#78350f] transition-all" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
                               PLAY ▶
