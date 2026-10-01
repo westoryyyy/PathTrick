@@ -16,12 +16,14 @@ export interface Column<T> {
 export interface Field {
   key: string;
   label: string;
-  type: 'text' | 'textarea' | 'date' | 'select' | 'tags' | 'number' | 'image';
+  type: 'text' | 'textarea' | 'date' | 'select' | 'tags' | 'number' | 'image' | 'multiselect';
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
   /** Teks bantuan kecil di bawah field */
   helpText?: string;
+  /** Izinkan upload file teks (.txt, .md) untuk otomatis mengisi textarea */
+  allowFileUpload?: boolean;
 }
 
 interface AdminCRUDTableProps<T extends { id: string }> {
@@ -40,15 +42,34 @@ interface AdminCRUDTableProps<T extends { id: string }> {
    * Gunakan untuk konversi tipe data (mis. ISO date → YYYY-MM-DD).
    */
   normalizeForEdit?: (row: T) => Partial<T>;
-<<<<<<< HEAD
   isLoading?: boolean;
-=======
->>>>>>> e0af7411bea4f3fe352042eb9d828479969e0b02
+  customFilter?: React.ReactNode;
 }
 
 // ───────────────────────────
-// Tag Input sub-component
+// Tag Input & MultiSelect sub-components
 // ───────────────────────────
+function MultiSelect({ value = [], onChange, options = [] }: { value: string[]; onChange: (v: string[]) => void; options: {value: string, label: string}[] }) {
+  const toggle = (val: string) => {
+    if (value.includes(val)) {
+      onChange(value.filter(v => v !== val));
+    } else {
+      onChange([...value, val]);
+    }
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '8px', background: '#3b1f0a', border: '2px solid #5a3a29' }}>
+      {options.map(o => (
+        <label key={o.value} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', background: value.includes(o.value) ? '#065f46' : '#2a1405', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', color: '#fff', border: `1px solid ${value.includes(o.value) ? '#10b981' : '#5a3a29'}`, userSelect: 'none' }}>
+          <input type="checkbox" checked={value.includes(o.value)} onChange={() => toggle(o.value)} style={{ display: 'none' }} />
+          <span style={{ color: value.includes(o.value) ? '#10b981' : '#a3a3a3', fontWeight: 'bold' }}>{value.includes(o.value) ? '✓' : '+'}</span> 
+          <span style={{ fontFamily: 'Inter, sans-serif' }}>{o.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 function TagInput({ value, onChange, placeholder }: { value: string[]; onChange: (v: string[]) => void; placeholder?: string }) {
   const [input, setInput] = useState('');
   const add = (e: React.KeyboardEvent) => {
@@ -141,11 +162,7 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
 // Main Component
 // ───────────────────────────
 export default function AdminCRUDTable<T extends { id: string }>({
-<<<<<<< HEAD
-  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit, isLoading = false,
-=======
-  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit,
->>>>>>> e0af7411bea4f3fe352042eb9d828479969e0b02
+  title, icon, data, columns, fields, onAdd, onEdit, onDelete, searchKeys = [], addButtonLabel = 'Tambah Baru', normalizeForEdit, isLoading = false, customFilter
 }: AdminCRUDTableProps<T>) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState<null | 'add' | 'edit' | 'delete'>(null);
@@ -219,16 +236,21 @@ export default function AdminCRUDTable<T extends { id: string }>({
         </button>
       </div>
 
-      {/* ── Search ── */}
-      {searchKeys.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '1rem' }}>🔍</span>
-          <input
-            placeholder="Cari data..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', background: '#4a2410', border: '2px solid #5a3a29', color: '#fff', padding: '10px 16px', outline: 'none', width: '300px' }}
-          />
+      {/* ── Toolbar (Search + Filters) ── */}
+      {(searchKeys.length > 0 || customFilter) && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          {searchKeys.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1rem' }}>🔍</span>
+              <input
+                placeholder="Cari data..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', background: '#4a2410', border: '2px solid #5a3a29', color: '#fff', padding: '10px 16px', outline: 'none', width: '300px' }}
+              />
+            </div>
+          )}
+          {customFilter}
         </div>
       )}
 
@@ -299,16 +321,41 @@ export default function AdminCRUDTable<T extends { id: string }>({
             <div style={{ padding: '20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {fields.map(field => (
                 <div key={field.key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '0.03em' }}>
-                    {field.label}{field.required && <span style={{ color: '#f87171', marginLeft: '4px' }}>*</span>}
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '0.03em' }}>
+                      {field.label}{field.required && <span style={{ color: '#f87171', marginLeft: '4px' }}>*</span>}
+                    </label>
+                    {field.allowFileUpload && field.type === 'textarea' && (
+                      <label style={{ cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', background: '#3b261b', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', border: '1px solid #5a3a29' }}>
+                        + Upload .md / .txt
+                        <input 
+                          type="file" 
+                          accept=".md,.txt" 
+                          style={{ display: 'none' }} 
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              if (ev.target?.result) {
+                                setField(field.key, ev.target.result.toString());
+                              }
+                            };
+                            reader.readAsText(file);
+                            // Reset input so the same file can be uploaded again if needed
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
                   {field.type === 'textarea' ? (
                     <textarea
                       value={String(formData[field.key] ?? '')}
                       onChange={e => setField(field.key, e.target.value)}
                       placeholder={field.placeholder}
-                      rows={3}
-                      style={{ fontFamily: '"Pixelify Sans"', fontSize: "0.9rem", background: '#3b1f0a', border: '2px solid #5a3a29', color: '#fff', padding: '10px 12px', outline: 'none', resize: 'vertical', lineHeight: 1.7 }}
+                      rows={5}
+                      style={{ fontFamily: 'Inter, sans-serif', fontSize: "0.9rem", background: '#3b1f0a', border: '2px solid #5a3a29', color: '#fff', padding: '10px 12px', outline: 'none', resize: 'vertical', lineHeight: 1.7 }}
                     />
                   ) : field.type === 'select' ? (
                     <select
@@ -321,6 +368,8 @@ export default function AdminCRUDTable<T extends { id: string }>({
                     </select>
                   ) : field.type === 'tags' ? (
                     <TagInput value={(formData[field.key] as string[]) ?? []} onChange={v => setField(field.key, v)} placeholder={field.placeholder} />
+                  ) : field.type === 'multiselect' ? (
+                    <MultiSelect value={(formData[field.key] as string[]) ?? []} onChange={v => setField(field.key, v)} options={field.options ?? []} />
                   ) : field.type === 'image' ? (
                     <ImageInput value={String(formData[field.key] ?? '')} onChange={v => setField(field.key, v)} />
                   ) : (

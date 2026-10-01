@@ -1,0 +1,491 @@
+/* ══════════════════════════════════════════
+   LEARNING MISSION FLOW (QUEST BOOK STYLE)
+   ══════════════════════════════════════════ */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1600px;
+  /* Make it wider */
+  width: 95%;
+  /* Adjust width on smaller screens */
+  margin: 0 auto;
+  align-items: center;
+  padding: 24px 24px 32px 24px;
+  /* Move content higher up */
+}
+
+/* ── Top Bar ── */
+.topBar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.backBtn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  /* Increased size */
+  padding: 12px 24px;
+  /* Increased padding */
+  background: #3b261b;
+  border: 4px solid #5a3a29;
+  border-radius: 12px;
+  color: #fbbf24;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 4px 4px 0 rgba(0, 0, 0, 0.8);
+  transition: transform 0.1s, background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Add gap for the arrow */
+}
+
+.backBtn:hover {
+  background: #5a3a29;
+  transform: translate(-2px, -2px);
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 6px 6px 0 rgba(0, 0, 0, 0.8);
+}
+
+.backBtn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.missionId {
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fbbf24;
+  background: #3b261b;
+  padding: 8px 16px;
+  border: 4px solid #5a3a29;
+  border-radius: 12px;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 4px 4px 0 rgba(0, 0, 0, 0.8);
+  margin-right: 48px;
+  /* Offset by the width of the bookmark tabs to align with the book body */
+}
+
+/* ── Quest Book Container ── */
+.questBook {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  filter: drop-shadow(8px 8px 0 #1a0f08);
+  height: 85vh;
+  /* Taller */
+  max-height: 900px;
+  /* Allow it to be much taller */
+  min-height: 600px;
+}
+
+/* ── Book Content (Two Pages) ── */
+.bookContent {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.leftPage,
+.rightPage {
+  flex: 1;
+  background: #fdf6e3;
+  color: #3b261b;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.leftPage {
+  border: 4px solid #fde047;
+  border-right: none;
+  border-radius: 24px 0 0 24px;
+  box-shadow: inset -15px 0 20px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.rightPage {
+  border: 4px solid #fde047;
+  border-left: none;
+  border-radius: 0 24px 24px 0;
+  box-shadow: inset 15px 0 20px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.3);
+  perspective: 1500px;
+  overflow: hidden;
+}
+
+.bookSpine {
+  width: 32px;
+  background: linear-gradient(to right, #e5d7c5 0%, #c4af9a 30%, #a89481 50%, #c4af9a 70%, #e5d7c5 100%);
+  z-index: 2;
+  border-top: 4px solid #fde047;
+  border-bottom: 4px solid #fde047;
+  box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.1), inset -4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Tabs (Bookmarks on the right) ── */
+.tabsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 48px;
+  /* z-index removed so it doesn't form a restrictive stacking context */
+  margin-left: 0;
+  /* sit exactly outside book content border */
+  padding: 32px 0;
+  /* Keeps tabs away from the very top/bottom */
+  gap: 8px;
+  /* Slight gap between tabs looks cleaner */
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.2rem;
+  padding: 16px 8px;
+  /* color defined in specific tab classes */
+  border-radius: 0 12px 12px 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  /* Stronger shadow */
+  cursor: pointer;
+  filter: brightness(0.9) saturate(0.85);
+  /* Dimmer and less saturated when inactive */
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border: none;
+  position: relative;
+  z-index: -1;
+  /* Sit behind the bookContent */
+}
+
+.activeTab {
+  filter: brightness(1.05) saturate(1.1);
+  /* Cozy effect: slightly brighter when active */
+  /* Make it much brighter when active */
+  width: 64px;
+  /* Expands to the right without detaching */
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  /* Sit ABOVE the bookContent (which is z-index 1) */
+  border-left: none;
+}
+
+/* Custom Tab Colors */
+.tabTeori {
+  background: #c89f2d;
+  /* Mustard / Gold */
+  color: #3b261b;
+}
+
+.tabKuis {
+  background: #33a579;
+  /* Sea Green */
+  color: #114227;
+}
+
+.tabBoss {
+  background: #a285fc;
+  /* Lavender / Light Purple */
+  color: #351c75;
+}
+
+.tabReward {
+  background: #c9651c;
+  /* Bronze / Orange */
+  color: #4a1f00;
+}
+
+/* ── Card Header & Title ── */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 4px dashed #8c5d41;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.3rem;
+  color: #3b261b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.text {
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.1rem;
+  color: #3b261b;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+/* ── Specific Elements ── */
+.dialogueBox {
+  background: #fae1c5;
+  border: 4px solid #8c5d41;
+  padding: 12px 16px 12px 32px;
+  position: relative;
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.1rem;
+  color: #3b261b;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dialogueBox::before {
+  content: '▶';
+  position: absolute;
+  left: 16px;
+  top: 15px;
+  color: #047857;
+  font-size: 0.8rem;
+}
+
+.materialCode {
+  background: #291a13;
+  color: #34d399;
+  padding: 16px;
+  border: 4px solid #5a3a29;
+  font-family: monospace;
+  font-size: 0.9rem;
+  margin: 16px 0;
+  display: block;
+  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.optionBtn {
+  text-align: left;
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.1rem;
+  padding: 12px 16px;
+  background: #fae1c5;
+  border: 4px solid #8c5d41;
+  color: #3b261b;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #8c5d41;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  line-height: 1.4;
+}
+
+.optionBtn:hover {
+  background: #fff3e0;
+  border-color: #bc8f65;
+}
+
+.optionBtn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.bossFightContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+/* ── Buttons (Dinkum Style) ── */
+.btn {
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 8px 18px;
+  background: #5cb85c;
+  color: #1a3d1a;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+  border: 3px solid #2d6e2d;
+  border-radius: 4px;
+  outline: none;
+  text-decoration: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    0 5px 0 #1e4e1e,
+    1px 6px 0 #1e4e1e,
+    -1px 6px 0 #1e4e1e;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  position: relative;
+  top: 0;
+}
+
+.btn:hover:not(:disabled) {
+  background: #6dcf6d;
+  border-color: #2d6e2d;
+}
+
+.btn:active:not(:disabled) {
+  top: 5px;
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.15),
+    0 0 0 #1e4e1e;
+}
+
+.btn:disabled {
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  text-shadow: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    0 5px 0 #4b5563,
+    1px 6px 0 #4b5563,
+    -1px 6px 0 #4b5563;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  font-family: var(--font-vt323), 'VT323', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 8px 18px;
+  background: #c9955c;
+  color: #3b1f0e;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.2);
+  border: 3px solid #7a4a20;
+  border-radius: 4px;
+  outline: none;
+  text-decoration: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    0 5px 0 #5c3110,
+    1px 6px 0 #5c3110,
+    -1px 6px 0 #5c3110;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  position: relative;
+  top: 0;
+}
+
+.secondaryBtn:hover {
+  background: #d9a870;
+  border-color: #7a4a20;
+}
+
+.secondaryBtn:active {
+  top: 5px;
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.15),
+    0 0 0 #5c3110;
+}
+
+/* ── Success Card (Certificate Style) ── */
+.cardSuccess {
+  background: #fae1c5;
+  border: 4px dashed #8c5d41;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  flex: 1;
+  box-shadow: inset 0 0 20px rgba(140, 93, 65, 0.2);
+  margin: 16px;
+  position: relative;
+}
+
+.successIcon {
+  font-size: 4rem;
+  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.2));
+  animation: bounce 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+.titleSuccess {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: #b45309;
+  margin: 0;
+  text-shadow: 2px 2px 0 #fae1c5, 3px 3px 0 #8c5d41;
+  letter-spacing: 2px;
+}
+
+/* ── CUSTOM DIALOG (MODAL) ── */
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialogModal {
+  background: #fae1c5;
+  border: 4px solid #8c5d41;
+  border-radius: 8px;
+  padding: 32px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: inset 0 0 20px rgba(140, 93, 65, 0.2), 0 10px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.dialogTitle {
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  margin: 0;
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+}
+
+.dialogMessage {
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.1rem;
+  color: #3b261b;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  /* Allows \n to render correctly */
+}

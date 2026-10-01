@@ -19,7 +19,29 @@
     "sqlBadgeMinted": "Your SQL badge has been minted on-chain.",
     "aiCareerCoach": "AI Career Coach",
     "roadmapReady": "Your personal roadmap is ready! Let's explore.",
-    "scholarshipFound": "A new scholarship matching your profile was found."
+    "scholarshipFound": "A new scholarship matching your profile was found.",
+    "quizDailyQuest": "Complete 1 quiz module today to earn +150 XP!",
+    "aiSkillGapAnalysis": "Based on AI analysis, here is your skill gap. Complete this training module to meet industry qualifications.",
+    "noNewNotifications": "No new notifications.",
+    "bountyClaimedMsg": "You've claimed today's bounty! Come back tomorrow.",
+    "quizCompletedMsg": "Quiz completed! Claim your reward now!",
+    "playQuizBtn": "PLAY QUIZ ▶",
+    "claimingBtn": "CLAIMING...",
+    "claimedBtn": "CLAIMED",
+    "claimXpBtn": "CLAIM +150 XP",
+    "uploadCvPrompt": "Got a new skill? Upload your latest CV so AI can update your profile & career recommendations.",
+    "achievementsDesc": "Your Achievement Collection. Complete more missions to unlock all badges!",
+    "noCertificatesDesc": "You haven't conquered any Boss Modules yet. Play Learning Missions to earn Certificates!"
+  },
+  "badges": {
+    "missionCompleter": "Completed 1 Mission",
+    "earlyBird": "Login Before Dawn",
+    "streakWarrior": "7-Day Login Streak",
+    "quizMaster": "Perfect Quiz",
+    "quickLearner": "Fast Finisher",
+    "courseMaster": "Completed 1 Course",
+    "firstStep": "Started Journey",
+    "nightOwl": "Night Owl Study"
   },
   "nav": {
     "mahasiswa": {
@@ -50,7 +72,7 @@
       "weeklyChallenge": "Weekly Challenge",
       "skillTree": "Skill Tree",
       "achievementVault": "Achievement Vault",
-      "unlocked": "4 Unlocked",
+      "unlocked": "Unlocked",
       "active": "Active",
       "aiJobMatch": "AI JOB MATCH",
       "jobsFoundThisWeek": "5 suitable jobs found this week!",

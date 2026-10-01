@@ -54,4 +54,62 @@ export default async function housesRoutes(fastify: FastifyInstance) {
       });
     }
   );
+
+  /**
+   * GET /api/houses/:id
+   * Ambil detail 1 House beserta daftar modul (courses) dan BAB (chapters).
+   */
+  fastify.get(
+    "/api/houses/:id",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const { userId } = request.user;
+
+      const house = await prisma.house.findUnique({
+        where: { id },
+        include: {
+          courses: {
+            where: { isPublished: true },
+            orderBy: { onChainId: "asc" },
+            include: {
+              chapters: {
+                orderBy: { order: "asc" },
+                include: {
+                  sections: {
+                    select: { id: true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!house) {
+        return reply.code(404).send({ error: "NotFound", message: "House tidak ditemukan" });
+      }
+
+      // Format response to match frontend 'stages' structure
+      const mappedHouse = {
+        ...house,
+        stages: house.courses.map((course) => ({
+          id: course.id,
+          name: course.title,
+          description: course.description,
+          isCompleted: false, // For now hardcoded false or logic here if needed
+          duration: "6 Levels",
+          contentType: course.contentType,
+          chapters: course.chapters.map((chapter) => ({
+            id: chapter.id,
+            name: chapter.title,
+            duration: chapter.sections.length + " Levels",
+            isCompleted: false
+          }))
+        }))
+      };
+
+      return reply.code(200).send(mappedHouse);
+    }
+  );
 }

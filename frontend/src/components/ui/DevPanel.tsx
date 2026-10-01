@@ -114,7 +114,7 @@ function DevPanelInner() {
             <div style={{ color: '#fff', lineHeight: '1.8' }}>
               <div>Role: <span style={{ color: '#a78bfa' }}>{store.selectedRole ?? 'null'}</span></div>
               <div>Step: <span style={{ color: '#a78bfa' }}>{store.currentStep + 1}/{store.totalSteps || '?'}</span></div>
-              <div>Budget: <span style={{ color: '#a78bfa' }}>{store.smaAssessment.budgetPreference || 'not set'}</span></div>
+              <div>Budget: <span style={{ color: '#a78bfa' }}>{store.dreamerAssessment.budgetPreference || 'not set'}</span></div>
               <div>StorageKey: <span style={{ color: '#6ee7b7', fontSize: '7px', wordBreak: 'break-all' }}>{storageKey ?? 'none'}</span></div>
             </div>
           </section>
@@ -127,7 +127,7 @@ function DevPanelInner() {
               onClick={() => {
                 const s = useOnboardingStore.getState();
                 const uid = user?.id ?? 'dev-user';
-                s.setRole('mahasiswa', uid);
+                s.setRole('chaser', uid);
                 window.location.href = '/chaser/dashboard';
               }}
               style={btnStyle('#0d2e0d', '#34d399')}
@@ -139,7 +139,7 @@ function DevPanelInner() {
               onClick={() => {
                 const s = useOnboardingStore.getState();
                 const uid = user?.id ?? 'dev-user';
-                s.setRole('sma', uid);
+                s.setRole('dreamer', uid);
                 window.location.href = '/dreamer/dashboard';
               }}
               style={btnStyle('#1a1a0d', '#fbbf24')}
@@ -157,14 +157,14 @@ function DevPanelInner() {
             <div style={{ color: '#888', marginTop: '4px', marginBottom: '2px' }}>── QUICK MAP LINKS ──</div>
 
             <button
-              onClick={() => window.location.href = '/map?role=mahasiswa'}
+              onClick={() => window.location.href = '/map?role=chaser'}
               style={btnStyle('#1a0d2e', '#a78bfa')}
             >
               🗺️ Chaser World Map
             </button>
 
             <button
-              onClick={() => window.location.href = '/map?chapter=module-education-1-bab-1&role=mahasiswa'}
+              onClick={() => window.location.href = '/map?chapter=module-education-1-bab-1&role=chaser'}
               style={btnStyle('#1a0d2e', '#c084fc')}
             >
               ⚔️ Test Chapter Map (Education)

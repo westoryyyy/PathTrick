@@ -1,15 +1,42 @@
 'use client';
 
-import React, { use, useState } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockBackendData } from '@/data/mockBackendData';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelIcon from '@/components/ui/PixelIcon';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const [house, setHouse] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchHouse() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/houses/${id}`, {
+          headers: getAuthHeaders(),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setHouse(data);
+        } else {
+          const mockHouse = mockBackendData.houses.find(h => h.id === id);
+          setHouse(mockHouse);
+        }
+      } catch (err) {
+        const mockHouse = mockBackendData.houses.find(h => h.id === id);
+        setHouse(mockHouse);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHouse();
+  }, [id]);
 
   const playHoverSound = () => {
     try {
@@ -19,7 +46,13 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
     } catch(e) {}
   };
 
-  const house = mockBackendData.houses.find(h => h.id === id);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f4]">
+        <div style={{ fontFamily: '"Press Start 2P"', color: '#3b261b' }} className="animate-pulse">LOADING HOUSE...</div>
+      </div>
+    );
+  }
 
   if (!house) {
     return (
@@ -30,7 +63,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   const modules = house.stages;
-  const completedCount = modules.filter(m => m.isCompleted).length;
+  const completedCount = modules.filter((m: any) => m.isCompleted).length;
   const progressPercent = Math.round((completedCount / modules.length) * 100);
 
   return (
@@ -39,7 +72,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       <header className="sticky top-0 z-50 bg-[#3b261b] border-b-4 border-[#291a13] px-6 py-4 flex items-center justify-between shadow-[0_4px_0_rgba(0,0,0,0.2)]">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push('/sma/learning-progress')}
+            onClick={() => router.push('/dreamer/learning-progress')}
             onMouseEnter={playHoverSound}
             className="px-5 py-3 bg-[#3b261b] hover:bg-[#5a3a29] border-4 border-[#5a3a29] rounded-xl transition-colors text-[#fbbf24] shadow-[inset_-2px_-2px_0_rgba(0,0,0,0.5),_4px_4px_0_rgba(0,0,0,0.8)] active:translate-y-1 active:shadow-none"
           >
@@ -102,7 +135,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className="flex flex-col gap-6">
-          {modules.map((mod, index) => (
+          {modules.map((mod: any, index: number) => (
             <div key={mod.id} className="flex flex-col relative">
               {/* Module Header Button */}
               <button
@@ -168,10 +201,10 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                         DAFTAR BAB (CHAPTERS):
                       </div>
                       
-                      {mod.chapters?.map((chapter, chapIdx) => (
+                      {mod.chapters?.map((chapter: any, chapIdx: number) => (
                         <div 
                           key={chapter.id}
-                          onClick={() => router.push(`/map?chapter=${chapter.id}`)}
+                          onClick={() => router.push(`/map?chapter=${chapter.id}&house=${id}`)}
                           onMouseEnter={playHoverSound}
                           className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] rounded-xl p-4 cursor-pointer hover:bg-[#d4a373] transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
                         >
@@ -181,7 +214,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                               {chapter.name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 flex-shrink-0 ml-4">
                             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29' }}>{chapter.duration}</span>
                             <button className="px-4 py-2 bg-[#fbbf24] border-2 border-[#b45309] text-[#78350f] rounded-lg shadow-[0_4px_0_#78350f] group-hover:translate-y-1 group-hover:shadow-[0_0_0_#78350f] transition-all" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
                               PLAY ▶
@@ -207,7 +240,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       {/* ─── Floating Dashboard Button ─── */}
       <div className="fixed bottom-6 right-6 z-40">
          <button
-            onClick={() => router.push('/sma/dashboard')}
+            onClick={() => router.push('/dreamer/dashboard')}
             onMouseEnter={playHoverSound}
             className="px-6 py-4 bg-[#fbbf24] border-4 border-[#b45309] rounded-[16px] text-[#78350f] shadow-[0_6px_0_#78350f] hover:translate-y-1 hover:shadow-[0_2px_0_#78350f] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3"
          >

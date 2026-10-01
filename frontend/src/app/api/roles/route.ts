@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 
 const roles = [
   {
-    id: 'sma',
+    id: 'dreamer',
     displayName: 'The Dreamer',
     description: 'Masih SMA & bingung mau kuliah apa? Temukan jurusan dan karier sesuai bakatmu.',
     perks: ['Asesmen Minat & Bakat', 'Tes RIASEC', 'Rekomendasi Jurusan', 'Info Beasiswa'],
     iconUrl: '/NPC High School Student.png',
   },
   {
-    id: 'mahasiswa',
+    id: 'chaser',
     displayName: 'The Chaser',
     description: 'Mahasiswa atau baru lulus? Upload CV-mu dan buat roadmap kariermu.',
     perks: ['Asesmen Karier AI', 'CV Analysis', 'Job Matching', 'Career Roadmap'],

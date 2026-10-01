@@ -69,6 +69,7 @@ interface MapState {
   error: string | null;
   completedDynamicNodes: string[];
   activeChapterId?: string;
+  houseId?: string;
 
   /* ── Actions ── */
   setRole: (role: 'SMA' | 'MAHASISWA') => void;
@@ -86,6 +87,7 @@ interface MapState {
   completeNode: (nodeId: string) => Promise<void>;
   unlockDependentNodes: (completedNodeId: string) => void;
   completeDynamicNode: (nodeId: string) => void;
+  setHouseId: (houseId: string | undefined) => void;
 }
 
 /* ═══════════════════════════════════════════════
@@ -577,6 +579,8 @@ export const useMapStore = create<MapState>()(
     }
   },
 
+  setHouseId: (houseId) => set({ houseId }),
+
   /* ═══════════════════════════════════════════
      SMA Actions
      ═══════════════════════════════════════════ */
@@ -682,37 +686,68 @@ export const useMapStore = create<MapState>()(
   fetchRoadmap: async (chapterId?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const roadmap = await fetchAIRoadmapMock(get().role, chapterId);
+      // 1. Fetch real roadmap from backend
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const res = await fetch(`${API_BASE_URL}/api/roadmap`, { headers: getAuthHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch roadmap');
       
-      // Re-apply completion status from state
-      const { completedDynamicNodes } = get();
-      const completedSet = new Set(completedDynamicNodes);
+      const rawNodes = await res.json(); // Array of { houseId, courseId, chapterId, sectionId, order, title, locked, completed, status }
 
-      let adjustedRoadmap = roadmap.map(node => {
-        if (completedSet.has(node.id)) {
-          return { ...node, status: 'completed' as const };
+      // 2. Map backend nodes to CourseNodeData format for the 2D Map Game
+      const { ASSET_PATHS } = await import('@/phaser/config');
+      
+      let mappedNodes: CourseNodeData[] = rawNodes.map((rn: any, idx: number) => {
+        // Generate pseudo-coordinates based on order (mock path)
+        const pathCoords = [
+          {x: 13, y: 23}, {x: 6,  y: 8}, {x: 22, y: 17}, 
+          {x: 21, y: 8}, {x: 31, y: 11}, {x: 28, y: 24},
+          {x: 26, y: 28}, {x: 10, y: 28}
+        ];
+        const coords = pathCoords[rn.order % pathCoords.length];
+        
+        let npcKey = 'npc-professor';
+        let badgeImage: string = ASSET_PATHS.OBJ_BOOK;
+        let category: CourseNodeData['category'] = 'skill';
+        
+        if (rn.order === 1) {
+          badgeImage = ASSET_PATHS.BADGE_FIRST_STEP;
+          category = 'foundation';
+          npcKey = 'npc-mentor';
+        } else if (rn.title.toLowerCase().includes('quiz')) {
+          badgeImage = ASSET_PATHS.BADGE_QUIZ_MASTER;
+          npcKey = 'npc-scholarship';
+        } else if (rn.title.toLowerCase().includes('project') || rn.title.toLowerCase().includes('boss')) {
+          badgeImage = ASSET_PATHS.BADGE_COURSE_MASTER;
+          category = 'milestone';
+          npcKey = 'npc-wizard';
         }
-        return node;
+
+        return {
+          id: rn.sectionId,
+          title: `Lvl ${rn.order}: ${rn.title}`,
+          description: `Materi dari bab ${rn.chapterId}`,
+          category: category,
+          status: rn.status, // 'available', 'locked', 'completed'
+          xp: 150,
+          x: coords.x,
+          y: coords.y,
+          prerequisites: [],
+          badgeImage: badgeImage,
+          npcKey: npcKey,
+          courseId: rn.courseId,
+          sectionId: rn.sectionId,
+          chapterId: rn.chapterId, // keep chapterId for filtering later
+          missionId: rn.missionId,
+        };
       });
 
-      // Iteratively unlock nodes whose prerequisites are all completed
-      let changed = true;
-      let iterations = 0;
-      while (changed && iterations < 100) {
-        changed = false;
-        iterations++;
-        const currentCompleted = new Set(adjustedRoadmap.filter(n => n.status === 'completed').map(n => n.id));
-        
-        adjustedRoadmap = adjustedRoadmap.map(node => {
-          if (node.status === 'locked' && node.prerequisites?.length > 0 && node.prerequisites.every(req => currentCompleted.has(req))) {
-            changed = true;
-            return { ...node, status: 'available' as const };
-          }
-          return node;
-        });
+      // Filter by chapterId if requested (for Mahasiswa view)
+      if (chapterId) {
+        mappedNodes = mappedNodes.filter(n => (n as any).chapterId === chapterId);
       }
 
-      set({ nodes: adjustedRoadmap, isLoading: false });
+      set({ nodes: mappedNodes, isLoading: false, activeChapterId: chapterId });
     } catch (err: unknown) {
       console.error("fetchRoadmap error:", err);
       const message = err instanceof Error ? err.message : 'Failed to fetch roadmap';

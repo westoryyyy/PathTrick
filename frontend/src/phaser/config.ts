@@ -205,6 +205,10 @@ export interface CourseNodeData {
   universityMatchId?: string;
   /** Mahasiswa specific: Link to skill gap details */
   jobGapId?: string;
+  courseId?: string;
+  sectionId?: string;
+  chapterId?: string;
+  missionId?: string;
 }
 
 export const COURSE_NODES_SMA: CourseNodeData[] = [

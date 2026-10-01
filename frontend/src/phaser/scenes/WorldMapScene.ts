@@ -176,7 +176,24 @@ export class WorldMapScene extends Phaser.Scene {
       if (state.role !== prevState.role || state.activeChapterId !== prevState.activeChapterId) {
         let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
 
-        if (state.activeChapterId) {
+        if (state.houseId) {
+          if (state.houseId === 'house-health') {
+            textureKey = 'world-map-kedokteran';
+          } else if (state.houseId === 'house-education') {
+            textureKey = 'world-map-3';
+          } else if (state.houseId === 'house-arts') {
+            textureKey = 'world-map-4';
+          } else if (state.houseId === 'house-social') {
+            textureKey = 'world-map-6';
+          } else if (state.houseId === 'house-agriculture') {
+            textureKey = 'world-map-8';
+          } else if (state.houseId === 'house-engineering' || state.houseId === 'house-ict') {
+            textureKey = 'world-map-mahasiswa';
+          } else {
+            const mapIndex = 6; // Default to map 6
+            textureKey = `world-map-${mapIndex}`;
+          }
+        } else if (state.activeChapterId) {
           if (state.activeChapterId === 'module-health-1-bab-1') {
             textureKey = 'world-map-kedokteran';
           } else if (state.activeChapterId === 'module-education-1-bab-2') {
@@ -240,7 +257,23 @@ export class WorldMapScene extends Phaser.Scene {
     const state = useMapStore.getState();
     let textureKey = state.role === 'SMA' ? 'world-map-sma' : 'world-map-mahasiswa';
 
-    if (state.activeChapterId) {
+    if (state.houseId) {
+      if (state.houseId === 'house-health') {
+        textureKey = 'world-map-kedokteran';
+      } else if (state.houseId === 'house-education') {
+        textureKey = 'world-map-3';
+      } else if (state.houseId === 'house-arts') {
+        textureKey = 'world-map-4';
+      } else if (state.houseId === 'house-social') {
+        textureKey = 'world-map-6';
+      } else if (state.houseId === 'house-agriculture') {
+        textureKey = 'world-map-8';
+      } else if (state.houseId === 'house-engineering' || state.houseId === 'house-ict') {
+        textureKey = 'world-map-mahasiswa';
+      } else {
+        textureKey = 'world-map-6';
+      }
+    } else if (state.activeChapterId) {
       if (state.activeChapterId === 'module-health-1-bab-1') {
         textureKey = 'world-map-kedokteran';
       } else if (state.activeChapterId === 'module-education-1-bab-2') {

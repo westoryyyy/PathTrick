@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -71,14 +71,14 @@ const mockAiResponse: AIResponse = {
   universityTarget: {
     name: 'UI - Teknik Komputer',
     country: 'Indonesia',
-    matchPercentage: 75,
+    matchPercentage: 0,
     targetTier: 'Top Applicant',
     aiFeedback: 'Selesaikan 2 kursus lagi untuk mencapai 100% kesiapan!',
   },
   scholarshipTarget: {
     name: 'KIP Kuliah & Beasiswa Unggulan',
     provider: 'Pemerintah',
-    matchPercentage: 88,
+    matchPercentage: 0,
     currentTier: 'High Match',
     officialLink: '#',
     aiFeedback: 'Sangat cocok dengan profil RIASEC & kebutuhan finansialmu.',
@@ -86,18 +86,13 @@ const mockAiResponse: AIResponse = {
 };
 
 const INITIAL_BOUNTIES: Bounty[] = [
-  { id: 1, task: 'Taklukkan Modul HTML Basics', desc: 'Selesaikan 1 quiz di House of Tech', reward: '+150 XP', done: true, claimed: false },
+  { id: 1, task: 'Taklukkan Modul HTML Basics', desc: 'Selesaikan 1 quiz di House of Tech', reward: '+150 XP', done: false, claimed: false },
   { id: 2, task: 'Simulasi Penalaran Matematika', desc: 'Latihan 5 soal TPS SNBT 2026', reward: '+200 XP', done: false },
   { id: 3, task: 'Diskusi Komunitas Mahasiswa', desc: 'Bantu 1 teman di forum tanya jawab', reward: '+50 XP', done: false },
   { id: 4, task: 'Klaim SBT First House Master', desc: 'Selesaikan evaluasi tahap 4 mini project', reward: 'Free Claim', done: false },
 ];
 
-const VAULT_SBTS = [
-  { id: 1, name: 'HTML Basics', desc: 'House of Tech', earned: true, icon: '🛡️' },
-  { id: 2, name: 'Python Logic', desc: 'Algorithm Core', earned: true, icon: '⚔️' },
-  { id: 3, name: 'Figma UI/UX', desc: 'Design Fundamentals', earned: false, icon: '💎' },
-  { id: 4, name: 'Data Wizard', desc: 'Data Analytics', earned: false, icon: '🔮' },
-];
+// removed mock VAULT_SBTS
 
 const LEADERBOARD_MOCK = [
   { rank: 1, name: 'AlexTheGreat', score: 3450 },
@@ -114,10 +109,52 @@ export default function Dashboard() {
   const [bounties, setBounties] = useState<Bounty[]>(INITIAL_BOUNTIES);
   const [activeNav, setActiveNav] = useState(defaultNav);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMailOpen, setIsMailOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [unreadMails, setUnreadMails] = useState([{ id: 1, sender: 'Prof. Oak', msg: 'Jangan lupa kerjakan kuis HTML!' }, { id: 2, sender: 'System', msg: 'Selamat datang di PathTrick!' }]);
-  const [unreadNotifs, setUnreadNotifs] = useState([{ id: 1, msg: 'Anda berhasil naik ke Level 12!' }]);
+  const [unreadNotifs, setUnreadNotifs] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [gamification, setGamification] = useState<{xp: number, completedCourses: number, achievements: any[]}>({ xp: 0, completedCourses: 0, achievements: [] });
+  const [leaderboard, setLeaderboard] = useState<any[]>(LEADERBOARD_MOCK);
+  
+  const unlockedKeys = gamification.achievements.map((a: any) => a.key);
+  const VAULT_SBTS = [
+    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: '🛡️' },
+    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: '⚔️' },
+    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: '💎' },
+    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '🔮' },
+  ];
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+        const { API_BASE_URL } = await import('@/config/pathtrick');
+        const headers = getAuthHeaders();
+        const [gamiRes, lbRes, notifRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/gamification`, { headers }),
+          fetch(`${API_BASE_URL}/api/leaderboard`, { headers }),
+          fetch(`${API_BASE_URL}/api/notifications`, { headers })
+        ]);
+        if (gamiRes.ok) {
+          const gData = await gamiRes.json();
+          setGamification(gData);
+        }
+        if (lbRes.ok) {
+          const lData = await lbRes.json();
+          if (lData.leaderboard && lData.leaderboard.length > 0) {
+            setLeaderboard(lData.leaderboard);
+          }
+        }
+        if (notifRes.ok) {
+          const nData = await notifRes.json();
+          setUnreadNotifs(nData.notifications);
+          setUnreadCount(nData.unreadCount);
+        }
+      } catch (e) {
+        console.error('Failed to fetch dashboard data:', e);
+      }
+    }
+    fetchDashboardData();
+  }, []);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, avatarUrl, totalXP, level } = useUserStore();
@@ -129,9 +166,8 @@ export default function Dashboard() {
     || user?.email?.address?.split('@')[0]
     || (activeWallet ? `${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}` : 'Explorer');
 
-  const toggleMail = () => { setIsMailOpen(!isMailOpen); setIsNotifOpen(false); setIsDropdownOpen(false); };
-  const toggleNotif = () => { setIsNotifOpen(!isNotifOpen); setIsMailOpen(false); setIsDropdownOpen(false); };
-  const toggleProfile = () => { setIsDropdownOpen(!isDropdownOpen); setIsMailOpen(false); setIsNotifOpen(false); };
+  const toggleNotif = () => { setIsNotifOpen(!isNotifOpen); setIsDropdownOpen(false); };
+  const toggleProfile = () => { setIsDropdownOpen(!isDropdownOpen); setIsNotifOpen(false); };
 
   const handleToggleTheme = () => {
     const current = document.documentElement.dataset.theme || 'dark';
@@ -193,15 +229,15 @@ export default function Dashboard() {
             </h2>
             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24' }}>Lvl {level}</span>
           </div>
-          <div className={styles.readinessContainer}>
-            <div className={styles.readinessLabel}>
-              <span>{t('sma.dashboard.xpProgress')}</span>
-              <span>{totalXP} / {level * 2000} XP</span>
+            <div className={styles.readinessContainer}>
+              <div className={styles.readinessLabel}>
+                <span>{t('sma.dashboard.xpProgress')}</span>
+                <span>{gamification.xp > 0 ? gamification.xp : totalXP} / {level * 2000} XP</span>
+              </div>
+              <div className={styles.readinessBarBg} style={{ height: '32px' }}>
+                <div className={styles.readinessBarFillBlue} style={{ width: `${((gamification.xp > 0 ? gamification.xp : totalXP) / (level * 2000)) * 100}%` }} />
+              </div>
             </div>
-            <div className={styles.readinessBarBg} style={{ height: '32px' }}>
-              <div className={styles.readinessBarFillBlue} style={{ width: `${(mockAiResponse.user.totalXP / 2000) * 100}%` }} />
-            </div>
-          </div>
         </div>
       </div>
 
@@ -321,16 +357,16 @@ export default function Dashboard() {
               <span className={styles.cardTitle}>👑 {t('sma.dashboard.weeklyLeaderboard')}</span>
             </div>
             <div className={styles.lbList}>
-              {LEADERBOARD_MOCK.map((lb) => (
+              {leaderboard.map((lb: any) => (
                 <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
                   <div className={styles.lbRankInfo}>
                     <span className={styles.lbRankNum}>#{lb.rank}</span>
                     <span className={styles.lbName}>
-                      {lb.rank === 2 ? displayName : lb.name}
-                      {lb.rank === 2 && <span style={{ fontSize: '0.6em', color: '#fbbf24', marginLeft: '6px' }}>{t('sma.dashboard.you')}</span>}
+                      {lb.name}
+                      {lb.userId === user?.id && <span style={{ fontSize: '0.6em', color: '#fbbf24', marginLeft: '6px' }}>{t('sma.dashboard.you')}</span>}
                     </span>
                   </div>
-                  <span className={styles.lbScore}>{lb.score} XP</span>
+                  <span className={styles.lbScore}>{lb.xp ?? lb.score} XP</span>
                 </div>
               ))}
             </div>
@@ -341,7 +377,7 @@ export default function Dashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>💎 {t('sma.dashboard.achievementVault')}</span>
               <span 
-                onClick={() => router.push('/sma/certificate')}
+                onClick={() => router.push('/dreamer/certificate')}
                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
               >
                 {t('sma.dashboard.viewAll')}

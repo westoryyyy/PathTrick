@@ -12,7 +12,7 @@ import {
   isLocalRoleFallbackEnabled,
   readApiResponse,
 } from '@/config/pathtrick';
-import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { getAuthHeaders, useAuthSync } from '@/hooks/useAuthSync';
 import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
 
 /**
@@ -21,11 +21,11 @@ import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
  */
 const ROLE_TO_ROUTE: Record<string, UserRole> = {
   // by id (dari seed)
-  'role-dreamer': 'sma',
-  'role-chaser': 'mahasiswa',
+  'role-dreamer': 'dreamer',
+  'role-chaser': 'chaser',
   // by name (fallback)
-  'DREAMER': 'sma',
-  'CHASER': 'mahasiswa',
+  'DREAMER': 'dreamer',
+  'CHASER': 'chaser',
 };
 import PixelIcon from '@/components/ui/PixelIcon';
 import styles from './page.module.css';
@@ -37,6 +37,7 @@ export default function SelectRolePage() {
   const { user, linkWallet } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, setProfile } = useUserStore();
+  const { isSynced } = useAuthSync();
 
   // Store
   const setRole = useOnboardingStore((s) => s.setRole);
@@ -53,26 +54,17 @@ export default function SelectRolePage() {
   // Prevents flash of role-selector UI when user actually has a role.
   const [isVerifyingRole, setIsVerifyingRole] = useState(true);
 
-  // hasName hanya true jika user punya nama NYATA dari Privy (Google/email)
-  // Sengaja TIDAK pakai savedName dari Zustand karena bisa berisi "Explorer" (fallback)
-  // yang menyebabkan popup nickname tidak pernah muncul untuk wallet user
-  const hasPrivyName = !!(user?.google?.name || user?.email?.address);
-  const isWalletOnly = !user?.google && !user?.email && wallets.length > 0;
-  const needsNicknameSetup = isWalletOnly && !hasPrivyName;
   const isGoogleLogin = !!user?.google;
   const needsWalletConnection = isGoogleLogin && wallets.length === 0;
+
+  const [existingRoleSlug, setExistingRoleSlug] = useState<string | null>(null);
 
   const [showGate, setShowGate] = useState(false); // diset via useEffect saat wallet terdeteksi
   const [nickname, setNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState(false);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
-  // Munculkan pop-up nickname saat kondisi terpenuhi (reaktif terhadap wallet detection)
-  useEffect(() => {
-    if (needsNicknameSetup && !isVerifyingRole) {
-      setShowGate(true);
-    }
-  }, [needsNicknameSetup, isVerifyingRole]);
+
 
   // ── Verify role from BACKEND on first load ──
   // This is the primary guard. It fetches /api/users/me to check whether
@@ -80,7 +72,7 @@ export default function SelectRolePage() {
   // - Zustand store is stale (different account, corrupt data)
   // - User closed the tab before completing role selection
   useEffect(() => {
-    if (!user) return; // wait for Privy to report the current user
+    if (!user || !isSynced) return; // wait for Privy and AuthSync
     const token = getAuthHeaders()['Authorization'];
     if (!token) {
       // No JWT yet — cannot verify against backend; fall through to Zustand guard
@@ -91,16 +83,29 @@ export default function SelectRolePage() {
     fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
       .then(async (res) => {
         if (!res.ok || cancelled) { setIsVerifyingRole(false); return; }
-        const data = await res.json() as { role?: { name?: string } | null };
+        const data = await res.json() as { name?: string | null, role?: { name?: string } | null };
         if (cancelled) return;
         const roleName = data?.role?.name?.toUpperCase();
-        if (roleName === 'DREAMER') {
-          setRole('sma', user.id);
-          router.replace('/sma/dashboard');
-        } else if (roleName === 'CHASER') {
-          setRole('mahasiswa', user.id);
-          router.replace('/mahasiswa/dashboard');
-        } else if (roleName === 'ADMIN') {
+        
+        let slug: string | null = null;
+        if (roleName === 'DREAMER') slug = 'dreamer';
+        else if (roleName === 'CHASER') slug = 'chaser';
+        else if (roleName === 'ADMIN') slug = 'admin';
+
+        const backendName = data?.name;
+        const needsName = !backendName;
+
+        if (needsName) {
+          setShowGate(true);
+          setExistingRoleSlug(slug);
+          setIsVerifyingRole(false);
+          return;
+        }
+
+        if (slug === 'dreamer' || slug === 'chaser') {
+          setRole(slug, user.id);
+          router.replace(`/${slug}/dashboard`);
+        } else if (slug === 'admin') {
           router.replace('/admin/dashboard');
         } else {
           // No role in backend — clear any stale store data and show role selector
@@ -111,7 +116,7 @@ export default function SelectRolePage() {
       .catch(() => { if (!cancelled) setIsVerifyingRole(false); });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, isSynced]);
 
   // ── Load available roles from backend ──
   useEffect(() => {
@@ -195,6 +200,15 @@ export default function SelectRolePage() {
       setProfile(nickname.trim(), wallets[0]?.address || '');
       setShowGate(false);
       setIsSavingNickname(false);
+
+      if (existingRoleSlug) {
+        if (existingRoleSlug === 'admin') {
+          router.replace('/admin/dashboard');
+        } else {
+          setRole(existingRoleSlug as UserRole, user?.id);
+          router.replace(`/${existingRoleSlug}/dashboard`);
+        }
+      }
     }
   };
 

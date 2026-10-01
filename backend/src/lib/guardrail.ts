@@ -38,28 +38,13 @@ interface RunAgentWithGuardrailParams<TInput, TOutput> {
   userId?: string;
   input: TInput;
   outputSchema: z.ZodType<TOutput>;
-  /**
-   * Fungsi yang benar-benar memanggil LLM. Dipisah sebagai parameter supaya
-   * guardrail ini tidak perlu tahu SDK LLM apa yang dipakai (Groq/Gemini) --
-   * itu tanggung jawab tim AI yang isi fungsi ini di masing-masing service
-   * Agent 1 / Agent 2. Guardrail yang membungkus pemanggilannya dengan
-   * timeout, jadi implementasi callLLM tidak perlu (dan tidak perlu)
-   * menangani timeout-nya sendiri.
-   */
-  callLLM: (input: TInput) => Promise<string>; // wajib return raw string (belum di-JSON.parse)
-  /**
-   * Cross-check ID hasil LLM terhadap kandidat yang dikirim (termasuk
-   * dedup). Return array kosong kalau semua valid, atau daftar pesan error
-   * kalau ada ID yang "dikarang" atau muncul dobel.
-   */
+  callLLM: (input: TInput) => Promise<string>;
   checkReferencedIds: (input: TInput, output: TOutput) => string[];
   buildFallback: (input: TInput) => TOutput;
+  timeoutMs?: number;
 }
 
 interface GuardrailResult<TOutput> {
-  // null HANYA kalau fallback-nya sendiri juga gagal validasi (lihat
-  // fallbackAlsoFailed). Endpoint pemanggil WAJIB cek fallbackAlsoFailed
-  // sebelum memakai `data` -- jangan asumsikan selalu ada isinya.
   data: TOutput | null;
   usedFallback: boolean;
   fallbackAlsoFailed: boolean;
@@ -73,11 +58,12 @@ export async function runAgentWithGuardrail<TInput, TOutput>({
   callLLM,
   checkReferencedIds,
   buildFallback,
+  timeoutMs = 6000,
 }: RunAgentWithGuardrailParams<TInput, TOutput>): Promise<GuardrailResult<TOutput>> {
   const startedAt = Date.now();
 
   try {
-    const rawText = await withTimeout(callLLM(input), LLM_TIMEOUT_MS, `callLLM(${agent})`);
+    const rawText = await withTimeout(callLLM(input), timeoutMs, `callLLM(${agent})`);
 
     let parsedJson: unknown;
     try {
