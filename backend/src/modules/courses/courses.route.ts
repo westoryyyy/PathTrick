@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { getCourseDetail, getCoursesForUser, submitQuiz, submitProject, getRoadmapNodes, getMissionBySectionSlug, submitQuizByMissionId, submitProjectByMissionId } from "./courses.service";
+import { getCourseDetail, getCoursesForUser, submitQuiz, submitProject, getRoadmapNodes, getMissionBySectionSlug, submitQuizByMissionId, submitProjectByMissionId, completeMissionById } from "./courses.service";
 import { z } from "zod";
 
 const submitQuizBodySchema = z.object({
@@ -50,6 +50,25 @@ export default async function coursesRoutes(fastify: FastifyInstance) {
         return reply.code(404).send({ error: "NotFound", message: "Course tidak ditemukan atau belum dipublikasikan" });
       }
       return reply.code(200).send(course);
+    }
+  );
+
+  /**
+   * GET /api/chapters/:chapterId
+   * Detail 1 chapter + sections
+   */
+  fastify.get(
+    "/api/chapters/:chapterId",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { chapterId } = request.params as { chapterId: string };
+      const { prisma } = await import('../../lib/prisma');
+      const chapter = await prisma.courseChapter.findUnique({
+        where: { id: chapterId },
+        include: { sections: { orderBy: { order: 'asc' } } }
+      });
+      if (!chapter) return reply.code(404).send({ error: "NotFound" });
+      return reply.code(200).send(chapter);
     }
   );
 
@@ -189,6 +208,29 @@ export default async function coursesRoutes(fastify: FastifyInstance) {
         return reply.code(200).send(result);
       } catch (err) {
         request.log.error(err, 'Error di POST missions project/submit');
+        return reply.code(500).send({ error: 'InternalError' });
+      }
+    }
+  );
+
+  /**
+   * POST /api/missions/:missionId/complete
+   * Mark mission as complete (without quiz or project) and add XP.
+   */
+  fastify.post(
+    '/api/missions/:missionId/complete',
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { missionId } = request.params as { missionId: string };
+      const { userId } = request.user;
+      try {
+        const result = await completeMissionById({ userId, missionId });
+        return reply.code(200).send(result);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          if (err.message === 'MISSION_NOT_FOUND') return reply.code(404).send({ error: 'NotFound' });
+        }
+        request.log.error(err, 'Error di POST missions complete');
         return reply.code(500).send({ error: 'InternalError' });
       }
     }

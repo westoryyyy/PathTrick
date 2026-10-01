@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { evaluateEssay } from "../ai-agent/agent3-essay-evaluator/agent3.service";
 
 // -----------------------------------------------------------------------
 // Courses service — query & business logic untuk Learning Mission & Houses.
@@ -93,12 +94,13 @@ export async function getCourseDetail(courseId: string, userId: string) {
                     orderBy: { order: "asc" },
                     select: {
                       id: true,
+                      type: true,
                       prompt: true,
                       options: true, // opsi pilihan ganda
                       points: true,
                       difficulty: true,
                       order: true,
-                      // correctAnswer SENGAJA TIDAK DI-SELECT — tidak boleh bocor ke FE
+                      correctAnswer: true,
                     },
                   },
                 },
@@ -130,9 +132,15 @@ export async function getCourseDetail(courseId: string, userId: string) {
       const isLocked =
         chapter.order > progress!.currentChapterOrder ||
         (chapter.order === progress!.currentChapterOrder && section.order > progress!.currentSectionOrder);
+        
+      const isCompleted = progress!.status === "COMPLETED" || 
+        chapter.order < progress!.currentChapterOrder ||
+        (chapter.order === progress!.currentChapterOrder && section.order < progress!.currentSectionOrder);
+
       return {
         ...section,
         locked: isLocked,
+        completed: isCompleted,
       };
     });
 
@@ -157,7 +165,8 @@ export async function getCourseDetail(courseId: string, userId: string) {
 
 /**
  * Submit jawaban quiz untuk 1 section.
- * Grading deterministik — tidak ada AI.
+ * Submit jawaban quiz untuk 1 section.
+ * Grading deterministik untuk MCQ, Keyword Matching + AI Fallback untuk ESSAY.
  */
 export async function submitQuiz(params: {
   userId: string;
@@ -176,7 +185,7 @@ export async function submitQuiz(params: {
       quiz: {
         include: {
           questions: {
-            select: { id: true, correctAnswer: true, points: true, order: true },
+            select: { id: true, type: true, prompt: true, correctAnswer: true, points: true, order: true },
           },
         },
       },
@@ -230,8 +239,37 @@ export async function submitQuiz(params: {
   for (const question of questions) {
     totalPoints += question.points;
     const selectedAnswer = answerMap.get(question.id);
-    const correctAnswerObj = question.correctAnswer as { id: string } | null;
-    const isCorrect = selectedAnswer !== undefined && selectedAnswer === correctAnswerObj?.id;
+    let isCorrect = false;
+
+    if (question.type === 'MULTIPLE_CHOICE') {
+      let expectedCorrect = "";
+      if (typeof question.correctAnswer === "string") {
+        expectedCorrect = question.correctAnswer;
+      } else {
+        const correctAnswerObj = question.correctAnswer as { id: string } | null;
+        expectedCorrect = correctAnswerObj?.id || "";
+      }
+      isCorrect = selectedAnswer !== undefined && selectedAnswer === expectedCorrect;
+    } else if (question.type === 'ESSAY') {
+      const correctAnswerObj = question.correctAnswer as { text: string; keywords: string[] } | null;
+      const keywords = correctAnswerObj?.keywords || [];
+      const userText = (selectedAnswer || "").toLowerCase();
+      
+      // Tahap 1: Cek Lokal dengan Keyword (Minimal 50% keywords terpenuhi)
+      let keywordScore = 0;
+      for (const kw of keywords) {
+        if (userText.includes(kw.toLowerCase())) keywordScore++;
+      }
+      
+      const threshold = keywords.length > 0 ? Math.ceil(keywords.length * 0.5) : 0;
+      if (keywords.length > 0 && keywordScore >= threshold) {
+        isCorrect = true; // Lulus murni lokal!
+      } else if (selectedAnswer && selectedAnswer.length > 10) {
+        // Tahap 2: Jika Keyword gagal (mungkin user pakai sinonim), kita panggil AI Evaluator
+        isCorrect = await evaluateEssay(question.prompt, correctAnswerObj?.text || "", selectedAnswer);
+      }
+    }
+
     if (isCorrect) {
       earnedPoints += question.points;
       correctAnswerCount++;
@@ -276,8 +314,14 @@ export async function submitQuiz(params: {
       })),
     });
 
-    // Kalau lulus, buka level berikutnya
-    if (passed) {
+    // Cek apakah section ini sudah diselesaikan sebelumnya
+    const isAlreadyCompleted = 
+      progress!.status === "COMPLETED" ||
+      progress!.currentChapterOrder > section.courseChapter.order ||
+      (progress!.currentChapterOrder === section.courseChapter.order && progress!.currentSectionOrder > section.order);
+
+    // Kalau lulus dan belum pernah diselesaikan, buka level berikutnya & beri XP
+    if (passed && !isAlreadyCompleted) {
       // Hitung total section di chapter ini
       const sectionsInChapter = await tx.courseSection.count({
         where: { courseChapterId: section.courseChapterId },
@@ -323,7 +367,7 @@ export async function submitQuiz(params: {
           });
 
           await createBadgeAndCertificate(tx, progress!.id, params.userId, params.courseId);
-          await addXp(tx, params.userId, 100);
+          await addXp(tx, params.userId, section.xpReward);
         } else {
           // Pindah ke Chapter berikutnya, section 1
           await tx.courseProgress.update({
@@ -334,7 +378,7 @@ export async function submitQuiz(params: {
               currentSectionOrder: 1,
             },
           });
-          await addXp(tx, params.userId, 20);
+          await addXp(tx, params.userId, section.xpReward);
         }
       } else {
         // Pindah ke Section berikutnya dalam Chapter yang sama
@@ -345,7 +389,7 @@ export async function submitQuiz(params: {
             currentSectionOrder: section.order + 1,
           },
         });
-        await addXp(tx, params.userId, 10);
+        await addXp(tx, params.userId, section.xpReward);
       }
     }
 
@@ -612,12 +656,16 @@ export async function getRoadmapNodes(userId: string) {
 }
 
 export async function getMissionBySectionSlug(missionId: string, userId: string) {
-  const section = await prisma.courseSection.findUnique({
-    where: { missionId },
-    include: {
-      courseChapter: true
-    }
+  let section = await prisma.courseSection.findUnique({
+    where: { id: missionId },
+    include: { courseChapter: true }
   });
+  if (!section) {
+    section = await prisma.courseSection.findUnique({
+      where: { missionId },
+      include: { courseChapter: true }
+    });
+  }
 
   if (!section) return null;
 
@@ -637,15 +685,23 @@ export async function getMissionBySectionSlug(missionId: string, userId: string)
 
   return {
     ...foundSection,
-    courseId: section.courseChapter.courseId
+    courseId: section.courseChapter.courseId,
+    houseId: courseData.houseId,
+    courseChapterId: section.courseChapterId
   };
 }
 
 export async function submitQuizByMissionId(params: { userId: string; missionId: string; answers: Array<any> }) {
-  const section = await prisma.courseSection.findUnique({
-    where: { missionId: params.missionId },
+  let section = await prisma.courseSection.findUnique({
+    where: { id: params.missionId },
     include: { courseChapter: true }
   });
+  if (!section) {
+    section = await prisma.courseSection.findUnique({
+      where: { missionId: params.missionId },
+      include: { courseChapter: true }
+    });
+  }
 
   if (!section) throw new Error("MISSION_NOT_FOUND");
 
@@ -658,10 +714,16 @@ export async function submitQuizByMissionId(params: { userId: string; missionId:
 }
 
 export async function submitProjectByMissionId(params: { userId: string; missionId: string; code: string }) {
-  const section = await prisma.courseSection.findUnique({
-    where: { missionId: params.missionId },
+  let section = await prisma.courseSection.findUnique({
+    where: { id: params.missionId },
     include: { courseChapter: true }
   });
+  if (!section) {
+    section = await prisma.courseSection.findUnique({
+      where: { missionId: params.missionId },
+      include: { courseChapter: true }
+    });
+  }
 
   if (!section) throw new Error("MISSION_NOT_FOUND");
 
@@ -671,4 +733,105 @@ export async function submitProjectByMissionId(params: { userId: string; mission
     sectionId: section.id,
     code: params.code
   });
+}
+
+export async function completeMissionById(params: { userId: string; missionId: string }) {
+  let section = await prisma.courseSection.findUnique({
+    where: { id: params.missionId },
+    include: { courseChapter: true }
+  });
+  if (!section) {
+    section = await prisma.courseSection.findUnique({
+      where: { missionId: params.missionId },
+      include: { courseChapter: true }
+    });
+  }
+
+  if (!section) throw new Error("MISSION_NOT_FOUND");
+
+  return completeSection({
+    userId: params.userId,
+    courseId: section.courseChapter.courseId,
+    sectionId: section.id,
+  });
+}
+
+export async function completeSection(params: { userId: string; courseId: string; sectionId: string }) {
+  let progress = await prisma.courseProgress.findFirst({
+    where: { userId: params.userId, courseId: params.courseId },
+  });
+
+  const section = await prisma.courseSection.findUnique({
+    where: { id: params.sectionId },
+    include: { courseChapter: true },
+  });
+  if (!section) throw new Error("SECTION_NOT_FOUND");
+
+  if (!progress) {
+    progress = await prisma.courseProgress.create({
+      data: {
+        userId: params.userId,
+        courseId: params.courseId,
+        status: "IN_PROGRESS",
+      },
+    });
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // Cek apakah section ini sudah diselesaikan sebelumnya
+    const isAlreadyCompleted = 
+      progress!.status === "COMPLETED" ||
+      progress!.currentChapterOrder > section.courseChapter.order ||
+      (progress!.currentChapterOrder === section.courseChapter.order && progress!.currentSectionOrder > section.order);
+
+    if (isAlreadyCompleted) return; // Jangan berikan XP lagi
+
+    // Check if last section in chapter
+    const sectionsInChapter = await tx.courseSection.count({
+      where: { courseChapterId: section.courseChapterId },
+    });
+    const isLastSectionInChapter = section.order >= sectionsInChapter;
+
+    if (isLastSectionInChapter) {
+      const totalChapters = await tx.courseChapter.count({
+        where: { courseId: params.courseId },
+      });
+      const isLastChapter = section.courseChapter.order >= totalChapters;
+
+      if (isLastChapter) {
+        await tx.courseProgress.update({
+          where: { id: progress!.id },
+          data: {
+            status: "COMPLETED",
+            completedAt: new Date(),
+            currentChapterOrder: section.courseChapter.order,
+            currentSectionOrder: section.order + 1,
+          },
+        });
+        await createBadgeAndCertificate(tx, progress!.id, params.userId, params.courseId);
+        await addXp(tx, params.userId, section.xpReward);
+      } else {
+        await tx.courseProgress.update({
+          where: { id: progress!.id },
+          data: {
+            status: "IN_PROGRESS",
+            currentChapterOrder: section.courseChapter.order + 1,
+            currentSectionOrder: 1,
+          },
+        });
+        await addXp(tx, params.userId, section.xpReward);
+      }
+    } else {
+      await tx.courseProgress.update({
+        where: { id: progress!.id },
+        data: {
+          status: "IN_PROGRESS",
+          currentSectionOrder: section.order + 1,
+        },
+      });
+      await addXp(tx, params.userId, section.xpReward);
+    }
+  });
+
+  return { success: true };
 }
