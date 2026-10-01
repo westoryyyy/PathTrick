@@ -301,12 +301,29 @@ export default function MahasiswaLearningProgress() {
                   }
 
                   // Already completed, claim the bounty
-                  setIsClaimingBounty(true);
-                  setTimeout(() => {
-                    claimDailyBounty();
-                    addXP(150);
-                    setIsClaimingBounty(false);
-                  }, 800);
+                  if (!dailyBountyClaimed && !isClaimingBounty) {
+                    setIsClaimingBounty(true);
+                    
+                    try {
+                      const res = await fetch(`${API_BASE_URL}/api/gamification/add-xp`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ amount: 150 })
+                      });
+                      
+                      if (res.ok) {
+                        setTimeout(() => {
+                          claimDailyBounty();
+                          addXP(150);
+                          setIsClaimingBounty(false);
+                        }, 800);
+                      } else {
+                        setIsClaimingBounty(false);
+                      }
+                    } catch (e) {
+                      setIsClaimingBounty(false);
+                    }
+                  }
                 }}
                 style={{
                   background: dailyBountyClaimed ? '#737373' : (hasCompletedQuizToday ? '#10b981' : '#f59e0b'),

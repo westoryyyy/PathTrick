@@ -114,7 +114,7 @@ function DevPanelInner() {
             <div style={{ color: '#fff', lineHeight: '1.8' }}>
               <div>Role: <span style={{ color: '#a78bfa' }}>{store.selectedRole ?? 'null'}</span></div>
               <div>Step: <span style={{ color: '#a78bfa' }}>{store.currentStep + 1}/{store.totalSteps || '?'}</span></div>
-              <div>Budget: <span style={{ color: '#a78bfa' }}>{store.smaAssessment.budgetPreference || 'not set'}</span></div>
+              <div>Budget: <span style={{ color: '#a78bfa' }}>{store.dreamerAssessment.budgetPreference || 'not set'}</span></div>
               <div>StorageKey: <span style={{ color: '#6ee7b7', fontSize: '7px', wordBreak: 'break-all' }}>{storageKey ?? 'none'}</span></div>
             </div>
           </section>

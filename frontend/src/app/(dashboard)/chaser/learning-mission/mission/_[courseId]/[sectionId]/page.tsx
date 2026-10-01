@@ -360,13 +360,6 @@ export default function MissionFlowPage() {
     setIsSubmitting(true);
     // Simulate AI grading delay
     try {
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate AI grading success
-        await new Promise(r => setTimeout(r, 1500));
-        showDialog('success', 'Jawaban yang sangat bagus! Kamu memahami konsepnya. (Demo Mode)', () => handleLevelComplete());
-        return;
-      }
-
       const response = await fetch(`/api/courses/${courseId}/sections/${sectionId}/project/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -378,21 +371,28 @@ export default function MissionFlowPage() {
         showDialog('success', data.message || 'Berhasil!', () => handleLevelComplete());
       } else {
         const newHp = playerHp - 1;
-        try {
-          const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
-          audio.volume = 0.5;
-          audio.play().catch(() => {});
-        } catch (e) {}
-        
-        setPlayerHp(newHp);
-        if (newHp > 0) {
-          showDialog('error', `Tebakanmu meleset!\n${data.message || 'Coba lagi!'}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+        if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+          showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+          setPlayerHp(playerHp); // Do not reduce HP for system error
         } else {
-          showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
-            setPlayerHp(3);
-            setPhase('MATERIAL');
-            setMaterialPage(0);
-          });
+          try {
+            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+            audio.volume = 0.5;
+            audio.play().catch(() => {});
+          } catch (e) {}
+          
+          setPlayerHp(newHp);
+          if (newHp > 0) {
+            const errorMessage = data.message || data.error || 'Tebakan/Kodemu masih kurang tepat. Coba perbaiki lagi!';
+            showDialog('error', `Tebakanmu meleset!\n${errorMessage}\n\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+          } else {
+            const errorMessage = data.message || data.error || 'Tebakan/Kodemu salah.';
+            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\n\n${errorMessage}\n\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+              setPlayerHp(3);
+              setPhase('MATERIAL');
+              setMaterialPage(0);
+            });
+          }
         }
       }
     } catch {
@@ -434,7 +434,7 @@ export default function MissionFlowPage() {
             setQuizIndex(0);
           });
         } else {
-          showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nPelajari ulang materi.`, () => {
+          showDialog('error', `Nyawamu telah habis!\nPelajari ulang materi.`, () => {
             setPlayerHp(3);
             setQuizAnswers([]);
             setQuizIndex(0);
@@ -880,7 +880,7 @@ export default function MissionFlowPage() {
                             }}
                             onSuccess={() => {
                               setIsBossMinted(true);
-                              addXP(500);
+                              addXP(dbSection?.xpReward ?? 100);
                               completeQuiz();
                             }}
                           />
@@ -890,7 +890,7 @@ export default function MissionFlowPage() {
                             onClick={() => {
                               if (!isClaiming) {
                                 setIsClaiming(true);
-                                addXP(500);
+                                addXP(dbSection?.xpReward ?? 100);
                                 completeQuiz();
                                 setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                               }
@@ -917,7 +917,7 @@ export default function MissionFlowPage() {
                       onClick={() => {
                         if (!isClaiming) {
                           setIsClaiming(true);
-                          addXP(500);
+                          addXP(dbSection?.xpReward ?? 100);
                           if (isBossLevel) {
                             triggerLevelUp();
                           }
@@ -952,13 +952,15 @@ export default function MissionFlowPage() {
           >
             KUIS
           </div>
-          <div
-            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
-          >
-            BOSS
-          </div>
+          {isBossLevel && (
+            <div
+              className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
+              onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
+              style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
+            >
+              BOSS
+            </div>
+          )}
           <div
             className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}

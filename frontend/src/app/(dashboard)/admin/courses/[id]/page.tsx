@@ -7,7 +7,7 @@ import { getAuthHeaders } from '@/hooks/useAuthSync';
 
 const px: React.CSSProperties = { fontFamily: '"Pixelify Sans", sans-serif' };
 
-interface QuizQuestion { id?: string; prompt: string; options: string[]; correctAnswer: string; points: number; order: number; }
+interface QuizQuestion { id?: string; type?: string; prompt: string; options: string[]; correctAnswer: any; points: number; order: number; }
 interface Quiz { id?: string; title: string; passingScore: number; questions: QuizQuestion[]; }
 interface Section { id: string; title: string; order: number; content: string; category: string; xpReward: number; quiz?: Quiz | null; missionId?: string | null; }
 interface Chapter { id: string; title: string; order: number; durationLabel: string; sections: Section[]; }

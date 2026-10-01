@@ -9,6 +9,8 @@ import PixelIcon from '@/components/ui/PixelIcon';
 import { useUserStore } from '@/store/useUserStore';
 import { useMapStore } from '@/store/useMapStore';
 import { useRouter } from 'next/navigation';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
 
 const stageIconMap: Record<string, string> = {
   material: '📚',
@@ -406,14 +408,29 @@ export default function LearningProgress() {
 
               <button
                 disabled={dailyBountyClaimed || isClaimingBounty}
-                onClick={() => {
+                onClick={async () => {
                   if (!dailyBountyClaimed && !isClaimingBounty) {
                     setIsClaimingBounty(true);
-                    setTimeout(() => {
-                      addXP(user.dailyBounty.xpReward);
-                      claimDailyBounty();
+                    
+                    try {
+                      const res = await fetch(`${API_BASE_URL}/api/gamification/add-xp`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ amount: user.dailyBounty.xpReward })
+                      });
+                      
+                      if (res.ok) {
+                        setTimeout(() => {
+                          addXP(user.dailyBounty.xpReward);
+                          claimDailyBounty();
+                          setIsClaimingBounty(false);
+                        }, 1200);
+                      } else {
+                        setIsClaimingBounty(false);
+                      }
+                    } catch (e) {
                       setIsClaimingBounty(false);
-                    }, 1200);
+                    }
                   }
                 }}
                 onMouseEnter={playHoverSound}
@@ -441,7 +458,11 @@ export default function LearningProgress() {
                     CLAIMING...
                   </motion.span>
                 ) : dailyBountyClaimed ? (
-                  `NEXT CLAIM AT ${user.dailyBounty.nextClaimAt}`
+                  `NEXT CLAIM AT ${(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 1);
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                  })()}`
                 ) : (
                   'CLAIM DAILY XP'
                 )}

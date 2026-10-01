@@ -5,7 +5,6 @@ import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
-import CodePlayground from '@/components/ui/CodePlayground';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
 import { mockBackendData } from '@/data/mockBackendData';
@@ -70,14 +69,7 @@ export default function MissionFlowPage() {
 
   const [phase, setPhase] = useState<Phase>(baseLevelType);
   const [materialPage, setMaterialPage] = useState(0);
-  const [code, setCode] = useState(() => {
-    const m = (missionId as string) || '';
-    const isTech = m.includes('python') || m.includes('data') || m.includes('javascript') || m.includes('js') || m.includes('html') || m.includes('css') || m.includes('tailwind') || m.includes('tech');
-    if (!isTech) return '';
-    if (m.includes('python') || m.includes('data')) return '# Tulis kodemu di sini\n';
-    if (m.includes('javascript') || m.includes('js')) return '// Tulis kodemu di sini\n';
-    return '<!-- Tulis Kodemu di Sini -->\n';
-  });
+  const [essayAnswer, setEssayAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [playerHp, setPlayerHp] = useState(3);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -308,16 +300,6 @@ export default function MissionFlowPage() {
     const levelNum = parseInt(levelNumStr);
     const isBoss = levelNum === 6;
 
-    const isPython = (missionId as string).includes('python') || (missionId as string).includes('data');
-    const isJs = (missionId as string).includes('javascript') || (missionId as string).includes('js');
-    const isHtml = (missionId as string).includes('html') || (missionId as string).includes('css') || (missionId as string).includes('tailwind');
-
-    // Check if module is coding-related
-    const isTech = isPython || isJs || isHtml || (missionId as string).includes('tech');
-
-    const lang = isPython ? 'python' : isJs ? 'javascript' : 'html';
-    const printCmd = isPython ? 'print("Hello Ksatria")' : isJs ? 'console.log("Hello Ksatria")' : '<h1>Hello Ksatria</h1>';
-
     // Get topic-specific quizzes from bank, fallback to generic if not available
     const bankQuizCount = isBoss ? 5 : 3;
     const bankQuizzes = getQuizForMission(missionId as string, bankQuizCount);
@@ -447,47 +429,28 @@ export default function MissionFlowPage() {
         </div>
       ],
       quiz: finalQuizzes,
-      project: (isBoss || isTech) ? {
-        type: isTech ? 'code' : 'essay',
+      project: isBoss ? {
+        type: 'essay',
         instruction: (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <h3 style={{ color: '#fbbf24', fontSize: '1rem', marginBottom: '4px', fontFamily: 'var(--font-vt323), sans-serif', lineHeight: '1.3' }}>
-              {isBoss ? `⚔️ BOSS FIGHT: Penjaga ${currentChapter.name}` : `🛠️ Tantangan Praktik — ${currentChapter.name} Lvl.${levelNum}`}
+              ⚔️ BOSS FIGHT: Penjaga {currentChapter.name}
             </h3>
             <p style={{ color: '#3b261b', fontSize: '1rem', lineHeight: '1.5', fontFamily: 'var(--font-vt323), sans-serif' }}>
-              {isTech
-                ? (isBoss
-                  ? `Ksatria, ini adalah momen penentu! Tuliskan kode yang mencerminkan penguasaanmu atas ${currentChapter.name}. Pastikan kodenya valid dan berjalan dengan benar.`
-                  : `Saatnya mempraktikkan apa yang baru kamu pelajari! Terapkan konsep dari ${currentChapter.name} Level ${levelNum} dalam bentuk kode.`)
-                : (isBoss
-                  ? `Penjaga Relic bab ini menantangmu! Tuliskan laporan analisa atau essay mendalam untuk membuktikan kelayakanmu sebagai Ksatria sejati.`
-                  : `Praktikkan pemahamanmu tentang ${currentChapter.name} dengan menuliskan analisa atau studi kasus singkat di bawah ini.`)
-              }
+              Penjaga Relic bab ini menantangmu! Tuliskan laporan analisa atau essay mendalam untuk membuktikan kelayakanmu sebagai Ksatria sejati.
             </p>
             <div style={{ background: '#fae1c5', padding: '10px 14px', border: '2px dashed #8c5d41', borderRadius: '4px' }}>
               <p style={{ color: '#92400e', fontSize: '1rem', marginBottom: '8px', fontFamily: 'var(--font-vt323), sans-serif', fontWeight: 'bold' }}>SYARAT KELULUSAN:</p>
               <ul style={{ color: '#3b261b', fontSize: '1rem', lineHeight: '1.5', marginLeft: '16px', listStyleType: 'disc', fontFamily: 'var(--font-vt323), sans-serif', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {isTech ? (
-                  <>
-                    <li>Tulis kode program menggunakan <strong style={{ color: '#047857' }}>{lang.toUpperCase()}</strong>.</li>
-                    <li>Gunakan perintah output yang valid. Contoh: <code style={{ color: '#fbbf24', background: '#3b261b', padding: '2px 6px', borderRadius: '3px' }}>{printCmd}</code></li>
-                    <li>Kode tidak boleh kosong (minimal 10 karakter).</li>
-                  </>
-                ) : (
-                  <>
-                    <li>Tuliskan analisa, laporan, atau studi kasusmu di kotak jawaban.</li>
-                    <li>Gunakan terminologi/kata kunci yang relevan dengan materi ini.</li>
-                    <li>Jawaban harus substansial (minimal 10 karakter).</li>
-                  </>
-                )}
+                <li>Tuliskan analisa, laporan, atau studi kasusmu di kotak jawaban.</li>
+                <li>Gunakan terminologi/kata kunci yang relevan dengan materi ini.</li>
+                <li>Jawaban harus substansial (minimal 10 karakter).</li>
               </ul>
             </div>
           </div>
         ),
-        defaultCode: isTech
-          ? (isPython ? `# Latihan: ${currentChapter.name}\n# Level ${levelNum}\n\n` : isJs ? `// Latihan: ${currentChapter.name}\n// Level ${levelNum}\n\n` : `<!-- Latihan: ${currentChapter.name} -->\n<!-- Level ${levelNum} -->\n\n`)
-          : "",
-        language: lang as 'html' | 'javascript' | 'python'
+        defaultCode: "",
+        language: 'html'
       } : undefined
     };
   }
@@ -495,15 +458,7 @@ export default function MissionFlowPage() {
 
   const handleBossSubmit = async () => {
     setIsSubmitting(true);
-    // Simulate AI grading delay
     try {
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate AI grading success
-        await new Promise(r => setTimeout(r, 1500));
-        showDialog('success', 'Jawaban yang sangat bagus! Kamu memahami konsepnya. (Demo Mode)', () => handleLevelComplete());
-        return;
-      }
-
       if ((content.project as any)?.type === 'essay') {
         const { getAuthHeaders } = await import('@/hooks/useAuthSync');
         const { API_BASE_URL } = await import('@/config/pathtrick');
@@ -518,7 +473,7 @@ export default function MissionFlowPage() {
 
         const allAnswers = [
           ...mcqAnswers,
-          { questionId: (content.project as any).id, selectedAnswer: code }
+          { questionId: (content.project as any).id, selectedAnswer: essayAnswer }
         ];
 
         const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/quiz/submit`, {
@@ -538,35 +493,16 @@ export default function MissionFlowPage() {
           const newHp = playerHp - 1;
           setPlayerHp(newHp);
           if (newHp > 0) {
-            showDialog('error', `${data.message || data.error}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+            if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+              showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+              setPlayerHp(playerHp); // Do not reduce HP for system error
+            } else {
+              const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis masih kurang tepat atau kurang lengkap. Coba perbaiki lagi!';
+              showDialog('error', `${errorMessage}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+            }
           } else {
-            showDialog('error', `GAME OVER!\n\n${data.message || data.error}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
-              setPlayerHp(3);
-              setPhase('MATERIAL');
-              setMaterialPage(0);
-            });
-          }
-        }
-      } else {
-        const response = await fetch('/api/submit-task', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, missionId })
-        });
-        const data = await response.json();
-
-        if (data.passed) {
-          showDialog('success', data.message, () => {
-            completeDynamicNode(missionId as string);
-            setPhase('CLAIM');
-          });
-        } else {
-          const newHp = playerHp - 1;
-          setPlayerHp(newHp);
-          if (newHp > 0) {
-            showDialog('error', `${data.message}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
-          } else {
-            showDialog('error', `GAME OVER!\n\n${data.message}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
+            const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis salah.';
+            showDialog('error', `${errorMessage}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
               setPlayerHp(3);
               setPhase('MATERIAL');
               setMaterialPage(0);
@@ -616,10 +552,10 @@ export default function MissionFlowPage() {
                   </div>
                   {quizArray.length > 1 && (
                     <div style={{ marginBottom: '16px', fontSize: '1.05rem', color: '#57534e', textAlign: 'left', fontFamily: 'var(--font-vt323), sans-serif', fontWeight: 'bold' }}>
-                      SOAL {quizIndex + 1} DARI {quizArray.length} [{currentQuiz.type}]
+                      SOAL {quizIndex + 1} DARI {quizArray.length}
                     </div>
                   )}
-                  <div className={`${styles.dialogueBox} prose-content`} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6', flex: 1, overflowY: 'auto' }}>
+                  <div className={`${styles.dialogueBox} prose-content`} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6', flex: '0 1 auto', overflowY: 'auto' }}>
                     <ReactMarkdown>{currentQuiz.question}</ReactMarkdown>
                   </div>
                 </>
@@ -774,7 +710,7 @@ export default function MissionFlowPage() {
                           if (newHp > 0) {
                             showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
                           } else {
-                            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+                            showDialog('error', `Nyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
                               setPlayerHp(3);
                               setQuizIndex(0);
                               setPhase('MATERIAL');
@@ -802,23 +738,13 @@ export default function MissionFlowPage() {
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {content.project ? (
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}>
-                {(content.project as any).type === 'essay' ? (
-                  <textarea
-                    className={styles.textarea}
-                    style={{ flex: 1, minHeight: 0, padding: '12px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
-                    placeholder="Ketikkan analisamu di sini..."
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                  />
-                ) : (
-                  <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    <CodePlayground
-                      language={(content.project as any).language}
-                      initialCode={(content.project as any).defaultCode}
-                      onChange={(val) => setCode(val || '')}
-                    />
-                  </div>
-                )}
+                <textarea
+                  className={styles.textarea}
+                  style={{ flex: 1, minHeight: 0, padding: '12px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
+                  placeholder="Ketikkan analisamu di sini..."
+                  value={essayAnswer}
+                  onChange={(e) => setEssayAnswer(e.target.value)}
+                />
                 <button
                   onMouseEnter={playHoverSound}
                   className={styles.btn}
@@ -826,7 +752,7 @@ export default function MissionFlowPage() {
                   disabled={isSubmitting}
                   style={{ alignSelf: 'flex-end', marginTop: '16px' }}
                 >
-                {isSubmitting ? 'AI SEDANG MENILAI...' : ((content.project as any).type === 'essay' ? 'KUMPULKAN ESAI' : '⚔️ SERANG BOSS (SUBMIT)')}
+                  {isSubmitting ? 'AI SEDANG MENILAI...' : '⚔️ SERANG BOSS (SUBMIT)'}
                 </button>
               </div>
             ) : (
@@ -1118,7 +1044,7 @@ export default function MissionFlowPage() {
                       if (!isClaiming) {
                         setIsClaiming(true);
                         if (!dbSection?.completed) {
-                          addXP(500); // Add 500 XP for clearing a mission!
+                          addXP(dbSection?.xpReward ?? 100);
                         }
                         if (isBossLevel && !dbSection?.completed) {
                           triggerLevelUp();
@@ -1154,13 +1080,15 @@ export default function MissionFlowPage() {
           >
             KUIS
           </div>
-          <div
-            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
-          >
-            BOSS
-          </div>
+          {isBossLevel && (
+            <div
+              className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
+              onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
+              style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
+            >
+              BOSS
+            </div>
+          )}
           <div
             className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}
@@ -1205,13 +1133,13 @@ export default function MissionFlowPage() {
               <h2 className={styles.dialogTitle} style={{ color: dialogState.type === 'success' ? '#059669' : '#ef4444' }}>
                 {dialogState.type === 'success'
                   ? 'BERHASIL!'
-                  : dialogState.message.startsWith('GAME OVER!')
+                  : dialogState.message.includes('Nyawamu habis')
                     ? 'GAME OVER'
                     : 'UPS! SALAH'}
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
               <button className={styles.btn} onMouseEnter={playHoverSound} onClick={closeDialog}>
-                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
+                {dialogState.onConfirm ? (dialogState.message.includes('Nyawamu habis') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
               </button>
             </motion.div>
           </motion.div>

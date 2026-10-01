@@ -348,13 +348,6 @@ export default function MissionFlowPage() {
     setIsSubmitting(true);
     // Simulate AI grading delay
     try {
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate AI grading success
-        await new Promise(r => setTimeout(r, 1500));
-        showDialog('success', 'Jawaban yang sangat bagus! Kamu memahami konsepnya. (Demo Mode)', () => handleLevelComplete());
-        return;
-      }
-
       const response = await fetch('/api/submit-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -362,19 +355,32 @@ export default function MissionFlowPage() {
       });
       const data = await response.json();
 
-      if (data.passed) {
-        showDialog('success', data.message, () => handleLevelComplete());
+      if (response.ok && data.passed) {
+        showDialog('success', data.message || 'Luar biasa! Analisis kasusmu sangat tepat.', () => handleLevelComplete());
       } else {
         const newHp = playerHp - 1;
-        setPlayerHp(newHp);
-        if (newHp > 0) {
-          showDialog('error', `${data.message}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+        if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+          showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+          setPlayerHp(playerHp); // Do not reduce HP for system error
         } else {
-          showDialog('error', `GAME OVER!\n\n${data.message}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
-            setPlayerHp(3);
-            setPhase('MATERIAL');
-            setMaterialPage(0);
-          });
+          try {
+            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+            audio.volume = 0.5;
+            audio.play().catch(() => {});
+          } catch (e) {}
+
+          setPlayerHp(newHp);
+          if (newHp > 0) {
+            const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis masih kurang tepat atau kurang lengkap. Coba perbaiki lagi!';
+            showDialog('error', `Tebakanmu meleset!\n${errorMessage}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+          } else {
+            const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis salah.';
+            showDialog('error', `${errorMessage}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
+              setPlayerHp(3);
+              setPhase('MATERIAL');
+              setMaterialPage(0);
+            });
+          }
         }
       }
     } catch {
@@ -701,7 +707,7 @@ export default function MissionFlowPage() {
                           }}
                           onSuccess={() => {
                             setIsBossMinted(true);
-                            addXP(500);
+                            addXP(100);
                           }}
                         />
                         <button onMouseEnter={playHoverSound}
@@ -710,7 +716,7 @@ export default function MissionFlowPage() {
                           onClick={() => {
                             if (!isClaiming) {
                               setIsClaiming(true);
-                              addXP(500);
+                              addXP(100);
                               setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                             }
                           }}
@@ -736,7 +742,7 @@ export default function MissionFlowPage() {
                     onClick={() => {
                       if (!isClaiming) {
                         setIsClaiming(true);
-                        addXP(500);
+                        addXP(100);
                         if (isBossLevel) {
                           triggerLevelUp();
                         }
@@ -851,7 +857,7 @@ export default function MissionFlowPage() {
                     onClick={() => {
                       if (!isClaiming) {
                         setIsClaiming(true);
-                        addXP(500); // Add 500 XP for clearing a mission!
+                        addXP(100);
                         if (isBossLevel) {
                           triggerLevelUp();
                         }
@@ -884,13 +890,15 @@ export default function MissionFlowPage() {
           >
             KUIS
           </div>
-          <div
-            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
-          >
-            BOSS
-          </div>
+          {isBossLevel && (
+            <div
+              className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
+              onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
+              style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
+            >
+              BOSS
+            </div>
+          )}
           <div
             className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}
@@ -935,13 +943,13 @@ export default function MissionFlowPage() {
               <h2 className={styles.dialogTitle} style={{ color: dialogState.type === 'success' ? '#059669' : '#ef4444' }}>
                 {dialogState.type === 'success'
                   ? 'BERHASIL!'
-                  : dialogState.message.startsWith('GAME OVER!')
+                  : dialogState.message.includes('Nyawamu habis')
                     ? 'GAME OVER'
                     : 'UPS! SALAH'}
               </h2>
               <p className={styles.dialogMessage}>{dialogState.message}</p>
               <button className={styles.btn} onMouseEnter={playHoverSound} onClick={closeDialog}>
-                {dialogState.onConfirm ? (dialogState.message.startsWith('GAME OVER!') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
+                {dialogState.onConfirm ? (dialogState.message.includes('Nyawamu habis') ? 'ULANGI MATERI' : 'LANJUT ➔') : 'TUTUP'}
               </button>
             </motion.div>
           </motion.div>

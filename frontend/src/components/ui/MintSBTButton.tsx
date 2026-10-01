@@ -143,20 +143,6 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
     }
 
     try {
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate the exact UI flow without touching blockchain/backend
-        setStatus('preparing');
-        await new Promise(r => setTimeout(r, 1000));
-        setStatus('pending');
-        await new Promise(r => setTimeout(r, 1500));
-        setStatus('confirming');
-        await new Promise(r => setTimeout(r, 1000));
-        setStatus('success');
-        setSuccessMessage(`Sertifikat berhasil dicetak (Demo Mode). Tx: 0x${Math.random().toString(16).slice(2, 12)}...`);
-        onSuccess?.();
-        return;
-      }
-
       setStatus('preparing');
       setErrorMessage('');
       setSuccessMessage('');

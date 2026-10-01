@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
-import CodePlayground from '@/components/ui/CodePlayground';
 import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -81,14 +80,7 @@ export default function MissionFlowPage() {
   const [phase, setPhase] = useState<Phase>(baseLevelType);
   const [materialPage, setMaterialPage] = useState(0);
   const [isBossMinted, setIsBossMinted] = useState(false);
-  const [code, setCode] = useState(() => {
-    const m = (missionId as string) || '';
-    const isTech = m.includes('python') || m.includes('data') || m.includes('javascript') || m.includes('js') || m.includes('html') || m.includes('css') || m.includes('tailwind') || m.includes('tech');
-    if (!isTech) return '';
-    if (m.includes('python') || m.includes('data')) return '# Tulis kodemu di sini\n';
-    if (m.includes('javascript') || m.includes('js')) return '// Tulis kodemu di sini\n';
-    return '<!-- Tulis Kodemu di Sini -->\n';
-  });
+  const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [playerHp, setPlayerHp] = useState(3);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -193,7 +185,10 @@ export default function MissionFlowPage() {
       })
     })) || [],
     project: dbSection.expectedKeywords ? {
+      type: 'essay',
       instruction: `Praktikkan materi ini. Sistem akan mengecek pemahamanmu secara otomatis.`,
+      defaultCode: '',
+      language: 'html',
       codeValidation: (c: string) => {
         const kws = Array.isArray(dbSection.expectedKeywords) ? dbSection.expectedKeywords : [dbSection.expectedKeywords];
         return kws.some((kw: string) => c.toLowerCase().includes(kw.toLowerCase()));
@@ -389,15 +384,7 @@ export default function MissionFlowPage() {
 
   const handleBossSubmit = async () => {
     setIsSubmitting(true);
-    // Simulate AI grading delay
     try {
-      if (process.env.NEXT_PUBLIC_APP_ENV === 'demo') {
-        // DEMO MODE: Simulate AI grading success
-        await new Promise(r => setTimeout(r, 1500));
-        showDialog('success', 'Jawaban yang sangat bagus! Kamu memahami konsepnya. (Demo Mode)', () => handleLevelComplete());
-        return;
-      }
-
       const response = await fetch(`/api/missions/${missionId}/project/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -405,25 +392,32 @@ export default function MissionFlowPage() {
       });
       const data = await response.json();
 
-      if (data.passed) {
-        showDialog('success', data.message, () => handleLevelComplete());
+      if (response.ok && data.passed) {
+        showDialog('success', data.message || 'Luar biasa! Kodemu benar.', () => handleLevelComplete());
       } else {
         const newHp = playerHp - 1;
-        try {
-          const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
-          audio.volume = 0.5;
-          audio.play().catch(() => { });
-        } catch (e) { }
-
-        setPlayerHp(newHp);
-        if (newHp > 0) {
-          showDialog('error', `Tebakanmu meleset!\n${data.message}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+        if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+          showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+          setPlayerHp(playerHp); // Do not reduce HP for system error
         } else {
-          showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
-            setPlayerHp(3);
-            setPhase('MATERIAL');
-            setMaterialPage(0);
-          });
+          try {
+            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+            audio.volume = 0.5;
+            audio.play().catch(() => { });
+          } catch (e) { }
+
+          setPlayerHp(newHp);
+          if (newHp > 0) {
+            const errorMessage = data.message || data.error || 'Tebakan/Kodemu masih kurang tepat. Coba perbaiki lagi!';
+            showDialog('error', `Tebakanmu meleset!\n${errorMessage}\n\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+          } else {
+            const errorMessage = data.message || data.error || 'Tebakan/Kodemu salah.';
+            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\n\n${errorMessage}\n\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+              setPlayerHp(3);
+              setPhase('MATERIAL');
+              setMaterialPage(0);
+            });
+          }
         }
       }
     } catch {
@@ -576,7 +570,7 @@ export default function MissionFlowPage() {
               const currentQuiz = quizArray[quizIndex];
               return (
                 <div className={styles.quizOptions}>
-                  {currentQuiz.options.map((opt, i) => (
+                  {currentQuiz.options.map((opt: any, i: number) => (
                     <button onMouseEnter={playHoverSound}
                       key={i}
                       className={styles.optionBtn}
@@ -607,7 +601,7 @@ export default function MissionFlowPage() {
                           if (newHp > 0) {
                             showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
                           } else {
-                            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+                            showDialog('error', `Nyawamu telah habis!\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
                               setPlayerHp(3);
                               setQuizIndex(0);
                               setPhase('MATERIAL');
@@ -635,30 +629,20 @@ export default function MissionFlowPage() {
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {content.project ? (
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}>
-                {content.project.type === 'essay' ? (
-                  <textarea
-                    className={styles.textarea}
-                    style={{ flex: 1, padding: '24px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
-                    placeholder="Ketikkan analisamu di sini..."
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                  />
-                ) : (
-                  <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    <CodePlayground
-                      language={content.project.language}
-                      initialCode={content.project.defaultCode}
-                      onChange={(val) => setCode(val || '')}
-                    />
-                  </div>
-                )}
+                <textarea
+                  className={styles.textarea}
+                  style={{ flex: 1, padding: '24px', background: '#fae1c5', color: '#3b261b', border: '4px solid #8c5d41', borderRadius: '8px', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', resize: 'none', boxShadow: 'inset 4px 4px 0 rgba(140, 93, 65, 0.2)', outline: 'none' }}
+                  placeholder="Ketikkan analisamu di sini..."
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                />
                 <button onMouseEnter={playHoverSound}
                   className={styles.btn}
                   onClick={handleBossSubmit}
                   disabled={isSubmitting}
                   style={{ alignSelf: 'flex-end', marginTop: '16px' }}
                 >
-                  {isSubmitting ? 'AI SEDANG MENILAI...' : (content.project.type === 'essay' ? 'KUMPULKAN ESAI' : '⚔️ SERANG BOSS (SUBMIT)')}
+                  {isSubmitting ? 'AI SEDANG MENILAI...' : '⚔️ SERANG BOSS (SUBMIT)'}
                 </button>
               </div>
             ) : (
@@ -827,7 +811,7 @@ export default function MissionFlowPage() {
                             }}
                             onSuccess={() => {
                               setIsBossMinted(true);
-                              addXP(500);
+                              addXP(dbSection?.xpReward ?? 100);
                               completeQuiz();
                             }}
                           />
@@ -837,7 +821,7 @@ export default function MissionFlowPage() {
                             onClick={() => {
                               if (!isClaiming) {
                                 setIsClaiming(true);
-                                addXP(500);
+                                addXP(dbSection?.xpReward ?? 100);
                                 completeQuiz();
                                 setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                               }
@@ -864,7 +848,7 @@ export default function MissionFlowPage() {
                       onClick={() => {
                         if (!isClaiming) {
                           setIsClaiming(true);
-                          addXP(500);
+                          addXP(dbSection?.xpReward ?? 100);
                           if (isBossLevel) {
                             triggerLevelUp();
                           }
@@ -899,13 +883,15 @@ export default function MissionFlowPage() {
           >
             KUIS
           </div>
-          <div
-            className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
-            onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
-            style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
-          >
-            BOSS
-          </div>
+          {isBossLevel && (
+            <div
+              className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
+              onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
+              style={{ cursor: highestPhaseReached >= 2 ? 'pointer' : 'not-allowed', opacity: (highestPhaseReached >= 2 || phase === 'PROJECT') ? 1 : 0.6 }}
+            >
+              BOSS
+            </div>
+          )}
           <div
             className={`${styles.tab} ${styles.tabReward} ${phase === 'CLAIM' ? styles.activeTab : ''}`}
             onClick={() => { if (highestPhaseReached >= 3) setPhaseWithProgress('CLAIM'); }}

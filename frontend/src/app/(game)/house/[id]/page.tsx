@@ -63,7 +63,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   const modules = house.stages;
-  const completedCount = modules.filter(m => m.isCompleted).length;
+  const completedCount = modules.filter((m: any) => m.isCompleted).length;
   const progressPercent = Math.round((completedCount / modules.length) * 100);
 
   return (
@@ -135,7 +135,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className="flex flex-col gap-6">
-          {modules.map((mod, index) => (
+          {modules.map((mod: any, index: number) => (
             <div key={mod.id} className="flex flex-col relative">
               {/* Module Header Button */}
               <button
@@ -201,7 +201,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                         DAFTAR BAB (CHAPTERS):
                       </div>
                       
-                      {mod.chapters?.map((chapter, chapIdx) => (
+                      {mod.chapters?.map((chapter: any, chapIdx: number) => (
                         <div 
                           key={chapter.id}
                           onClick={() => router.push(`/map?chapter=${chapter.id}&house=${id}`)}
