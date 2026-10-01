@@ -150,7 +150,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
     { preHandler: [fastify.authenticate, requireAdmin] },
     async (_request, reply) => {
       const courses = await prisma.course.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
         include: { chapters: { include: { sections: true } } }
       });
       const mapped = courses.map((c) => {
@@ -162,7 +162,10 @@ export default async function adminRoutes(fastify: FastifyInstance) {
           description: c.description,
           published: String(c.isPublished),
           isFallback: c.isFallback,
-          sections: sectionCount
+          sections: sectionCount,
+          facultyTags: c.facultyTags,
+          houseId: c.houseId || '',
+          order: (c as any).order ?? 0 // casting to any to bypass TS error if prisma client is stale
         };
       });
       return reply.send(mapped);
