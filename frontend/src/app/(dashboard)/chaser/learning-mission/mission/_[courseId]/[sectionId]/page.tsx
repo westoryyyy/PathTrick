@@ -880,7 +880,7 @@ export default function MissionFlowPage() {
                             }}
                             onSuccess={() => {
                               setIsBossMinted(true);
-                              addXP(dbSection?.xpReward ?? 100);
+                              addXP(sectionData?.xpReward ?? 100);
                               completeQuiz();
                             }}
                           />
@@ -890,7 +890,7 @@ export default function MissionFlowPage() {
                             onClick={() => {
                               if (!isClaiming) {
                                 setIsClaiming(true);
-                                addXP(dbSection?.xpReward ?? 100);
+                                addXP(sectionData?.xpReward ?? 100);
                                 completeQuiz();
                                 setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                               }
@@ -917,7 +917,7 @@ export default function MissionFlowPage() {
                       onClick={() => {
                         if (!isClaiming) {
                           setIsClaiming(true);
-                          addXP(dbSection?.xpReward ?? 100);
+                          addXP(sectionData?.xpReward ?? 100);
                           if (isBossLevel) {
                             triggerLevelUp();
                           }

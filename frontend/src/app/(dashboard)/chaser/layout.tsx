@@ -16,6 +16,7 @@ import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
 import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
 import { API_BASE_URL } from '@/config/pathtrick';
+import WalletPanel from '@/components/ui/WalletPanel';
 
 const NAV_KEYS = [
   { href: '/chaser/dashboard', labelKey: 'nav.mahasiswa.dashboard', icon: '📊' },
@@ -34,6 +35,8 @@ export default function MahasiswaLayout({
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [isWalletAnimating, setIsWalletAnimating] = useState(false);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
@@ -274,6 +277,45 @@ export default function MahasiswaLayout({
                     )}
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* ─── WALLET BUTTON ─── */}
+            <div style={{ position: 'relative' }}>
+              <div
+                className={styles.iconBtn}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  setIsNotificationsOpen(false);
+                  setIsWalletAnimating(true);
+                  setTimeout(() => {
+                    setIsWalletOpen(prev => !prev);
+                    setIsWalletAnimating(false);
+                  }, 150);
+                }}
+                onMouseEnter={playHoverSound}
+                title={isWalletOpen ? 'Tutup Wallet' : 'Buka Wallet'}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
+              >
+                <Image
+                  src={isWalletAnimating ? (isWalletOpen ? '/Wallet.png' : '/Open Wallet.png') : (isWalletOpen ? '/Open Wallet.png' : '/Wallet.png')}
+                  alt={isWalletOpen ? 'Open Wallet' : 'Wallet'}
+                  width={28}
+                  height={28}
+                  style={{
+                    imageRendering: 'pixelated',
+                    transform: isWalletAnimating ? 'scale(0.6) rotate(-15deg)' : 'scale(1) rotate(0deg)',
+                    transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease',
+                    opacity: isWalletAnimating ? 0 : 1,
+                  }}
+                />
+              </div>
+
+              {isWalletOpen && (
+                <WalletPanel
+                  walletAddress={activeWallet?.address}
+                  onClose={() => setIsWalletOpen(false)}
+                />
               )}
             </div>
 
