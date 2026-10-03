@@ -151,18 +151,18 @@ a {
   margin-bottom: 0.5rem;
 }
 .prose-content pre {
-  background: rgba(0,0,0,0.1);
-  padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0.75rem;
   white-space: pre-wrap;
   word-break: break-word;
 }
 .prose-content code {
-  background: rgba(0,0,0,0.1);
-  padding: 0.1rem 0.3rem;
-  border-radius: 4px;
-  font-family: monospace;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: inherit;
   white-space: pre-wrap;
   word-break: break-word;
 }
