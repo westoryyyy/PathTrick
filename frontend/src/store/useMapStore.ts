@@ -56,6 +56,10 @@ export interface ActiveCourse {
 
 interface MapState {
   role: 'SMA' | 'MAHASISWA';
+  /** Number of unlocked badge achievements (shared app state) */
+  badgeCount: number;
+  /** Fetch achievements and update badgeCount, returns achievement keys */
+  fetchAchievements: () => Promise<string[]>;
 
   /* ── SMA: Course Hierarchy ── */
   dashboardView: 'dashboard' | 'courses' | 'map';
@@ -91,461 +95,8 @@ interface MapState {
 }
 
 /* ═══════════════════════════════════════════════
-   Mock Data — AI Recommended Courses for SMA
+   Legacy mock data has been removed. SMA course cards and quest chains now come from the backend APIs.
    ═══════════════════════════════════════════════ */
-
-const MOCK_RECOMMENDED_COURSES: RecommendedCourse[] = [
-  /* ═══ MVP-READY COURSES (IT, Design, Business) ═══ */
-  {
-    id: 'html-basics',
-    title: 'HTML Basics',
-    description: 'Pelajari fondasi web development — struktur halaman, elemen semantik, dan form.',
-    icon: ASSET_PATHS.OBJ_BOOK,
-    category: 'coding',
-    difficulty: 'beginner',
-    totalQuests: 5,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 95,
-    accentColor: '#f97316',
-  },
-  {
-    id: 'python-logic',
-    title: 'Python Logic',
-    description: 'Kuasai dasar pemrograman — variabel, loop, kondisi, dan fungsi dengan Python.',
-    icon: ASSET_PATHS.OBJ_SCROLL,
-    category: 'coding',
-    difficulty: 'beginner',
-    totalQuests: 6,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 92,
-    accentColor: '#3b82f6',
-  },
-  {
-    id: 'figma-uiux',
-    title: 'Figma UI/UX',
-    description: 'Desain antarmuka yang indah dan user-friendly menggunakan Figma.',
-    icon: ASSET_PATHS.OBJ_COMPASS,
-    category: 'design',
-    difficulty: 'beginner',
-    totalQuests: 4,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 88,
-    accentColor: '#a855f7',
-  },
-  {
-    id: 'data-literacy',
-    title: 'Data Literacy',
-    description: 'Belajar membaca, menganalisis, dan memvisualisasikan data untuk pengambilan keputusan.',
-    icon: ASSET_PATHS.OBJ_CRYSTAL_GEM,
-    category: 'data',
-    difficulty: 'intermediate',
-    totalQuests: 5,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 78,
-    accentColor: '#10b981',
-  },
-  {
-    id: 'entrepreneurship-101',
-    title: 'Entrepreneurship 101',
-    description: 'Pelajari dasar bisnis, lean startup, dan validasi ide dari nol.',
-    icon: ASSET_PATHS.OBJ_GOLD_TICKET,
-    category: 'business',
-    difficulty: 'intermediate',
-    totalQuests: 4,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 72,
-    accentColor: '#f59e0b',
-  },
-  {
-    id: 'intro-ai',
-    title: 'Intro to AI',
-    description: 'Kenali konsep dasar kecerdasan buatan, machine learning, dan aplikasinya.',
-    icon: ASSET_PATHS.OBJ_ENERGY_SHARD,
-    category: 'coding',
-    difficulty: 'advanced',
-    totalQuests: 6,
-    completedQuests: 0,
-    isLocked: false,
-    aiMatchPercent: 65,
-    accentColor: '#ec4899',
-  },
-
-  /* ═══ COMING SOON COURSES (Non-MVP Faculties) ═══ */
-  {
-    id: 'anatomi-dasar',
-    title: 'Anatomi & Fisiologi Dasar',
-    description: 'Pelajari struktur tubuh manusia dan cara kerja organ — fondasi untuk jurusan Kedokteran.',
-    icon: ASSET_PATHS.OBJ_RED_POTION,
-    category: 'health',
-    difficulty: 'intermediate',
-    totalQuests: 8,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 70,
-    accentColor: '#ef4444',
-  },
-  {
-    id: 'pengantar-hukum',
-    title: 'Pengantar Ilmu Hukum',
-    description: 'Memahami sistem hukum Indonesia, hak warga negara, dan dasar-dasar perundangan.',
-    icon: ASSET_PATHS.OBJ_SHIELD,
-    category: 'law',
-    difficulty: 'beginner',
-    totalQuests: 6,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 60,
-    accentColor: '#6366f1',
-  },
-  {
-    id: 'psikologi-dasar',
-    title: 'Psikologi Umum',
-    description: 'Kenali dasar perilaku manusia, kognitif, emosi, dan perkembangan kepribadian.',
-    icon: ASSET_PATHS.OBJ_BLUE_POTION,
-    category: 'psychology',
-    difficulty: 'beginner',
-    totalQuests: 5,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 68,
-    accentColor: '#8b5cf6',
-  },
-  {
-    id: 'pedagogi-modern',
-    title: 'Pedagogi Modern',
-    description: 'Teknik mengajar abad 21 — project-based learning, diferensiasi, dan asesmen formatif.',
-    icon: ASSET_PATHS.OBJ_LANTERN,
-    category: 'education',
-    difficulty: 'intermediate',
-    totalQuests: 5,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 55,
-    accentColor: '#14b8a6',
-  },
-  {
-    id: 'mekanika-teknik',
-    title: 'Mekanika Teknik',
-    description: 'Fondasi teknik mesin dan sipil — gaya, momen, kesetimbangan, dan struktur.',
-    icon: ASSET_PATHS.OBJ_SWORD,
-    category: 'engineering',
-    difficulty: 'advanced',
-    totalQuests: 7,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 58,
-    accentColor: '#78716c',
-  },
-  {
-    id: 'farmasi-dasar',
-    title: 'Farmasi & Kimia Obat',
-    description: 'Pelajari interaksi obat, farmakokinetika, dan cara kerja senyawa aktif.',
-    icon: ASSET_PATHS.OBJ_MANA_POTION,
-    category: 'health',
-    difficulty: 'advanced',
-    totalQuests: 6,
-    completedQuests: 0,
-    isLocked: false,
-    comingSoon: true,
-    aiMatchPercent: 52,
-    accentColor: '#d946ef',
-  },
-];
-
-/* ═══════════════════════════════════════════════
-   Mock Data — Quest Nodes per Course
-   ═══════════════════════════════════════════════ */
-
-const MOCK_COURSE_QUESTS: Record<string, QuestNode[]> = {
-  'html-basics': [
-    {
-      id: 'html-1', order: 0, questType: 'lesson',
-      title: 'Apa itu HTML?', description: 'Pengenalan dasar HTML dan bagaimana browser membaca kode.',
-      category: 'foundation', status: 'available', xp: 50, x: 0, y: 0, prerequisites: [],
-      badgeImage: ASSET_PATHS.BADGE_FIRST_STEP, npcKey: 'npc-mentor',
-    },
-    {
-      id: 'html-2', order: 1, questType: 'lesson',
-      title: 'Tags & Elements', description: 'Belajar tentang tag heading, paragraf, list, dan link.',
-      category: 'skill', status: 'locked', xp: 75, x: 0, y: 0, prerequisites: ['html-1'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-recruiter',
-    },
-    {
-      id: 'html-3', order: 2, questType: 'quiz',
-      title: 'Quiz: Struktur HTML', description: 'Uji pemahamanmu tentang tag dan elemen dasar.',
-      category: 'skill', status: 'locked', xp: 100, x: 0, y: 0, prerequisites: ['html-2'],
-      badgeImage: ASSET_PATHS.BADGE_QUIZ_MASTER, npcKey: 'npc-scholarship',
-    },
-    {
-      id: 'html-4', order: 3, questType: 'project',
-      title: 'Mini Project: Bio Page', description: 'Buat halaman bio personal menggunakan HTML murni.',
-      category: 'project', status: 'locked', xp: 200, x: 0, y: 0, prerequisites: ['html-3'],
-      badgeImage: ASSET_PATHS.OBJ_SCROLL, npcKey: 'npc-professor',
-    },
-    {
-      id: 'html-5', order: 4, questType: 'lesson',
-      title: 'Struktur Data & Tabel', description: 'Menyajikan data menggunakan tag table dan list.',
-      category: 'skill', status: 'locked', xp: 150, x: 0, y: 0, prerequisites: ['html-4'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-ai-engineer',
-    },
-    {
-      id: 'html-6', order: 5, questType: 'lesson',
-      title: 'Dasar Form & Input', description: 'Cara mengambil data teks dan angka dari pengguna.',
-      category: 'skill', status: 'locked', xp: 150, x: 0, y: 0, prerequisites: ['html-5'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-mentor',
-    },
-    {
-      id: 'html-7', order: 6, questType: 'lesson',
-      title: 'Input Lanjutan & Validasi', description: 'Checkbox, radio button, dan atribut required.',
-      category: 'skill', status: 'locked', xp: 200, x: 0, y: 0, prerequisites: ['html-6'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-recruiter',
-    },
-    {
-      id: 'html-8', order: 7, questType: 'lesson',
-      title: 'Semantic Web', description: 'Tag pembungkus cerdas seperti main, article, section.',
-      category: 'skill', status: 'locked', xp: 250, x: 0, y: 0, prerequisites: ['html-7'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-scholarship',
-    },
-    {
-      id: 'html-9', order: 8, questType: 'lesson',
-      title: 'Metadata & SEO', description: 'Optimasi ranking pencarian dengan Meta tag.',
-      category: 'skill', status: 'locked', xp: 250, x: 0, y: 0, prerequisites: ['html-8'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-professor',
-    },
-    {
-      id: 'html-10', order: 9, questType: 'lesson',
-      title: 'Aksesibilitas (a11y)', description: 'Praktik ARIA dan memastikan web ramah disabilitas.',
-      category: 'skill', status: 'locked', xp: 250, x: 0, y: 0, prerequisites: ['html-9'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-ai-engineer',
-    },
-    {
-      id: 'html-11', order: 10, questType: 'project',
-      title: 'Mini Project: Final Form', description: 'Buat form pendaftaran kompleks dan terstruktur.',
-      category: 'project', status: 'locked', xp: 300, x: 0, y: 0, prerequisites: ['html-10'],
-      badgeImage: ASSET_PATHS.OBJ_SCROLL, npcKey: 'npc-mentor',
-    },
-    {
-      id: 'html-12', order: 11, questType: 'boss',
-      title: 'Boss: HTML Mastery', description: 'Tantangan akhir — buktikan penguasaan HTML-mu!',
-      category: 'milestone', status: 'locked', xp: 500, x: 0, y: 0, prerequisites: ['html-11'],
-      badge: '🏆', badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER, npcKey: 'npc-wizard',
-    },
-  ],
-  'python-logic': [
-    {
-      id: 'py-1', order: 0, questType: 'lesson',
-      title: 'Hello Python!', description: 'Install Python dan jalankan program pertamamu.',
-      category: 'foundation', status: 'available', xp: 50, x: 0, y: 0, prerequisites: [],
-      badgeImage: ASSET_PATHS.BADGE_FIRST_STEP, npcKey: 'npc-mentor',
-    },
-    {
-      id: 'py-2', order: 1, questType: 'lesson',
-      title: 'Variabel & Tipe Data', description: 'String, integer, float, boolean — dan cara menggunakannya.',
-      category: 'skill', status: 'locked', xp: 75, x: 0, y: 0, prerequisites: ['py-1'],
-      badgeImage: ASSET_PATHS.OBJ_BOOK, npcKey: 'npc-recruiter',
-    },
-    {
-      id: 'py-3', order: 2, questType: 'lesson',
-      title: 'If / Else Logic', description: 'Buat keputusan dalam kode dengan kondisional.',
-      category: 'skill', status: 'locked', xp: 75, x: 0, y: 0, prerequisites: ['py-2'],
-      badgeImage: ASSET_PATHS.OBJ_SWORD, npcKey: 'npc-scholarship',
-    },
-    {
-      id: 'py-4', order: 3, questType: 'quiz',
-      title: 'Quiz: Logic Flow', description: 'Uji pemahamanmu tentang alur logika Python.',
-      category: 'skill', status: 'locked', xp: 100, x: 0, y: 0, prerequisites: ['py-3'],
-      badgeImage: ASSET_PATHS.BADGE_QUIZ_MASTER, npcKey: 'npc-professor',
-    },
-    {
-      id: 'py-5', order: 4, questType: 'project',
-      title: 'Mini Project: Calculator', description: 'Buat kalkulator sederhana dengan Python.',
-      category: 'project', status: 'locked', xp: 200, x: 0, y: 0, prerequisites: ['py-4'],
-      badgeImage: ASSET_PATHS.OBJ_SCROLL, npcKey: 'npc-ai-engineer',
-    },
-    {
-      id: 'py-6', order: 5, questType: 'boss',
-      title: 'Boss: Python Logic Master', description: 'Tantangan akhir — selesaikan semua puzzle Python!',
-      category: 'milestone', status: 'locked', xp: 500, x: 0, y: 0, prerequisites: ['py-5'],
-      badge: '🏆', badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER, npcKey: 'npc-wizard',
-    },
-  ],
-  'figma-uiux': [
-    {
-      id: 'fig-1', order: 0, questType: 'lesson',
-      title: 'Mengenal Figma', description: 'Navigasi Figma — artboard, frame, dan layer.',
-      category: 'foundation', status: 'available', xp: 50, x: 0, y: 0, prerequisites: [],
-      badgeImage: ASSET_PATHS.BADGE_FIRST_STEP, npcKey: 'npc-mentor',
-    },
-    {
-      id: 'fig-2', order: 1, questType: 'lesson',
-      title: 'Komponen & Style', description: 'Auto layout, komponen reusable, dan design tokens.',
-      category: 'skill', status: 'locked', xp: 100, x: 0, y: 0, prerequisites: ['fig-1'],
-      badgeImage: ASSET_PATHS.OBJ_COMPASS, npcKey: 'npc-recruiter',
-    },
-    {
-      id: 'fig-3', order: 2, questType: 'project',
-      title: 'Mini Project: App Screen', description: 'Desain satu halaman mobile app dari wireframe ke hi-fi.',
-      category: 'project', status: 'locked', xp: 200, x: 0, y: 0, prerequisites: ['fig-2'],
-      badgeImage: ASSET_PATHS.OBJ_SCROLL, npcKey: 'npc-scholarship',
-    },
-    {
-      id: 'fig-4', order: 3, questType: 'boss',
-      title: 'Boss: UI/UX Master', description: 'Evaluasi desainmu oleh AI — usability & estetika.',
-      category: 'milestone', status: 'locked', xp: 500, x: 0, y: 0, prerequisites: ['fig-3'],
-      badge: '🏆', badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER, npcKey: 'npc-wizard',
-    },
-  ],
-};
-
-/* ═══════════════════════════════════════════════
-   Mock AI APIs
-   ═══════════════════════════════════════════════ */
-
-const fetchAIRecommendedCoursesMock = async (): Promise<RecommendedCourse[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve([...MOCK_RECOMMENDED_COURSES]), 1200);
-  });
-};
-
-const fetchAIRoadmapMock = async (role: 'SMA' | 'MAHASISWA', chapterId?: string): Promise<CourseNodeData[]> => {
-  return new Promise((resolve) => {
-    if (role === 'MAHASISWA' && chapterId) {
-      // Generate dynamic nodes based on chapter
-      const chapterTitle = chapterId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      
-      // Determine context based on chapterId
-      let levelContexts = [
-        { t: 'Konsep Dasar', d: 'Pelajari fundamental' },
-        { t: 'Praktik 1', d: 'Terapkan konsep dasar' },
-        { t: 'Praktik Lanjutan', d: 'Eksplorasi teknik lanjutan' },
-        { t: 'Mini Project', d: 'Uji kemampuan dengan live code' }
-      ];
-      
-      if (chapterId.includes('framer')) {
-        levelContexts = [
-          { t: 'Intro to Motion', d: 'Pahami dasar animasi Framer' },
-          { t: 'Gestures & Drag', d: 'Buat elemen interaktif' },
-          { t: 'Scroll Animations', d: 'Animasi berbasis scroll' },
-          { t: 'Layout Transitions', d: 'Transisi layout mulus' }
-        ];
-      } else if (chapterId.includes('tailwind')) {
-        levelContexts = [
-          { t: 'Utility Classes', d: 'Styling cepat dengan Tailwind' },
-          { t: 'Flexbox & Grid', d: 'Membangun layout modern' },
-          { t: 'Responsive Design', d: 'Desain mobile-first' },
-          { t: 'Custom Themes', d: 'Konfigurasi tailwind.config' }
-        ];
-      } else if (chapterId.includes('sql')) {
-        levelContexts = [
-          { t: 'SELECT & WHERE', d: 'Query dasar pengambilan data' },
-          { t: 'JOIN Operations', d: 'Menggabungkan beberapa tabel' },
-          { t: 'GROUP BY & Aggregasi', d: 'Analisis data berkelompok' },
-          { t: 'Subqueries', d: 'Query bersarang tingkat lanjut' }
-        ];
-      }
-
-      const dynamicNodes: CourseNodeData[] = [
-        {
-          id: `${chapterId}-level-1`,
-          title: `Level 1: ${levelContexts[0].t}`,
-          description: `${levelContexts[0].d} dari ${chapterTitle}.`,
-          category: 'skill',
-          status: 'available',
-          xp: 100,
-          x: 13, y: 23,
-          prerequisites: [],
-          badgeImage: ASSET_PATHS.BADGE_FIRST_STEP,
-          npcKey: 'npc-mentor',
-        },
-        {
-          id: `${chapterId}-level-2`,
-          title: `Level 2: ${levelContexts[1].t}`,
-          description: `${levelContexts[1].d} untuk ${chapterTitle}.`,
-          category: 'skill',
-          status: 'locked',
-          xp: 150,
-          x: 15, y: 15,
-          prerequisites: [`${chapterId}-level-1`],
-          badgeImage: ASSET_PATHS.BADGE_QUICK_LEARNER,
-          npcKey: 'npc-recruiter',
-        },
-        {
-          id: `${chapterId}-level-3`,
-          title: `Level 3: ${levelContexts[2].t}`,
-          description: `${levelContexts[2].d}.`,
-          category: 'skill',
-          status: 'locked',
-          xp: 150,
-          x: 23, y: 13,
-          prerequisites: [`${chapterId}-level-2`],
-          badgeImage: ASSET_PATHS.BADGE_NIGHT_OWL,
-          npcKey: 'npc-scholarship',
-        },
-        {
-          id: `${chapterId}-level-4`,
-          title: `Level 4: ${levelContexts[3].t}`,
-          description: `${levelContexts[3].d}.`,
-          category: 'project',
-          status: 'locked',
-          xp: 200,
-          x: 28, y: 18,
-          prerequisites: [`${chapterId}-level-3`],
-          badgeImage: ASSET_PATHS.OBJ_SCROLL,
-          npcKey: 'npc-professor',
-        },
-        {
-          id: `${chapterId}-level-5`,
-          title: `Level 5: Persiapan Ujian Akhir`,
-          description: `Tinjau kembali seluruh materi ${chapterTitle} sebelum tantangan akhir.`,
-          category: 'skill',
-          status: 'locked',
-          xp: 250,
-          x: 25, y: 24,
-          prerequisites: [`${chapterId}-level-4`],
-          badgeImage: ASSET_PATHS.BADGE_NIGHT_OWL,
-          npcKey: 'npc-ai-engineer',
-        },
-        {
-          id: `${chapterId}-level-6`,
-          title: `Boss Challenge`,
-          description: `Ujian akhir untuk menguasai ${chapterTitle}.`,
-          category: 'milestone',
-          status: 'locked',
-          xp: 500,
-          x: 18, y: 26,
-          prerequisites: [`${chapterId}-level-5`],
-          badge: '🏆',
-          badgeImage: ASSET_PATHS.BADGE_COURSE_MASTER,
-          npcKey: 'npc-wizard',
-        }
-      ];
-      resolve(dynamicNodes);
-      return;
-    }
-
-    const sourceNodes = role === 'SMA' ? COURSE_NODES_SMA : COURSE_NODES_MAHASISWA;
-    const roadmap = sourceNodes.map(node => {
-      if (node.id === 'beasiswa-hub' || node.id === 'job-match') {
-        return { ...node, aiRecommendation: 'AI Match (92%): Highly recommended based on your recent skill acquisitions.' };
-      }
-      if (node.id === 'internship-match' || node.id === 'advanced-skill') {
-        return { ...node, aiRecommendation: 'AI Match (88%): Matches your logical reasoning assessment.' };
-      }
-      return node;
-    });
-    resolve(roadmap);
-  });
-};
 
 /* ═══════════════════════════════════════════════
    Store
@@ -580,6 +131,23 @@ export const useMapStore = create<MapState>()(
   },
 
   setHouseId: (houseId) => set({ houseId }),
+  
+  /* Shared badge count for achievements */
+  badgeCount: 0,
+  fetchAchievements: async () => {
+    try {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const res = await fetch(`${API_BASE_URL}/api/gamification`, { headers: getAuthHeaders() });
+      if (!res.ok) return [];
+      const data = await res.json();
+      const keys = Array.isArray(data.achievements) ? data.achievements.map((a: any) => a.key) : [];
+      set({ badgeCount: keys.length });
+      return keys;
+    } catch (err) {
+      return [];
+    }
+  },
 
   /* ═══════════════════════════════════════════
      SMA Actions
@@ -588,8 +156,58 @@ export const useMapStore = create<MapState>()(
   fetchRecommendedCourses: async () => {
     set({ isFetchingCourses: true, isLoading: true, error: null });
     try {
-      const courses = await fetchAIRecommendedCoursesMock();
-      set({ recommendedCourses: courses, isFetchingCourses: false, isLoading: false });
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const res = await fetch(`${API_BASE_URL}/api/courses`, { headers: getAuthHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch courses');
+
+      const data = await res.json();
+      const backendCourses = Array.isArray(data?.courses) ? data.courses : [];
+
+      const mappedCourses = backendCourses.map((course: any, index: number) => {
+        const title = String(course.title || 'Learning Path');
+        const description = course.reasonRecommended || course.description || 'Materi yang dipersonalisasi dari backend.';
+        const facultyTags: string[] = Array.isArray(course.facultyTags) ? course.facultyTags : [];
+        const category: CourseCategory = facultyTags.some(tag => /design|art|ui|ux/i.test(tag))
+          ? 'design'
+          : facultyTags.some(tag => /data|stat/i.test(tag))
+            ? 'data'
+            : facultyTags.some(tag => /business|manaj|econ/i.test(tag))
+              ? 'business'
+              : facultyTags.some(tag => /health|med/i.test(tag))
+                ? 'health'
+                : facultyTags.some(tag => /law/i.test(tag))
+                  ? 'law'
+                  : facultyTags.some(tag => /psych/i.test(tag))
+                    ? 'psychology'
+                    : facultyTags.some(tag => /educ/i.test(tag))
+                      ? 'education'
+                      : facultyTags.some(tag => /eng|tech|cs|it/i.test(tag))
+                        ? 'engineering'
+                        : 'coding';
+
+        const progressStatus = course.progress?.status ?? 'NOT_STARTED';
+        const completedQuests = progressStatus === 'COMPLETED'
+          ? (course.sectionCount ?? 0)
+          : Math.max(0, Math.min(course.progress?.currentSectionOrder ? course.progress.currentSectionOrder - 1 : 0, course.sectionCount ?? 0));
+
+        return {
+          id: course.id,
+          title,
+          description,
+          icon: course.coverImageUrl || ASSET_PATHS.OBJ_BOOK,
+          category,
+          difficulty: (course.level === 'advanced' ? 'advanced' : course.level === 'intermediate' ? 'intermediate' : 'beginner') as CourseDifficulty,
+          totalQuests: Math.max(1, course.sectionCount ?? 1),
+          completedQuests,
+          isLocked: false,
+          comingSoon: false,
+          aiMatchPercent: course.reasonRecommended ? 90 - (index * 3) : undefined,
+          accentColor: ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b'][index % 5],
+        } satisfies RecommendedCourse;
+      });
+
+      set({ recommendedCourses: mappedCourses, isFetchingCourses: false, isLoading: false });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch courses';
       set({ error: message, isFetchingCourses: false, isLoading: false });
@@ -601,8 +219,53 @@ export const useMapStore = create<MapState>()(
     const course = recommendedCourses.find(c => c.id === courseId);
     if (!course || course.isLocked || course.comingSoon) return;
 
-    // Fetch quest nodes for this course (mock)
-    const quests = MOCK_COURSE_QUESTS[courseId] ?? [];
+    const fallbackQuests: QuestNode[] = [
+      {
+        id: `${courseId}-overview`,
+        title: 'Overview Materi',
+        description: `Mulai dengan gambaran umum ${course.title}.`,
+        category: 'foundation',
+        status: 'available',
+        xp: 100,
+        x: 120,
+        y: 160,
+        prerequisites: [],
+        badgeImage: ASSET_PATHS.BADGE_FIRST_STEP,
+        npcKey: 'npc-mentor',
+        order: 0,
+        questType: 'lesson',
+      },
+      {
+        id: `${courseId}-practice`,
+        title: 'Latihan Inti',
+        description: `Terapkan konsep ${course.title} dalam soal dan tugas.` ,
+        category: 'skill',
+        status: 'locked',
+        xp: 150,
+        x: 240,
+        y: 260,
+        prerequisites: [`${courseId}-overview`],
+        badgeImage: ASSET_PATHS.OBJ_BOOK,
+        npcKey: 'npc-recruiter',
+        order: 1,
+        questType: 'quiz',
+      },
+      {
+        id: `${courseId}-project`,
+        title: 'Mini Project',
+        description: `Buat proyek singkat yang relevan dengan ${course.title}.`,
+        category: 'project',
+        status: 'locked',
+        xp: 250,
+        x: 360,
+        y: 360,
+        prerequisites: [`${courseId}-practice`],
+        badgeImage: ASSET_PATHS.OBJ_SCROLL,
+        npcKey: 'npc-professor',
+        order: 2,
+        questType: 'project',
+      },
+    ];
 
     const activeCourse: ActiveCourse = {
       id: course.id,
@@ -612,7 +275,7 @@ export const useMapStore = create<MapState>()(
       category: course.category,
       difficulty: course.difficulty,
       accentColor: course.accentColor,
-      quests: quests.map(q => ({ ...q })), // deep copy
+      quests: fallbackQuests,
     };
 
     set({
@@ -686,70 +349,86 @@ export const useMapStore = create<MapState>()(
   fetchRoadmap: async (chapterId?: string) => {
     set({ isLoading: true, error: null });
     try {
-      // 1. Fetch real roadmap from backend
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
       const { API_BASE_URL } = await import('@/config/pathtrick');
       const res = await fetch(`${API_BASE_URL}/api/roadmap`, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error('Failed to fetch roadmap');
-      
-      const rawNodes = await res.json(); // Array of { houseId, courseId, chapterId, sectionId, order, title, locked, completed, status }
 
-      // 2. Map backend nodes to CourseNodeData format for the 2D Map Game
+      const rawNodes = await res.json();
+      const nodes = Array.isArray(rawNodes) ? rawNodes : [];
+
       const { ASSET_PATHS } = await import('@/phaser/config');
-      
-      let mappedNodes: CourseNodeData[] = rawNodes.map((rn: any, idx: number) => {
-        // Generate pseudo-coordinates based on order (mock path)
-        const pathCoords = [
-          {x: 13, y: 23}, {x: 6,  y: 8}, {x: 22, y: 17}, 
-          {x: 21, y: 8}, {x: 31, y: 11}, {x: 28, y: 24},
-          {x: 26, y: 28}, {x: 10, y: 28}
-        ];
-        const coords = pathCoords[rn.order % pathCoords.length];
-        
-        let npcKey = 'npc-professor';
-        let badgeImage: string = ASSET_PATHS.OBJ_BOOK;
+      const pathCoords = [
+        { x: 13, y: 23 }, { x: 6, y: 8 }, { x: 22, y: 17 },
+        { x: 21, y: 8 }, { x: 31, y: 11 }, { x: 28, y: 24 },
+        { x: 26, y: 28 }, { x: 10, y: 28 },
+      ];
+
+      let mappedNodes: CourseNodeData[] = nodes.map((rn: any, idx: number) => {
+        const coords = pathCoords[(rn.order ?? idx) % pathCoords.length];
+        const isBoss = /boss|final|project/i.test(String(rn.title || ''));
+        const isQuiz = /quiz|kuis/i.test(String(rn.title || ''));
+
         let category: CourseNodeData['category'] = 'skill';
-        
-        if (rn.order === 1) {
-          badgeImage = ASSET_PATHS.BADGE_FIRST_STEP;
+        let badgeImage: string | undefined = ASSET_PATHS.OBJ_BOOK;
+        let npcKey = 'npc-professor';
+
+        if ((rn.order ?? 1) === 1) {
+          badgeImage = ASSET_PATHS.BADGE_FIRST_STEP as string;
           category = 'foundation';
           npcKey = 'npc-mentor';
-        } else if (rn.title.toLowerCase().includes('quiz')) {
-          badgeImage = ASSET_PATHS.BADGE_QUIZ_MASTER;
+        } else if (isQuiz) {
+          badgeImage = ASSET_PATHS.BADGE_QUIZ_MASTER as string;
           npcKey = 'npc-scholarship';
-        } else if (rn.title.toLowerCase().includes('project') || rn.title.toLowerCase().includes('boss')) {
-          badgeImage = ASSET_PATHS.BADGE_COURSE_MASTER;
+        } else if (isBoss) {
+          badgeImage = ASSET_PATHS.BADGE_COURSE_MASTER as string;
           category = 'milestone';
           npcKey = 'npc-wizard';
         }
 
         return {
-          id: rn.sectionId,
-          title: `Lvl ${rn.order}: ${rn.title}`,
-          description: `Materi dari bab ${rn.chapterId}`,
-          category: category,
-          status: rn.status, // 'available', 'locked', 'completed'
+          id: rn.sectionId || rn.id || `${rn.chapterId || 'chapter'}-level-${rn.order ?? idx + 1}`,
+          title: `Lvl ${(rn.order ?? idx + 1)}: ${rn.title || 'Materi'}`,
+          description: `Materi dari bab ${rn.chapterId || 'aktif'}`,
+          category,
+          status: rn.status || (rn.completed ? 'completed' : rn.locked ? 'locked' : 'available'),
           xp: 150,
           x: coords.x,
           y: coords.y,
           prerequisites: [],
-          badgeImage: badgeImage,
-          npcKey: npcKey,
+          badgeImage,
+          npcKey,
           courseId: rn.courseId,
           sectionId: rn.sectionId,
-          chapterId: rn.chapterId, // keep chapterId for filtering later
+          chapterId: rn.chapterId,
           missionId: rn.missionId,
         };
       });
 
-      // Filter by chapterId if requested (for Mahasiswa view)
       if (chapterId) {
-        mappedNodes = mappedNodes.filter(n => (n as any).chapterId === chapterId);
+        mappedNodes = mappedNodes.filter((node) => (node as any).chapterId === chapterId);
       }
 
-      set({ nodes: mappedNodes, isLoading: false, activeChapterId: chapterId });
+      const normalizedCompletedIds = Array.from(
+        new Set(
+          nodes
+            .filter((node: any) => node?.completed || node?.status === 'completed')
+            .flatMap((node: any) => [
+              node.sectionId,
+              node.missionId,
+              node.id,
+            ].filter((value): value is string => typeof value === 'string' && value.length > 0))
+        )
+      );
+
+      set({
+        nodes: mappedNodes,
+        isLoading: false,
+        activeChapterId: chapterId,
+        completedDynamicNodes: normalizedCompletedIds,
+      });
     } catch (err: unknown) {
-      console.error("fetchRoadmap error:", err);
+      console.error('fetchRoadmap error:', err);
       const message = err instanceof Error ? err.message : 'Failed to fetch roadmap';
       set({ error: message, isLoading: false });
     }
@@ -800,6 +479,7 @@ export const useMapStore = create<MapState>()(
     // Only persist the completed nodes list — everything else is re-derived on load
     partialize: (state) => ({
       completedDynamicNodes: state.completedDynamicNodes,
+      badgeCount: state.badgeCount,
     }),
   }
   )

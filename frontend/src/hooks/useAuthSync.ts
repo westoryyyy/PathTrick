@@ -83,7 +83,7 @@ async function hydrateFrontendState(
   const resolvedName = getProfileName(backendUser.name, resolvedEmail, fallbackName);
 
   const xp = backendUser.gamification?.xp || 0;
-  const calculatedLevel = Math.max(1, Math.floor(xp / 1000) + 1);
+  const calculatedLevel = Math.max(0, Math.floor(xp / 1000));
   useUserStore.getState().hydrateUser(xp, calculatedLevel, resolvedName, resolvedEmail);
 
   const currentOnboarding = useOnboardingStore.getState();
@@ -157,8 +157,6 @@ export function useAuthSync() {
         body: JSON.stringify({
           email: user.email?.address ?? user.google?.email ?? undefined,
           name: user.google?.name ?? undefined,
-          // Kirim walletAddress dari useWallets hook (lebih reliable dari linkedAccounts)
-          walletAddress: wallets[0]?.address ?? undefined,
         }),
       });
 
@@ -182,20 +180,26 @@ export function useAuthSync() {
         const isOnLanding = currentPath === '/';
 
         if (routeRole && routeRole !== 'admin') {
-          // User has a role and is on landing page → do NOT auto-redirect.
-          // They navigated here intentionally (e.g. clicked the logo) or landed here
-          // for the first time. The Dashboard button is visible; let them choose.
-          // Only redirect automatically if they came from a fresh login action
-          // (detected by the 'pt_fresh_login' flag set by handleStart on login).
+          const isOnOnboarding = currentPath.startsWith('/assessment') || currentPath.startsWith('/select-role');
           const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
-          if (isFreshLogin) {
+          const shouldSkipRedirect = currentPath === '/' && sessionStorage.getItem('pt_stay_on_landing') === '1';
+          if (isFreshLogin && !isOnOnboarding) {
             sessionStorage.removeItem('pt_fresh_login');
-            window.location.replace(`/${routeRole}/dashboard`);
+            const { onboardingCompleted } = useOnboardingStore.getState();
+            if (onboardingCompleted) {
+              window.location.replace(`/${routeRole}/dashboard`);
+            } else {
+              window.location.replace('/assessment');
+            }
+          } else if (isOnOnboarding) {
+            sessionStorage.removeItem('pt_fresh_login');
+          } else if (isOnLanding && !shouldSkipRedirect && !sessionStorage.getItem('pt_retain_dashboard')) {
+            sessionStorage.setItem('pt_retain_dashboard', '1');
           }
-          // Otherwise: stay on landing page, button will show "Dashboard".
         } else if (!routeRole) {
-          // No role yet → must go through onboarding
-          if (!currentPath.startsWith('/select-role')) {
+          const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
+          if (isFreshLogin && !currentPath.startsWith('/select-role')) {
+            sessionStorage.removeItem('pt_fresh_login');
             window.location.replace('/select-role');
           }
         }

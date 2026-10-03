@@ -23,7 +23,10 @@ export interface RIASECScores {
 
 /** Dreamer assessment form state */
 export interface DreamerAssessmentState {
-  riasec: RIASECScores;
+  /** questionId → score (1–5). Keyed by backend question ID. */
+  riasecAnswers: Record<string, number>;
+  /** Total pertanyaan yang di-fetch dari backend (untuk validasi completeness). */
+  riasecTotalQuestions: number;
   budgetPreference: string;        // required
   facultyPreferences: string[];    // optional, multi-select
   countryPreferences: string[];    // optional, multi-select
@@ -70,7 +73,10 @@ interface OnboardingStore {
   /* ── Dreamer Assessment ── */
   dreamerAssessment: DreamerAssessmentState;
   setDreamerField: <K extends keyof DreamerAssessmentState>(key: K, value: DreamerAssessmentState[K]) => void;
-  setRIASECScore: (dimension: keyof RIASECScores, score: number) => void;
+  /** Set/update satu jawaban RIASEC: questionId → score (1–5). */
+  setRiasecAnswer: (questionId: string, score: number) => void;
+  /** Dipanggil RIASECStep setelah fetch berhasil, untuk menyimpan total soal. */
+  setRiasecTotalQuestions: (total: number) => void;
 
   /* ── Chaser Assessment ── */
   chaserAssessment: ChaserAssessmentState;
@@ -79,6 +85,8 @@ interface OnboardingStore {
 
   /* ── Submission ── */
   isSubmitting: boolean;
+  /** True setelah assessment berhasil di-submit ke backend. Digunakan sebagai guard redirect. */
+  onboardingCompleted: boolean;
   submitAssessment: () => Promise<void>;
 
   /* ── Reset ── */
@@ -99,7 +107,8 @@ const DEFAULT_RIASEC: RIASECScores = {
 };
 
 const DEFAULT_DREAMER: DreamerAssessmentState = {
-  riasec: { ...DEFAULT_RIASEC },
+  riasecAnswers: {},
+  riasecTotalQuestions: 0,
   budgetPreference: '',
   facultyPreferences: [],
   countryPreferences: [],
@@ -162,12 +171,16 @@ export const useOnboardingStore = create<OnboardingStore>()(
     set((s) => ({
       dreamerAssessment: { ...s.dreamerAssessment, [key]: value },
     })),
-  setRIASECScore: (dimension, score) =>
+  setRiasecAnswer: (questionId, score) =>
     set((s) => ({
       dreamerAssessment: {
         ...s.dreamerAssessment,
-        riasec: { ...s.dreamerAssessment.riasec, [dimension]: score },
+        riasecAnswers: { ...s.dreamerAssessment.riasecAnswers, [questionId]: score },
       },
+    })),
+  setRiasecTotalQuestions: (total) =>
+    set((s) => ({
+      dreamerAssessment: { ...s.dreamerAssessment, riasecTotalQuestions: total },
     })),
 
   /* ── Chaser ── */
@@ -187,40 +200,208 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
   /* ── Submission ── */
   isSubmitting: false,
+  onboardingCompleted: false,
   submitAssessment: async () => {
     set({ isSubmitting: true });
     const { selectedRole, dreamerAssessment, chaserAssessment } = get();
     try {
-      let requestBody: any = { role: selectedRole, data: dreamerAssessment };
-      
-      if (selectedRole === 'chaser') {
+      let requestBody: any;
+
+      if (selectedRole === 'dreamer') {
+        const answers = Object.entries(dreamerAssessment.riasecAnswers ?? {})
+          .filter(([questionId]) => /^q\d{2}$/.test(questionId))
+          .map(([questionId, score]) => ({ questionId, value: score }));
+        requestBody = {
+          type: 'DREAMER_RIASEC',
+          payload: { answers },
+        };
+      } else if (selectedRole === 'chaser') {
         const gicsNames = chaserAssessment.preferredGICS.join(', ');
         const workTypes = chaserAssessment.workInterests.join(', ');
         const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`;
-        
         requestBody = {
-          type: "SCHOLAR_PROFILE",
+          type: 'CHASER_PROFILE',
           payload: {
-            cvText: chaserAssessment.cvText || "",
+            cvText: chaserAssessment.cvText || '',
             portfolioText: chaserAssessment.portfolioText || null,
-            major: "Lulusan S1/Sederajat", // Fallback karena belum ada input jurusan di UI
+            major: 'Lulusan S1/Sederajat',
             jobPreference: jobPreferenceStr,
-          }
+          },
         };
       }
 
-
-      const response = await fetch('/api/assessment', {
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const response = await fetch(`${API_BASE_URL}/api/assessment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify(requestBody),
       });
-      
-      if (!response.ok) throw new Error('API Error');
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        
+        // Auto-recovery jika role belum diset di backend
+        if (errData?.error === 'RoleNotSet' || errData?.message?.includes('belum memilih role')) {
+          console.warn('[Onboarding] Role belum diset di backend, melakukan auto-sync...');
+          const roleId = selectedRole === 'dreamer' ? 'role-dreamer' : 'role-chaser';
+          const roleSyncResponse = await fetch(`${API_BASE_URL}/api/users/me/role`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify({ roleId }),
+          });
+          
+          if (roleSyncResponse.ok) {
+            console.log('[Onboarding] Auto-sync role berhasil, mengulang pengiriman asesmen...');
+            // Retry submission
+            const retryResponse = await fetch(`${API_BASE_URL}/api/assessment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+              body: JSON.stringify(requestBody),
+            });
+            
+            if (!retryResponse.ok) {
+              const retryErrData = await retryResponse.json().catch(() => ({}));
+              const details = retryErrData?.details ? JSON.stringify(retryErrData.details) : '';
+              throw new Error((retryErrData as any)?.message || `HTTP ${retryResponse.status} ${details}`);
+            }
+            
+            // If dreamer, submit preferences as well
+            if (selectedRole === 'dreamer') {
+              const { budgetPreference, facultyPreferences, countryPreferences } = dreamerAssessment;
+              const countryPref = countryPreferences;
+              
+              // Mapping dari value frontend ke label backend
+              const FACULTY_MAP: Record<string, string> = {
+                'agr_farm': 'Agribisnis & Pertanian',
+                'biz_acc': 'Akuntansi & Keuangan',
+                'biz_mgmt': 'Bisnis & Manajemen',
+                'data_ai': 'Data Science & AI',
+                'arts_design': 'Desain & Seni Rupa',
+                'sci_natural': 'Fisika, Kimia & Biologi', // Backend expects &
+                'soc_ir': 'Hubungan Internasional',
+                'law': 'Ilmu Hukum',
+                'soc_comm': 'Ilmu Komunikasi',
+                'cs_it': 'Ilmu Komputer & TI',
+                'law_public': 'Ilmu Politik & Publik',
+                'med_doctor': 'Kedokteran Umum/Gigi', // Backend expects without ()
+                'agr_env': 'Kehutanan & Lingkungan',
+                'med_nurse': 'Keperawatan & Farmasi',
+                'sci_math': 'Matematika & Statistika',
+                'eng_mech': 'Mesin & Elektro',
+                'edu_teacher': 'Pendidikan Guru',
+                'soc_psy': 'Psikologi',
+                'arts_lang': 'Sastra & Bahasa',
+                'eng_civil': 'Sipil & Arsitektur',
+                'edu_tech': 'Teknologi Pendidikan'
+              };
+              
+              const BUDGET_MAP: Record<string, string> = {
+                'under5': 'TERJANGKAU',
+                '5to15': 'MENENGAH',
+                '15to30': 'PREMIUM',
+                'above30': 'EKSKLUSIF',
+                'beasiswa': 'FULL_SCHOLARSHIP'
+              };
+              
+              const studyfieldValue = facultyPreferences.length > 0 ? facultyPreferences.map(fp => FACULTY_MAP[fp]).filter(Boolean) : null;
+              const mappedBudget = BUDGET_MAP[budgetPreference] || 'MENENGAH';
+
+              const prefPayload = {
+                type: 'DREAMER_PREFERENCE',
+                payload: {
+                  studyfield: studyfieldValue,
+                  budgetTier: mappedBudget,
+                  countryPreference: countryPref
+                }
+              };
+              const prefResponse = await fetch(`${API_BASE_URL}/api/assessment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                body: JSON.stringify(prefPayload),
+              });
+              if (!prefResponse.ok) {
+                 throw new Error("Preferences Fallback Submission Failed");
+              }
+            }
+
+            console.log('[Onboarding] Assessment submitted (after retry)');
+            set({ onboardingCompleted: true });
+            return;
+          }
+        }
+
+        const details = errData?.details ? JSON.stringify(errData.details) : '';
+        throw new Error((errData as any)?.message || `HTTP ${response.status} ${details}`);
+      }
       const data = await response.json();
-      console.log('AI Assessment Result:', data);
+      
+      // If dreamer, submit preferences as well
+      if (selectedRole === 'dreamer') {
+        const { budgetPreference, facultyPreferences, countryPreferences } = dreamerAssessment;
+        const countryPref = countryPreferences;
+        
+        const FACULTY_MAP: Record<string, string> = {
+          'agr_farm': 'Agribisnis & Pertanian',
+          'biz_acc': 'Akuntansi & Keuangan',
+          'biz_mgmt': 'Bisnis & Manajemen',
+          'data_ai': 'Data Science & AI',
+          'arts_design': 'Desain & Seni Rupa',
+          'sci_natural': 'Fisika, Kimia & Biologi',
+          'soc_ir': 'Hubungan Internasional',
+          'law': 'Ilmu Hukum',
+          'soc_comm': 'Ilmu Komunikasi',
+          'cs_it': 'Ilmu Komputer & TI',
+          'law_public': 'Ilmu Politik & Publik',
+          'med_doctor': 'Kedokteran Umum/Gigi',
+          'agr_env': 'Kehutanan & Lingkungan',
+          'med_nurse': 'Keperawatan & Farmasi',
+          'sci_math': 'Matematika & Statistika',
+          'eng_mech': 'Mesin & Elektro',
+          'edu_teacher': 'Pendidikan Guru',
+          'soc_psy': 'Psikologi',
+          'arts_lang': 'Sastra & Bahasa',
+          'eng_civil': 'Sipil & Arsitektur',
+          'edu_tech': 'Teknologi Pendidikan'
+        };
+        
+        const BUDGET_MAP: Record<string, string> = {
+          'under5': 'TERJANGKAU',
+          '5to15': 'MENENGAH',
+          '15to30': 'PREMIUM',
+          'above30': 'EKSKLUSIF',
+          'beasiswa': 'FULL_SCHOLARSHIP'
+        };
+        
+        const studyfieldValue = facultyPreferences.length > 0 ? facultyPreferences.map(fp => FACULTY_MAP[fp]).filter(Boolean) : null;
+        const mappedBudget = BUDGET_MAP[budgetPreference] || 'MENENGAH';
+
+        const prefPayload = {
+          type: 'DREAMER_PREFERENCE',
+          payload: {
+            studyfield: studyfieldValue,
+            budgetTier: mappedBudget,
+            countryPreference: countryPref
+          }
+        };
+        
+        const prefResponse = await fetch(`${API_BASE_URL}/api/assessment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify(prefPayload),
+        });
+        
+        if (!prefResponse.ok) {
+           const errText = await prefResponse.text();
+           throw new Error(`Preferences Submission Failed: ${errText}`);
+        }
+      }
+
+      console.log('[Onboarding] Assessment & Preferences submitted:', data);
+      // Mark onboarding as completed so redirects to dashboard are now allowed.
+      set({ onboardingCompleted: true });
     } catch (e) {
-      console.error('Submission failed', e);
+      console.error('[Onboarding] Submission failed:', e);
     } finally {
       set({ isSubmitting: false });
     }
@@ -233,7 +414,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
       savedPrivyUserId: null,
       currentStep: 0,
       totalSteps: 0,
-      dreamerAssessment: { ...DEFAULT_DREAMER, riasec: { ...DEFAULT_RIASEC } },
+      onboardingCompleted: false,
+      dreamerAssessment: { ...DEFAULT_DREAMER, riasecAnswers: {}, riasecTotalQuestions: 0 },
       chaserAssessment: { ...DEFAULT_CHASER, preferredGICS: [], workInterests: [] },
       isSubmitting: false,
     }),

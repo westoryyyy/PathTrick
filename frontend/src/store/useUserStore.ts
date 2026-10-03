@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { mockBackendData } from '@/data/mockBackendData';
 
 interface UserState {
   totalXP: number;
@@ -15,6 +14,8 @@ interface UserState {
   triggerLevelUp: () => void;
   claimDailyBounty: () => void;
   completeQuiz: () => void;
+  setDailyBountyClaimed: (claimed: boolean) => void;
+  setHasCompletedQuizToday: (completed: boolean) => void;
   setProfile: (name: string, email: string) => void;
   setAvatar: (avatarUrl: string) => void;
   clearLevelUpFlag: () => void;
@@ -34,7 +35,7 @@ export const useUserStore = create<UserState>()(
       hasJustLeveledUp: false,
       addXP: (amount) => set((state) => {
         const newXP = state.totalXP + amount;
-        const newLevel = Math.max(1, Math.floor(newXP / 1000) + 1);
+        const newLevel = Math.max(0, Math.floor(newXP / 1000));
         if (newLevel > state.level) {
           return { totalXP: newXP, level: newLevel, hasJustLeveledUp: true };
         }
@@ -46,6 +47,8 @@ export const useUserStore = create<UserState>()(
       })),
       claimDailyBounty: () => set({ dailyBountyClaimed: true }),
       completeQuiz: () => set({ hasCompletedQuizToday: true }),
+      setDailyBountyClaimed: (claimed) => set({ dailyBountyClaimed: claimed }),
+      setHasCompletedQuizToday: (completed) => set({ hasCompletedQuizToday: completed }),
       setProfile: (name, email) => set({ displayName: name, displayEmail: email }),
       setAvatar: (avatarUrl) => set({ avatarUrl }),
       clearLevelUpFlag: () => set({ hasJustLeveledUp: false }),

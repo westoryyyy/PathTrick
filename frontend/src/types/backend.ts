@@ -22,13 +22,16 @@ export interface House {
   title: string;
   description?: string;
   icon: string;
-  status: 'completed' | 'active' | 'locked';
+  status: 'completed' | 'active' | 'locked' | 'not_recommended' | 'lockedByLevel';
+  isActive?: boolean;
   stages: Stage[];
   houseNumber: number;
   gradient: string;
   progress?: number;
   skillsOverview?: string[];
   idealFor?: string[];
+  courseCount?: number;
+  matchScore?: number;
 }
 
 export interface CareerTrack {
