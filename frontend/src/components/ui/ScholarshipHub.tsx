@@ -143,7 +143,8 @@ export default function ScholarshipHub() {
                 </div>
               )}
 
-              <div>
+              {/* Content Wrapper */}
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {scholarship.coverImageUrl && (
                   <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#2c1810', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
                     <img src={scholarship.coverImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
@@ -162,7 +163,7 @@ export default function ScholarshipHub() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29', marginTop: 'auto' }}>
                   {scholarship.coverage && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
@@ -223,6 +224,7 @@ export default function ScholarshipHub() {
               >
                 VIEW DETAILS
               </button>
+              </div>
             </div>
           ))}
         </div>

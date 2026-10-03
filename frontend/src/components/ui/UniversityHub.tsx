@@ -187,7 +187,7 @@ export default function UniversityHub() {
                 </div>
               )}
 
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {uni.coverImageUrl && (
                   <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#ffffff', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={uni.coverImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
@@ -206,7 +206,7 @@ export default function UniversityHub() {
                   </div>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29', marginTop: 'auto' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <img src="/Map.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
                     <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location || uni.country || '-'}</span>
@@ -266,6 +266,7 @@ export default function UniversityHub() {
               >
                 VIEW ROADMAP
               </button>
+              </div>
             </div>
           ))}
         </div>
