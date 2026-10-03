@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Batalkan run lama kalau ada push baru di branch yang sama
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Nilai publik / dummy hanya untuk keperluan build di CI
+      NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID || 'cmtz98a8m00sb0bjzr2pnjfbq' }}
+      NEXT_PUBLIC_CONTRACT_ADDRESS: "0x39632892C33435a76043343Ef17Ac03124627ba9"
+      NEXT_PUBLIC_PATHTRICK_SBT_ADDRESS: "0x39632892C33435a76043343Ef17Ac03124627ba9"
+      NEXT_PUBLIC_MINT_PRICE: "0.005"
+      NEXT_PUBLIC_CHAIN_ID: "97"
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"
+      NEXT_PUBLIC_USE_MOCK_BACKEND: "false"
+      NEXT_PUBLIC_ALLOW_LOCAL_ROLE_FALLBACK: "false"
+      NEXT_PUBLIC_BNB_TESTNET_RPC_URL: "https://data-seed-prebsc-1-s1.binance.org:8545"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        # Non-blocking dulu; hapus baris ini kalau lint sudah bersih
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend (prisma + typecheck build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Dummy, hanya agar prisma generate tidak protes
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/ci"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Build (tsc)
+        run: npm run build
