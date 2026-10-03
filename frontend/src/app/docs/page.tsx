@@ -130,7 +130,7 @@ export default function DocsPage() {
                 <div className={styles.callout} style={{ textAlign: 'justify' }}>
                   <strong>
                     {locale === 'en'
-                      ? <>“PathTrick is the bridge from ‘I don’t know where to start’ to ‘I know my next step, I’ve done it, and I have proof to show for it.’”</>
+                      ? <>"PathTrick bridges the gap between 'I don't know where to start' and 'I know my next step, I've taken action, and I have proof.'"</>
                       : <>“PathTrick adalah jembatan dari ‘Saya tidak tahu harus mulai dari mana’ menjadi ‘Saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya punya bukti untuk menunjukkannya.’”</>
                     }
                   </strong>
