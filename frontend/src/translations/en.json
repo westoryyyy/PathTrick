@@ -31,7 +31,13 @@
     "claimXpBtn": "CLAIM +150 XP",
     "uploadCvPrompt": "Got a new skill? Upload your latest CV so AI can update your profile & career recommendations.",
     "achievementsDesc": "Your Achievement Collection. Complete more missions to unlock all badges!",
-    "noCertificatesDesc": "You haven't conquered any Boss Modules yet. Play Learning Missions to earn Certificates!"
+    "noCertificatesDesc": "You haven't conquered any Boss Modules yet. Play Learning Missions to earn Certificates!",
+    "relicsTitle": "RELICS & TREASURES (WEB3 VAULT)",
+    "relicsDesc": "An exclusive collection of Soulbound Tokens (SBT) as tangible proof of your achievements. All certificates below are encrypted and eternalized on the Blockchain.",
+    "badgesTitle": "BADGES",
+    "badgesUnlocked": "BADGES UNLOCKED",
+    "unlocked": "UNLOCKED",
+    "locked": "LOCKED"
   },
   "badges": {
     "missionCompleter": "Completed 1 Mission",

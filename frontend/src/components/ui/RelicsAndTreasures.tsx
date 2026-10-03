@@ -58,7 +58,7 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
       {!hideHeader && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-            BADGES
+            {t('common.badgesTitle')}
           </h2>
           <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
             {t('common.achievementsDesc')}
@@ -66,7 +66,7 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fbbf24' }}>
-        <span>{statsLabel}</span>
+        <span>{statsLabel === 'BADGES UNLOCKED' ? t('common.badgesUnlocked') : statsLabel}</span>
         <span style={{ color: '#fff' }}>{badgeCount}</span>
       </div>
 
@@ -124,7 +124,7 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
               fontSize: '0.45rem', 
               color: sbt.earned ? '#fff' : '#a3a3a3' 
             }}>
-              {sbt.earned ? 'UNLOCKED' : 'LOCKED'}
+              {sbt.earned ? t('common.unlocked') : t('common.locked')}
             </div>
           </div>
         ))}

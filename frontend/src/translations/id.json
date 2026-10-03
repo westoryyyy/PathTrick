@@ -31,7 +31,13 @@
     "claimXpBtn": "KLAIM +150 XP",
     "uploadCvPrompt": "Punya skill baru? Upload CV terbaru kamu agar AI memperbarui profil & rekomendasi karir kamu.",
     "achievementsDesc": "Koleksi Pencapaian kamu. Selesaikan lebih banyak misi untuk membuka semua badge!",
-    "noCertificatesDesc": "Kamu belum menaklukkan Boss Modul manapun. Mainkan Learning Mission untuk mendapatkan Sertifikat!"
+    "noCertificatesDesc": "Kamu belum menaklukkan Boss Modul manapun. Mainkan Learning Mission untuk mendapatkan Sertifikat!",
+    "relicsTitle": "RELICS & TREASURES (WEB3 VAULT)",
+    "relicsDesc": "Koleksi eksklusif Soulbound Token (SBT) sebagai bukti nyata pencapaianmu. Semua sertifikat di bawah ini terenkripsi dan abadi di dalam Blockchain.",
+    "badgesTitle": "BADGES",
+    "badgesUnlocked": "BADGES UNLOCKED",
+    "unlocked": "UNLOCKED",
+    "locked": "LOCKED"
   },
   "badges": {
     "missionCompleter": "Selesai 1 Misi",
