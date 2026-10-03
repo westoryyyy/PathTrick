@@ -357,7 +357,7 @@ export default function Dashboard() {
               <span className={styles.cardTitle}>👑 {t('sma.dashboard.weeklyLeaderboard')}</span>
             </div>
             <div className={styles.lbList}>
-              {leaderboard.map((lb: any) => (
+              {leaderboard.slice(0, 5).map((lb: any) => (
                 <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
                   <div className={styles.lbRankInfo}>
                     <span className={styles.lbRankNum}>#{lb.rank}</span>
