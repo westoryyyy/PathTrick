@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
-import { useOnboardingStore } from '@/store/useOnboardingStore';
-import { useAuthSync } from '@/hooks/useAuthSync';
+import { useAuthSync, getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
 import styles from './page.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
 import LanguageToggle from '@/components/ui/LanguageToggle';
@@ -55,12 +55,12 @@ export default function LandingPage() {
   const { login, ready, authenticated } = usePrivy();
   const { t, locale } = useTranslation();
   const router = useRouter();
-  const { selectedRole } = useOnboardingStore();
   const { isSyncing } = useAuthSync();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [clientMounted, setClientMounted] = React.useState(false);
   const [hasStoredToken, setHasStoredToken] = React.useState(false);
+  const [isResolvingDestination, setIsResolvingDestination] = React.useState(false);
 
   // Read localStorage only after client mounts (avoid SSR hydration mismatch)
   React.useEffect(() => {
@@ -74,13 +74,38 @@ export default function LandingPage() {
   // No longer auto-redirecting here — redirect is handled inside useAuthSync
   // after backend sync completes (see hooks/useAuthSync.ts).
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!ready || isSyncing) return;
     if (authenticated) {
-      if (selectedRole) {
-        router.replace(`/${selectedRole}/dashboard`);
-      } else {
+      setIsResolvingDestination(true);
+      try {
+        const token = getAuthHeaders()['Authorization'];
+        if (!token) {
+          router.replace('/select-role');
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() });
+        if (!response.ok) {
+          router.replace('/select-role');
+          return;
+        }
+
+        const data = await response.json() as any;
+        const roleName = data?.role?.name?.toUpperCase();
+        if (roleName === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else if (roleName === 'CHASER') {
+          router.replace('/chaser/dashboard');
+        } else if (roleName === 'DREAMER') {
+          router.replace('/dreamer/dashboard');
+        } else {
+          router.replace('/select-role');
+        }
+      } catch {
         router.replace('/select-role');
+      } finally {
+        setIsResolvingDestination(false);
       }
     } else {
       // Mark this as a fresh login so useAuthSync redirects to dashboard after sync
@@ -166,7 +191,7 @@ export default function LandingPage() {
                 {isLikelyAuthenticated ? (
                   <Image
                     src="/dashboard-button.png"
-                    alt={isSyncing ? "..." : selectedRole ? "Dashboard" : "LANJUTKAN SETUP"}
+                    alt={isSyncing || isResolvingDestination ? "..." : "Dashboard"}
                     width={120}
                     height={36}
                     unoptimized

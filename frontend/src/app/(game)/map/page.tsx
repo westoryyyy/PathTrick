@@ -9,7 +9,6 @@ import PlayerHUD from '@/components/ui/PlayerHUD';
 import NodeInfoPanel from '@/components/ui/NodeInfoPanel';
 import SBTBadgePopup from '@/components/ui/SBTBadgePopup';
 import GameLoadingScreen from '@/components/ui/GameLoadingScreen';
-import { mockBackendData } from '@/data/mockBackendData';
 import type { Chapter } from '@/types/backend';
 import { useUserStore } from '@/store/useUserStore';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
@@ -45,6 +44,8 @@ function MapContent() {
   const [showSBT,      setShowSBT]      = useState(false);
   const [sbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
   const [houseId,      setHouseId]      = useState<string | null>(null);
+  const badgeCount = useMapStore(state => state.badgeCount);
+  const fetchAchievements = useMapStore(state => state.fetchAchievements);
 
   const { user } = usePrivy();
   const { wallets } = useWallets();
@@ -82,22 +83,9 @@ function MapContent() {
         return;
       }
 
-      // Find the Chapter inside the Module (Legacy SMA)
+      // We removed mockBackendData.houses lookup, so targetChapter starts as null.
       let targetChapter: Chapter | null = null;
       let targetHouseId = searchParams.get('house') || searchParams.get('houseId');
-      for (const h of mockBackendData.houses) {
-        for (const s of h.stages) {
-          if (s.chapters) {
-            const found = s.chapters.find(c => c.id === chapterId);
-            if (found) {
-              targetChapter = found;
-              targetHouseId = targetHouseId || h.id;
-              break;
-            }
-          }
-        }
-        if (targetChapter) break;
-      }
       
       if (targetHouseId) {
         useMapStore.setState({ houseId: targetHouseId });
@@ -249,6 +237,11 @@ function MapContent() {
     }
   }, [moduleId, chapterId, role, roleQuery, fetchRecommendedCourses, fetchRoadmap]);
 
+  useEffect(() => {
+    // populate shared badge count
+    fetchAchievements().catch(() => {});
+  }, [fetchAchievements]);
+
   const handleNodeSelected = useCallback((node: CourseNodeData) => {
     setSelectedNode(node);
   }, []);
@@ -261,15 +254,22 @@ function MapContent() {
     setNearbyNode(null);
   }, []);
 
+  const isNotRecommended = searchParams.get('isNotRecommended');
+
   const handleStartCourse = useCallback(async (node: CourseNodeData) => {
     setSelectedNode(null);
+    let queryParams = new URLSearchParams();
+    if (isNotRecommended) queryParams.set('isNotRecommended', 'true');
+    if (chapterId) queryParams.set('chapter', chapterId);
+    
+    const queryStr = queryParams.toString() ? `?${queryParams.toString()}` : '';
 
     if (role === 'SMA') {
-      router.push(`/dreamer/learning-progress/${node.id}`);
+      router.push(`/dreamer/learning-progress/${node.id}${queryStr}`);
     } else {
-      router.push(`/chaser/learning-mission/mission/${node.id}`);
+      router.push(`/chaser/learning-mission/mission/${node.id}${queryStr}`);
     }
-  }, [role, router]);
+  }, [role, router, isNotRecommended, chapterId]);
 
   if (isLoading || (chapterId && dynamicNodes.length === 0)) {
     return <GameLoadingScreen statusText="Menyiapkan Data Peta..." />;
@@ -291,7 +291,7 @@ function MapContent() {
           xp={totalXP}
           xpToNext={level * 2500}
           level={level}
-          sbtCount={0}
+            sbtCount={badgeCount}
           nearbyNodeTitle={nearbyNode?.title ?? null}
         />
 

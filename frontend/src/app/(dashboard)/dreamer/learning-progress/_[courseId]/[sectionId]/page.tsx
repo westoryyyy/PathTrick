@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
-import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
@@ -33,14 +32,37 @@ export default function MissionFlowPage() {
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
 
-  // Find the exact chapter from mock data by extracting base chapter ID
+  // Fetch the chapter from DB based on baseChapterId
   const baseChapterId = (missionId as string)?.replace(/-level-\d+$/, '');
-  const allChapters = mockBackendData.houses.flatMap(h => h.stages).flatMap(s => s.chapters || []);
-  const currentChapter = allChapters.find(c => c.id === baseChapterId) || {
+  const [currentChapter, setCurrentChapter] = useState<{name: string, description?: string, duration?: string}>({
     name: 'Materi Pembelajaran',
     description: 'Selamat datang! Persiapkan dirimu untuk menerima ilmu baru.',
     duration: '6 Levels'
-  };
+  });
+
+  useEffect(() => {
+    async function loadChapter() {
+      if (baseChapterId) {
+        import('@/hooks/useAuthSync').then(({ getAuthHeaders }) => {
+          import('@/config/pathtrick').then(({ API_BASE_URL }) => {
+            fetch(`${API_BASE_URL}/api/chapters/${baseChapterId}`, { headers: getAuthHeaders() })
+              .then(res => { if (res.ok) return res.json(); throw new Error('Not found'); })
+              .then(data => {
+                if (data && !data.error) {
+                  setCurrentChapter({
+                    name: data.title,
+                    description: data.description || 'Pelajari materi ini dengan cermat.',
+                    duration: data.sections?.length ? `${data.sections.length} Levels` : '6 Levels'
+                  });
+                }
+              })
+              .catch(err => console.error(err));
+          });
+        });
+      }
+    }
+    loadChapter();
+  }, [baseChapterId]);
 
   // Determine level type based on dynamic ID
   let baseLevelType: Phase = 'MATERIAL';
@@ -348,10 +370,12 @@ export default function MissionFlowPage() {
     setIsSubmitting(true);
     // Simulate AI grading delay
     try {
-      const response = await fetch('/api/submit-task', {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/project/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, missionId })
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ code })
       });
       const data = await response.json();
 

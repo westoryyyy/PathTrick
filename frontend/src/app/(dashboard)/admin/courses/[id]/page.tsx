@@ -158,10 +158,8 @@ export default function CourseDetailPage() {
           }
           return {
             ...q,
-            options: (q.options || []).map((opt: any) => 
-              typeof opt === 'string' ? opt : (opt?.text || opt?.id || '')
-            ),
-            correctAnswer: typeof ans === 'string' ? ans : (ans?.text || ans?.id || '')
+            options: q.options || [],
+            correctAnswer: typeof ans === 'string' ? ans : (ans?.id || ans?.text || '')
           };
         })
       };
@@ -378,7 +376,7 @@ export default function CourseDetailPage() {
                               return { ...prev, [section.id]: { ...prev[section.id], questions: qs } };
                             })}>Hapus Soal</button>
                           </div>
-                          <input placeholder="Pertanyaan..." style={{ ...px, width: '100%', background: '#1a0d05', border: '1px solid #5a3a29', color: '#fff', padding: '6px 10px', fontSize: '0.9rem', boxSizing: 'border-box' as const }}
+                          <textarea placeholder="Pertanyaan (Bisa multi-baris)..." rows={4} style={{ ...px, width: '100%', background: '#1a0d05', border: '1px solid #5a3a29', color: '#fff', padding: '6px 10px', fontSize: '0.9rem', resize: 'vertical', boxSizing: 'border-box' as const }}
                             value={q.prompt}
                             onChange={e => setEditingQuiz(prev => { const qs = [...prev[section.id].questions]; qs[qi] = { ...qs[qi], prompt: e.target.value }; return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; })} />
                           
@@ -399,13 +397,25 @@ export default function CourseDetailPage() {
                           ) : (
                             <>
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                                {q.options.map((opt: any, oi) => {
-                                  const optStr = typeof opt === 'string' ? opt : (opt?.text || opt?.id || '');
+                                {q.options.map((opt: any, oi: number) => {
+                                  const optStr = typeof opt === 'string' ? opt : (opt?.text || '');
+                                  const optId = typeof opt === 'string' ? opt : (opt?.id || '');
+                                  const isCorrect = q.correctAnswer === (optId || optStr);
                                   return (
                                   <input key={oi} placeholder={`Opsi ${String.fromCharCode(65 + oi)}`}
-                                    style={{ ...px, background: '#1a0d05', border: `1px solid ${optStr === q.correctAnswer && optStr ? '#10b981' : '#5a3a29'}`, color: '#fff', padding: '5px 8px', fontSize: '0.85rem' }}
+                                    style={{ ...px, background: '#1a0d05', border: `1px solid ${isCorrect && optStr ? '#10b981' : '#5a3a29'}`, color: '#fff', padding: '5px 8px', fontSize: '0.85rem' }}
                                     value={optStr}
-                                    onChange={e => setEditingQuiz(prev => { const qs = [...prev[section.id].questions]; const opts = [...qs[qi].options]; opts[oi] = e.target.value; qs[qi] = { ...qs[qi], options: opts }; return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; })} />
+                                    onChange={e => setEditingQuiz(prev => { 
+                                      const qs = [...prev[section.id].questions]; 
+                                      const opts = [...qs[qi].options]; 
+                                      if (typeof opts[oi] === 'object' && opts[oi] !== null) {
+                                        opts[oi] = { ...(opts[oi] as any), text: e.target.value };
+                                      } else {
+                                        opts[oi] = e.target.value; 
+                                      }
+                                      qs[qi] = { ...qs[qi], options: opts }; 
+                                      return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; 
+                                    })} />
                                 )})}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -414,7 +424,13 @@ export default function CourseDetailPage() {
                                   value={q.correctAnswer}
                                   onChange={e => setEditingQuiz(prev => { const qs = [...prev[section.id].questions]; qs[qi] = { ...qs[qi], correctAnswer: e.target.value }; return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; })}>
                                   <option value="">-- Pilih --</option>
-                                  {q.options.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.id || '')).filter(Boolean).map((optStr, oi) => <option key={oi} value={optStr}>{optStr}</option>)}
+                                  {q.options.map((opt: any, oi) => {
+                                    const optStr = typeof opt === 'string' ? opt : (opt?.text || '');
+                                    const optId = typeof opt === 'string' ? opt : (opt?.id || '');
+                                    const val = optId || optStr;
+                                    if (!val) return null;
+                                    return <option key={oi} value={val}>{val === optStr ? val : `${val}. ${optStr}`}</option>;
+                                  })}
                                 </select>
                               </div>
                             </>

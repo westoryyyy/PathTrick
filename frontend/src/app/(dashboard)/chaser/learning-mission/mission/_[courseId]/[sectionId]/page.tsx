@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './page.module.css';
 import CodePlayground from '@/components/ui/CodePlayground';
-import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';

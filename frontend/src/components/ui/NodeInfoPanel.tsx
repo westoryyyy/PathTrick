@@ -163,6 +163,7 @@ export default function NodeInfoPanel({
   };
   const statusMeta = STATUS_META[displayNode.status];
   const canStart = displayNode.status === 'available' || displayNode.status === 'in_progress';
+  const isCompleted = displayNode.status === 'completed';
   const isBoss = displayNode.category === 'milestone' || displayNode.title.toLowerCase().includes('boss');
   const allLinesShown = bossLineIndex >= BOSS_DIALOGUE_LINES.length - 1;
 
@@ -262,13 +263,13 @@ export default function NodeInfoPanel({
                       Lewati ▶▶
                     </button>
                   )}
-                  {displayNode.status === 'completed' && (
+                  {isCompleted && (
                     <button
                       className={`${styles.actionBtn} ${styles.goldBtn}`}
                       onClick={handleStartCourse}
                       onMouseEnter={playHoverSound}
                     >
-                      Lihat Badge 🌟
+                      📖 Review Materi
                     </button>
                   )}
                   {displayNode.status === 'locked' && (
@@ -315,13 +316,13 @@ export default function NodeInfoPanel({
                       )}
                     </>
                   )}
-                  {displayNode.status === 'completed' && (
+                  {isCompleted && (
                     <button
                       className={`${styles.actionBtn} ${styles.goldBtn}`}
                       onClick={handleStartCourse}
                       onMouseEnter={playHoverSound}
                     >
-                      Lihat Badge 🌟
+                      📖 Review Materi
                     </button>
                   )}
                   {displayNode.status === 'locked' && (

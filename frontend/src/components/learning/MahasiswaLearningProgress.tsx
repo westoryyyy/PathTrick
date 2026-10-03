@@ -17,7 +17,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 export default function MahasiswaLearningProgress() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { totalXP, level, dailyBountyClaimed, hasCompletedQuizToday, claimDailyBounty, completeQuiz, addXP } = useUserStore();
+  const { totalXP, level, dailyBountyClaimed, hasCompletedQuizToday, claimDailyBounty, completeQuiz, addXP, setDailyBountyClaimed, setHasCompletedQuizToday } = useUserStore();
   const { fetchProfileData, analyzeSkillGap, earnedSBTs, matchedJobs } = useScholarStore();
 
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
@@ -29,6 +29,7 @@ export default function MahasiswaLearningProgress() {
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [dailyQuest, setDailyQuest] = useState<{ id: string; isCompleted: boolean; isRewardClaimed: boolean; rewardXp: number } | null>(null);
 
   const [activeModules, setActiveModules] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,6 +61,25 @@ export default function MahasiswaLearningProgress() {
             progressObj: c.progress
           }));
           setActiveModules(mappedCourses);
+        }
+
+        const questsRes = await fetch(`${API_BASE_URL}/api/quests`, { headers: getAuthHeaders() });
+        if (questsRes.ok) {
+          const questsData = await questsRes.json();
+          const quest = Array.isArray(questsData.quests)
+            ? questsData.quests.find((item: any) => item.type === 'DAILY_LOGIN')
+            : null;
+          if (quest) {
+            const resolvedQuest = {
+              id: quest.id,
+              isCompleted: !!quest.isCompleted,
+              isRewardClaimed: !!quest.isRewardClaimed,
+              rewardXp: quest.rewardXp ?? 0,
+            };
+            setDailyQuest(resolvedQuest);
+            setHasCompletedQuizToday(resolvedQuest.isCompleted);
+            setDailyBountyClaimed(resolvedQuest.isRewardClaimed);
+          }
         }
       } catch (e) {
         console.error('Failed to fetch courses:', e);
@@ -292,29 +312,25 @@ export default function MahasiswaLearningProgress() {
               </p>
 
               <button onMouseEnter={playHoverSound}
-                disabled={dailyBountyClaimed || isClaimingBounty}
+                disabled={!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty}
                 onClick={async () => {
-                  if (!hasCompletedQuizToday) {
-                    // Not completed yet, route to map
-                    router.push('/map?role=chaser');
+                  if (!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty) {
                     return;
                   }
 
-                  // Already completed, claim the bounty
                   if (!dailyBountyClaimed && !isClaimingBounty) {
                     setIsClaimingBounty(true);
                     
                     try {
-                      const res = await fetch(`${API_BASE_URL}/api/gamification/add-xp`, {
+                      const res = await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
                         method: 'POST',
                         headers: getAuthHeaders(),
-                        body: JSON.stringify({ amount: 150 })
                       });
                       
                       if (res.ok) {
                         setTimeout(() => {
                           claimDailyBounty();
-                          addXP(150);
+                          addXP(dailyQuest.rewardXp || 150);
                           setIsClaimingBounty(false);
                         }, 800);
                       } else {
@@ -326,30 +342,35 @@ export default function MahasiswaLearningProgress() {
                   }
                 }}
                 style={{
-                  background: dailyBountyClaimed ? '#737373' : (hasCompletedQuizToday ? '#10b981' : '#f59e0b'),
-                  color: dailyBountyClaimed ? '#a3a3a3' : (hasCompletedQuizToday ? '#fff' : '#3b261b'),
-                  border: `4px solid ${dailyBountyClaimed ? '#404040' : (hasCompletedQuizToday ? '#059669' : '#b45309')}`,
+                  background: dailyBountyClaimed ? '#737373' : (!dailyQuest?.isCompleted ? '#f59e0b' : '#10b981'),
+                  color: dailyBountyClaimed ? '#a3a3a3' : (!dailyQuest?.isCompleted ? '#3b261b' : '#fff'),
+                  border: `4px solid ${dailyBountyClaimed ? '#404040' : (!dailyQuest?.isCompleted ? '#b45309' : '#059669')}`,
                   borderRadius: '12px',
                   padding: '12px 16px',
                   fontFamily: '"Press Start 2P"',
                   fontSize: '0.6rem',
-                  cursor: dailyBountyClaimed ? 'not-allowed' : 'pointer',
+                  cursor: dailyBountyClaimed || isClaimingBounty || !dailyQuest?.isCompleted ? 'not-allowed' : 'pointer',
                   width: '100%',
                   boxShadow: dailyBountyClaimed ? 'none' : 'inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8)',
                   transform: isClaimingBounty ? 'scale(0.95)' : 'scale(1)',
                   transition: 'transform 0.1s',
-                  animation: (hasCompletedQuizToday && !dailyBountyClaimed && !isClaimingBounty) ? 'pulseGlow 2s infinite' : 'none'
+                  animation: (dailyQuest?.isCompleted && !dailyBountyClaimed && !isClaimingBounty) ? 'pulseGlow 2s infinite' : 'none'
                 }}
               >
-                {!hasCompletedQuizToday
-                  ? t('common.playQuizBtn')
-                  : (isClaimingBounty ? t('common.claimingBtn') : (dailyBountyClaimed ? t('common.claimedBtn') : t('common.claimXpBtn')))}
+                {isClaimingBounty
+                  ? t('common.claimingBtn')
+                  : (dailyBountyClaimed
+                    ? t('common.claimedBtn')
+                    : (!dailyQuest?.isCompleted ? 'LOGIN DAILY' : t('common.claimXpBtn')))}
               </button>
 
               {/* HIDDEN DEV BUTTON TO SIMULATE COMPLETING QUIZ */}
               {!hasCompletedQuizToday && (
                 <button onMouseEnter={playHoverSound}
-                  onClick={() => completeQuiz()}
+                  onClick={() => {
+                    completeQuiz();
+                    setHasCompletedQuizToday(true);
+                  }}
                   style={{ fontSize: '0.4rem', opacity: 0.1, position: 'absolute', top: 5, right: 5 }}
                   title="Dev: Simulate Quiz Completion"
                 >

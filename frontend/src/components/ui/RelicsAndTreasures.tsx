@@ -1,54 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import styles from '@/components/ui/Dashboard.module.css';
-
-import { useMapStore } from '@/store/useMapStore';
-
 import Image from 'next/image';
-import { getAuthHeaders } from '@/hooks/useAuthSync';
-import { API_BASE_URL } from '@/config/pathtrick';
+import { ASSET_PATHS } from '@/phaser/config';
 import { useTranslation } from '@/hooks/useTranslation';
+import styles from '@/components/ui/Dashboard.module.css';
+import { useMapStore } from '@/store/useMapStore';
+import { PixelSkeletonTileGrid } from '@/components/ui/PixelSkeleton';
 
 type Props = {
   hideHeader?: boolean;
   statsLabel?: string;
 };
 
+const BADGE_ASSET_MAP = {
+  mission_completer: ASSET_PATHS.BADGE_MISSION_COMPLETE,
+  early_bird: ASSET_PATHS.BADGE_EARLY_BIRD,
+  streak_warrior: ASSET_PATHS.BADGE_STREAK_WARRIOR,
+  quiz_master: ASSET_PATHS.BADGE_QUIZ_MASTER,
+  quick_learner: ASSET_PATHS.BADGE_QUICK_LEARNER,
+  course_master: ASSET_PATHS.BADGE_COURSE_MASTER,
+  first_step: ASSET_PATHS.BADGE_FIRST_STEP,
+  night_owl: ASSET_PATHS.BADGE_NIGHT_OWL,
+} as const;
+
 export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'BADGES UNLOCKED' }: Props = {}) {
   const { t } = useTranslation();
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
+  const badgeCount = useMapStore(state => state.badgeCount);
+  const fetchAchievements = useMapStore(state => state.fetchAchievements);
   const [unlockedKeys, setUnlockedKeys] = useState<string[]>([]);
-  
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/gamification`, {
-          headers: { ...getAuthHeaders() }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const keys = data.achievements.map((a: any) => a.key);
-          setUnlockedKeys(keys);
-        }
-      } catch (e) {}
-    };
-    fetchAchievements();
-  }, []);
-  
-  
+  const [loadingBadges, setLoadingBadges] = useState(true);
 
+  useEffect(() => {
+    // Use centralized fetch so multiple components share cached value
+    (async () => {
+      try {
+        const keys = await fetchAchievements();
+        setUnlockedKeys(keys);
+      } finally {
+        setLoadingBadges(false);
+      }
+    })();
+  }, [fetchAchievements]);
+  
   const VAULT_SBTS = [
-    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: '/Mission Completer.png' },
-    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: '/Early Bird.png' },
-    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: '/Streak Warrior copy.png' },
-    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '/Quiz Master copy.png' },
-    { id: 5, name: 'Quick Learner', desc: t('badges.quickLearner'), earned: unlockedKeys.includes('quick_learner'), icon: '/Quick Learner copy.png' },
-    { id: 6, name: 'Course Master', desc: t('badges.courseMaster'), earned: unlockedKeys.includes('course_master'), icon: '/course-master.png' },
-    { id: 8, name: 'First Step', desc: t('badges.firstStep'), earned: unlockedKeys.includes('first_step'), icon: '/First Step.png' },
-    { id: 9, name: 'Night Owl', desc: t('badges.nightOwl'), earned: unlockedKeys.includes('night_owl'), icon: '/Night Owl copy.png' },
+    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: BADGE_ASSET_MAP.mission_completer },
+    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: BADGE_ASSET_MAP.early_bird },
+    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: BADGE_ASSET_MAP.streak_warrior },
+    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: BADGE_ASSET_MAP.quiz_master },
+    { id: 5, name: 'Quick Learner', desc: t('badges.quickLearner'), earned: unlockedKeys.includes('quick_learner'), icon: BADGE_ASSET_MAP.quick_learner },
+    { id: 6, name: 'Course Master', desc: t('badges.courseMaster'), earned: unlockedKeys.includes('course_master'), icon: BADGE_ASSET_MAP.course_master },
+    { id: 8, name: 'First Step', desc: t('badges.firstStep'), earned: unlockedKeys.includes('first_step'), icon: BADGE_ASSET_MAP.first_step },
+    { id: 9, name: 'Night Owl', desc: t('badges.nightOwl'), earned: unlockedKeys.includes('night_owl'), icon: BADGE_ASSET_MAP.night_owl },
   ];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
-      {/* Header */}
       {!hideHeader && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
@@ -59,10 +65,12 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
           </p>
         </div>
       )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fbbf24' }}>
+        <span>{statsLabel}</span>
+        <span style={{ color: '#fff' }}>{badgeCount}</span>
+      </div>
 
-
-
-      {/* Grid */}
+      {loadingBadges ? <PixelSkeletonTileGrid count={8} /> : (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '24px', width: '100%', marginTop: '8px' }}>
         {VAULT_SBTS.map(sbt => (
           <div 
@@ -116,11 +124,12 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
               fontSize: '0.45rem', 
               color: sbt.earned ? '#fff' : '#a3a3a3' 
             }}>
-              {sbt.earned ? 'CLAIMED' : 'LOCKED'}
+              {sbt.earned ? 'UNLOCKED' : 'LOCKED'}
             </div>
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

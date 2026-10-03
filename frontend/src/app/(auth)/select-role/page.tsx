@@ -9,11 +9,10 @@ import { useUserStore } from '@/store/useUserStore';
 import {
   API_BASE_URL,
   getApiError,
-  isLocalRoleFallbackEnabled,
   readApiResponse,
 } from '@/config/pathtrick';
 import { getAuthHeaders, useAuthSync } from '@/hooks/useAuthSync';
-import { LOCAL_ROLES, type RoleOption } from '@/data/roles';
+import { type RoleOption } from '@/data/roles';
 
 /**
  * Bridge: backend role id/name → frontend route slug.
@@ -41,8 +40,6 @@ export default function SelectRolePage() {
 
   // Store
   const setRole = useOnboardingStore((s) => s.setRole);
-  const selectedRole = useOnboardingStore((s) => s.selectedRole);
-  const savedPrivyUserId = useOnboardingStore((s) => s.savedPrivyUserId);
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
 
   const [selected, setSelected] = useState<string | null>(null);
@@ -55,7 +52,7 @@ export default function SelectRolePage() {
   const [isVerifyingRole, setIsVerifyingRole] = useState(true);
 
   const isGoogleLogin = !!user?.google;
-  const needsWalletConnection = isGoogleLogin && wallets.length === 0;
+  const needsWalletConnection = !wallets[0]?.address && isGoogleLogin;
 
   const [existingRoleSlug, setExistingRoleSlug] = useState<string | null>(null);
 
@@ -102,14 +99,23 @@ export default function SelectRolePage() {
           return;
         }
 
+        const hasRoadmap = (data as any)?.roadmaps && (data as any).roadmaps.length > 0;
+
         if (slug === 'dreamer' || slug === 'chaser') {
           setRole(slug, user.id);
-          router.replace(`/${slug}/dashboard`);
+          // Only send to dashboard if assessment was already completed (verified by backend roadmap).
+          // Otherwise send to /assessment so they can finish onboarding.
+          if (hasRoadmap) {
+            useOnboardingStore.setState({ onboardingCompleted: true }); // sync state just in case
+            router.replace(`/${slug}/dashboard`);
+          } else {
+            router.replace('/assessment');
+          }
         } else if (slug === 'admin') {
           router.replace('/admin/dashboard');
         } else {
           // No role in backend — clear any stale store data and show role selector
-          if (selectedRole && savedPrivyUserId === user.id) resetOnboarding();
+          resetOnboarding();
           setIsVerifyingRole(false);
         }
       })
@@ -143,13 +149,8 @@ export default function SelectRolePage() {
       .catch((error: unknown) => {
         console.warn('Roles API unavailable:', error);
         if (!cancelled) {
-          if (isLocalRoleFallbackEnabled()) {
-            setRoles(LOCAL_ROLES);
-            setRolesError('');
-          } else {
-            setRoles([]);
-            setRolesError('Role belum dapat dimuat. Coba lagi atau hubungi administrator.');
-          }
+          setRoles([]);
+          setRolesError('Role belum dapat dimuat. Coba lagi atau hubungi administrator.');
         }
       })
       .finally(() => {
@@ -157,20 +158,6 @@ export default function SelectRolePage() {
       });
     return () => { cancelled = true; };
   }, []);
-
-  // ── Zustand guard (secondary) ──
-  // Runs only after backend verification is done to avoid race conditions.
-  // Handles the case where the sync already ran before this page mounted.
-  useEffect(() => {
-    if (isVerifyingRole || !user || entering) return;
-    const currentUserId = user.id;
-    if (selectedRole && savedPrivyUserId === currentUserId) {
-      router.replace(`/${selectedRole}/dashboard`);
-    } else if (selectedRole && savedPrivyUserId !== currentUserId) {
-      // Different user logged in — clear stale role data
-      resetOnboarding();
-    }
-  }, [isVerifyingRole, user, selectedRole, savedPrivyUserId, router, resetOnboarding, entering]);
 
   const handleNicknameConfirm = async () => {
     if (!nickname.trim()) return;
@@ -225,11 +212,9 @@ export default function SelectRolePage() {
 
   const handleContinue = async () => {
     if (!selected) return;
-    // If Google login but no wallet, prompt to connect first
-    if (isGoogleLogin && wallets.length === 0) {
-      handleConnectWallet();
-      return;
-    }
+    // We no longer block Google logins that don't have a wallet yet.
+    // Privy automatically provisions embedded wallets in the background
+    // based on our Providers.tsx configuration (createOnLogin: 'users-without-wallets').
     try {
       setEntering(true);
 
@@ -262,21 +247,8 @@ export default function SelectRolePage() {
       router.push('/assessment');
     } catch (error) {
       console.warn('Role API unavailable:', error);
-      const selectedRole = roles.find(r => r.id === selected);
-      const roleName = (selectedRole as any)?.name ?? '';
-      const routeSlug = ROLE_TO_ROUTE[selected] ?? ROLE_TO_ROUTE[roleName];
-      if (!routeSlug) {
-        setRolesError(error instanceof Error ? error.message : 'Role gagal disimpan.');
-        setEntering(false);
-        return;
-      }
-      if (isLocalRoleFallbackEnabled()) {
-        setRole(routeSlug, user?.id);
-        router.push('/assessment');
-      } else {
-        setRolesError('Role gagal disimpan. Coba lagi atau hubungi administrator.');
-        setEntering(false);
-      }
+      setRolesError(error instanceof Error ? error.message : 'Role gagal disimpan. Coba lagi atau hubungi administrator.');
+      setEntering(false);
     }
   };
 

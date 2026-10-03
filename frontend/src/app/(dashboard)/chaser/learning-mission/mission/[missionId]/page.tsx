@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
-import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
@@ -14,6 +13,7 @@ import { getQuizForMission } from '@/data/quizBank';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+
 
 const generateCourseId = (str: string) => {
   let hash = 0;
@@ -29,6 +29,9 @@ type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 
 export default function MissionFlowPage() {
   const { missionId } = useParams();
+  const searchParams = useSearchParams();
+  const isNotRecommended = searchParams.get('isNotRecommended') === 'true';
+  const penaltyFactor = isNotRecommended ? 0.5 : 1;
   const router = useRouter();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, completeQuiz, displayName: savedName } = useUserStore();
@@ -43,14 +46,37 @@ export default function MissionFlowPage() {
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
 
-  // Find the exact chapter from mock data by extracting base chapter ID
-  const baseChapterId = (missionId as string)?.replace(/-level-\d+$/, '');
-  const allChapters = mockBackendData.houses.flatMap(h => h.stages).flatMap(s => s.chapters || []);
-  const currentChapter = allChapters.find(c => c.id === baseChapterId) || {
+  // Fetch the chapter from DB based on baseChapterId
+  const baseChapterId = searchParams.get('chapter') || (missionId as string)?.replace(/-level-\d+$/, '');
+  const [currentChapter, setCurrentChapter] = useState<{name: string, description?: string, duration?: string}>({
     name: 'Materi Pembelajaran',
     description: 'Selamat datang! Persiapkan dirimu untuk menerima ilmu baru.',
     duration: '6 Levels'
-  };
+  });
+
+  useEffect(() => {
+    async function loadChapter() {
+      if (baseChapterId) {
+        import('@/hooks/useAuthSync').then(({ getAuthHeaders }) => {
+          import('@/config/pathtrick').then(({ API_BASE_URL }) => {
+            fetch(`${API_BASE_URL}/api/chapters/${baseChapterId}`, { headers: getAuthHeaders() })
+              .then(res => { if (res.ok) return res.json(); throw new Error('Not found'); })
+              .then(data => {
+                if (data && !data.error) {
+                  setCurrentChapter({
+                    name: data.title,
+                    description: data.description || 'Pelajari materi ini dengan cermat.',
+                    duration: data.sections?.length ? `${data.sections.length} Levels` : '6 Levels'
+                  });
+                }
+              })
+              .catch(err => console.error(err));
+          });
+        });
+      }
+    }
+    loadChapter();
+  }, [baseChapterId]);
 
   // Determine level type based on dynamic ID
   let baseLevelType: Phase = 'MATERIAL';
@@ -89,6 +115,46 @@ export default function MissionFlowPage() {
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
   const [isClaiming, setIsClaiming] = useState(false);
   const [dbSection, setDbSection] = useState<any>(null);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    if (phase !== 'MATERIAL' || !contentRef.current) return;
+    const el = contentRef.current;
+    
+    const calculateTotalPages = () => {
+      // clientWidth is the width of the visible window (2 columns + 1 gap)
+      // scrollWidth is the total width of all columns + gaps
+      // 1 page = clientWidth
+      if (el.scrollWidth <= el.clientWidth + 10) {
+        setTotalPages(1);
+      } else {
+        const gap = 112; // Matches columnGap
+        const pages = Math.ceil((el.scrollWidth - el.clientWidth) / (el.clientWidth + gap)) + 1;
+        setTotalPages(Math.max(1, pages));
+      }
+    };
+
+    const observer = new ResizeObserver(() => {
+      calculateTotalPages();
+    });
+    
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+    
+    // Fallback recalculation for when fonts/images load
+    const timeout1 = setTimeout(calculateTotalPages, 100);
+    const timeout2 = setTimeout(calculateTotalPages, 500);
+    const timeout3 = setTimeout(calculateTotalPages, 1000);
+    
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+    };
+  }, [phase, dbSection]);
 
   useEffect(() => {
     if (MISSION_CONTENT[missionId as string]) return;
@@ -385,9 +451,11 @@ export default function MissionFlowPage() {
   const handleBossSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/missions/${missionId}/project/submit`, {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+      const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/project/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ code })
       });
       const data = await response.json();
@@ -458,7 +526,7 @@ export default function MissionFlowPage() {
               <h2 className={styles.title}>{currentChapter.name} - KUIS</h2>
             </div>
 
-            {content.quiz ? (() => {
+            {content.quiz && content.quiz.length > 0 ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
@@ -565,7 +633,7 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ height: '48px', marginBottom: '16px' }}></div>
-            {content.quiz ? (() => {
+            {content.quiz && content.quiz.length > 0 ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
@@ -725,6 +793,33 @@ export default function MissionFlowPage() {
             )}
           </div>
 
+          {/* MATERIAL TEXT OVERLAY FOR PAGINATION */}
+          {phase === 'MATERIAL' && (
+            <div style={{
+              position: 'absolute',
+              top: '40px',
+              bottom: '100px', // Space for the pagination buttons
+              left: '40px',
+              right: '40px',
+              overflow: 'hidden',
+              zIndex: 10
+            }}>
+              <div ref={contentRef} style={{
+                columnCount: 2,
+                columnGap: '112px',
+                columnFill: 'auto',
+                height: '100%',
+                transition: 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)',
+                transform: `translateX(calc(${materialPage} * (-100% - 112px)))`,
+                willChange: 'transform'
+              }}>
+                <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#3b261b', lineHeight: '1.5' }}>
+                  {content?.materials}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* CLAIM CERTIFICATE OVERLAY */}
           {phase === 'CLAIM' && (
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', zIndex: 10, background: 'rgba(60, 30, 10, 0.4)', backdropFilter: 'blur(6px)', borderRadius: '24px' }}>
@@ -811,7 +906,7 @@ export default function MissionFlowPage() {
                             }}
                             onSuccess={() => {
                               setIsBossMinted(true);
-                              addXP(dbSection?.xpReward ?? 100);
+                              addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                               completeQuiz();
                             }}
                           />
@@ -821,7 +916,7 @@ export default function MissionFlowPage() {
                             onClick={() => {
                               if (!isClaiming) {
                                 setIsClaiming(true);
-                                addXP(dbSection?.xpReward ?? 100);
+                                addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                                 completeQuiz();
                                 setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
                               }
@@ -848,7 +943,7 @@ export default function MissionFlowPage() {
                       onClick={() => {
                         if (!isClaiming) {
                           setIsClaiming(true);
-                          addXP(dbSection?.xpReward ?? 100);
+                          addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                           if (isBossLevel) {
                             triggerLevelUp();
                           }

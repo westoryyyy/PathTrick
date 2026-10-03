@@ -12,7 +12,7 @@ import styles from './page.module.css';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user } = usePrivy();
+  const { user, linkWallet } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, avatarUrl, setProfile, setAvatar } = useUserStore();
   const role = useOnboardingStore((s) => s.selectedRole);
@@ -26,7 +26,19 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
   const avatarOptions = ['/char_dreamer.png', '/char_chaser.png', '/char_scholar.png', '/Main Character.png'];
+
+  const handleConnectWallet = async () => {
+    try {
+      setIsConnectingWallet(true);
+      await linkWallet();
+    } catch (error) {
+      console.error('[Profile] Wallet connect error:', error);
+    } finally {
+      setIsConnectingWallet(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,13 +149,30 @@ export default function ProfilePage() {
 
           <div className={styles.formGroup}>
             <label className={styles.label}>WEB3 WALLET ADDRESS</label>
-            <input 
-              type="text" 
-              className={styles.input} 
-              value={wallets[0]?.address || 'No wallet detected'} 
-              disabled
-              style={{ opacity: 0.7, cursor: 'not-allowed' }}
-            />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <input 
+                type="text" 
+                className={styles.input} 
+                value={wallets[0]?.address || 'No wallet detected'} 
+                disabled
+                style={{ opacity: 0.7, cursor: 'not-allowed', flex: 1 }}
+              />
+              {!wallets[0]?.address && (
+                <button
+                  type="button"
+                  className={styles.changeAvatarBtn}
+                  onClick={handleConnectWallet}
+                  disabled={isConnectingWallet}
+                  style={{
+                    minWidth: '160px',
+                    opacity: isConnectingWallet ? 0.7 : 1,
+                    cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className={styles.formGroup}>
@@ -163,6 +192,14 @@ export default function ProfilePage() {
             disabled={isSaving}
           >
             {isSaving ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE CHANGES'}
+          </button>
+
+          <button 
+            type="button" 
+            className={styles.connectWalletBtn}
+            disabled={isConnectingWallet}
+          >
+            {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
           </button>
         </form>
       </div>

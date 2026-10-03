@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
-import { mockBackendData } from '@/data/mockBackendData';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { MISSION_CONTENT } from '@/data/missionContent';
@@ -15,10 +14,14 @@ import { getQuizForMission } from '@/data/quizBank';
 import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 
+
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 
 export default function MissionFlowPage() {
   const { missionId } = useParams();
+  const searchParams = useSearchParams();
+  const isNotRecommended = searchParams.get('isNotRecommended') === 'true';
+  const penaltyFactor = isNotRecommended ? 0.5 : 1;
   const router = useRouter();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, displayName: savedName } = useUserStore();
@@ -33,14 +36,43 @@ export default function MissionFlowPage() {
     ? `${activeWallet.address.slice(0, 8)}...${activeWallet.address.slice(-6)}`
     : 'Not Connected';
 
-  // Find the exact chapter from mock data by extracting base chapter ID
-  const baseChapterId = (missionId as string)?.replace(/-level-\d+$/, '');
-  const allChapters = mockBackendData.houses.flatMap(h => h.stages).flatMap(s => s.chapters || []);
-  const currentChapter = allChapters.find(c => c.id === baseChapterId) || {
+  // Fetch the chapter from DB based on baseChapterId
+  const baseChapterId = searchParams.get('chapter') || (missionId as string)?.replace(/-level-\d+$/, '');
+  const [currentChapter, setCurrentChapter] = useState<{name: string, description?: string, duration?: string}>({
     name: 'Materi Pembelajaran',
     description: 'Selamat datang! Persiapkan dirimu untuk menerima ilmu baru.',
     duration: '6 Levels'
-  };
+  });
+
+  useEffect(() => {
+    async function loadChapter() {
+      if (baseChapterId) {
+        import('@/hooks/useAuthSync').then(({ getAuthHeaders }) => {
+          import('@/config/pathtrick').then(({ API_BASE_URL }) => {
+            fetch(`${API_BASE_URL}/api/chapters/${baseChapterId}`, { headers: getAuthHeaders() })
+              .then(async res => { 
+                if (res.ok) return res.json(); 
+                const errText = await res.text();
+                throw new Error(`Not found. baseChapterId="${baseChapterId}", Status=${res.status}, Body=${errText}`); 
+              })
+              .then(data => {
+                if (data && !data.error) {
+                  setCurrentChapter({
+                    name: data.title,
+                    description: data.description || 'Pelajari materi ini dengan cermat.',
+                    duration: data.sections?.length ? `${data.sections.length} Levels` : '6 Levels'
+                  });
+                }
+              })
+              .catch(err => {
+                console.error("loadChapter Error:", err.message || err);
+              });
+          });
+        });
+      }
+    }
+    loadChapter();
+  }, [baseChapterId]);
 
   // Determine level type based on dynamic ID
   let baseLevelType: Phase = 'MATERIAL';
@@ -506,6 +538,7 @@ export default function MissionFlowPage() {
               setPlayerHp(3);
               setPhase('MATERIAL');
               setMaterialPage(0);
+              resetMissionState();
             });
           }
         }
@@ -515,6 +548,32 @@ export default function MissionFlowPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const resetMissionState = () => {
+    setPhase('MATERIAL');
+    setMaterialPage(0);
+    setEssayAnswer('');
+    setPlayerHp(3);
+    setQuizIndex(0);
+    setEssayAnswers({});
+    setHighestPhaseReached(0);
+    setDialogState({ isOpen: false, type: 'success', message: '' });
+  };
+
+  useEffect(() => {
+    resetMissionState();
+    return () => {
+      setEssayAnswer('');
+      setEssayAnswers({});
+      setQuizIndex(0);
+      setPlayerHp(3);
+    };
+  }, [missionId]);
+
+  const retryMission = () => {
+    resetMissionState();
+    setIsClaiming(false);
   };
 
   const renderLeftPage = () => {
@@ -541,7 +600,7 @@ export default function MissionFlowPage() {
               <h2 className={styles.title} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.8rem' }}>{currentChapter.name} - KUIS</h2>
             </div>
 
-            {content.quiz ? (() => {
+            {content.quiz && content.quiz.length > 0 ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
@@ -643,7 +702,7 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ height: '48px', marginBottom: '16px' }}></div>
-            {content.quiz ? (() => {
+            {content.quiz && content.quiz.length > 0 ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return currentQuiz.type === 'ESSAY' ? (
@@ -715,6 +774,7 @@ export default function MissionFlowPage() {
                               setQuizIndex(0);
                               setPhase('MATERIAL');
                               setMaterialPage(0);
+                              resetMissionState();
                             });
                           }
                         }
@@ -840,13 +900,13 @@ export default function MissionFlowPage() {
                     {!isBossMinted ? (
                       <>
                         <MintSBTButton
-                          courseId={generateCourseId(baseChapterId)}
+                          courseId={Number(dbSection?.onChainId ?? dbSection?.course?.onChainId ?? generateCourseId(baseChapterId))}
                           customStyle={{
                             width: '100%',
                           }}
                           onSuccess={() => {
                             setIsBossMinted(true);
-                            if (!dbSection?.completed) addXP(dbSection?.xpReward ?? 100);
+                            if (!dbSection?.completed) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                           }}
                         />
                         <button onMouseEnter={playHoverSound}
@@ -855,7 +915,7 @@ export default function MissionFlowPage() {
                           onClick={() => {
                             if (!isClaiming) {
                               setIsClaiming(true);
-                              if (!dbSection?.completed) addXP(dbSection?.xpReward ?? 100);
+                              if (!dbSection?.completed) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                               setTimeout(() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`), 1200);
                             }
                           }}
@@ -882,7 +942,7 @@ export default function MissionFlowPage() {
                       if (!isClaiming) {
                         setIsClaiming(true);
                         if (!dbSection?.completed) {
-                          addXP(dbSection?.xpReward ?? 100);
+                          addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                         }
                         if (isBossLevel) {
                           triggerLevelUp();
@@ -1044,7 +1104,7 @@ export default function MissionFlowPage() {
                       if (!isClaiming) {
                         setIsClaiming(true);
                         if (!dbSection?.completed) {
-                          addXP(dbSection?.xpReward ?? 100);
+                          addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                         }
                         if (isBossLevel && !dbSection?.completed) {
                           triggerLevelUp();

@@ -2,11 +2,11 @@
 
 import React, { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockBackendData } from '@/data/mockBackendData';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelIcon from '@/components/ui/PixelIcon';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { useMapStore } from '@/store/useMapStore';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const [house, setHouse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
 
   useEffect(() => {
     async function fetchHouse() {
@@ -25,12 +26,12 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
           const data = await res.json();
           setHouse(data);
         } else {
-          const mockHouse = mockBackendData.houses.find(h => h.id === id);
-          setHouse(mockHouse);
+          console.error("Failed to fetch house details");
+          setHouse(null);
         }
       } catch (err) {
-        const mockHouse = mockBackendData.houses.find(h => h.id === id);
-        setHouse(mockHouse);
+        console.error("Error fetching house details", err);
+        setHouse(null);
       } finally {
         setLoading(false);
       }
@@ -201,27 +202,120 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                         DAFTAR BAB (CHAPTERS):
                       </div>
                       
-                      {mod.chapters?.map((chapter: any, chapIdx: number) => (
-                        <div 
-                          key={chapter.id}
-                          onClick={() => router.push(`/map?chapter=${chapter.id}&house=${id}`)}
-                          onMouseEnter={playHoverSound}
-                          className="flex items-center justify-between bg-[#c29a6e] border-2 border-[#5a3a29] rounded-xl p-4 cursor-pointer hover:bg-[#d4a373] transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
-                        >
-                          <div className="flex items-center gap-4">
-                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b' }}>{chapIdx + 1}.</span>
-                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#1a100c', lineHeight: '1.4' }}>
-                              {chapter.name}
-                            </span>
+                      {mod.chapters?.map((chapter: any, chapIdx: number) => {
+                        const chapterNodeIds = completedDynamicNodes.filter(nodeId =>
+                          nodeId.startsWith(chapter.id)
+                        );
+                        const durationMatch = chapter.duration?.match(/(\d+)/);
+                        const totalLevels = chapter.sections?.length ||
+                          (durationMatch ? parseInt(durationMatch[1]) : 6);
+                        const completedLevels = chapterNodeIds.length;
+                        const chapterCompleted = completedLevels >= totalLevels;
+
+                        let isLocked = false;
+                        if (chapIdx > 0) {
+                          const prevChapter = mod.chapters[chapIdx - 1];
+                          const prevDurationMatch = prevChapter.duration?.match(/(\d+)/);
+                          const prevTotalLevels = prevChapter.sections?.length ||
+                            (prevDurationMatch ? parseInt(prevDurationMatch[1]) : 6);
+                          const prevBossNodeId = prevChapter.sections?.length > 0
+                            ? prevChapter.sections[prevChapter.sections.length - 1].id
+                            : `${prevChapter.id}-level-${prevTotalLevels}`;
+                          isLocked = !completedDynamicNodes.includes(prevBossNodeId);
+                        } else if (index > 0) {
+                          const prevModule = modules[index - 1];
+                          if (prevModule.chapters && prevModule.chapters.length > 0) {
+                            const prevModuleLastChapter = prevModule.chapters[prevModule.chapters.length - 1];
+                            const prevDurationMatch = prevModuleLastChapter.duration?.match(/(\d+)/);
+                            const prevTotalLevels = prevModuleLastChapter.sections?.length ||
+                              (prevDurationMatch ? parseInt(prevDurationMatch[1]) : 6);
+                            const prevBossNodeId = prevModuleLastChapter.sections?.length > 0
+                              ? prevModuleLastChapter.sections[prevModuleLastChapter.sections.length - 1].id
+                              : `${prevModuleLastChapter.id}-level-${prevTotalLevels}`;
+                            isLocked = !completedDynamicNodes.includes(prevBossNodeId);
+                          }
+                        }
+
+                        return (
+                          <div
+                            key={chapter.id}
+                            onClick={() => {
+                              if (!isLocked) router.push(`/map?chapter=${chapter.id}&house=${id}${!house.isActive ? '&isNotRecommended=true' : ''}`);
+                            }}
+                            onMouseEnter={isLocked ? undefined : playHoverSound}
+                            className={`flex items-center justify-between border-2 border-[#5a3a29] rounded-xl p-4 transition-colors group shadow-[2px_2px_0_rgba(0,0,0,0.2)] ${
+                              isLocked
+                                ? 'bg-[#7a5a45] opacity-60 cursor-not-allowed'
+                                : 'bg-[#c29a6e] hover:bg-[#d4a373] cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center gap-4">
+                              {/* Lock icon for locked chapters */}
+                              {isLocked ? (
+                                <span style={{ fontSize: '1.2rem' }}>🔒</span>
+                              ) : (
+                                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#3b261b' }}>{chapIdx + 1}.</span>
+                              )}
+                              <div className="flex flex-col gap-1">
+                                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: isLocked ? '#a87b51' : '#1a100c', lineHeight: '1.4' }}>
+                                  {chapter.name}
+                                </span>
+                                {isLocked && (
+                                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#b45309' }}>
+                                    🔒 Selesaikan boss bab sebelumnya dulu!
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                              {/* ── Point 3: Progress indicator ── */}
+                              {chapterCompleted ? (
+                                <span
+                                  style={{
+                                    fontFamily: '"Press Start 2P"',
+                                    fontSize: '0.5rem',
+                                    background: '#166534',
+                                    color: '#86efac',
+                                    border: '2px solid #16a34a',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  ✅ Selesai
+                                </span>
+                              ) : completedLevels > 0 ? (
+                                <span
+                                  style={{
+                                    fontFamily: '"Press Start 2P"',
+                                    fontSize: '0.5rem',
+                                    background: '#78350f',
+                                    color: '#fde68a',
+                                    border: '2px solid #b45309',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  ⚡ {completedLevels}/{totalLevels}
+                                </span>
+                              ) : (
+                                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29' }}>
+                                  {chapter.duration}
+                                </span>
+                              )}
+                              {!isLocked && (
+                                <button
+                                  className="px-4 py-2 bg-[#fbbf24] border-2 border-[#b45309] text-[#78350f] rounded-lg shadow-[0_4px_0_#78350f] group-hover:translate-y-1 group-hover:shadow-[0_0_0_#78350f] transition-all"
+                                  style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}
+                                >
+                                  {chapterCompleted ? 'REVIEW ▶' : 'PLAY ▶'}
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-4 flex-shrink-0 ml-4">
-                            <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#5a3a29' }}>{chapter.duration}</span>
-                            <button className="px-4 py-2 bg-[#fbbf24] border-2 border-[#b45309] text-[#78350f] rounded-lg shadow-[0_4px_0_#78350f] group-hover:translate-y-1 group-hover:shadow-[0_0_0_#78350f] transition-all" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}>
-                              PLAY ▶
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {(!mod.chapters || mod.chapters.length === 0) && (
                         <div className="text-center p-6 bg-[#c29a6e] border-2 border-dashed border-[#5a3a29] rounded-xl">

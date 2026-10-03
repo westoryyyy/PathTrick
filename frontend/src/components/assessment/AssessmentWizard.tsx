@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import AssessmentShell from './AssessmentShell';
-import RIASECStep, { isRIASECComplete } from './dreamer/RIASECStep';
+import RIASECStep from './dreamer/RIASECStep';
 import BudgetStep from './dreamer/BudgetStep';
 import PreferencesStep from './dreamer/PreferencesStep';
 import CVUploadStep from './chaser/CVUploadStep';
@@ -11,7 +11,7 @@ import WorkInterestStep from './chaser/WorkInterestStep';
 import { useRouter } from 'next/navigation';
 
 const DREAMER_STEPS = [
-  { title: 'Asesmen RIASEC',           desc: 'Kenali minat dan bakatmu lewat 6 dimensi kepribadian RIASEC.' },
+  { title: 'Asesmen RIASEC',           desc: 'Jawab setiap pertanyaan untuk mengetahui profil minat & bakatmu (RIASEC).' },
   { title: 'Preferensi Budget',         desc: 'Pilih rentang biaya kuliah yang sesuai dengan rencana keluargamu.' },
   { title: 'Preferensi Jurusan & Negara', desc: 'Tambahkan preferensi jurusan dan negara tujuan (opsional).' },
 ];
@@ -32,7 +32,8 @@ export default function AssessmentWizard() {
   const submitAssessment = useOnboardingStore((s) => s.submitAssessment);
 
   // Form State
-  const riasec = useOnboardingStore((s) => s.dreamerAssessment.riasec);
+  const riasecAnswers = useOnboardingStore((s) => s.dreamerAssessment.riasecAnswers);
+  const riasecTotalQuestions = useOnboardingStore((s) => s.dreamerAssessment.riasecTotalQuestions);
   const budget = useOnboardingStore((s) => s.dreamerAssessment.budgetPreference);
   const cvStatus = useOnboardingStore((s) => s.chaserAssessment.cvExtractionStatus);
   const preferredGICS = useOnboardingStore((s) => s.chaserAssessment.preferredGICS);
@@ -47,7 +48,13 @@ export default function AssessmentWizard() {
   let canNext = false;
   if (role === 'dreamer') {
     switch (currentStep) {
-      case 0: canNext = isRIASECComplete(riasec); break;
+      case 0: {
+        const answers = riasecAnswers ?? {};
+        const expectedCount = riasecTotalQuestions > 0 ? riasecTotalQuestions : 42;
+        const answeredCount = Object.keys(answers).filter(k => /^q\d{2}$/.test(k)).length;
+        canNext = answeredCount >= expectedCount;
+        break;
+      }
       case 1: canNext = budget !== ''; break;
       case 2: canNext = true; break;
     }

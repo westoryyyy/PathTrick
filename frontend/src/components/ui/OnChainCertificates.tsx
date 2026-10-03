@@ -12,6 +12,7 @@ import CertificatePreview from './CertificatePreview';
 import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS, API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { useTranslation } from '@/hooks/useTranslation';
+import { PixelSkeletonTileGrid } from './PixelSkeleton';
 
 type Props = {
   hideHeader?: boolean;
@@ -19,6 +20,8 @@ type Props = {
 
 // Helper to convert chapter ID string to uint256-compatible number for SBT Minting
 const generateCourseId = (str: string) => {
+  // Badges from /api/badges already carry the numeric on-chain course id; use as-is.
+  if (/^[0-9]+$/.test(str)) return Number(str);
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -141,14 +144,14 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
           <div style={{ color: '#fbbf24', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             Hubungkan wallet untuk memuat sertifikat On-Chain.
           </div>
+        ) : !hasFetched ? (
+          <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={4} /></div>
         ) : bossNodes.length === 0 ? (
           <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             {t('common.noCertificatesDesc')}
           </div>
         ) : isLoadingOwnership ? (
-          <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
-            Memuat sertifikat On-Chain...
-          </div>
+          <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={Math.max(bossNodes.length, 2)} /></div>
         ) : ownershipError ? (
           <div style={{ color: '#fca5a5', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             Sertifikat belum dapat dimuat.{' '}

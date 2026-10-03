@@ -9,7 +9,6 @@ import { useMapStore } from '@/store/useMapStore';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
-import { useOnboardingStore } from '@/store/useOnboardingStore';
 import PixelIcon from '@/components/ui/PixelIcon';
 import BGMPlayer from '@/components/ui/BGMPlayer';
 import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
@@ -37,7 +36,7 @@ export default function MahasiswaLayout({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isWalletAnimating, setIsWalletAnimating] = useState(false);
-  const { logout, user } = usePrivy();
+  const { logout, user, ready } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
   const { setRole: setMapRole } = useMapStore();
@@ -60,10 +59,52 @@ export default function MahasiswaLayout({
   };
 
   useEffect(() => {
-    if (user) {
-      setTimeout(() => fetchNotifications(), 0);
+    if (!ready) return;
+    if (!user) {
+      const storedToken = localStorage.getItem('pathtrick_token');
+      if (!storedToken) {
+        router.replace('/');
+      }
+      return;
     }
-  }, [user]);
+    const token = getAuthHeaders()['Authorization'];
+    if (!token) {
+      router.replace('/select-role');
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) { router.replace('/select-role'); return; }
+        const data = await res.json() as any;
+        if (cancelled) return;
+        
+        if (data.gamification) {
+          const calculatedLevel = Math.max(0, Math.floor(data.gamification.xp / 1000));
+          useUserStore.getState().hydrateUser(data.gamification.xp, calculatedLevel, data.name || '', data.email || '');
+        }
+        
+        const roleName = data?.role?.name?.toUpperCase();
+        if (!roleName) {
+          router.replace('/select-role');
+        } else if (roleName === 'CHASER') {
+          setIsCheckingAuth(false);
+        } else if (roleName === 'DREAMER') {
+          router.replace('/dreamer/dashboard');
+        } else if (roleName === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace('/select-role');
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        router.replace('/select-role');
+      });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const handleMarkAllRead = async () => {
     try {
@@ -98,26 +139,32 @@ export default function MahasiswaLayout({
 
   // ── Route Guard: verifikasi role dari BACKEND ──
   // Zustand memberikan render cepat; backend adalah sumber kebenaran akhir.
-  const { selectedRole, savedPrivyUserId, setRole: setOnboardingRole } = useOnboardingStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready) return;
+    if (!user) {
+      const storedToken = localStorage.getItem('pathtrick_token');
+      if (!storedToken) {
+        router.replace('/');
+      }
+      return;
+    }
     const token = getAuthHeaders()['Authorization'];
     if (!token) {
-      setIsCheckingAuth(false);
+      router.replace('/select-role');
       return;
     }
     let cancelled = false;
     fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
       .then(async (res) => {
         if (cancelled) return;
-        if (!res.ok) { router.replace('/'); return; }
+        if (!res.ok) { router.replace('/select-role'); return; }
         const data = await res.json() as any;
         if (cancelled) return;
         
         if (data.gamification) {
-          const calculatedLevel = Math.max(1, Math.floor(data.gamification.xp / 1000) + 1);
+          const calculatedLevel = Math.max(0, Math.floor(data.gamification.xp / 1000));
           useUserStore.getState().hydrateUser(data.gamification.xp, calculatedLevel, data.name || '', data.email || '');
         }
         
@@ -125,10 +172,8 @@ export default function MahasiswaLayout({
         if (!roleName) {
           router.replace('/select-role');
         } else if (roleName === 'CHASER') {
-          setOnboardingRole('chaser', user.id);
           setIsCheckingAuth(false);
         } else if (roleName === 'DREAMER') {
-          setOnboardingRole('dreamer', user.id);
           router.replace('/dreamer/dashboard');
         } else if (roleName === 'ADMIN') {
           router.replace('/admin/dashboard');
@@ -138,13 +183,7 @@ export default function MahasiswaLayout({
       })
       .catch(() => {
         if (cancelled) return;
-        if (!selectedRole || savedPrivyUserId !== user.id) {
-          router.replace('/select-role');
-        } else if (selectedRole !== 'chaser') {
-          router.replace(`/${selectedRole}/dashboard`);
-        } else {
-          setIsCheckingAuth(false);
-        }
+        router.replace('/select-role');
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,7 +200,9 @@ export default function MahasiswaLayout({
   const isFullScreenPage = pathname.startsWith('/chaser/learning-mission/') && pathname !== '/chaser/learning-mission';
 
   // Don't render the dashboard while backend role check is in progress.
-  if (isCheckingAuth) return null;
+  if (isCheckingAuth && pathname !== '/chaser/dashboard') {
+    return null;
+  }
 
   if (isFullScreenPage) {
     return (

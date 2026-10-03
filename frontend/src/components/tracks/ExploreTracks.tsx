@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { mockBackendData } from '@/data/mockBackendData';
 import { CareerTrack } from '@/types/backend';
 import PixelIcon from '@/components/ui/PixelIcon';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { API_BASE_URL } from '@/config/pathtrick';
 
 // categoryIcons removed
 const categories = [
@@ -33,7 +34,50 @@ const difficultyLabels: Record<string, string> = {
 };
 
 export default function ExploreTracks() {
-  const { careerTracks, metadata } = mockBackendData;
+  const [careerTracks, setCareerTracks] = useState<CareerTrack[]>([]);
+  const [metadata, setMetadata] = useState<any>({ riasecScore: 'N/A', primaryTrack: 'N/A', targetCountry: 'N/A' });
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    async function loadData() {
+      try {
+        const headers = await getAuthHeaders();
+        // Fetch User profile to get RIASEC score
+        const userRes = await fetch(`${API_BASE_URL}/api/users/me`, { headers });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setMetadata({
+            riasecScore: userData.assessment?.riasecScore || 'TBD',
+            primaryTrack: userData.role?.displayName || 'TBD',
+            targetCountry: userData.assessment?.countryPreference?.[0] || 'TBD',
+          });
+        }
+        
+        // Fetch Jobs to act as Career Tracks
+        const jobsRes = await fetch(`${API_BASE_URL}/api/jobs`, { headers });
+        if (jobsRes.ok) {
+          const jobsData = await jobsRes.json();
+          const mappedTracks: CareerTrack[] = (jobsData.jobs || []).map((job: any, index: number) => ({
+            id: job.id,
+            title: job.title,
+            description: `A career as ${job.title} at ${job.company}`,
+            category: job.type || 'Web Development',
+            techTags: job.skillsRequired || ['General'],
+            iconType: '💼',
+            difficulty: index % 3 === 0 ? 'beginner' : (index % 3 === 1 ? 'intermediate' : 'advanced'),
+            estimatedWeeks: 12 + (index % 5) * 4
+          }));
+          setCareerTracks(mappedTracks);
+        }
+      } catch (e) {
+        console.error('Failed to load explore tracks', e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const filteredTracks = useMemo(() => {

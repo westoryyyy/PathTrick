@@ -10,6 +10,8 @@ interface Scholarship {
   provider: string;
   deadline: string;   // ISO string dari backend, diformat ke YYYY-MM-DD untuk input[type=date]
   coverage: string;
+  scope?: string;
+  country?: string;
   requirements: string[];
   url: string;
   coverImage?: string;
@@ -52,6 +54,7 @@ const COLUMNS: Column<Scholarship>[] = [
   },
   { key: 'title', label: 'Nama Beasiswa' },
   { key: 'provider', label: 'Penyelenggara' },
+  { key: 'country', label: 'Negara', render: row => row.country || '-' },
   {
     key: 'deadline', label: 'Deadline',
     render: row => (
@@ -94,6 +97,25 @@ const FIELDS: Field[] = [
       { value: 'Partial', label: 'Partial' },
       { value: 'Biaya Kuliah + Uang Saku', label: 'Biaya Kuliah + Uang Saku' },
       { value: 'Full Funding + Akomodasi', label: 'Full Funding + Akomodasi' },
+    ]
+  },
+  { key: 'country', label: 'Negara', type: 'select', options: [
+    { value: 'australia', label: 'Australia' },
+    { value: 'belanda', label: 'Belanda' },
+    { value: 'indonesia', label: 'Indonesia' },
+    { value: 'inggris', label: 'Inggris' },
+    { value: 'jepang', label: 'Jepang' },
+    { value: 'jerman', label: 'Jerman' },
+    { value: 'korea', label: 'Korea' },
+    { value: 'malaysia', label: 'Malaysia' },
+    { value: 'singapura', label: 'Singapura' },
+    { value: 'usa', label: 'USA' },
+  ] },
+  {
+    key: 'scope', label: 'Scope', type: 'select', options: [
+      { value: 'dalam_negeri', label: 'Dalam Negeri' },
+      { value: 'luar_negeri', label: 'Luar Negeri' },
+      { value: 'keduanya', label: 'Keduanya' },
     ]
   },
   { key: 'requirements', label: 'Persyaratan', type: 'tags', placeholder: 'Ketik lalu tekan Enter...' },

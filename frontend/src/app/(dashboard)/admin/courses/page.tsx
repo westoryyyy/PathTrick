@@ -50,10 +50,10 @@ const COLUMNS: Column<Course>[] = [
   )},
 ];
 
-const FIELDS: Field[] = [
+const BASE_FIELDS: Field[] = [
   { key: 'title', label: 'Judul Course', type: 'text', placeholder: 'React untuk Pemula', required: true },
   { key: 'description', label: 'Deskripsi', type: 'textarea', placeholder: 'Deskripsi singkat course...' },
-  { key: 'houseId', label: 'House ID', type: 'text', placeholder: 'Kosongkan jika untuk Chaser. Cth: house-health' },
+  { key: 'houseId', label: 'House', type: 'select', options: [] }, // Options populated dynamically
   { key: 'facultyTags', label: 'Fakultas / Tag', type: 'multiselect', options: FACULTIES.filter(f => f.value !== 'all'), helpText: 'Klik untuk memilih (bisa lebih dari 1)', required: true },
   { key: 'order', label: 'Urutan (Order)', type: 'number', placeholder: '0', helpText: 'Angka lebih kecil tampil lebih awal' },
   { key: 'published', label: 'Status', type: 'select', options: [
@@ -64,14 +64,30 @@ const FIELDS: Field[] = [
 export default function CoursesPage() {
   const [data, setData] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fields, setFields] = useState<Field[]>(BASE_FIELDS);
 
   const load = useCallback(() => {
     setLoading(true);
+    // Fetch courses
     fetch(`${API_BASE_URL}/api/admin/courses`, { headers: getAuthHeaders() })
       .then(r => r.json())
       .then((d: Course[]) => setData(Array.isArray(d) ? d : []))
       .catch(() => setData([]))
       .finally(() => setLoading(false));
+
+    // Fetch houses for dropdown
+    fetch(`${API_BASE_URL}/api/houses`, { headers: getAuthHeaders() })
+      .then(r => r.json())
+      .then(data => {
+        if (data.houses) {
+          const houseOptions = [{ value: '', label: 'Kosongkan (Untuk Chaser)' }];
+          data.houses.forEach((h: any) => {
+            houseOptions.push({ value: h.id, label: h.title });
+          });
+          setFields(prev => prev.map(f => f.key === 'houseId' ? { ...f, options: houseOptions } : f));
+        }
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -127,7 +143,7 @@ export default function CoursesPage() {
         icon="📚" 
         data={filteredData} 
         columns={COLUMNS} 
-        fields={FIELDS}
+        fields={fields}
         normalizeForEdit={(row) => ({
           ...row,
           facultyTags: row.facultyTags || [],

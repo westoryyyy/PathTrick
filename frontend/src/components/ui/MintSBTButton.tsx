@@ -238,7 +238,8 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
       });
       const confirmationData = await readApiResponse(confirmation);
       if (!confirmation.ok) {
-        throw new Error(getApiError(confirmationData, 'Backend belum menerima konfirmasi transaksi.'));
+        const detail = !Array.isArray(confirmationData) && typeof confirmationData.message === 'string' ? confirmationData.message : '';
+        throw new Error(detail || getApiError(confirmationData, 'Backend belum menerima konfirmasi transaksi.'));
       }
 
       setStatus('success');

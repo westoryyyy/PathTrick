@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
 
 interface Scholarship {
   id: string;
@@ -83,16 +84,17 @@ export default function ScholarshipHub() {
       .then(res => res.ok ? res.json() : null)
       .then((data: { scholarships?: Scholarship[] } | null) => {
         if (cancelled) return;
-        const list = data?.scholarships;
+        const list = Array.isArray(data?.scholarships)
+          ? [...data.scholarships].sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
+          : [];
         if (Array.isArray(list) && list.length > 0) {
           setScholarships(list);
         } else {
-          // Fallback ke mock jika backend belum punya data
-          setScholarships(MOCK_SCHOLARSHIPS);
+          setScholarships([]);
         }
       })
       .catch(() => {
-        if (!cancelled) setScholarships(MOCK_SCHOLARSHIPS);
+        if (!cancelled) setScholarships([]);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -113,11 +115,7 @@ export default function ScholarshipHub() {
         </p>
       </div>
 
-      {loading && (
-        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', color: '#fbbf24', fontSize: '1rem' }}>
-          Memuat beasiswa...
-        </p>
-      )}
+      {loading && <PixelSkeletonCardGrid count={6} />}
 
       {/* Grid */}
       {!loading && (
@@ -178,8 +176,8 @@ export default function ScholarshipHub() {
                     </span>
                   </div>
                   {parseReqs(scholarship.requirements).length > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                      <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
                       <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                         Reqs: {parseReqs(scholarship.requirements).join(', ')}
                       </span>

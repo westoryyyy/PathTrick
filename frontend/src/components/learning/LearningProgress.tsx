@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockBackendData } from '@/data/mockBackendData';
 import { House, Stage } from '@/types/backend';
 import styles from '@/components/ui/Dashboard.module.css';
 import PixelIcon from '@/components/ui/PixelIcon';
@@ -11,6 +10,7 @@ import { useMapStore } from '@/store/useMapStore';
 import { useRouter } from 'next/navigation';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
+import { PixelSkeletonRows } from '@/components/ui/PixelSkeleton';
 
 const stageIconMap: Record<string, string> = {
   material: '📚',
@@ -28,10 +28,159 @@ const stageColorMap: Record<string, string> = {
 
 export default function LearningProgress() {
   const router = useRouter();
-  const { houses, user } = mockBackendData;
-  const { totalXP, level, dailyBountyClaimed, claimDailyBounty, addXP } = useUserStore();
+  const { totalXP, level, dailyBountyClaimed, claimDailyBounty, addXP, setDailyBountyClaimed } = useUserStore();
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [houses, setHouses] = useState<House[]>([]);
+  const [loadingMap, setLoadingMap] = useState(true);
+  const [loadingVault, setLoadingVault] = useState(true);
+  const [vaultSBTs, setVaultSBTs] = useState<any[]>([]);
+  const [dailyQuest, setDailyQuest] = useState<{ id: string; isCompleted: boolean; isRewardClaimed: boolean; rewardXp: number } | null>(null);
+
+  React.useEffect(() => {
+    async function loadData() {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/api/users/me`, { headers });
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        const data = await res.json();
+
+        const mappedHouses: Record<string, House> = {};
+
+        if (data.roadmaps && data.roadmaps.length > 0) {
+          const activeRoadmap = data.roadmaps[0];
+          activeRoadmap.courses?.forEach((rc: any) => {
+            const course = rc.course;
+            if (!course?.house) return;
+
+            if (!mappedHouses[course.house.id]) {
+              mappedHouses[course.house.id] = {
+                id: course.house.id,
+                title: course.house.title,
+                description: course.house.description,
+                icon: course.house.icon,
+                status: 'active',
+                houseNumber: course.house.houseNumber,
+                gradient: course.house.gradient,
+                stages: [],
+              };
+            }
+
+            mappedHouses[course.house.id].stages.push({
+              id: course.id,
+              name: course.title,
+              description: course.description,
+              isCompleted: false,
+              contentType: 'material',
+              chapters: course.chapters?.map((ch: any) => ({
+                id: ch.id,
+                name: ch.title,
+                duration: ch.sections?.length?.toString() || '1'
+              })) || [],
+            });
+          });
+        }
+
+        const housesRes = await fetch(`${API_BASE_URL}/api/houses`, { headers });
+        if (housesRes.ok) {
+          const housesData = await housesRes.json();
+          const levelLocked = level < 5;
+
+          housesData.houses.forEach((apiHouse: any) => {
+            const courseCount = apiHouse._count?.courses ?? 0;
+            if (mappedHouses[apiHouse.id]) {
+              mappedHouses[apiHouse.id].status = apiHouse.isActive ? 'active' : (levelLocked ? 'lockedByLevel' : 'locked');
+              mappedHouses[apiHouse.id].isActive = apiHouse.isActive;
+              mappedHouses[apiHouse.id].courseCount = courseCount;
+              mappedHouses[apiHouse.id].skillsOverview = apiHouse.skillsOverview;
+              mappedHouses[apiHouse.id].idealFor = apiHouse.idealFor;
+              (mappedHouses[apiHouse.id] as any).matchScore = apiHouse.matchScore ?? 0;
+            } else {
+              mappedHouses[apiHouse.id] = {
+                id: apiHouse.id,
+                title: apiHouse.title,
+                description: apiHouse.description,
+                icon: apiHouse.icon,
+                status: apiHouse.isActive ? 'active' : (levelLocked ? 'lockedByLevel' : 'locked'),
+                isActive: apiHouse.isActive,
+                houseNumber: apiHouse.houseNumber,
+                gradient: apiHouse.gradient || 'from-slate-500 to-slate-700',
+                stages: [],
+                courseCount,
+                skillsOverview: apiHouse.skillsOverview,
+                idealFor: apiHouse.idealFor,
+                matchScore: apiHouse.matchScore ?? 0,
+              };
+            }
+          });
+        }
+
+        try {
+          const questsRes = await fetch(`${API_BASE_URL}/api/quests`, { headers });
+          if (questsRes.ok) {
+            const questsData = await questsRes.json();
+            const quest = Array.isArray(questsData.quests)
+              ? questsData.quests.find((item: any) => item.type === 'DAILY_LOGIN')
+              : null;
+            if (quest) {
+              const resolvedQuest = {
+                id: quest.id,
+                isCompleted: !!quest.isCompleted,
+                isRewardClaimed: !!quest.isRewardClaimed,
+                rewardXp: quest.rewardXp ?? 0,
+              };
+              setDailyQuest(resolvedQuest);
+              setDailyBountyClaimed(resolvedQuest.isRewardClaimed);
+            }
+          }
+        } catch (questError) {
+          console.error('Failed to load quests:', questError);
+        }
+
+        const sortedHouses = Object.values(mappedHouses).sort((a: any, b: any) => {
+          const scoreDelta = (b.matchScore ?? 0) - (a.matchScore ?? 0);
+          if (scoreDelta !== 0) return scoreDelta;
+
+          const statusOrder = (h: any) => {
+            if (h.status === 'active' || h.status === 'completed') return 0;
+            if (h.status === 'lockedByLevel') return 1;
+            if (h.status === 'locked') return 2;
+            return 3;
+          };
+
+          const statusDelta = statusOrder(a) - statusOrder(b);
+          if (statusDelta !== 0) return statusDelta;
+
+          return a.houseNumber - b.houseNumber;
+        });
+        setHouses(sortedHouses);
+        // mark map loading finished
+        setLoadingMap(false);
+
+        // Fetch vault SBTs
+        try {
+          const vaultRes = await fetch(`${API_BASE_URL}/api/badges`, { headers });
+          if (vaultRes.ok) {
+            const vaultData = await vaultRes.json();
+            setVaultSBTs(vaultData.badges || []);
+          } else {
+            setVaultSBTs([]);
+          }
+        } catch (e) {
+          console.error('Failed to load vault badges:', e);
+          setVaultSBTs([]);
+        } finally {
+          setLoadingVault(false);
+        }
+      } catch (err) {
+        console.error('Failed to load roadmap:', err);
+        // ensure loading flags are cleared so UI doesn't hang
+        setLoadingMap(false);
+        setLoadingVault(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const playHoverSound = () => {
     try {
@@ -78,7 +227,7 @@ export default function LearningProgress() {
       case 'locked':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#78350f', border: '2px solid #451a03', color: '#fcd34d', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <PixelIcon icon="⚔️" size={18} /> SIDE QUEST
+            <PixelIcon icon="🔒" size={18} /> LOCKED
           </span>
         );
       case 'lockedByLevel':
@@ -102,6 +251,17 @@ export default function LearningProgress() {
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
           Jelajahi 10 House dan kuasai ilmu baru. Klik House untuk mulai petualanganmu!
         </p>
+        <button
+          onClick={() => {
+            import('@/store/useOnboardingStore').then(({ useOnboardingStore }) => {
+              useOnboardingStore.setState({ selectedRole: 'dreamer' });
+              router.push('/assessment');
+            });
+          }}
+          style={{ alignSelf: 'flex-start', padding: '8px 16px', background: '#3b82f6', color: 'white', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', borderRadius: '8px', cursor: 'pointer', border: '2px solid #2563eb' }}
+        >
+          ULANGI ASESMEN
+        </button>
       </div>
 
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
@@ -113,12 +273,20 @@ export default function LearningProgress() {
             const totalPages = Math.ceil(houses.length / ITEMS_PER_PAGE);
             const currentHouses = houses.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+            if (loadingMap) {
+              return <PixelSkeletonRows count={4} />;
+            }
+            
+            if (houses.length === 0) {
+              return <div style={{ color: 'white', fontFamily: '"Press Start 2P"' }}>NO HOUSES AVAILABLE.</div>;
+            }
+
             return (
               <>
                 {currentHouses.map((house: House, idx: number) => {
                   const isCompleted = house.status === 'completed';
-                  const isLocked = house.status === 'locked';
-                  const isLockedByLevel = isLocked && level < 5;
+                  const isLocked = house.status === 'locked' || house.status === 'lockedByLevel';
+                  const isLockedByLevel = house.status === 'lockedByLevel';
                   const progress = getProgressPercentage(house.stages);
 
                   return (
@@ -132,7 +300,11 @@ export default function LearningProgress() {
                       <div
                         className={styles.retroCard}
                         onMouseEnter={playHoverSound}
-                        onClick={() => { if (!isLockedByLevel) router.push(`/house/${house.id}`); }}
+                        onClick={() => { 
+                          if (!isLockedByLevel) {
+                            router.push(`/house/${house.id}`);
+                          } 
+                        }}
                         style={{
                           padding: '0',
                           opacity: isLockedByLevel ? 0.5 : (isLocked ? 0.7 : 1),
@@ -161,23 +333,7 @@ export default function LearningProgress() {
                           </span>
                         </div>
                       )}
-                      {isLocked && !isLockedByLevel && (
-                        <div style={{
-                          position: 'absolute',
-                          top: 12, right: -40,
-                          transform: 'rotate(45deg)',
-                          background: '#b91c1c',
-                          padding: '8px 48px',
-                          border: '2px solid #7f1d1d',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-                          zIndex: 10,
-                          pointerEvents: 'none'
-                        }}>
-                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fca5a5' }}>
-                            EXP PENALTY
-                          </span>
-                        </div>
-                      )}
+                      {/* Remove EXP PENALTY ribbon */}
 
                       {/* House Header */}
                       <div
@@ -237,7 +393,7 @@ export default function LearningProgress() {
                         {/* Status & Modules count */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           {getStatusBadge(isLockedByLevel ? 'lockedByLevel' : house.status)}
-                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.stages.length} MODUL DI DALAM</span>
+                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.courseCount ?? house.stages.length} MODUL DI DALAM</span>
                         </div>
                       </div>
                       
@@ -254,7 +410,7 @@ export default function LearningProgress() {
 
                              {house.skillsOverview && (
                                <div className="flex flex-col gap-3">
-                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29', display: 'flex', alignItems: 'center', gap: '8px' }}><PixelIcon icon="⚔️" size={16} /> SKILL YANG DIASAH</h4>
+                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="⚔️" size={16} /> SKILL YANG DIASAH</h4>
                                  <div className="flex flex-col gap-1">
                                    {house.skillsOverview.map(skill => (
                                      <div key={skill} className="flex items-start gap-2">
@@ -267,7 +423,7 @@ export default function LearningProgress() {
                              )}
                              {house.idealFor && (
                                <div className="flex flex-col gap-3">
-                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29', display: 'flex', alignItems: 'center', gap: '8px' }}><PixelIcon icon="💡" size={16} /> COCOK UNTUK</h4>
+                                 <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="💡" size={16} /> COCOK UNTUK</h4>
                                  <div className="flex flex-col gap-1">
                                    {house.idealFor.map(ideal => (
                                      <div key={ideal} className="flex items-start gap-2">
@@ -339,46 +495,104 @@ export default function LearningProgress() {
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>THE VAULT</span>
-              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', cursor: 'pointer' }}>VIEW ALL</span>
+              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', cursor: 'pointer' }}
+                onClick={() => router.push('/dreamer/certificate')}>VIEW ALL</span>
             </div>
 
-            <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', marginBottom: '16px', lineHeight: '1.6' }}>
-              Claimed Soulbound Tokens
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-              {user.claimedSBTs.map((sbt) => (
-                <div key={sbt.id} style={{ background: 'rgba(0,0,0,0.2)', border: '2px solid #5a3a29', padding: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '48px', height: '48px', background: '#3b261b', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                    {sbt.icon}
-                  </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: '1.4' }}>{sbt.name}</span>
-                    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fbbf24', lineHeight: '1.4', marginTop: '4px' }}>{sbt.description}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Active SBT Progress */}
-            <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ fontSize: '2rem' }}>{user.activeSBT.icon}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', lineHeight: '1.4' }}>{user.activeSBT.name}</span>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#34d399' }}>{user.activeSBT.nextMilestone} NEXT</span>
-                </div>
+            {loadingVault ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* Skeleton Loader */}
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  style={{
+                    height: '24px',
+                    background: '#2a1f1a',
+                    border: '2px solid #5a3a29',
+                    borderRadius: '4px',
+                    marginBottom: '12px'
+                  }}
+                />
+                {[1, 2, 3].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+                    style={{
+                      background: 'rgba(0,0,0,0.2)',
+                      border: '2px solid #5a3a29',
+                      padding: '12px',
+                      display: 'flex',
+                      gap: '12px',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div style={{ width: '48px', height: '48px', background: '#3b261b', border: '2px solid #5a3a29', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }} />
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ height: '14px', background: '#3b261b', borderRadius: '2px', width: '80%' }} />
+                      <div style={{ height: '10px', background: '#3b261b', borderRadius: '2px', width: '60%' }} />
+                    </div>
+                  </motion.div>
+                ))}
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                  style={{
+                    background: '#3b261b',
+                    border: '2px solid #5a3a29',
+                    padding: '16px',
+                    marginTop: '12px',
+                    height: '120px',
+                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)'
+                  }}
+                />
               </div>
-              <div className={styles.readinessContainer}>
-                <div className={styles.readinessBarBg} style={{ height: '16px' }}>
-                  <div className={styles.readinessBarFillBlue} style={{ width: `${user.activeSBT.progress}%` }} />
+            ) : (
+              <>
+                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', marginBottom: '16px', lineHeight: '1.6' }}>
+                  Claimed Soulbound Tokens
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                  {vaultSBTs.slice(0, 3).map((sbt: any, i: number) => (
+                    <div key={sbt.id || i} style={{ background: 'rgba(0,0,0,0.2)', border: '2px solid #5a3a29', padding: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div style={{ width: '48px', height: '48px', background: '#3b261b', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
+                        <PixelIcon icon={sbt.course?.coverImageUrl ? '🏅' : '🏅'} size={24} />
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: '1.4' }}>{sbt.course?.title || 'Badge'}</span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fbbf24', lineHeight: '1.4', marginTop: '4px' }}>Completed {sbt.course?.title?.split('–')?.[0] || ''}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {vaultSBTs.length === 0 && (
+                    <div style={{ padding: '16px', textAlign: 'center', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8' }}>
+                      Belum ada token. Selesaikan kursus untuk mendapatkan SBT!
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#fff' }}>
-                  <span>PROGRESS</span>
-                  <span style={{ color: '#60a5fa' }}>{user.activeSBT.progress}%</span>
+
+                {/* Active SBT Progress */}
+                <div style={{ background: '#3b261b', border: '2px solid #5a3a29', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ fontSize: '2rem' }}>🚀</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', lineHeight: '1.4' }}>Keep Going!</span>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#34d399' }}>{Math.max(5 - vaultSBTs.length, 0)} NEXT</span>
+                    </div>
+                  </div>
+                  <div className={styles.readinessContainer}>
+                    <div className={styles.readinessBarBg} style={{ height: '16px' }}>
+                      <div className={styles.readinessBarFillBlue} style={{ width: `${Math.min((vaultSBTs.length / 5) * 100, 100)}%` }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#fff' }}>
+                      <span>PROGRESS</span>
+                      <span style={{ color: '#60a5fa' }}>{Math.min((vaultSBTs.length / 5) * 100, 100)}%</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
           {/* Daily Bounty */}
@@ -390,39 +604,42 @@ export default function LearningProgress() {
             <div style={{ background: '#d4a373', border: '4px solid #5a3a29', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.2), inset -4px -4px 8px rgba(0,0,0,0.3)' }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{ width: '48px', height: '48px', background: '#fff', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-                  {user.dailyBounty.icon}
+                  🏅
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3b261b', lineHeight: '1.6' }}>
-                    {user.dailyBounty.title}
+                    Daily Skill Builder
                   </h4>
                   <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#047857', background: '#fff', padding: '6px 12px', border: '1px solid #064e3b', width: 'fit-content' }}>
-                    {user.dailyBounty.xpReward} XP
+                    150 XP
                   </span>
                 </div>
               </div>
 
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.8' }}>
-                {user.dailyBounty.description}
+                Complete 1 quiz module to earn +150 XP
               </p>
 
               <button
-                disabled={dailyBountyClaimed || isClaimingBounty}
+                disabled={!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty}
                 onClick={async () => {
+                  if (!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty) {
+                    return;
+                  }
+
                   if (!dailyBountyClaimed && !isClaimingBounty) {
                     setIsClaimingBounty(true);
-                    
                     try {
-                      const res = await fetch(`${API_BASE_URL}/api/gamification/add-xp`, {
+                      const { getAuthHeaders: getHeaders } = await import('@/hooks/useAuthSync');
+                      const res = await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
                         method: 'POST',
-                        headers: getAuthHeaders(),
-                        body: JSON.stringify({ amount: user.dailyBounty.xpReward })
+                        headers: getHeaders(),
                       });
-                      
                       if (res.ok) {
                         setTimeout(() => {
-                          addXP(user.dailyBounty.xpReward);
+                          addXP(dailyQuest.rewardXp || 150);
                           claimDailyBounty();
+                          setDailyBountyClaimed(true);
                           setIsClaimingBounty(false);
                         }, 1200);
                       } else {
@@ -439,11 +656,11 @@ export default function LearningProgress() {
                   padding: '24px',
                   fontFamily: '"Press Start 2P"',
                   fontSize: '0.8rem',
-                  color: dailyBountyClaimed ? '#a3a3a3' : '#fff',
-                  background: dailyBountyClaimed ? '#525252' : '#047857',
-                  border: `2px solid ${dailyBountyClaimed ? '#404040' : '#064e3b'}`,
+                  color: dailyBountyClaimed ? '#a3a3a3' : (!dailyQuest?.isCompleted ? '#3b261b' : '#fff'),
+                  background: dailyBountyClaimed ? '#525252' : (!dailyQuest?.isCompleted ? '#f59e0b' : '#047857'),
+                  border: `2px solid ${dailyBountyClaimed ? '#404040' : (!dailyQuest?.isCompleted ? '#b45309' : '#064e3b')}`,
                   boxShadow: dailyBountyClaimed ? 'none' : '4px 4px 0 rgba(0,0,0,0.5)',
-                  cursor: dailyBountyClaimed || isClaimingBounty ? 'not-allowed' : 'pointer',
+                  cursor: dailyBountyClaimed || isClaimingBounty || !dailyQuest?.isCompleted ? 'not-allowed' : 'pointer',
                   transform: dailyBountyClaimed ? 'none' : 'active:translate(2px, 2px)',
                   marginTop: '8px',
                   position: 'relative',
@@ -458,11 +675,9 @@ export default function LearningProgress() {
                     CLAIMING...
                   </motion.span>
                 ) : dailyBountyClaimed ? (
-                  `NEXT CLAIM AT ${(() => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + 1);
-                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                  })()}`
+                  `NEXT CLAIM AT 00:00`
+                ) : !dailyQuest?.isCompleted ? (
+                  'LOGIN DAILY'
                 ) : (
                   'CLAIM DAILY XP'
                 )}
@@ -480,7 +695,7 @@ export default function LearningProgress() {
                       transition={{ duration: 1 }}
                       style={{ position: 'absolute', top: 0, left: 0, right: 0, color: '#34d399', fontFamily: '"Press Start 2P"', fontSize: '0.6rem' }}
                     >
-                      +{user.dailyBounty.xpReward} XP!
+                      +150 XP!
                     </motion.div>
                   )}
                 </AnimatePresence>

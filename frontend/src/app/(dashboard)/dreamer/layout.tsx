@@ -8,7 +8,6 @@ import Image from 'next/image';
 import styles from './layout.module.css';
 import DailyMantra from '@/components/ui/DailyMantra';
 import { useUserStore } from '@/store/useUserStore';
-import { useOnboardingStore } from '@/store/useOnboardingStore';
 import PixelIcon from '@/components/ui/PixelIcon';
 import BGMPlayer from '@/components/ui/BGMPlayer';
 import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
@@ -37,7 +36,7 @@ export default function SMALayout({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isWalletAnimating, setIsWalletAnimating] = useState(false);
-  const { logout, user } = usePrivy();
+  const { logout, user, ready } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
   const { displayName: savedName, displayEmail: savedEmail, avatarUrl } = useUserStore();
@@ -93,39 +92,44 @@ export default function SMALayout({
 
   // ── Route Guard: verifikasi role dari BACKEND ──
   // Zustand memberikan render cepat; backend adalah sumber kebenaran akhir.
-  const { selectedRole, savedPrivyUserId, setRole } = useOnboardingStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready) return;
+    if (!user) {
+      const storedToken = localStorage.getItem('pathtrick_token');
+      if (!storedToken) {
+        router.replace('/');
+      }
+      return;
+    }
     const token = getAuthHeaders()['Authorization'];
     if (!token) {
-      // Belum ada JWT — kemungkinan sedang proses sync, tunggu sebentar
-      setTimeout(() => setIsCheckingAuth(false), 0);
+      router.replace('/select-role');
       return;
     }
     let cancelled = false;
     fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
       .then(async (res) => {
         if (cancelled) return;
-        if (!res.ok) { router.replace('/'); return; }
+        if (!res.ok) {
+          router.replace('/select-role');
+          return;
+        }
         const data = await res.json() as any;
         if (cancelled) return;
-        
+
         if (data.gamification) {
-          const calculatedLevel = Math.max(1, Math.floor(data.gamification.xp / 1000) + 1);
+          const calculatedLevel = Math.max(0, Math.floor(data.gamification.xp / 1000));
           useUserStore.getState().hydrateUser(data.gamification.xp, calculatedLevel, data.name || '', data.email || '');
         }
-        
+
         const roleName = data?.role?.name?.toUpperCase();
         if (!roleName) {
-          // Tidak ada role di backend → ke select-role
           router.replace('/select-role');
         } else if (roleName === 'DREAMER') {
-          setRole('dreamer', user.id);
           setIsCheckingAuth(false);
         } else if (roleName === 'CHASER') {
-          setRole('chaser', user.id);
           router.replace('/chaser/dashboard');
         } else if (roleName === 'ADMIN') {
           router.replace('/admin/dashboard');
@@ -135,18 +139,11 @@ export default function SMALayout({
       })
       .catch(() => {
         if (cancelled) return;
-        // Jika backend tidak bisa dihubungi, gunakan Zustand sebagai fallback
-        if (!selectedRole || savedPrivyUserId !== user.id) {
-          router.replace('/select-role');
-        } else if (selectedRole !== 'dreamer') {
-          router.replace(`/${selectedRole}/dashboard`);
-        } else {
-          setIsCheckingAuth(false);
-        }
+        router.replace('/select-role');
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, ready]);
 
   const playHoverSound = () => {
     try {
@@ -160,7 +157,9 @@ export default function SMALayout({
 
   // Don't render the dashboard while backend role check is in progress.
   // This prevents flash of authenticated content before we know the user's role.
-  if (isCheckingAuth) return null;
+  if (isCheckingAuth && pathname !== '/dreamer/dashboard') {
+    return null;
+  }
 
   if (isMissionPage) {
     return (
@@ -256,8 +255,25 @@ export default function SMALayout({
                   zIndex: 100,
                   padding: '12px'
                 }}>
-                  <div style={{ borderBottom: '2px dashed #5a3a29', paddingBottom: '8px', marginBottom: '8px' }}>
+                  <div style={{ borderBottom: '2px dashed #5a3a29', paddingBottom: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                     <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#3b261b' }}>{t('common.alerts')}</span>
+                    {notifications.some(n => !n.isRead) && (
+                      <button
+                        onClick={handleMarkAllRead}
+                        style={{
+                          background: '#3b261b',
+                          color: '#fbbf24',
+                          border: '2px solid #5a3a29',
+                          borderRadius: '6px',
+                          fontFamily: '"Press Start 2P"',
+                          fontSize: '0.35rem',
+                          padding: '6px 8px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Mark all read
+                      </button>
+                    )}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {notifications.length === 0 ? (

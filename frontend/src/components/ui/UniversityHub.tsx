@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from '@/components/ui/Dashboard.module.css';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
 
 interface University {
   id: string;
@@ -16,10 +17,36 @@ interface University {
   admissionRequirements?: string | null;
   description?: string | null;
   accreditation?: string | null;
+  title?: string | null;
+  website?: string | null;
   
   // Frontend injected fields
   matchScore?: number;
 }
+
+const FACULTIES = [
+  { value: 'agr_farm', label: 'Agribisnis & Pertanian' },
+  { value: 'biz_acc', label: 'Akuntansi & Keuangan' },
+  { value: 'biz_mgmt', label: 'Bisnis & Manajemen' },
+  { value: 'data_ai', label: 'Data Science & AI' },
+  { value: 'arts_design', label: 'Desain & Seni Rupa' },
+  { value: 'sci_natural', label: 'Fisika, Kimia, Biologi' },
+  { value: 'soc_ir', label: 'Hubungan Internasional' },
+  { value: 'law', label: 'Ilmu Hukum' },
+  { value: 'soc_comm', label: 'Ilmu Komunikasi' },
+  { value: 'cs_it', label: 'Ilmu Komputer & TI' },
+  { value: 'law_public', label: 'Ilmu Politik & Publik' },
+  { value: 'med_doctor', label: 'Kedokteran (Umum/Gigi)' },
+  { value: 'agr_env', label: 'Kehutanan & Lingkungan' },
+  { value: 'med_nurse', label: 'Keperawatan & Farmasi' },
+  { value: 'sci_math', label: 'Matematika & Statistika' },
+  { value: 'eng_mech', label: 'Mesin & Elektro' },
+  { value: 'edu_teacher', label: 'Pendidikan Guru' },
+  { value: 'soc_psy', label: 'Psikologi' },
+  { value: 'arts_lang', label: 'Sastra & Bahasa' },
+  { value: 'eng_civil', label: 'Sipil & Arsitektur' },
+  { value: 'edu_tech', label: 'Teknologi Pendidikan' },
+];
 
 const MOCK_UNIVERSITIES: University[] = [
   {
@@ -63,24 +90,50 @@ export default function UniversityHub() {
     let cancelled = false;
     setLoading(true);
 
-    fetch(`${API_BASE_URL}/api/universities`, { headers: getAuthHeaders() })
-      .then(res => res.ok ? res.json() : null)
-      .then((data: { universities?: University[] } | null) => {
-        if (cancelled) return;
-        const list = data?.universities;
-        if (Array.isArray(list) && list.length > 0) {
-          // Tambahkan skor acak atau default karena API belum mengembalikan matchScore
-          setUniversities(list.map(u => ({ ...u, matchScore: Math.floor(Math.random() * 20) + 75 })));
-        } else {
-          setUniversities(MOCK_UNIVERSITIES);
+    (async () => {
+      try {
+        const headers = getAuthHeaders();
+        // First try: use AI roadmap matches from /api/users/me
+        const meRes = await fetch(`${API_BASE_URL}/api/users/me`, { headers });
+        if (meRes.ok) {
+          const me = await meRes.json();
+          const activeRoadmap = me.roadmaps?.[0];
+          if (activeRoadmap?.universityMatches?.length > 0) {
+            // Map roadmap university matches to University interface
+              const fromRoadmap: University[] = [...activeRoadmap.universityMatches]
+                .sort((a: any, b: any) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
+                .map((um: any) => ({
+                  ...um.university,
+                  matchScore: um.matchScore,
+                  reasoning: um.reasoning,
+                }));
+            if (!cancelled) {
+              setUniversities(fromRoadmap);
+              setLoading(false);
+            }
+            return;
+          }
         }
-      })
-      .catch(() => {
-        if (!cancelled) setUniversities(MOCK_UNIVERSITIES);
-      })
-      .finally(() => {
+
+        // Fallback: use /api/universities with user's preference filter
+        const uniRes = await fetch(`${API_BASE_URL}/api/universities`, { headers });
+        if (uniRes.ok) {
+          const data = await uniRes.json();
+          const list = Array.isArray(data?.universities)
+            ? [...data.universities].sort((a: University, b: University) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
+            : [];
+          if (!cancelled) {
+            setUniversities(list);
+          }
+        } else if (!cancelled) {
+          setUniversities([]);
+        }
+      } catch {
+        if (!cancelled) setUniversities([]);
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    })();
 
     return () => { cancelled = true; };
   }, []);
@@ -105,11 +158,7 @@ export default function UniversityHub() {
         </p>
       </div>
 
-      {loading && (
-        <p style={{ fontFamily: '"Pixelify Sans", sans-serif', color: '#fbbf24', fontSize: '1rem' }}>
-          Memuat rekomendasi universitas...
-        </p>
-      )}
+      {loading && <PixelSkeletonCardGrid count={6} />}
 
       {/* Grid */}
       {!loading && (
@@ -140,14 +189,16 @@ export default function UniversityHub() {
 
               <div>
                 {uni.coverImageUrl && (
-                  <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#2c1810', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
-                    <img src={uni.coverImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }} />
+                  <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#ffffff', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={uni.coverImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', marginTop: uni.coverImageUrl ? '0' : '16px', position: 'relative' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
                     <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b', margin: 0 }}>
-                      {uni.facultyTags && uni.facultyTags.length > 0 ? uni.facultyTags[0] : 'Program Umum'}
+                      {uni.title || (uni.facultyTags && uni.facultyTags.length > 0 
+                        ? (FACULTIES.find(f => f.value === uni.facultyTags![0])?.label || uni.facultyTags[0]) 
+                        : 'Program Umum')}
                     </h3>
                     <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                       {uni.name}
@@ -156,17 +207,21 @@ export default function UniversityHub() {
                 </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <img src="/Map.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <img src="/Map.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
                     <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location || uni.country || '-'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <img src="/Journall.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.accreditation ? `Akreditasi: ${uni.accreditation}` : 'Tingkat Penerimaan: -'}</span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <img src="/Journall.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
+                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6', wordBreak: 'break-all' }}>{uni.website ? <a href={uni.website.startsWith('http') ? uni.website : `https://${uni.website}`} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>{uni.website}</a> : (uni.accreditation ? `Akreditasi: ${uni.accreditation}` : 'Website: -')}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Reqs: {uni.admissionRequirements || '-'}</span>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '2px' }}>💰</span>
+                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.estimatedCostMin && uni.estimatedCostMax ? `Rp ${(uni.estimatedCostMin/1000000).toFixed(0)}Jt - ${(uni.estimatedCostMax/1000000).toFixed(0)}Jt / smtr` : 'Estimasi Biaya: -'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
+                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Jalur Masuk: {uni.admissionRequirements || '-'}</span>
                   </div>
                 </div>
               </div>

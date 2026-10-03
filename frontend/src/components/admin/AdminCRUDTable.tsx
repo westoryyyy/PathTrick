@@ -130,17 +130,30 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
         </div>
       ) : value ? (
         <div style={{ position: 'relative', width: '160px', height: '90px', border: '2px solid #5a3a29' }}>
-          <Image src={value} alt="Preview" fill style={{ objectFit: 'cover' }} />
+          <img src={value} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           <button
             onClick={() => onChange('')}
             style={{ position: 'absolute', top: 0, right: 0, background: '#ef4444', color: '#fff', border: 'none', padding: '2px 6px', cursor: 'pointer', fontFamily: '"Pixelify Sans"' }}
           >✕</button>
         </div>
       ) : (
-        <label style={{ fontFamily: '"Pixelify Sans"', fontSize: '0.9rem', background: '#4a2410', border: '2px dashed #5a3a29', color: '#fbbf24', padding: '16px', textAlign: 'center', cursor: 'pointer' }}>
-          + Upload Gambar
-          <input type="file" accept="image/*" onChange={onFileChange} style={{ display: 'none' }} />
-        </label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={{ fontFamily: '"Pixelify Sans"', fontSize: '0.9rem', background: '#4a2410', border: '2px dashed #5a3a29', color: '#fbbf24', padding: '16px', textAlign: 'center', cursor: 'pointer', margin: 0 }}>
+            + Upload Gambar
+            <input type="file" accept="image/*" onChange={onFileChange} style={{ display: 'none' }} />
+          </label>
+          <div style={{ textAlign: 'center', color: '#a3a3a3', fontSize: '0.8rem', fontFamily: 'Inter, sans-serif' }}>ATAU</div>
+          <input
+            type="text"
+            placeholder="Tempel URL Gambar..."
+            onChange={(e) => {
+              if (e.target.value.startsWith('http')) {
+                onChange(e.target.value);
+              }
+            }}
+            style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', background: '#4a2410', border: '2px solid #5a3a29', color: '#fff', padding: '8px 12px', outline: 'none' }}
+          />
+        </div>
       )}
 
       {imageSrc && (
