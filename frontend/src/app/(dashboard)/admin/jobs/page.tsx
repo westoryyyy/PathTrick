@@ -25,7 +25,7 @@ const COLUMNS: Column<Job>[] = [
 ];
 
 const FIELDS: Field[] = [
-  { key: 'coverImage', label: 'Cover Image', type: 'image' },
+  { key: 'coverImage', label: 'Cover Image URL', type: 'text', placeholder: 'https://example.com/image.jpg' },
   { key: 'title', label: 'Posisi / Jabatan', type: 'text', placeholder: 'Backend Developer', required: true },
   { key: 'company', label: 'Nama Perusahaan', type: 'text', placeholder: 'Tokopedia', required: true },
   { key: 'location', label: 'Lokasi', type: 'text', placeholder: 'Jakarta / Remote' },
