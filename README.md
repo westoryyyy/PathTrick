@@ -27,6 +27,14 @@ We do not just place a certificate on the blockchain; we mathematically guarante
 
 ---
 
+## TECH STACK
+
+**Frontend:** Next.js, React, TypeScript, Tailwind CSS, Phaser (RPG Engine), Privy (Auth), Wagmi, Viem.
+**Backend:** Node.js, Fastify, TypeScript, Prisma, PostgreSQL, Groq API (AI LLM).
+**Smart Contract:** Solidity, Foundry, BNB Smart Chain (Testnet), ERC-1155 (SBT), EIP-712 (Signatures).
+
+---
+
 ## HOW IT WORKS
 
 The platform seamlessly bridges AI evaluation (off-chain) with Smart Contract verification (on-chain) in a completely trustless manner.
@@ -134,4 +142,10 @@ Everything below is verified on BNB Smart Chain Testnet.
 ---
 
 ## TEAM
-**Pathtrick Team** - Building the future of verifiable, AI-driven education on BNB Chain.
+
+- **Rotua Paulina** - Smart Contract Engineer, Product Manager
+- **Renatha Amelia Manggala Putri** - Backend Engineer and AI Engineer
+- **Grace Yoelanda Turnip** - Front End Engineer
+- **Nabilah Aprilia Darwin** - Visual and Assets Artist
+
+*Building the future of verifiable, AI-driven education on BNB Chain.*
