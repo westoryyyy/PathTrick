@@ -178,9 +178,14 @@ export default function ScholarshipHub() {
                   {parseReqs(scholarship.requirements).length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                       <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
-                      <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                        Reqs: {parseReqs(scholarship.requirements).join(', ')}
-                      </span>
+                      <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                        <span style={{ fontWeight: 'bold' }}>Reqs:</span>
+                        <ul style={{ margin: '4px 0 0', paddingLeft: '20px', listStyleType: 'disc' }}>
+                          {parseReqs(scholarship.requirements).map((req, idx) => (
+                            <li key={idx} style={{ paddingLeft: '4px', marginBottom: '4px' }}>{req}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -287,9 +292,16 @@ export default function ScholarshipHub() {
                   <span>DEADLINE: {fmtDeadline(selectedScholarship.deadline)}</span>
                 </div>
                 {parseReqs(selectedScholarship.requirements).length > 0 && (
-                  <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                    <span>REQUIREMENTS: {parseReqs(selectedScholarship.requirements).join(' • ')}</span>
+                  <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>REQUIREMENTS:</span>
+                      <ul style={{ margin: 0, paddingLeft: '20px', listStyleType: 'disc' }}>
+                        {parseReqs(selectedScholarship.requirements).map((req, idx) => (
+                          <li key={idx} style={{ paddingLeft: '4px', marginBottom: '6px' }}>{req}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 )}
               </div>
