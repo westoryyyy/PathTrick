@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
@@ -101,6 +101,7 @@ const VAULT_SBTS = [
 export default function Dashboard() {
   const { t } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
   const defaultNav = tabParam === 'learning' ? 'Learning Progress' : 'Dashboard';
@@ -445,7 +446,7 @@ export default function Dashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>💎 {t('sma.dashboard.achievementVault')}</span>
               <span 
-                onClick={() => router.push(window.location.pathname.includes('/chaser') ? '/chaser/certificate' : '/dreamer/certificate')}
+                onClick={() => router.push(pathname.includes('/chaser') ? '/chaser/certificate' : '/dreamer/certificate')}
                 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#fbbf24', cursor: 'pointer' }}
               >
                 {t('sma.dashboard.viewAll')}
