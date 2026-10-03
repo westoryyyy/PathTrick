@@ -42,8 +42,12 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
       });
       const data = await res.json();
       if (data?.result) {
-        const wei = parseInt(data.result, 16);
-        setBalance((wei / 1e18).toFixed(4));
+        const weiStr = data.result;
+        // Gunakan BigInt untuk menghindari kehilangan presisi (MAX_SAFE_INTEGER)
+        const wei = BigInt(weiStr);
+        // Konversi ke BNB: bagi dengan 10^14 untuk dapatkan nilai dengan 4 angka desimal, lalu ubah ke float
+        const bnbVal = Number(wei / 100000000000000n) / 10000;
+        setBalance(bnbVal.toFixed(4));
       } else {
         console.error("RPC Error:", data);
         setBalance('0.0000');
