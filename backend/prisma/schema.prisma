@@ -229,6 +229,7 @@ model RoadmapCourse {
 model University {
   id                    String   @id @default(cuid())
   name                  String
+  title                 String?  // Tambahan: "Fakultas - Jurusan" (contoh: "Fasilkom - Ilmu Komputer")
   country               String
   coverImageUrl         String?
   location              String?

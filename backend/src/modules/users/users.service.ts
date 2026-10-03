@@ -109,7 +109,18 @@ export async function getUserProfile(userId: string) {
         include: {
           universityMatches: { include: { university: true } },
           scholarshipMatches: { include: { scholarship: true } },
-          jobMatches: { include: { job: true } }
+          jobMatches: { include: { job: true } },
+          courses: {
+            orderBy: { order: "asc" },
+            include: {
+              course: {
+                include: {
+                  house: true,
+                  chapters: { include: { sections: true } },
+                },
+              },
+            },
+          },
         }
       },
     },

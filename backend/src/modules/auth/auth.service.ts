@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { refreshUserAchievements } from "../gamification/achievement.service";
 import { SyncBody } from "./auth.schema";
 
 /**
@@ -43,6 +44,8 @@ export async function syncUserFromPrivy(privyId: string, profile: SyncBody) {
       create: { userId: user.id, dateStr },
       update: {},
     });
+
+    await refreshUserAchievements(user.id);
   } catch (err) {
     // ignore
   }

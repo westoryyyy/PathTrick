@@ -2,6 +2,24 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../lib/prisma";
 import { mapTopCodeToFacultyTags } from "../assessment/riasec.service";
 
+function getStudyfieldHouseNames(studyfield: unknown): Set<string> {
+  if (!studyfield) {
+    return new Set();
+  }
+
+  const riasecService = require("../assessment/riasec.service");
+  const studyfields = Array.isArray(studyfield) ? studyfield : [studyfield];
+  const names = studyfields.flatMap((entry: unknown) => {
+    if (typeof entry !== "string") {
+      return [];
+    }
+
+    return riasecService.STUDYFIELD_TO_HOUSE[entry] ? [riasecService.STUDYFIELD_TO_HOUSE[entry]] : [];
+  });
+
+  return new Set(names);
+}
+
 export default async function housesRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/houses
@@ -29,28 +47,65 @@ export default async function housesRoutes(fastify: FastifyInstance) {
           skillsOverview: true,
           idealFor: true,
           status: true,
+          _count: {
+            select: {
+              courses: { where: { isPublished: true } }
+            }
+          },
         },
       });
 
-      // Cari hasil RIASEC terbaru user
+      // Cari hasil preference terbaru
+      const latestPref = await prisma.assessment.findFirst({
+        where: { userId, type: "DREAMER_PREFERENCE" },
+        orderBy: { version: "desc" },
+      });
+      
+      // Cari hasil RIASEC terbaru
       const latestRiasec = await prisma.riasecResult.findFirst({
         where: { userId },
         orderBy: { createdAt: "desc" },
         select: { topCode: true },
       });
 
-      // Tentukan houses yang active berdasar RIASEC
       let activeHouseNames = new Set<string>();
-      if (latestRiasec) {
-        activeHouseNames = new Set(mapTopCodeToFacultyTags(latestRiasec.topCode));
+      let preferredHouseNames = new Set<string>();
+      let hasTakenAssessment = false;
+      
+      if (latestPref && typeof latestPref.payload === 'object' && latestPref.payload !== null) {
+        hasTakenAssessment = true;
+        const payload = latestPref.payload as any;
+        if (payload.studyfield) {
+           preferredHouseNames = getStudyfieldHouseNames(payload.studyfield);
+           preferredHouseNames.forEach((t: string) => activeHouseNames.add(t));
+        } else if (latestRiasec) {
+           mapTopCodeToFacultyTags(latestRiasec.topCode).forEach(t => activeHouseNames.add(t));
+        }
+      } else if (latestRiasec) {
+        hasTakenAssessment = true;
+        mapTopCodeToFacultyTags(latestRiasec.topCode).forEach(t => activeHouseNames.add(t));
       }
 
-      return reply.code(200).send({
-        hasTakenAssessment: !!latestRiasec,
-        houses: houses.map((house) => ({
+      const rankedHouses = houses.map((house) => {
+        const isStudyfieldMatch = preferredHouseNames.has(house.title);
+        const isRiasecMatch = activeHouseNames.has(house.title);
+        const matchScore = (isStudyfieldMatch ? 100 : 0) + (isRiasecMatch ? 50 : 0);
+
+        return {
           ...house,
-          isActive: activeHouseNames.has(house.title),
-        })),
+          isActive: matchScore > 0,
+          matchScore,
+        };
+      }).sort((a, b) => {
+        if (b.matchScore !== a.matchScore) {
+          return b.matchScore - a.matchScore;
+        }
+        return a.houseNumber - b.houseNumber;
+      });
+
+      return reply.code(200).send({
+        hasTakenAssessment,
+        houses: rankedHouses,
       });
     }
   );
@@ -71,42 +126,111 @@ export default async function housesRoutes(fastify: FastifyInstance) {
         include: {
           courses: {
             where: { isPublished: true },
-            orderBy: { onChainId: "asc" },
+            orderBy: { order: "asc" },
             include: {
               chapters: {
                 orderBy: { order: "asc" },
-                include: {
+                select: {
+                  id: true,
+                  title: true,
+                  order: true,
+                  durationLabel: true,
                   sections: {
-                    select: { id: true }
-                  }
-                }
-              }
-            }
-          }
-        }
+                    select: {
+                      id: true,
+                      title: true,
+                      order: true,
+                      missionId: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!house) {
         return reply.code(404).send({ error: "NotFound", message: "House tidak ditemukan" });
       }
 
-      // Format response to match frontend 'stages' structure
+      const latestRiasec = await prisma.riasecResult.findFirst({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        select: { topCode: true },
+      });
+
+      let isActive = false;
+      if (latestRiasec) {
+        const activeHouseNames = new Set(mapTopCodeToFacultyTags(latestRiasec.topCode));
+        isActive = activeHouseNames.has(house.title);
+      }
+
+      const courseProgressList = await prisma.courseProgress.findMany({
+        where: {
+          userId,
+          courseId: { in: house.courses.map((course) => course.id) },
+        },
+        select: {
+          courseId: true,
+          status: true,
+          currentChapterOrder: true,
+          currentSectionOrder: true,
+        },
+      });
+
+      const progressMap = new Map(
+        courseProgressList.map((progress) => [progress.courseId, progress])
+      );
+
       const mappedHouse = {
         ...house,
-        stages: house.courses.map((course) => ({
-          id: course.id,
-          name: course.title,
-          description: course.description,
-          isCompleted: false, // For now hardcoded false or logic here if needed
-          duration: "6 Levels",
-          contentType: course.contentType,
-          chapters: course.chapters.map((chapter) => ({
-            id: chapter.id,
-            name: chapter.title,
-            duration: chapter.sections.length + " Levels",
-            isCompleted: false
-          }))
-        }))
+        isActive,
+        stages: house.courses.map((course) => {
+          const progress = progressMap.get(course.id) ?? {
+            status: "NOT_STARTED",
+            currentChapterOrder: 1,
+            currentSectionOrder: 1,
+          };
+
+          const chapters = course.chapters.map((chapter) => {
+            const totalSections = chapter.sections.length;
+            const chapterCompleted =
+              progress.status === "COMPLETED" ||
+              chapter.order < progress.currentChapterOrder ||
+              (chapter.order === progress.currentChapterOrder && progress.currentSectionOrder > totalSections);
+
+            const sections = chapter.sections.map((section) => ({
+              id: section.id,
+              title: section.title,
+              order: section.order,
+              completed:
+                progress.status === "COMPLETED" ||
+                chapter.order < progress.currentChapterOrder ||
+                (chapter.order === progress.currentChapterOrder && section.order < progress.currentSectionOrder) ||
+                (chapter.order === progress.currentChapterOrder && progress.currentSectionOrder > totalSections),
+            }));
+
+            return {
+              id: chapter.id,
+              name: chapter.title,
+              duration: chapter.durationLabel || `${totalSections} Levels`,
+              isCompleted: chapterCompleted,
+              locked: chapter.order > progress.currentChapterOrder,
+              sections,
+            };
+          });
+
+          return {
+            id: course.id,
+            name: course.title,
+            description: course.description,
+            isCompleted: progress.status === "COMPLETED",
+            duration: `${course.chapters.length} Bab`,
+            contentType: course.contentType,
+            chapters,
+          };
+        }),
       };
 
       return reply.code(200).send(mappedHouse);

@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../lib/prisma";
+import { refreshUserAchievements, BADGE_DEFINITIONS } from "./achievement.service";
 
 export default async function gamificationRoutes(fastify: FastifyInstance) {
   /**
@@ -11,6 +12,8 @@ export default async function gamificationRoutes(fastify: FastifyInstance) {
     { preHandler: [fastify.authenticate] },
     async (request, reply) => {
       const { userId } = request.user;
+
+      const { unlocked } = await refreshUserAchievements(userId);
 
       const [gamification, achievements, completedCourses] = await Promise.all([
         prisma.gamification.findUnique({
@@ -31,8 +34,8 @@ export default async function gamificationRoutes(fastify: FastifyInstance) {
         xp: gamification?.xp ?? 0,
         completedCourses,
         achievements,
-        // Readiness meter: persentase course selesai dari roadmap aktif
-        // (dihitung client-side dari GET /api/courses supaya tidak double-query di sini)
+        badgeDefinitions: BADGE_DEFINITIONS,
+        unlockedBadges: unlocked,
       });
     }
   );
@@ -60,7 +63,7 @@ export default async function gamificationRoutes(fastify: FastifyInstance) {
         },
       });
 
-      return reply.code(200).send({
+      return reply.send({
         leaderboard: top.map((entry, index) => ({
           rank: index + 1,
           userId: entry.user.id,
@@ -105,7 +108,7 @@ export default async function gamificationRoutes(fastify: FastifyInstance) {
         },
       });
 
-      return reply.code(200).send({
+      return reply.send({
         total: badges.length,
         badges: badges.map((b) => ({
           id: b.id,

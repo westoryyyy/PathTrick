@@ -47,17 +47,21 @@ export default async function questsRoutes(fastify: FastifyInstance) {
         let currentProgress = p?.progress || 0;
         
         if (q.type === 'DAILY_LOGIN') {
-          currentProgress = streak;
+          const todayStr = new Date().toISOString().split('T')[0];
+          const hasLoggedInToday = loginEvents.some(event => event.dateStr === todayStr);
+          currentProgress = hasLoggedInToday ? 1 : 0;
         }
 
-        const isCompleted = currentProgress >= q.targetCount;
+        const effectiveTarget = q.type === 'DAILY_LOGIN' ? 1 : q.targetCount;
+        const isCompleted = currentProgress >= effectiveTarget;
         
         return {
           id: q.id,
+          type: q.type,
           title: q.title,
           description: q.description,
           rewardXp: q.rewardXp,
-          targetCount: q.targetCount,
+          targetCount: effectiveTarget,
           progress: currentProgress,
           isCompleted,
           isRewardClaimed: p?.isRewardClaimed || false
@@ -92,29 +96,8 @@ export default async function questsRoutes(fastify: FastifyInstance) {
           where: { userId },
           orderBy: { dateStr: 'desc' }
         });
-        
-        let streak = 0;
-        if (loginEvents.length > 0) {
-          const todayStr = new Date().toISOString().split('T')[0];
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayStr = yesterday.toISOString().split('T')[0];
-          
-          let expectedDate = new Date(loginEvents[0].dateStr);
-          if (loginEvents[0].dateStr === todayStr || loginEvents[0].dateStr === yesterdayStr) {
-            streak = 1;
-            for (let i = 1; i < loginEvents.length; i++) {
-              expectedDate.setDate(expectedDate.getDate() - 1);
-              const expectedStr = expectedDate.toISOString().split('T')[0];
-              if (loginEvents[i].dateStr === expectedStr) {
-                streak++;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-        currentProgress = streak;
+        const todayStr = new Date().toISOString().split('T')[0];
+        currentProgress = loginEvents.some(event => event.dateStr === todayStr) ? 1 : 0;
       } else {
         const p = await prisma.userQuestProgress.findUnique({
           where: { userId_questId: { userId, questId: id } }
@@ -122,7 +105,8 @@ export default async function questsRoutes(fastify: FastifyInstance) {
         currentProgress = p?.progress || 0;
       }
 
-      if (currentProgress < quest.targetCount) {
+      const effectiveTarget = quest.type === 'DAILY_LOGIN' ? 1 : quest.targetCount;
+      if (currentProgress < effectiveTarget) {
         return reply.code(400).send({ error: "BadRequest", message: "Quest not completed yet" });
       }
 

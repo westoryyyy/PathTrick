@@ -36,21 +36,51 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
       }
 
       // 2. Cari course dan pastikan user lulus (ada SkillBadge)
-      const badge = await prisma.skillBadge.findFirst({
-        where: {
-          userId,
-          courseProgress: { courseId: body.courseId },
-        },
-        include: {
-          certificate: true,
-          courseProgress: { select: { course: { select: { onChainId: true, title: true } } } },
-        },
-      });
+      // Accept either internal Course.id (cuid string) or numeric on-chain id
+      const isNumericId = /^[0-9]+$/.test(body.courseId);
+      let badge;
+      if (isNumericId) {
+        // match by denormalized courseOnChainId
+        badge = await prisma.skillBadge.findFirst({
+          where: {
+            userId,
+            courseOnChainId: BigInt(body.courseId),
+          },
+          include: {
+            certificate: true,
+            courseProgress: { select: { course: { select: { onChainId: true, title: true } } } },
+          },
+        });
+      } else {
+        badge = await prisma.skillBadge.findFirst({
+          where: {
+            userId,
+            courseProgress: { courseId: body.courseId },
+          },
+          include: {
+            certificate: true,
+            courseProgress: { select: { course: { select: { onChainId: true, title: true } } } },
+          },
+        });
+      }
 
       if (!badge) {
+        // Log and return user's existing badges to help debugging client-side mismatches
+        request.log.info({ userId, attemptedCourseId: body.courseId, isNumericId }, 'prepare-mint: badge not found');
+        const userBadges = await prisma.skillBadge.findMany({
+          where: { userId },
+          select: { courseOnChainId: true, courseProgress: { select: { courseId: true } } },
+        });
         return reply
           .code(403)
-          .send({ error: "Forbidden", message: "User belum lulus course ini." });
+          .send({
+            error: "Forbidden",
+            message: "User belum lulus course ini.",
+            availableBadges: userBadges.map((b) => ({
+              courseOnChainId: b.courseOnChainId?.toString?.(),
+              courseId: b.courseProgress?.courseId,
+            })),
+          });
       }
 
       const courseOnChainId = BigInt(badge.courseOnChainId);
@@ -157,10 +187,19 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
       }
 
       // Ambil certificate record
-      const badge = await prisma.skillBadge.findFirst({
-        where: { userId, courseProgress: { courseId: body.courseId } },
-        include: { certificate: true },
-      });
+      const isNumericId = /^[0-9]+$/.test(body.courseId);
+      let badge;
+      if (isNumericId) {
+        badge = await prisma.skillBadge.findFirst({
+          where: { userId, courseOnChainId: BigInt(body.courseId) },
+          include: { certificate: true },
+        });
+      } else {
+        badge = await prisma.skillBadge.findFirst({
+          where: { userId, courseProgress: { courseId: body.courseId } },
+          include: { certificate: true },
+        });
+      }
 
       if (!badge?.certificate) {
         return reply
@@ -198,7 +237,7 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
       // Verifikasi: ada event CertificateMinted dari contract yang benar
       // CertificateMinted(address indexed to, uint256 indexed courseId)
       // topic[0] = keccak256("CertificateMinted(address,uint256)")
-      const MINTED_SIG = "0x6ee93c6efb9234a18e3c9ef0ee1c1cfbad7c44ed32d5a22a44432a2a64a8ef6b";
+      const MINTED_SIG = "0xe351802b022b8ba03353eafd05148198c0dc13061427df4dbbbbfc5c726a1b9e";
       const mintLog = receipt.logs.find(
         (log) =>
           log.address.toLowerCase() === CONTRACT_ADDRESS &&
