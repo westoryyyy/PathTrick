@@ -82,7 +82,7 @@ The result: a credential that is an objective, tamper-proof reflection of real c
 
 ## KEY FEATURES
 
-| Feature | What it does |
+| Feature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | What it does |
 |---------|--------------|
 | 🧭 **AI Career Assessment** | Onboarding test that maps users to a RIASEC profile (Dreamer) or a skill-gap analysis (Chaser). |
 | 🗺️ **Personalized Roadmap** | AI-generated missions, courses, and quests tailored to each user's goal. |
