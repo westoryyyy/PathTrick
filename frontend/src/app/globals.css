@@ -154,6 +154,8 @@ a {
   background: transparent;
   padding: 0;
   margin-bottom: 0.75rem;
+  font-family: inherit;
+  font-size: inherit;
   white-space: pre-wrap;
   word-break: break-word;
 }
