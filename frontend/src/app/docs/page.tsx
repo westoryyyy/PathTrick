@@ -676,7 +676,7 @@ export default function DocsPage() {
                   </div>
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}>
-                      <Image src="/sbt_logo.jpg" alt="Soulbound Token" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <Image src="/sbt_logo_transparent.png" alt="Soulbound Token" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
                       <div className={styles.cardTitle}>{locale === 'en' ? <>Standard Tokens</> : <>Token Standard</>}</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
@@ -685,7 +685,7 @@ export default function DocsPage() {
                   </div>
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}>
-                      <Image src="/gas_fee_logo.jpg" alt="Gas Fee" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
+                      <Image src="/gas_fee_logo_transparent.png" alt="Gas Fee" width={32} height={32} style={{ borderRadius: '6px', marginRight: '12px', objectFit: 'contain' }} />
                       <div className={styles.cardTitle}>{locale === 'en' ? <>Gas Cost Model</> : <>Model Biaya Gas</>}</div>
                     </div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
@@ -698,7 +698,7 @@ export default function DocsPage() {
                 <h3 className={styles.sectionTitle} dangerouslySetInnerHTML={{ __html: t('docsContent.h3_43') }} />
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCardBoxed} style={{ padding: '20px' }}>
-                    <div className={styles.cardTitle} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}><Image src="/Coin.png" alt="" width={28} height={28} className={styles.cardInlineIcon} /> {locale === 'en' ? <>Low Cost</> : <>Biaya Rendah</>}</div>
+                    <div className={styles.cardTitle} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}><Image src="/Coin_transparent.png" alt="" width={28} height={28} className={styles.cardInlineIcon} /> {locale === 'en' ? <>Low Cost</> : <>Biaya Rendah</>}</div>
                     <div className={styles.cardText} style={{ fontSize: '0.95rem', textAlign: 'justify' }}>{locale === 'en' ? <>This is an ideal option for printing millions of future student certificates without burdening them with exorbitant gas fees.</> : <>Ini adalah pilihan yang sangat ideal untuk mencetak jutaan <strong>sertifikat pelajar</strong> masa depan tanpa perlu membebani mereka dengan <strong>biaya gas</strong> yang mencekik.</>}</div>
                   </div>
                   <div className={styles.featureCardBoxed} style={{ padding: '20px' }}>
@@ -781,25 +781,25 @@ export default function DocsPage() {
                 <h3 className={styles.sectionTitle} dangerouslySetInnerHTML={{ __html: t('docsContent.h3_46') }} />
                 <div className={styles.featureGrid}>
                   <div className={styles.featureCardBoxed}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/BNBSmartChainLogo.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Network and Contract</> : <>Jaringan dan Contract</>}</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/BNBSmartChainLogo_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Network and Contract</> : <>Jaringan dan Contract</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Deployment aktif berada di <strong>BNB Smart Chain Testnet</strong> dengan <strong>Chain ID 97</strong>. Contract certificate menggunakan alamat <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> dan ABI resmi dari <code>integration/PathtrickSBT.abi.json</code>. Data transaksi dapat diverifikasi melalui BscScan Testnet.
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/Security.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Authorization Flow</> : <>Alur Otorisasi</>}</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/Security_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Authorization Flow</> : <>Alur Otorisasi</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Setelah course selesai, frontend meminta authorization ke <code>POST /api/certificates/prepare-mint</code>. Backend mengembalikan <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, dan <strong>signature</strong>. Frontend tidak membuat, mengubah, atau memakai ulang nonce dan deadline secara manual.
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/sbt_logo.jpg" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>On-chain Verification</> : <>Verifikasi On-chain</>}</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/sbt_logo_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>On-chain Verification</> : <>Verifikasi On-chain</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Wallet harus berada di Chain ID 97. Frontend membaca <strong>mintPrice()</strong> secara langsung, menghitung kebutuhan saldo bersama gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>. Setelah receipt tersedia, frontend memeriksa event <strong>CertificateMinted(to, courseId)</strong>.
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
-                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/certificate-template.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Backend Confirmation</> : <>Konfirmasi Backend</>}</div></div>
+                    <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/certificate-template_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Backend Confirmation</> : <>Konfirmasi Backend</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
                       Certificate belum dianggap selesai hanya karena wallet mengirim transaksi. Setelah receipt dan event valid, frontend mengirim <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. Status sukses baru ditampilkan setelah backend menerima dan memvalidasi transaksi tersebut.
                     </div>
