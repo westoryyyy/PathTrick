@@ -39,6 +39,10 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      # Samakan dengan npm lokal (v11) — npm 10 bawaan Node 22 menganggap lockfile tidak sinkron
+      - name: Use npm 11
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
 
@@ -67,6 +71,10 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
+
+      # Samakan dengan npm lokal (v11) — npm 10 bawaan Node 22 menganggap lockfile tidak sinkron
+      - name: Use npm 11
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
