@@ -556,7 +556,7 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>5</div>
                     <div className={styles.timelineContent}>
-                      <strong>{locale === 'en' ? <>Forging a New Curriculum:</> : <>Penempaan Kurikulum Baru:</>}</strong> {locale === 'en' ? <>The results of these weaknesses were finally forged into a sequence of advanced Learning Missions. As a result, users no longer need to fumble around in the dark. They know exactly what skills to conquer next.</> : <>Hasil temuan kelemahan itu akhirnya ditempa menjadi sebuah urutan {locale === 'en' ? <>Learning Mission</> : <>Misi Belajar</>} (Learning Mission) tingkat lanjut. Alhasil, pengguna tidak perlu lagi meraba-raba dalam gelap. Mereka tahu persis skill apa yang harus ditaklukkan selanjutnya.</>}
+                      <strong>{locale === 'en' ? <>Forging a New Curriculum:</> : <>Penempaan Kurikulum Baru:</>}</strong> {locale === 'en' ? <>The results of these weaknesses were finally forged into a sequence of advanced Learning Missions. As a result, users no longer need to fumble around in the dark. They know exactly what skills to conquer next.</> : <>Hasil temuan kelemahan itu akhirnya ditempa menjadi sebuah urutan Misi Belajar (Learning Mission) tingkat lanjut. Alhasil, pengguna tidak perlu lagi meraba-raba dalam gelap. Mereka tahu persis skill apa yang harus ditaklukkan selanjutnya.</>}
                     </div>
                   </div>
                 </div>
