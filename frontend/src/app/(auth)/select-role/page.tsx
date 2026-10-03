@@ -33,7 +33,7 @@ export default function SelectRolePage() {
   const router = useRouter();
 
   // Privy hooks — must come first as other hooks depend on `user`
-  const { user, linkWallet } = usePrivy();
+  const { user } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, setProfile } = useUserStore();
   const { isSynced } = useAuthSync();
@@ -51,15 +51,11 @@ export default function SelectRolePage() {
   // Prevents flash of role-selector UI when user actually has a role.
   const [isVerifyingRole, setIsVerifyingRole] = useState(true);
 
-  const isGoogleLogin = !!user?.google;
-  const needsWalletConnection = !wallets[0]?.address && isGoogleLogin;
-
   const [existingRoleSlug, setExistingRoleSlug] = useState<string | null>(null);
 
   const [showGate, setShowGate] = useState(false); // diset via useEffect saat wallet terdeteksi
   const [nickname, setNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState(false);
-  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
 
 
@@ -199,16 +195,7 @@ export default function SelectRolePage() {
     }
   };
 
-  const handleConnectWallet = async () => {
-    try {
-      setIsConnectingWallet(true);
-      await linkWallet();
-      setIsConnectingWallet(false);
-    } catch (error) {
-      console.error('Wallet connection error:', error);
-      setIsConnectingWallet(false);
-    }
-  };
+
 
   const handleContinue = async () => {
     if (!selected) return;
@@ -360,99 +347,12 @@ export default function SelectRolePage() {
         </div>
       )}
 
-      {/* WALLET CONNECTION GATE – show when Google login but no wallet */}
-      {needsWalletConnection && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 999,
-          background: 'rgba(0,0,0,0.85)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backdropFilter: 'blur(4px)',
-        }}>
-          <div style={{
-            background: '#c8a96e',
-            border: '6px solid #5a3520',
-            borderRadius: '4px',
-            padding: '6px',
-            boxShadow: '6px 6px 0 #3b1f0e, inset 0 0 0 3px #e8c98a',
-            maxWidth: '480px',
-            width: '90%',
-          }}>
-            <div style={{
-              background: '#784626',
-              border: '3px solid #3b1f0e',
-              borderRadius: '2px',
-              padding: '32px 28px',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
-            }}>
-              <PixelIcon icon="💼" size={48} />
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px', lineHeight: 1.6 }}>
-                  CONNECT WALLET
-                </p>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: 1.6 }}>
-                  Essential untuk Web3
-                </p>
-              </div>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d4a96a', textAlign: 'center', lineHeight: 1.8 }}>
-                PathTrick membutuhkan wallet yang terhubung untuk minting sertifikat on-chain (SBT) dan menyelesaikan quest blockchain.
-              </p>
-              <button
-                onClick={handleConnectWallet}
-                disabled={isConnectingWallet}
-                style={{
-                  width: '100%',
-                  padding: '18px',
-                  fontFamily: '"Press Start 2P"',
-                  fontSize: '0.7rem',
-                  background: '#3b82f6',
-                  border: '4px solid',
-                  borderColor: '#1e40af',
-                  borderTopColor: '#60a5fa',
-                  borderLeftColor: '#60a5fa',
-                  color: '#fff',
-                  cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
-                  textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
-                  transition: 'all 0.2s',
-                  opacity: isConnectingWallet ? 0.7 : 1,
-                }}
-                onMouseDown={(e) => { if (!isConnectingWallet) e.currentTarget.style.transform = 'translate(2px,2px)'; }}
-                onMouseUp={(e) => { e.currentTarget.style.transform = 'none'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
-              >
-                {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
-              </button>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#a87b51', textAlign: 'center' }}>
-                Gunakan MetaMask, Wallet Connect, atau Privy Wallet
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       <div className={styles.boardContainer}>
         <div className={styles.boardHeader}>
           <h1 className={styles.boardTitle}>Pilih Role Anda</h1>
-          {/* Show wallet connection hint for Google login without wallet */}
-          {isGoogleLogin && wallets.length === 0 && (
-            <div style={{
-              marginTop: '12px',
-              padding: '12px',
-              background: 'rgba(255,193,7,0.1)',
-              border: '2px solid #ffc107',
-              borderRadius: '4px',
-              textAlign: 'center'
-            }}>
-              <p style={{ 
-                fontFamily: '"Press Start 2P"', 
-                fontSize: '0.4rem', 
-                color: '#fbbf24', 
-                margin: 0,
-                lineHeight: 1.6
-              }}>
-                Wallet belum terhubung. Hubungkan wallet sebelum lanjut!
-              </p>
-            </div>
-          )}
+
         </div>
         <div className={styles.boardContent}>
           {isLoadingRoles && <p>Memuat role...</p>}
@@ -499,14 +399,9 @@ export default function SelectRolePage() {
           id="role-continue-btn"
           className={`${styles.continueBtn} ${selected ? styles.continueBtnActive : ''}`}
           onClick={handleContinue}
-          disabled={!selected || entering || (needsWalletConnection && !isConnectingWallet)}
-          title={needsWalletConnection ? 'Hubungkan wallet terlebih dahulu' : ''}
+          disabled={!selected || entering}
         >
-          {isConnectingWallet ? (
-            <><span className={styles.spinner} /> Menghubungkan Wallet...</>
-          ) : needsWalletConnection ? (
-            <>Hubungkan Wallet Dulu →</>
-          ) : entering ? (
+          {entering ? (
             <><span className={styles.spinner} /> Memulai Petualangan...</>
           ) : selected ? (
             <>Mulai sebagai {roles.find(r => r.id === selected)?.displayName}</>
