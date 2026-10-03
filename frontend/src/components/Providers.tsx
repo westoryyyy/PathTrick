@@ -22,7 +22,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const providerChildren = [
     <AuthSyncMounter key="auth-sync-mounter" />,
     <React.Fragment key="app-children">{children}</React.Fragment>,
-    <DevPanel key="dev-panel" />,
+    // <DevPanel key="dev-panel" />,
   ];
 
   return (

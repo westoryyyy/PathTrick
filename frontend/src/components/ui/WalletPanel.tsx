@@ -46,7 +46,7 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
         // Gunakan BigInt untuk menghindari kehilangan presisi (MAX_SAFE_INTEGER)
         const wei = BigInt(weiStr);
         // Konversi ke BNB: bagi dengan 10^14 untuk dapatkan nilai dengan 4 angka desimal, lalu ubah ke float
-        const bnbVal = Number(wei / 100000000000000n) / 10000;
+        const bnbVal = Number(wei / BigInt("100000000000000")) / 10000;
         setBalance(bnbVal.toFixed(4));
       } else {
         console.error("RPC Error:", data);
