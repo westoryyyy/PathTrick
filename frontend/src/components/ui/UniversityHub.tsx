@@ -167,7 +167,7 @@ export default function UniversityHub() {
             <div 
               key={uni.id} 
               className={styles.retroCard}
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px', height: '100%', position: 'relative' }}
+              style={{ display: 'flex', flexDirection: 'column', padding: '24px', height: '100%', position: 'relative' }}
             >
               {/* Right-aligned Ribbon Flag */}
               {typeof uni.matchScore === 'number' && (
@@ -187,7 +187,7 @@ export default function UniversityHub() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 {uni.coverImageUrl && (
                   <div style={{ width: '100%', aspectRatio: '16/9', border: '3px solid #5a3a29', background: '#ffffff', marginBottom: '16px', overflow: 'hidden', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={uni.coverImageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
