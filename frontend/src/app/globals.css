@@ -150,9 +150,19 @@ a {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
+.prose-content pre {
+  background: rgba(0,0,0,0.1);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 .prose-content code {
   background: rgba(0,0,0,0.1);
   padding: 0.1rem 0.3rem;
   border-radius: 4px;
   font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
