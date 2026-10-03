@@ -8,20 +8,26 @@
   <b>A verifiable, AI-native career coach on BNB Smart Chain: learn, get graded by an objective AI Judge, and earn Soulbound credentials no one can fake.</b>
 </p>
 
-> Your skills, judged by AI, proven on-chain.
+<p align="center">
+  <i>Your skills, judged by AI, proven on-chain.</i>
+</p>
 
-🌐 **Live app:** [pathtrick.vercel.app](https://pathtrick.vercel.app) · 📜 **Contract:** [`0x3963…7ba9`](https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9) on BNB Smart Chain Testnet
+<p align="center">
+  🌐 <b>Live app:</b> <a href="https://pathtrick.vercel.app">pathtrick.vercel.app</a> · 📜 <b>Contract:</b> <a href="https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9"><code>0x3963…7ba9</code></a> on BNB Smart Chain Testnet
+</p>
 
-[![Live App](https://img.shields.io/badge/App-LIVE%20on%20Vercel-brightgreen?logo=vercel)](https://pathtrick.vercel.app)
-[![BNB Testnet](https://img.shields.io/badge/BNB%20Smart%20Chain-Testnet%20(97)-F0B90B?logo=binance&logoColor=white)](https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9)
-[![SBT](https://img.shields.io/badge/BEP--1155-Soulbound-purple)](#on-chain-bnb-smart-chain-testnet-chain-97)
-[![EIP-712](https://img.shields.io/badge/EIP--712-Signature%20gated-blueviolet)](https://eips.ethereum.org/EIPS/eip-712)
-[![Foundry Tests](https://img.shields.io/badge/Foundry%20tests-20%2F20%20passing-success)](#audit-posture)
-[![Solidity 0.8.28](https://img.shields.io/badge/solidity-0.8.28-363636?logo=solidity)](https://docs.soliditylang.org)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs)](https://nextjs.org)
-[![Fastify 5](https://img.shields.io/badge/Fastify-5-202020?logo=fastify)](https://fastify.dev)
-[![Groq](https://img.shields.io/badge/AI-Groq%20LLM-F55036)](https://groq.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+<p align="center">
+  <a href="https://pathtrick.vercel.app"><img src="https://img.shields.io/badge/App-LIVE%20on%20Vercel-brightgreen?logo=vercel" alt="Live App" /></a>
+  <a href="https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9"><img src="https://img.shields.io/badge/BNB%20Smart%20Chain-Testnet%20(97)-F0B90B?logo=binance&logoColor=white" alt="BNB Testnet" /></a>
+  <a href="#on-chain-bnb-smart-chain-testnet-chain-97"><img src="https://img.shields.io/badge/BEP--1155-Soulbound-purple" alt="SBT" /></a>
+  <a href="https://eips.ethereum.org/EIPS/eip-712"><img src="https://img.shields.io/badge/EIP--712-Signature%20gated-blueviolet" alt="EIP-712" /></a>
+  <a href="#audit-posture"><img src="https://img.shields.io/badge/Foundry%20tests-20%2F20%20passing-success" alt="Foundry Tests" /></a>
+  <a href="https://docs.soliditylang.org"><img src="https://img.shields.io/badge/solidity-0.8.28-363636?logo=solidity" alt="Solidity 0.8.28" /></a>
+  <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs" alt="Next.js 16" /></a>
+  <a href="https://fastify.dev"><img src="https://img.shields.io/badge/Fastify-5-202020?logo=fastify" alt="Fastify 5" /></a>
+  <a href="https://groq.com"><img src="https://img.shields.io/badge/AI-Groq%20LLM-F55036" alt="Groq" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+</p>
 
 🏆 **Indonesia Web3 Hackathon Submission**
 
