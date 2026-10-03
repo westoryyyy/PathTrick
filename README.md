@@ -81,6 +81,33 @@ The system is rigorously isolated. The execution layer never shares keys, and th
 
 ---
 
+## BACKEND API & AI AGENTS
+
+The backend exposes several core REST API modules via Fastify:
+
+- **`/api/assessment`**: Core onboarding API. Triggers the AI Agents to evaluate the user's initial test and generate their RIASEC profile, learning/career path, and missions.
+- **`/api/courses` & `/api/quests`**: Serves study materials, quizzes, and practical tasks.
+- **`/api/gamification`**: Handles XP, Lives, Leaderboard, and issues EIP-712 Certificates upon graduation.
+- **`/api/users` & `/api/auth`**: Manages user profiles, role selection (Dreamer/Chaser), and Privy JWT validation.
+
+### The 3 AI Agents Pipeline
+The system utilizes a specialized multi-agent architecture built on Groq API to evaluate users at different stages:
+
+1. **Agent 1: The Dreamer (RIASEC Evaluator)**
+   - **Role:** Assesses students or fresh graduates.
+   - **Input:** User's initial onboarding essay/answers.
+   - **Output:** Classifies the user into RIASEC types and generates a tailored "Career Path" with beginner-friendly missions.
+2. **Agent 2: The Chaser (Skill Evaluator)**
+   - **Role:** Assesses professionals or those with existing skill sets.
+   - **Input:** User's technical onboarding answers.
+   - **Output:** Identifies current skill gaps and generates a specific "Learning Path" focused on upskilling.
+3. **Agent 3: The AI Judge (Essay Evaluator)**
+   - **Role:** The strict, objective grader for all in-game quests and course exams.
+   - **Input:** User's answer to a specific course question + the grading rubric.
+   - **Output:** Returns a deterministic `PASS`/`FAIL`. If passed, it triggers the backend to sign the cryptographic graduation proof (EIP-712) for SBT minting.
+
+---
+
 ## QUICKSTART
 
 Three ways in, depending on what you want to test.
