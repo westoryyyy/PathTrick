@@ -155,7 +155,7 @@ export default function ScholarshipHub() {
                       {scholarship.name}
                     </h3>
                     {scholarship.provider && (
-                      <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
+                      <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                         {scholarship.provider}
                       </p>
                     )}
@@ -166,19 +166,19 @@ export default function ScholarshipHub() {
                   {scholarship.coverage && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                      <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{scholarship.coverage}</span>
+                      <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>{scholarship.coverage}</span>
                     </div>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <img src="/Hourglass.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                    <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                       Deadline: {fmtDeadline(scholarship.deadline)}
                     </span>
                   </div>
                   {parseReqs(scholarship.requirements).length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                       <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
-                      <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                      <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                         Reqs: {parseReqs(scholarship.requirements).join(', ')}
                       </span>
                     </div>
@@ -261,7 +261,7 @@ export default function ScholarshipHub() {
                     {selectedScholarship.name}
                   </h2>
                   {selectedScholarship.provider && (
-                    <p style={{ margin: '8px 0 0', fontFamily: 'system-ui, sans-serif', fontSize: '1rem', color: '#5a3a29', fontWeight: 'bold' }}>
+                    <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#5a3a29', fontWeight: 'bold' }}>
                       {selectedScholarship.provider}
                     </p>
                   )}
@@ -275,7 +275,7 @@ export default function ScholarshipHub() {
                   X
                 </button>
               </div>
-              <div style={{ display: 'grid', gap: '14px', marginTop: '22px', fontFamily: 'system-ui, sans-serif', fontSize: '0.95rem', lineHeight: 1.7, color: '#3b261b' }}>
+              <div style={{ display: 'grid', gap: '14px', marginTop: '22px', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: 1.7, color: '#3b261b' }}>
                 {selectedScholarship.coverage && (
                   <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
@@ -325,8 +325,8 @@ export default function ScholarshipHub() {
                   background: 'rgba(0,0,0,0.1)',
                   border: '2px dashed #8c5d41',
                   textAlign: 'center',
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '0.85rem',
+                  fontFamily: 'var(--font-vt323), sans-serif',
+                  fontSize: '1.1rem',
                   color: '#5a3a29',
                 }}>
                   Link pendaftaran belum tersedia
