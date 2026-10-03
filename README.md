@@ -2,11 +2,9 @@
   <img src="./frontend/public/PathTrick.png" alt="Pathtrick" width="320" />
 </p>
 
-<h1 align="center">PATHTRICK</h1>
+# Pathtrick
 
-<p align="center">
-  <b>A verifiable, AI-native career coach on BNB Smart Chain: learn, get graded by an objective AI Judge, and earn Soulbound credentials no one can fake.</b>
-</p>
+**A verifiable, AI-native career coach on BNB Smart Chain: learn, get graded by an objective AI Judge, and earn Soulbound credentials no one can fake.**
 
 > Your skills, judged by AI, proven on-chain.
 
