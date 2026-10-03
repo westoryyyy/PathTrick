@@ -7,6 +7,7 @@ import OnChainCertificates from '@/components/ui/OnChainCertificates';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function CertificateHubPage() {
+  const { t } = useTranslation();
   return (
     <div className={styles.container}>
       <div>
