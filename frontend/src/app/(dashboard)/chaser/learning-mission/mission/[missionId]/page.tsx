@@ -540,8 +540,8 @@ export default function MissionFlowPage() {
                       SOAL {quizIndex + 1} DARI {quizArray.length}
                     </div>
                   )}
-                  <div className={styles.dialogueBox} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6' }}>
-                    {currentQuiz.question}
+                  <div className={`${styles.dialogueBox} prose-content`} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.05rem', lineHeight: '1.5' }}>
+                    <ReactMarkdown>{currentQuiz.question}</ReactMarkdown>
                   </div>
                 </>
               );
@@ -565,8 +565,8 @@ export default function MissionFlowPage() {
                   <span style={{ fontSize: '1.05rem', fontFamily: 'var(--font-vt323), sans-serif', color: '#8c5d41', fontWeight: 'bold' }}>NYAWA KSATRIA:</span>
                   <span style={{ color: '#ef4444', fontSize: '1.2rem' }}>{'♥'.repeat(playerHp)}</span>
                 </div>
-                <div className={styles.text} style={{ flex: 1, fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6' }}>
-                  {content.project.instruction}
+                <div className={`${styles.dialogueBox} prose-content`} style={{ flex: 1, fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.05rem', lineHeight: '1.5' }}>
+                  <ReactMarkdown>{String(content.project.instruction || '')}</ReactMarkdown>
                 </div>
               </>
             ) : (
