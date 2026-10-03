@@ -224,7 +224,6 @@ export default function ScholarshipHub() {
               >
                 VIEW DETAILS
               </button>
-              </div>
             </div>
           ))}
         </div>

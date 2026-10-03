@@ -266,7 +266,6 @@ export default function UniversityHub() {
               >
                 VIEW ROADMAP
               </button>
-              </div>
             </div>
           ))}
         </div>
