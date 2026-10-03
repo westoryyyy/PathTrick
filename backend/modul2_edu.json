@@ -1,0 +1,2111 @@
+{
+  "title": "Modul 2: Perikanan & Ilmu Kelautan",
+  "description": "Modul untuk House of Agriculture.",
+  "facultyTags": [
+    "agr_farming"
+  ],
+  "isFallback": false,
+  "isPublished": true,
+  "chapters": [
+    {
+      "title": "Biologi Laut & Ekosistem Perairan",
+      "order": 1,
+      "sections": [
+        {
+          "title": "Level 1 : Zona Perairan & Oseanografi",
+          "order": 1,
+          "xpReward": 100,
+          "content": "Laut dibagi berdasarkan kedalaman dan penetrasi cahaya matahari: **Zona Fotik** (0–200 meter, cahaya cukup untuk fotosintesis), **Zona Mesofotik/Remang** (200–1.000 meter), dan **Zona Afotik** (>1.000 meter, gelap gulita). Arus laut digerakkan oleh angin dan perbedaan densitas air akibat suhu dan salinitas (sirkulasi termohalin).",
+          "quiz": {
+            "title": "Quiz Level 1",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Zona kedalaman laut yang masih mendapatkan penetrasi cahaya matahari cukup untuk fotosintesis tumbuhan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Zona Fotik"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Zona Mesofotik"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Zona Afotik"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Zona Hadal"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Fenomena pergerakan massa air laut dari lapisan dalam yang dingin dan kaya nutrisi menuju ke permukaan dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Downwelling"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Upwelling"
+                  },
+                  {
+                    "id": "C",
+                    "text": "El Niño"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Tsunami"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Alat yang digunakan untuk mengukur tingkat salinitas (kadar garam) air laut secara cepat adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Thermometer"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Secchi Disk"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Refraktometer"
+                  },
+                  {
+                    "id": "D",
+                    "text": "pH meter"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Sirkulasi arus laut global yang dipengaruhi oleh perbedaan suhu dan kadar garam air laut disebut sirkulasi...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Korolis"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Termohalin"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Barat-Timur"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Ekman"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 2 : Ekosistem Terumbu Karang & Pemutihan Karang (Bleaching)",
+          "order": 2,
+          "xpReward": 100,
+          "content": "Terumbu karang dibentuk oleh hewan koral yang bersimbiosis mutualisme dengan alga mikroskopis **Zooxanthellae**. Alga memberi warna dan makanan dari fotosintesis, sedangkan karang memberi perlindungan. Jika suhu air laut naik di atas normal, karang akan mengelurkan Zooxanthellae sehingga warnanya menjadi putih memucat (*coral bleaching*) dan berisiko mati.",
+          "quiz": {
+            "title": "Quiz Level 2",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Organisme alga mikroskopis yang bersimbiosis di dalam jaringan tubuh karang dan melakukan fotosintesis dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Gracilaria"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Zooxanthellae"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Sargassum"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Chlorella"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penyebab utama terjadinya fenomena pemutihan karang (*coral bleaching*) secara massal di lautan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Peningkatan suhu air laut akibat pemanasan global"
+                  },
+                  {
+                    "id": "B",
+                    "text": "penurunan kadar garam secara mendadak"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Serangan sampah plastik di dasar laut"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Aktivitas pasang surut air laut"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Tipe terumbu karang yang tumbuh sejajar dengan garis pantai dan dipisahkan oleh laguna dangkal dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Karang Tepi (Fringing Reef)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Karang Penghalang (Barrier Reef)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Karang Cincin (Atol)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Karang Patch"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Zat penyusun utama kerangka keras dari hewani terumbu karang (Polip) adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Silika (SiO2)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Kalsium Karbonat (CaCO3)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Natrium Klorida (NaCl)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Magnesium"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 3 : Ekosistem Mangrove & Padang Lamun (Blue Carbon)",
+          "order": 3,
+          "xpReward": 100,
+          "content": "Mangrove dan Padang Lamun (*Seagrass*) merupakan ekosistem pesisir penyerapan karbon alami yang sangat efektif, dikenal sebagai **Blue Carbon**. Akar napas mangrove (*pneumatofor*) menahan erosi gelombang dan menjadi tempat pemijahan (*spawning ground*) serta pembesaran (*nursery ground*) bagi larva ikan dan udang.",
+          "quiz": {
+            "title": "Quiz Level 3",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Istilah untuk karbon yang diserap, diikat, dan disimpan oleh ekosistem pesisir serta laut (seperti mangrove dan padang lamun) adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Green Carbon"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Blue Carbon"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Brown Carbon"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Black Carbon"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Peran ekosistem mangrove sebagai area berlindung dan tumbuh kembang bagi juvenile/anak ikan disebut fungsi...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Spawning ground"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Nursery ground"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Feeding ground"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Resting ground"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Akar khusus pada tanaman mangrove jenis *Avicennia* yang mencuat ke atas permukaan tanah untuk mengambil oksigen disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Pneumatofor (Akar Napas)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Akar Tunjang"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Akar Papan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Akar Gantung"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Tumbuhan berbunga (Angiospermae) yang hidup sepenuhnya terendam di dalam air laut dangkal berpasir adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Rumput laut (Alga)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Lamun (Seagrass)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Bakau"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Eceng Gondok"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 4 : Plankton & Rantai Makanan Perairan",
+          "order": 4,
+          "xpReward": 100,
+          "content": "Rantai makanan laut diawali oleh **Fitoplankton** sebagai produsen primer perairan. Fitoplankton dimakan oleh **Zooplankton** (konsumen primer). Fenomena peledakan populasi alga (*harmful algal blooms* / HABs) akibat pencemaran limbah kaya nitrat/fosfat dinamakan **Eutrofikasi**, yang dapat menyebabkan kematian massal ikan karena kekurangan oksigen terlarut (*anoxia*).",
+          "quiz": {
+            "title": "Quiz Level 4",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Organisme mikroskopis melayang di air yang mampu memproduksi makanannya sendiri melalui fotosintesis adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Fitoplankton"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Zooplankton"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Benthos"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Nekton"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Fenomena peledakan populasi alga beracun di laut akibat penumpukan nutrisi berlebih disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Upwelling"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Coral Bleaching"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Harmful Algal Blooms (HABs)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "El Niño"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kelompok organisme perairan yang berenang aktif melawan arus air, seperti ikan tuna dan cumi-cumi, dikategorikan sebagai...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Plankton"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Benthos"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Nekton"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Neuston"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Dampak utama bagi ikan di bawah permukaan air ketika terjadi fenomena *blooming* alga hingga menutupi permukaan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Salinitas air meningkat tajam"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Penurunan kadar oksigen terlarut (hipoksia/anoksia)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Air menjadi sangat dingin"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Tekanan air meningkat"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 5 : Bioekologi Mamalia & Reptil Laut",
+          "order": 5,
+          "xpReward": 100,
+          "content": "Mamalia laut (seperti Paus dan Lumba-lumba) bernapas menggunakan paru-paru dan bernavigasi menggunakan **Ekolokasi** (pantulan gelombang suara). Reptil laut seperti Penyu bertelur di daratan pasir. Keberadaan spesies cetacea ini menjadi indikator kesehatan rantai makanan laut puncak.",
+          "quiz": {
+            "title": "Quiz Level 5",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kemampuan navigasi dan berburu lumba-lumba dengan memancarkan gelombang suara frekuensi tinggi dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Basking"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Ekolokasi"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Sonar pasif"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Elektroresepsi"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Alat pernapasan utama pada mamalia laut paus saat muncul ke permukaan air adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Insang luar"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Labirin"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Paru-paru (melalui Blowhole)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kulit"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penyu laut betina selalu kembali bertelur ke lokasi pantai di mana ia dahulu menetas. Fenomena ini disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Natal Homing Instinct"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Imprinting Pasif"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Migration Pattern"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Ekolokasi"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penyu terbesar di dunia yang makanan utamanya adalah ubur-ubur dan tidak memiliki cangkang keras berkarapas adalah penyu...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Penyu Hijau"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Penyu Sisik"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Penyu Belimbing"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Penyu Lekat"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 6 : BOSS LEVEL : Misi Spesial: Ancaman Laut Modern",
+          "order": 6,
+          "xpReward": 500,
+          "content": "Pengasaman laut (*Ocean Acidification*) terjadi ketika lautan menyerap penumpukan gas CO2 atmosfer, menurunkan pH air laut dan merusak pembentukan cangkang organisme laut. Sementara itu, akumulasi **mikroplastik** (partikel plastik <5mm) masuk ke tubuh ikan melalui pakan dan terakumulasi hingga ke manusia melalui rantai makanan (*biomagnifikasi*).",
+          "quiz": {
+            "title": "Quiz Level 6",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Pengasaman laut (*Ocean Acidification*) disebabkan oleh peningkatan penyerapan gas tertentu dari atmosfer oleh air laut, yaitu gas...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Metana (CH4)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Karbon Dioksida (CO2)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Nitrogen (N2)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Sulfur Dioksida (SO2"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Akumulasi senyawa pencemar beracun atau partikel plastik yang konsentrasinya semakin meningkat pada tingkat trofik rantai makanan atas dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Eutrofikasi"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Bioflokulasi"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Biomagnifikasi"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Aklimatisasi"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 15,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Ukuran maksimal dari suatu partikel sintetis agar dapat dikategorikan sebagai mikroplastik adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "< 5 mm"
+                  },
+                  {
+                    "id": "B",
+                    "text": "< 5 cm"
+                  },
+                  {
+                    "id": "C",
+                    "text": "< 10 cm"
+                  },
+                  {
+                    "id": "D",
+                    "text": "< 1 meter"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 15,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Dampak langsung dari penurunan pH air laut bagi organisme kerang dan terumbu karang adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Cangkang menjadi semakin tebal"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Kesulitan membentuk struktur kalsium karbonat (CaCO3)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Pertumbuhan karang menjadi 2x lebih cepat"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kadar garam cangkang menurun"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 4
+              },
+              {
+                "type": "ESSAY",
+                "prompt": "Sebuah kawasan pesisir mengalami penurunan populasi ikan tangkap secara drastis serta akumulasi limbah mikroplastik tinggi pada pencernaan ikan lokal. Sebagai Marine Biologist, berikan rancangan solusi 3 langkah untuk memulihkan ekosistem pesisir tersebut secara berkelanjutan!",
+                "options": [],
+                "correctAnswer": {
+                  "text": "- Penetapan Zona Larang Tangkap (*No-Take Zone*): Menutup sementara sebagian area pesisir dari aktivitas penangkapan agar ikan memiliki ruang aman untuk berkembang biak dan populasinya pulih alami.\r\n    - Manajemen Limbah Terpadu: Menerapkan regulasi pembatasan plastik sekali pakai di kawasan pesisir dan mengelola sampah darat sebelum bocor ke laut menjadi mikroplastik.\r\n    - Restorasi Habitat Pesisir: Merehabilitasi terumbu karang dan menanam kembali mangrove sebagai *nursery ground* (tempat asuhan larva ikan) untuk mempercepat pemulihan rantai makanan.",
+                  "keywords": [
+                    "penetapan",
+                    "larang",
+                    "tangkap",
+                    "menutup",
+                    "sementara",
+                    "sebagian",
+                    "pesisir",
+                    "aktivitas",
+                    "penangkapan",
+                    "memiliki"
+                  ]
+                },
+                "points": 40,
+                "order": 5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Akuakultur & Budidaya Perairan Modern",
+      "order": 2,
+      "sections": [
+        {
+          "title": "Level 1 : Kualitas Air & Parameter Budidaya",
+          "order": 1,
+          "xpReward": 100,
+          "content": "Keberhasilan budidaya perairan ditentukan oleh parameter kualitas air:\r\n• **Oksigen Terlarut / DO (*Dissolved Oxygen*):** Minimal 4–5 mg/L untuk pertumbuhan optimal.\r\n• **pH Air:** Rentang ideal 6,5–8,5.\r\n• **Amoniak (NH3):** Senyawa beracun hasil sisa pakan dan kotoran ikan yang wajib dikendalikan agar tidak menyebabkan keracunan masal.",
+          "quiz": {
+            "title": "Quiz Level 1",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Parameter kualitas air yang paling kritis dan langsung menyebabkan kematian mendadak pada ikan jika nilainya drop di bawah 2 mg/L adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Dissolved Oxygen (Oksigen Terlarut)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Salinitas"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Kecerahan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kesadahan"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Senyawa beracun bagi ikan yang berasal dari penumpukan sisa pakan dan kotoran terakumulasi di dasar kolam adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Nitrat"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Amoniak (NH3)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Klorofil"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kalsium"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kecerahan air kolam budidaya dipengaruhi oleh kelimpahan plankton dan lumpur, diukur menggunakan alat...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "pH meter"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Secchi Disk"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Refraktometer"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Do meter"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Proses penambahan oksigen ke dalam air kolam menggunakan kincir air atau aerator dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Aerasi"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Aklimatisasi"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Agitasi"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Filtrasi"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 2 : Sistem Budidaya Bioflok",
+          "order": 2,
+          "xpReward": 100,
+          "content": "**Bioflok** adalah teknologi budidaya ramah lingkungan yang memanfaatkan bakteri heterotrof untuk mengubah limbah beracun (amoniak) menjadi gumpalan nutrisi (flok) yang dapat dimakan kembali oleh ikan/udang. Sistem ini menghemat penggunaan air (*zero water exchange*) dan membutuhkan penambahan rasio Karbon/Nitrogen (C/N ratio) seperti molase/tetes tebu.",
+          "quiz": {
+            "title": "Quiz Level 2",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Prinsip utama teknologi bioflok pada kolam budidaya ikan/udang adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Menggunakan obat kimia untuk membunuh bakteri"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Mengubah limbah amoniak menjadi protein mikroba yang bisa dimakan ikan"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Mengganti air kolam setiap hari"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Membiarkan lumut tumbuh tebal"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Bahan tambahan kaya karbon yang umum dimasukkan ke dalam kolam bioflok untuk menaikkan rasio C/N adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Pupuk Urea"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Molase (Tetes Tebu)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Kapur Pertanian"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Garam Krosok"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Keunggulan utama dari penerapan sistem bioflok pada budidaya ikan lele atau nila adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Kolam tidak memerlukan listrik"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Efisiensi pakan tinggi dan menghemat pergantian air"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Ikan tidak perlu diberi pakan pelet"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kolam bebas dari mikroba"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Gumpalan (*flok*) dalam sistem bioflok terdiri atas campuran...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Bakteri heterotrof, alga, protozoa, dan sisa organik"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pasir, kerikil, dan kapur"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Plastik micro dan busa"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Pestisida dan logam berat"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 3 : Manajemen Pembenihan & Komoditas Unggulan",
+          "order": 3,
+          "xpReward": 100,
+          "content": "Tahapan akuakultur dimulai dari pembenihan (*hatchery*) yang meliputi pemeliharaan induk, pemijahan (alami atau buatan dengan suntikan hormon Ovaprim), penetasan telur, dan pemeliharaan larva. Komoditas air tawar unggulan antara lain Nila dan Gurame, sedangkan air payau/laut didominasi Udang Vaname dan Ikan Bandeng.",
+          "quiz": {
+            "title": "Quiz Level 3",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Proses pelepasan telur oleh induk betina dan pembuahan oleh induk jantan pada ikan dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Striptis"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pemijahan (Spawning)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Pendederan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Pembesaran"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Hormon sintetis yang sering disuntikkan pada induk ikan untuk merangsang pematangan gonad dan pemijahan buatan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Sitokinin"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Ovaprim"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Progesteron"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Oxytocin"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Udang air payau unggulan yang paling banyak dibudidayakan secara intensif di Indonesia karena pertumbuhannya cepat adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Udang Windu"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Udang Vaname"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Udang Galah"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Udang Rebon"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Pakan alami berukuran mikroskopis yang wajib diberikan pada stadium awal larva ikan/udang adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Pelet tenggelam"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Artemia sp. atau Rotifera"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Cacing tanah"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Daun talas"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 4 : Nutrisi & Efisiensi Pakan (FCR)",
+          "order": 4,
+          "xpReward": 100,
+          "content": "Pakan menyedot 60–70% biaya operasional akuakultur. Efisiensi pakan dihitung menggunakan **FCR (*Feed Conversion Ratio*)**:\r\n\r\n!image.png\r\n\r\nSemakin rendah nilai FCR (misal $FCR < 1,2$), semakin efisien pakan tersebut. Pakan ikan membutuhkan kandungan protein tinggi ($28–40\\%$) sebagai sumber pembangun jaringan.",
+          "quiz": {
+            "title": "Quiz Level 4",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Jika dibutuhkan pakan sebanyak 12 kg untuk menghasilkan penambahan bobot ikan sebesar 10 kg, maka nilai FCR-nya adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "0,83"
+                  },
+                  {
+                    "id": "B",
+                    "text": "1,2"
+                  },
+                  {
+                    "id": "C",
+                    "text": "12"
+                  },
+                  {
+                    "id": "D",
+                    "text": "120"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Makronutrisi utama yang paling tinggi persentasenya dibutuhkan dalam formulasi pakan ikan karnivora adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Protein"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Karbohidrat"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Serat Kasar"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Vitamin C"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Nilai FCR yang paling menguntungkan bagi seorang pembudidaya ikan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "FCR = 1,0"
+                  },
+                  {
+                    "id": "B",
+                    "text": "FCR = 1,8"
+                  },
+                  {
+                    "id": "C",
+                    "text": "FCR = 2,5"
+                  },
+                  {
+                    "id": "D",
+                    "text": "FCR = 3,0"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kelemahan pemberian pakan buatan berlebihan (*overfeeding*) pada kolam budidaya adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Ikan bertelur lebih cepat"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Penurunan kualitas air akibat pembusukan sisa pakan di dasar kolam"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Air kolam menjadi sangat jernih"
+                  },
+                  {
+                    "id": "D",
+                    "text": "pH air naik tajam"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 5 : Hama, Penyakit, & Biosekuriti",
+          "order": 5,
+          "xpReward": 100,
+          "content": "Penyakit pada akuakultur disebabkan oleh infeksi bakteri (contoh: *Vibrio harveyi* atau *Aeromonas hydrophila*), virus (WSSV pada udang), atau parasit. **Biosekuriti** adalah tindakan pencegahan masuk dan menyebarnya wabah penyakit melalui sterilisasi peralatan, penggunaan benih bersertifikat SPF (*Specific Pathogen Free*), dan karantina.",
+          "quiz": {
+            "title": "Quiz Level 5",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Bakteri patogen oportunistik yang sering menyebabkan penyakit bercak merah pada ikan air tawar adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Aeromonas hydrophila"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Escherichia coli"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Rhizobium"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Lactobacillus"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Istilah benih udang yang diproduksi bebas dari patogen/penyakit bawaan tertentu dinamakan benih...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "FCR Free"
+                  },
+                  {
+                    "id": "B",
+                    "text": "SPF (Specific Pathogen Free)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "GMO"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Bioflok"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Tindakan pencegahan sistematis untuk mengisolasi dan mencegah masuknya wabah penyakit ke area budidaya dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Vaksinasi"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Biosekuriti"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Eradikasi"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Sterilisasi"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penyakit akibat serangan virus berbahaya yang menyebabkan cangkang udang vaname bercak putih dan kematian massal cepat adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Vibriosis"
+                  },
+                  {
+                    "id": "B",
+                    "text": "WSSV (White Spot Syndrome Virus)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Bintik Putih (Ich)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Saprolegniasis"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 6 : BOSS LEVEL :Misi Spesial: System RAS (Recirculating Aquaculture System)",
+          "order": 6,
+          "xpReward": 500,
+          "content": "**RAS** adalah teknologi budidaya perairan tertutup modern di mana air kolam disirkulasikan terus-menerus melalui serangkaian filter: **Filter Mekanis** (menyaring kotoran padat), **Filter Biologi** (bakteri nitrifikasi *Nitrosomonas* dan *Nitrobacter* mengkonversi amoniak menjadi nitrat), dan **Sterilisasi UV/Ozon** sebelum kembali ke kolam. RAS menghemat air hingga 95% dan dapat diterapkan di tengah kota (*urban farming*).",
+          "quiz": {
+            "title": "Quiz Level 6",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Peran utama bakteri nitrifikasi pada filter biologi dalam sistem RAS adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Menyaring kotoran sisa pakan berukuran kasar"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Mengubah amoniak berracun menjadi nitrit dan nitrat yang lebih aman"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Membunuh virus dengan radiasi"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Meningkatkan suhu air kolam"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Urutan komponen sistem filtrasi yang tepat dalam siklus Recirculating Aquaculture System (RAS) adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Kolam Ikan > Filter Mekanis > Filter Biologi > Sterilisasi UV > Kolam Ikan"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Kolam Ikan > Sterilisasi UV > Filter Mekanis > Filter Biologi"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Filter Biologi > Filter Mekanis > Kolam Ikan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Sterilisasi UV > Filter Biologi > Filter Mekanis"
+                  }
+                ],
+                "correctAnswer": "D",
+                "points": 15,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Keunggulan utama sistem RAS dibandingkan kolam tanah konvensional adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Tidak memerlukan energi listrik sama sekali"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Hemat penggunaan air, hemat lahan, dan kontrol kualitas air sangat stabil"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Tidak memerlukan pakan pelet"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Biaya pembangunan paling murah"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Komponen filter mekanis yang umum digunakan untuk memisahkan padatan kotoran ikan berukuran besar secara otomatis adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Lampu UV"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Drum Filter"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Bioball"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Venturi Injector"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 4
+              },
+              {
+                "type": "ESSAY",
+                "prompt": "Pengusaha muda ingin membangun usaha budidaya ikan konsumsi di lahan perkotaan yang sangat terbatas ($10 \\times 10\\text{ meter}$) dan memiliki sumber air bersih yang sedikit. Rancanglah sistem budidaya berbasis RAS beserta fungsi 3 komponen utamanya agar usaha tersebut sukses!",
+                "options": [],
+                "correctAnswer": {
+                  "text": "- Filter Mekanis (Drum Filter): Menyaring sisa pakan dan kotoran padat agar air tidak mudah kotor dan keruh.\r\n    - Filter Biologi: Memanfaatkan bakteri nitrifikasi untuk mengubah amoniak beracun dari kotoran ikan menjadi nitrat yang aman.\r\n    - Unit Sterilisasi (Lampu UV): Membunuh bakteri patogen dan virus secara kontinu sebelum air yang sudah bersih disirkulasikan kembali ke kolam.",
+                  "keywords": [
+                    "filter",
+                    "mekanis",
+                    "menyaring",
+                    "kotoran",
+                    "biologi",
+                    "memanfaatkan",
+                    "bakteri",
+                    "nitrifikasi",
+                    "mengubah",
+                    "amoniak"
+                  ]
+                },
+                "points": 40,
+                "order": 5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Perikanan Tangkap & Pengolahan Hasil Laut",
+      "order": 3,
+      "sections": [
+        {
+          "title": "Level 1 : Alat Penangkapan Ikan (API) Ramah Lingkungan",
+          "order": 1,
+          "xpReward": 100,
+          "content": "Alat penangkapan ikan dibagi berdasarkan tingkat ramah lingkungannya. Alat penangkap berbahaya seperti **Trawl/Pukat Hela** dan **Cantrang** merusak terumbu karang serta menangkap anakan ikan karena tidak selektif. Alat ramah lingkungan meliputi **Jaring Insang (*Gillnet*)**, **Pancing Tonda**, dan **Bubu (Trap)** yang memiliki selektivitas tinggi.",
+          "quiz": {
+            "title": "Quiz Level 1",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Alat tangkap ikan yang dilarang penggunaannya karena merusak habitat dasar laut dan menyapu seluruh ukuran ikan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Gillnet"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pukat Harimau (Trawl)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Pancing Tonda"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Bubu"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penggunaan celah mata jaring (*mesh size*) berukuran terukur pada jaring insang bertujuan untuk...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Memastikan hanya ikan ukuran layak tangkap yang terjerat"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Menangkap sebanyak mungkin anakan ikan"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Mempercepat jaring tenggelam"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Menarik perhatian mamalia laut"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Alat tangkap berbentuk jebakan perangkar dari bambu/kawat yang diturunkan ke dasar laut untuk menangkap kepiting atau lobster disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Longline"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pursea seine"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Bubu (Trap)"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Trawl"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kriteria Alat Penangkapan Ikan (API) ramah lingkungan menurut FAO adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Hasil tangkapan berlipat ganda"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Memiliki selektivitas tinggi dan tidak merusak keanekaragaman hayati"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Menggunakan bahan plastik sekali pakai"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Menggunakan aliran listrik tegangan tinggi"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 2 : Daerah Penangkapan Ikan (DPI) & Teknologi Oseanografi",
+          "order": 2,
+          "xpReward": 100,
+          "content": "Menentukan daerah penangkapan ikan (*fishing ground*) tidak lagi dengan berspekulasi, melainkan memanfaatkan data satelit oseanografi: **Suhu Permukaan Laut (SPL)** dan **Konsentrasi Klorofil-a**. Daerah dengan klorofil-a tinggi menandakan melimpahnya fitoplankton, yang menarik kawanan ikan pelagis (seperti Lemuru dan Tuna). Alat **Fish Finder / Sonar** digunakan kapal untuk mendeteksi korelasi kawanan ikan di bawah kapal.",
+          "quiz": {
+            "title": "Quiz Level 2",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Parameter oseanografi yang terdeteksi satelit dan menjadi indikator kelimpahan fitoplankton serta titik kumpul ikan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Salinitas dasar"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Konsentrasi Klorofil-a"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Pasang surut"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kecepatan angin"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Perangkat elektronik di atas kapal nelayan yang memancarkan gelombang suara ke dasar air untuk memetakan keberadaan kawanan ikan dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Fish Finder (Echosounder)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "GPS Tracker"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Barometer"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Refraktometer"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kelompok ikan yang hidup di dekat permukaan air dan membentuk gerombolan (*schooling*), seperti ikan kembung dan tongkol, disebut ikan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Demersal"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pelagis"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Anadromous"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Benthos"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kelompok ikan yang hidup dan beraktivitas di dekat dasar perairan (seperti kakap merah dan bawal) dikategorikan sebagai ikan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Demersal"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pelagis kecil"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Pelagis besar"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Neuston"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 3 : Rantai Dingin (Cold Chain) & Penanganan Pasca Tangkap",
+          "order": 3,
+          "xpReward": 100,
+          "content": "Ikan adalah komoditas yang sangat cepat membusuk (*highly perishable*). Fase pembusukan dimulai dari **Rigor Mortis** (kaku mayat), lalu aktivitas enzim (*autolysis*), dan serangan bakteri. Sistem **Rantai Dingin (*Cold Chain*)** menjaaga suhu ikan mendekati $0^\\circ\\text{C}$ sejak dari kapal hingga tangan konsumen dengan es curah atau air laut mendingin (*Refrigerated Seawater / RSW*).",
+          "quiz": {
+            "title": "Quiz Level 3",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Tujuan utama penerapan rantai dingin (*cold chain*) pada penanganan ikan segar adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Mengubah tekstur daging ikan menjadi keras"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Menghambat aktivitas enzim dan pertumbuhan bakteri pembusuk"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Menambah bobot timbangan ikan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Membunuh kandungan racun di dalam daging"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Fase pembusukan ikan di mana otot daging ikan menjadi kaku setelah mati dinamakan fase...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Rigor Mortis"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Hyperemia"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Autolisis"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Oksidasi"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Perbandingan ideal rasio es dan ikan yang dianjurkan saat penyimpanan dalam wadah terisolasi (*coolbox*) adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "1 : 5"
+                  },
+                  {
+                    "id": "B",
+                    "text": "1 : 1"
+                  },
+                  {
+                    "id": "C",
+                    "text": "1 : 10"
+                  },
+                  {
+                    "id": "D",
+                    "text": "5 : 1"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penguraian jaringan daging ikan secara mandiri oleh enzim alami di dalam tubuh ikan itu sendiri disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Oksidasi"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Pembusukan bakteri"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Autolisis"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Denaturasi"
+                  }
+                ],
+                "correctAnswer": "C",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 4 : Modern Processing & Nilai Tambah Hasil Laut",
+          "order": 4,
+          "xpReward": 100,
+          "content": "Pengolahan hasil laut menciptakan nilai tambah dan memperpanjang masa simpan. **Surimi** adalah lumat daging ikan bebas tulang/bau yang dicuci dan menjadi bahan baku *crabstick* serta bakso ikan. Limbah kulit dan sisik ikan diolah menjadi **Kolagen**, sedangkan cangkang udang/kepiting diolah menjadi **Kitosan** (sebagai bahan pengawet alami dan kosmetik).",
+          "quiz": {
+            "title": "Quiz Level 4",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Olahan daging ikan lumat yang telah dicuci bersih, dihilangkan lemaknya, dan dicampur bahan penstabil sebagai bahan baku kamaboko/bakso disebut...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Surimi"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Silase"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Agar-agar"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Tepung ikan"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Polimer alami yang diekstrak dari kandungan kitin pada limbah cangkang udang dan rajungan untuk pengawet makanan alami adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Gelatin"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Kitosan (Chitosan)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Kolagen"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Karagenan"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Senyawa protein berharga yang diekstrak dari limbah kulit dan sisik ikan untuk industri kosmetik dan kesehatan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Kolagen"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Albumin"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Squalene"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Alginat"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Produk ekstraksi rumput laut cokelat (*Sargassum*) yang banyak dimanfaatkan sebagai bahan pengental pada industri makanan dan tekstil adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Agar-agar"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Alginat"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Karagenan"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Gelatin"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 5 : Tata Kelola Perikanan & IUU Fishing",
+          "order": 5,
+          "xpReward": 100,
+          "content": "Penangkapan ikan berlebihan (*Overfishing*) mengancam kelestarian stok ikan laut. Praktik ini diperparah oleh **IUU Fishing** (*Illegal, Unreported, and Unregulated Fishing*). Pemerintah menetapkan kebijakan **Penangkapan Ikan Terukur (PIT)** berbasis kuota serta sistem zonasi Wilayah Pengelolaan Perikanan (WPPRI) untuk memastikan populasi ikan tetap berlanjut (*MSY - Maximum Sustainable Yield*).",
+          "quiz": {
+            "title": "Quiz Level 5",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Kepanjangan dari istilah praktik kejahatan penangkapan ikan IUU Fishing adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Illegal, Unreported, and Unregulated Fishing"
+                  },
+                  {
+                    "id": "B",
+                    "text": "International, Unlimited, and Undercover Fishing"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Industrial, Unused, and Unregistered Fishing"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Integrated, Unified, and Universal Fishing"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Batas maksimum jumlah ikan yang dapat ditangkap secara berkelanjutan tanpa mengganggu kelestarian populasinya di laut dinamakan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Total Allowable Catch (TAC)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Maximum Sustainable Yield (MSY)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Carrying Capacity"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Quota System"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Alat pemantau berbasis satelit yang wajib dipasang pada kapal-kapal perikanan berukuran besar untuk memantau pergerakan posisinya adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Sonar"
+                  },
+                  {
+                    "id": "B",
+                    "text": "VMS (Vessel Monitoring System)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "GPS Handheld"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Radar Pasif"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 25,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Pembagian wilayah pengelolaan perikanan laut di Indonesia yang diatur oleh pemerintah dikenal dengan singkatan...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "WPPRI"
+                  },
+                  {
+                    "id": "B",
+                    "text": "ZEEI"
+                  },
+                  {
+                    "id": "C",
+                    "text": "BPSPL"
+                  },
+                  {
+                    "id": "D",
+                    "text": "KKP"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 25,
+                "order": 4
+              }
+            ]
+          }
+        },
+        {
+          "title": "Level 6 : BOSS LEVEL : Blue Economy & Zero-Waste",
+          "order": 6,
+          "xpReward": 500,
+          "content": "Konsep **Blue Economy** menekankan pemanfaatan sumber daya laut secara berkelanjutan untuk pertumbuhan ekonomi dengan tetap menjaga kesehatan ekosistem. Penerapan prinsip *Zero-Waste Fisheries* memastikan seluruh bagian ikan hasil tangkapan dimanfaatkan: daging utama untuk filet/ekspor, limbah potongan untuk surimi, tulang untuk tepung kaya kalsium, dan jeroan untuk minyak ikan/petfood.",
+          "quiz": {
+            "title": "Quiz Level 6",
+            "passingScore": 75,
+            "questions": [
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Prinsip utama dari penerapan konsep *Blue Economy* dalam sektor perikanan adalah...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Menguras seluruh potensi laut secepat-cepatnya untuk pendapatan negara"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Mendorong pertumbuhan ekonomi laut yang berkelanjutan tanpa merusak ekosistem"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Melarang seluruh aktivitas penangkapan ikan di laut"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Mengganti seluruh kapal kayu dengan kapal besi besar"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 1
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Penerapan konsep *Zero-Waste* pada pabrik pengolahan filet ikan tuna dilakukan dengan cara...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Membuang seluruh limbah kepala dan tulang ke laut lepas"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Mengolah limbah tulang menjadi tepung kalsium dan jeroan menjadi minyak ikan"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Membakar sisa limbah di area pabrik"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Menimbun limbah di tanah"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 2
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Minyak ikan yang diekstrak dari limbah hati/jeroan ikan kaya akan kandungan asam lemak tak jenuh berkhasiat tinggi, yaitu...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Omega-3 (EPA dan DHA)"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Trans Fat"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Asam Laurat"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Kolesterol LDL"
+                  }
+                ],
+                "correctAnswer": "A",
+                "points": 15,
+                "order": 3
+              },
+              {
+                "type": "MULTIPLE_CHOICE",
+                "prompt": "Upaya diversifikasi hasil laut non-ikan yang dikembangkan dalam rantai *Blue Economy* untuk bahan kosmetik dan pangan adalah budidaya...",
+                "options": [
+                  {
+                    "id": "A",
+                    "text": "Terumbu karang keras"
+                  },
+                  {
+                    "id": "B",
+                    "text": "Rumput Laut (Kappaphycus alvarezii)"
+                  },
+                  {
+                    "id": "C",
+                    "text": "Bintang laut"
+                  },
+                  {
+                    "id": "D",
+                    "text": "Ubur-ubur api"
+                  }
+                ],
+                "correctAnswer": "B",
+                "points": 15,
+                "order": 4
+              },
+              {
+                "type": "ESSAY",
+                "prompt": "Sebuah pelabuhan perikanan menghasilkan 2 ton limbah padat hasil olahan ikan (tulang, kepala, dan jeroan) setiap hari yang memicu bau dan pencemaran lingkungan. Rancanglah solusi berbasis *Zero-Waste Fisheries* (3 langkah pengolahan limbah) untuk mengubah limbah tersebut menjadi 3 produk bernilai ekonomis!",
+                "options": [],
+                "correctAnswer": {
+                  "text": "1. Ekstraksi Jeroan > Minyak Ikan: Mengolah jeroan ikan menjadi minyak ikan kaya Omega-3 untuk suplemen kesehatan atau pakan ternak.\r\n    2. Pengolahan Tulang & Kepala > Tepung Kalsium / Tepung Ikan: Mengeringkan dan menggiling bagian keras menjadi tepung tinggi protein/kalsium sebagai bahan baku pakan pelet.\r\n    3. Ekstraksi Kulit & Sisik > Kolagen: Memproses limbah kulit dan sisik menjadi gelatin/kolagen bernilai tinggi untuk bahan baku industri kosmetik dan farmasi.",
+                  "keywords": [
+                    "ekstraksi",
+                    "jeroan",
+                    "minyak",
+                    "mengolah",
+                    "menjadi",
+                    "suplemen",
+                    "kesehatan",
+                    "ternak",
+                    "pengolahan",
+                    "tulang"
+                  ]
+                },
+                "points": 40,
+                "order": 5
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,37 +1,29 @@
-// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const prisma = new PrismaClient();
 
 async function run() {
-  const filePath = path.join(__dirname, 'course_template.json');
+  // File JSON ada di root backend, dua level di atas src/scripts/
+  const filePath = path.join(__dirname, '..', '..', 'modul1.json');
   if (!fs.existsSync(filePath)) {
-    console.error('File course_template.json tidak ditemukan!');
+    console.error('File modul1.json tidak ditemukan!');
     process.exit(1);
   }
 
   const raw = fs.readFileSync(filePath, 'utf-8');
   const courseData = JSON.parse(raw);
 
-  console.log('Ensuring house-health exists...');
-  const houseHealth = await prisma.house.upsert({
-    where: { id: 'house-health' },
-    update: {},
-    create: {
-      id: 'house-health',
-      title: 'House of Health & Welfare',
-      description: 'Kedokteran, Keperawatan, Farmasi & Pekerjaan Sosial',
-      icon: '🏥',
-      houseNumber: 9,
-      gradient: 'from-rose-400 via-red-400 to-pink-500',
-      skillsOverview: ['Diagnosis Klinis', 'Asuhan Keperawatan', 'Farmakologi', 'Konseling Psikologi', 'Manajemen Kesehatan'],
-      idealFor: ['Sangat peduli dan ingin membantu orang sakit', 'Tahan banting menghadapi situasi darurat', 'Teliti dalam memberikan obat', 'Punya empati tinggi'],
-      status: 'active',
-      isPublished: true,
-    }
+  console.log('Ensuring house-ict exists...');
+  const houseBusiness = await prisma.house.findUnique({
+    where: { id: 'house-ict' }
   });
+
+  if (!houseBusiness) {
+    console.error('house-ict not found in database. Run global seed first!');
+    process.exit(1);
+  }
 
   console.log('Creating course:', courseData.title);
   
@@ -41,7 +33,7 @@ async function run() {
 
   const course = await prisma.course.create({
     data: {
-      houseId: houseHealth.id,
+      houseId: houseBusiness.id,
       title: courseData.title,
       description: courseData.description,
       facultyTags: courseData.facultyTags || [],
@@ -59,8 +51,8 @@ async function run() {
               missionId: sec.missionId || null,
               order: sIdx + 1,
               content: sec.materi || sec.content,
-              category: sec.isBossLevel ? 'milestone' : 'skill',
-              xpReward: sec.isBossLevel ? 500 : 100,
+              category: sec.isBossLevel || sec.title.toLowerCase().includes('boss') ? 'milestone' : 'skill',
+              xpReward: sec.xpReward || (sec.isBossLevel || sec.title.toLowerCase().includes('boss') ? 500 : 100),
               quiz: sec.quiz ? {
                 create: {
                   title: sec.quiz.title || ("Kuis: " + (sec.levelTitle || sec.title)),
@@ -70,13 +62,13 @@ async function run() {
                       prompt: q.pertanyaan || q.prompt,
                       type: q.tipe || q.type || 'MULTIPLE_CHOICE',
                       options: (q.pilihan || q.options || []).map((opt: any) => ({
-                        id: opt.id,
-                        text: opt.teks || opt.text
+                        id: opt.id || opt,
+                        text: opt.teks || opt.text || opt
                       })),
                       correctAnswer: (q.tipe || q.type) === 'ESSAY' 
-                        ? { text: q.jawabanBenar || q.correctAnswer, keywords: q.keywords || [] } 
+                        ? { text: q.jawabanBenar?.text || q.correctAnswer?.text || q.correctAnswer, keywords: q.jawabanBenar?.keywords || q.correctAnswer?.keywords || [] } 
                         : (q.jawabanBenar || q.correctAnswer),
-                      points: (q.tipe || q.type) === 'ESSAY' ? 10 : 1,
+                      points: q.points || ((q.tipe || q.type) === 'ESSAY' ? 40 : 25),
                       order: qIdx + 1
                     }))
                   }
