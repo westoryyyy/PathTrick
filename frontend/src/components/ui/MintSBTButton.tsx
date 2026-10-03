@@ -4,15 +4,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { BrowserProvider, Contract, formatEther } from 'ethers';
+import { useReadContract } from 'wagmi';
 import pathtrickSbtAbi from '../../../integration/PathtrickSBT.abi.json';
 import {
   BNB_TESTNET_CHAIN,
+  PATHTRICK_SBT_ABI,
   PATHTRICK_SBT_ADDRESS,
   API_BASE_URL,
   getApiError,
   readApiResponse,
 } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
+import CertificateActions from './CertificateActions';
+import type { CertificatePdfData } from '@/lib/certificatePdf';
 
 type MintStatus = 'idle' | 'preparing' | 'pending' | 'confirming' | 'success' | 'error';
 
@@ -20,6 +24,10 @@ interface MintSBTButtonProps {
   courseId: number;
   customStyle?: React.CSSProperties;
   onSuccess?: () => void;
+  /** Called once when the certificate is found to be already minted on-chain (no XP side effects). */
+  onAlreadyMinted?: () => void;
+  /** Data for the PDF. When provided, minted state shows LIHAT PDF + LIHAT DI BSCSCAN. */
+  certificate?: CertificatePdfData;
 }
 
 interface MintAuthorization {
@@ -111,7 +119,7 @@ async function requestMintAuthorization(courseId: number): Promise<MintAuthoriza
   return data as unknown as MintAuthorization;
 }
 
-export default function MintSBTButton({ courseId, customStyle, onSuccess }: MintSBTButtonProps) {
+export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlreadyMinted, certificate }: MintSBTButtonProps) {
   const { wallets } = useWallets();
   const { linkWallet } = usePrivy();
   const [status, setStatus] = useState<MintStatus>('idle');
@@ -121,6 +129,47 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [modalCenter, setModalCenter] = useState({ x: 0, y: 0 });
+  const [mintedTxHash, setMintedTxHash] = useState<string | undefined>();
+  const alreadyMintedNotified = useRef(false);
+
+  const holderAddress = wallets[0]?.address as `0x${string}` | undefined;
+
+  // Source of truth: is this certificate already recorded on-chain for the connected wallet?
+  const {
+    data: hasCertificateOnChain,
+    isLoading: isCheckingChain,
+    refetch: refetchHasCertificate,
+  } = useReadContract({
+    address: PATHTRICK_SBT_ADDRESS,
+    abi: PATHTRICK_SBT_ABI,
+    functionName: 'hasCertificate',
+    args: holderAddress ? [holderAddress, BigInt(courseId)] : undefined,
+    chainId: BNB_TESTNET_CHAIN.id,
+    query: { enabled: Boolean(holderAddress) },
+  });
+
+  const isMinted = Boolean(mintedTxHash) || hasCertificateOnChain === true;
+
+  useEffect(() => {
+    if (hasCertificateOnChain === true && !mintedTxHash && !alreadyMintedNotified.current) {
+      alreadyMintedNotified.current = true;
+      onAlreadyMinted?.();
+    }
+  }, [hasCertificateOnChain, mintedTxHash, onAlreadyMinted]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (status === 'error' || status === 'success') {
+      const rect = buttonRef.current?.getBoundingClientRect();
+      setModalCenter({
+        x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
+        y: window.innerHeight / 2 // Center vertically on the screen, not over the button
+      });
+    }
+  }, [status]);
 
   const handleConnectWallet = async () => {
     try {
@@ -243,10 +292,18 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
       }
 
       setStatus('success');
-      setSuccessMessage(`Sertifikat berhasil dicetak. Tx: ${transaction.hash.slice(0, 10)}...`);
+      setMintedTxHash(transaction.hash);
+      setSuccessMessage(`Sertifikat berhasil tercatat di blockchain. Tx: ${transaction.hash.slice(0, 10)}...`);
       onSuccess?.();
+      void refetchHasCertificate();
     } catch (error) {
       console.error('Certificate mint failed:', error);
+      if (getErrorText(error).toLowerCase().includes('alreadycertified')) {
+        // Already on-chain: switch to the minted view instead of showing an error.
+        setStatus('idle');
+        void refetchHasCertificate();
+        return;
+      }
       setStatus('error');
       setErrorMessage(getErrorMessage(error));
     }
@@ -319,28 +376,24 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess }: Mint
   const label = status === 'preparing' ? 'MENYIAPKAN...' :
     status === 'pending' ? 'MENUNGGU WALLET...' :
       status === 'confirming' ? 'MENGKONFIRMASI...' :
-        status === 'success' ? 'SERTIFIKAT TERCETAK!' :
+        isCheckingChain ? 'MEMERIKSA BLOCKCHAIN...' :
           status === 'error' ? 'GAGAL - COBA LAGI' : 'CETAK SERTIFIKAT';
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if ((status === 'error' || status === 'success') && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setModalCenter({
-        x: rect.left + rect.width / 2,
-        y: window.innerHeight / 2 // Center vertically on the screen, not over the button
-      });
-    }
-  }, [status]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <button ref={buttonRef} onClick={handleMint} disabled={isBusy || status === 'success'} style={buttonStyle}>
-        {label}
-      </button>
+      {isMinted ? (
+        certificate ? (
+          <CertificateActions certificate={certificate} holderAddress={holderAddress} txHash={mintedTxHash} />
+        ) : (
+          <button ref={buttonRef} disabled style={{ ...buttonStyle, cursor: 'default' }}>
+            ✓ TERCATAT DI BLOCKCHAIN
+          </button>
+        )
+      ) : (
+        <button ref={buttonRef} onClick={handleMint} disabled={isBusy || isCheckingChain} style={buttonStyle}>
+          {label}
+        </button>
+      )}
       {mounted && status === 'error' && createPortal(
         <div style={{
           position: 'fixed',

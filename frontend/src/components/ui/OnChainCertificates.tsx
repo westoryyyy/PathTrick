@@ -8,6 +8,7 @@ import { useAccount, useReadContracts } from 'wagmi';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserStore } from '@/store/useUserStore';
 import MintSBTButton from './MintSBTButton';
+import CertificateActions from './CertificateActions';
 import CertificatePreview from './CertificatePreview';
 import { PATHTRICK_SBT_ABI, PATHTRICK_SBT_ADDRESS, API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
@@ -118,11 +119,6 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
     });
   }, [bossNodes, sbtOwnershipResults]);
 
-  const handleExplorerClick = (isMinted: boolean) => {
-    if (!isMinted || !address) return;
-    // Buka BscScan untuk address user (tab ERC-1155 Tokens)
-    window.open(`https://testnet.bscscan.com/address/${address}#tokentxnsErc1155`, '_blank');
-  };
 
   const walletShort = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'NOT CONNECTED';
 
@@ -190,33 +186,15 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
                 />
               
               {cert.isMinted ? (
-                <button 
-                  onClick={() => handleExplorerClick(cert.isMinted)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '14px', 
-                    fontFamily: '"Press Start 2P"', 
-                    fontSize: '0.6rem', 
-                    background: '#5cb85c', 
-                    border: '4px solid #224a22',
-                    borderTopColor: '#98e098',
-                    borderLeftColor: '#98e098',
-                    color: '#fff', 
-                    textShadow: '1px 1px 0 rgba(0,0,0,0.5)',
-                    cursor: 'pointer',
-                    imageRendering: 'pixelated',
-                    transition: 'transform 0.1s'
-                  }}
-                  onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'}
-                  onMouseUp={(e) => e.currentTarget.style.transform = 'none'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                >
-                  VIEW ON EXPLORER
-                </button>
+                <CertificateActions
+                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: walletShort, date: cert.date }}
+                  holderAddress={address}
+                />
               ) : (
                 <MintSBTButton 
                   courseId={cert.courseId}
                   onSuccess={() => refetch()}
+                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: walletShort, date: cert.date }}
                   customStyle={{
                     width: '100%', 
                     padding: '14px', 

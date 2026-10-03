@@ -870,19 +870,20 @@ export default function MissionFlowPage() {
 
                   {isBossLevel ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '400px' }}>
+                        <MintSBTButton
+                          courseId={generateCourseId(baseChapterId)}
+                          customStyle={{
+                            width: '100%',
+                          }}
+                          onSuccess={() => {
+                            setIsBossMinted(true);
+                            addXP(sectionData?.xpReward ?? 100);
+                            completeQuiz();
+                          }}
+                        certificate={{ userName: displayName, moduleName: currentChapter.name, walletAddress: walletShort, date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }}
+                        onAlreadyMinted={() => setIsBossMinted(true)}
+                      />
                       {!isBossMinted ? (
-                        <>
-                          <MintSBTButton
-                            courseId={generateCourseId(baseChapterId)}
-                            customStyle={{
-                              width: '100%',
-                            }}
-                            onSuccess={() => {
-                              setIsBossMinted(true);
-                              addXP(sectionData?.xpReward ?? 100);
-                              completeQuiz();
-                            }}
-                          />
                           <button onMouseEnter={playHoverSound}
                             className={styles.secondaryBtn}
                             style={{ width: '100%', padding: '14px 28px', fontSize: '1.1rem', opacity: isClaiming ? 0.7 : 1 }}
@@ -898,14 +899,13 @@ export default function MissionFlowPage() {
                           >
                             {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
                           </button>
-                        </>
                       ) : (
                         <button onMouseEnter={playHoverSound}
-                          className={styles.btn}
-                          style={{ width: '100%', padding: '18px 28px', fontSize: '1.2rem' }}
-                          onClick={() => router.push('/chaser/leaderboard#relics')}
+                          className={styles.secondaryBtn}
+                          style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
+                          onClick={() => router.push(`/map?chapter=${baseChapterId}`)}
                         >
-                          LIHAT DI RELICS & TREASURES
+                          KEMBALI KE PETA
                         </button>
                       )}
                     </div>

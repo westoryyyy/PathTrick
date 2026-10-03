@@ -119,10 +119,10 @@ export default function Dashboard() {
 
   const unlockedKeys = gamification.achievements.map((a: any) => a.key);
   const VAULT_SBTS = [
-    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: '🛡️' },
-    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: '⚔️' },
-    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: '💎' },
-    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '🔮' },
+    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: '/Mission Completer.png' },
+    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: '/Early Bird.png' },
+    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: '/Streak Warrior copy.png' },
+    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '/Quiz Master copy.png' },
   ];
 
   useEffect(() => {
@@ -455,7 +455,18 @@ export default function Dashboard() {
             <div className={styles.vaultGrid}>
               {VAULT_SBTS.map((sbt) => (
                 <div key={sbt.id} className={`${styles.sbtItem} ${!sbt.earned ? styles.sbtItemLocked : ''}`}>
-                  <div className={styles.sbtIcon}>{sbt.icon}</div>
+                  <div className={styles.sbtIcon} style={{ position: 'relative' }}>
+                    <Image 
+                      src={sbt.icon} 
+                      alt={sbt.name} 
+                      fill 
+                      style={{ 
+                        objectFit: 'contain', 
+                        padding: '6px',
+                        filter: sbt.earned ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))' : 'brightness(0) invert(0.8) opacity(0.8)'
+                      }} 
+                    />
+                  </div>
                   <div className={styles.sbtInfo}>
                     <span className={styles.sbtName}>{sbt.name}</span>
                     <span className={styles.sbtDesc}>{sbt.desc}</span>
