@@ -1,11 +1,13 @@
-﻿import { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { runAgent1 } from "../ai-agent/agent1-dreamer/agent1.service";
 import { runAgent2 } from "../ai-agent/agent2-chaser/agent2.service";
 import {
   mapTopCodeToFacultyTags,
+  mapTopCodeToShortCodes,
   scoreRiasec,
   STUDYFIELD_TO_HOUSE,
+  STUDYFIELD_TO_SHORTCODE,
 } from "./riasec.service";
 import {
   findCandidateCoursesByFacultyTags,
@@ -129,8 +131,12 @@ export async function submitDreamerPreference(userId: string, payload: DreamerPr
   let riasecTopCode: string | null = null;
 
   if (payload.studyfield) {
-    // Mapping dari studyfield ISCED ke House (1 to 1)
-    facultyTagsForQuery = [STUDYFIELD_TO_HOUSE[payload.studyfield]];
+    // Mapping dari studyfield ISCED ke short code
+    const studyfields = Array.isArray(payload.studyfield) ? payload.studyfield : [payload.studyfield];
+    facultyTagsForQuery = studyfields.map(sf => 
+      STUDYFIELD_TO_SHORTCODE[sf as keyof typeof STUDYFIELD_TO_SHORTCODE] || 
+      STUDYFIELD_TO_HOUSE[sf as keyof typeof STUDYFIELD_TO_HOUSE]
+    ).filter(Boolean) as string[];
   } else {
     const latestRiasec = await prisma.riasecResult.findFirst({
       where: { userId },
@@ -142,8 +148,8 @@ export async function submitDreamerPreference(userId: string, payload: DreamerPr
       );
     }
     riasecTopCode = latestRiasec.topCode;
-    // Map RIASEC topCode ke Houses
-    facultyTagsForQuery = mapTopCodeToFacultyTags(latestRiasec.topCode);
+    // Map RIASEC topCode ke short codes
+    facultyTagsForQuery = mapTopCodeToShortCodes(latestRiasec.topCode);
   }
 
   // Translasi enum budget tier ke range int per semester
@@ -168,15 +174,26 @@ export async function submitDreamerPreference(userId: string, payload: DreamerPr
 
   const assessment = await startNewAssessmentVersion(userId, "DREAMER", "DREAMER_PREFERENCE", payload);
 
+  let mappedCountries: string[] = [];
+  if (payload.countryPreference) {
+    const rawCountries = Array.isArray(payload.countryPreference) ? payload.countryPreference : [payload.countryPreference];
+    mappedCountries = rawCountries.flatMap(c => {
+      const normalized = c.toLowerCase().trim();
+      if (normalized === 'dalam_negeri') return ['indonesia', 'id'];
+      if (normalized === 'luar_negeri') return []; // Handled specially or ignored for specific matching
+      return [normalized];
+    });
+  }
+
   const [universities, scholarships, courses] = await Promise.all([
     findCandidateUniversities({
       facultyTags: facultyTagsForQuery,
-      countryPreference: payload.countryPreference,
+      countryPreference: mappedCountries,
       budgetRange,
     }),
     findCandidateScholarships({
       facultyTags: facultyTagsForQuery,
-      countryPreference: payload.countryPreference,
+      countryPreference: mappedCountries,
     }),
     findCandidateCoursesByFacultyTags(facultyTagsForQuery),
   ]);
@@ -187,7 +204,7 @@ export async function submitDreamerPreference(userId: string, payload: DreamerPr
       fakultas: payload.studyfield, // map field ke agent1 input
       riasecTopCode,
       budgetRange,
-      countryPreference: payload.countryPreference,
+      countryPreference: mappedCountries,
     },
     candidateUniversities: universities.candidates,
     candidateScholarships: scholarships.candidates,

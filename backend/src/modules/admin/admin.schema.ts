@@ -3,10 +3,16 @@ import { z } from "zod";
 export const universitySchema = z.object({
   name: z.string().min(1, "Nama wajib diisi"),
   location: z.string().optional(),
+  country: z.string().optional(),
   riasecCode: z.string().optional(),
   accreditation: z.string().optional(),
   description: z.string().optional(),
   coverImage: z.string().optional(),
+  facultyTags: z.array(z.string()).optional(),
+  website: z.string().optional(),
+  admissionRequirements: z.string().optional(),
+  estimatedCostMin: z.number().or(z.string().transform(Number)).optional(),
+  estimatedCostMax: z.number().or(z.string().transform(Number)).optional(),
 });
 
 export const scholarshipSchema = z.object({
@@ -19,6 +25,7 @@ export const scholarshipSchema = z.object({
   coverage: z.string().optional(),
   amount: z.string().optional(),
   scope: z.string().optional(),
+  country: z.string().optional(),
   // requirements can be string[] (from tags input) or plain string
   requirements: z.union([z.array(z.string()), z.string()]).optional(),
   coverImage: z.string().optional(),

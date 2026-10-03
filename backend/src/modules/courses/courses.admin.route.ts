@@ -128,10 +128,21 @@ export default async function adminCoursesRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       const { id } = request.params as { id: string };
       try {
-        await prisma.course.delete({ where: { id } });
+        await prisma.$transaction(async (tx) => {
+          // Hapus relasi yang bergantung pada course ini sebelum menghapus course
+          await tx.roadmapCourse.deleteMany({ where: { courseId: id } });
+          await tx.courseProgress.deleteMany({ where: { courseId: id } });
+          
+          await tx.course.delete({ where: { id } });
+        });
         return reply.code(200).send({ message: "Berhasil dihapus" });
-      } catch (error) {
-        return reply.code(404).send({ error: "NotFound", message: "Course tidak ditemukan" });
+      } catch (error: any) {
+        request.log.error(error, "Gagal menghapus course");
+        // P2025: Record to delete does not exist
+        if (error.code === 'P2025') {
+          return reply.code(404).send({ error: "NotFound", message: "Course tidak ditemukan" });
+        }
+        return reply.code(500).send({ error: "DatabaseError", message: "Gagal menghapus course (Mungkin ada data lain yang bergantung)" });
       }
     }
   );

@@ -253,20 +253,68 @@ export async function submitQuiz(params: {
     } else if (question.type === 'ESSAY') {
       const correctAnswerObj = question.correctAnswer as { text: string; keywords: string[] } | null;
       const keywords = correctAnswerObj?.keywords || [];
-      const userText = (selectedAnswer || "").toLowerCase();
-      
+      const rawUserText = (selectedAnswer || "").toString();
+
+      // Normalize: lowercase, remove punctuation/digits, collapse spaces
+      const normalize = (s: string) => s
+        .toLowerCase()
+        .replace(/[0-9]+/g, ' ')
+        .replace(/[\p{P}\p{S}]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const userText = normalize(rawUserText);
+      const userTokens = new Set(userText.split(' ').filter(Boolean));
+
       // Tahap 1: Cek Lokal dengan Keyword (Minimal 50% keywords terpenuhi)
       let keywordScore = 0;
+      const matchedKeywords: string[] = [];
       for (const kw of keywords) {
-        if (userText.includes(kw.toLowerCase())) keywordScore++;
+        const nk = normalize(kw || '');
+        if (!nk) continue;
+
+        // direct phrase match
+        if (userText.includes(nk)) {
+          keywordScore++;
+          matchedKeywords.push(kw);
+          continue;
+        }
+
+        // or any word in the expected keyword phrase appears in answer tokens
+        const kwTokens = nk.split(' ').filter(Boolean);
+        const anyTok = kwTokens.some(t => userTokens.has(t));
+        if (anyTok) {
+          keywordScore++;
+          matchedKeywords.push(kw);
+        }
       }
-      
+
       const threshold = keywords.length > 0 ? Math.ceil(keywords.length * 0.5) : 0;
+      // Debug logging to help investigate keyword vs sentence mismatch
+      console.debug('[essay-eval] quiz check', {
+        userId: params.userId,
+        questionId: question.id,
+        keywords,
+        matchedKeywords,
+        keywordScore,
+        threshold,
+        selectedAnswer: typeof selectedAnswer === 'string' ? (selectedAnswer.length > 200 ? selectedAnswer.slice(0,200)+'...' : selectedAnswer) : selectedAnswer,
+        normalizedAnswer: userText,
+      });
+
       if (keywords.length > 0 && keywordScore >= threshold) {
         isCorrect = true; // Lulus murni lokal!
-      } else if (selectedAnswer && selectedAnswer.length > 10) {
+      } else if (selectedAnswer && typeof selectedAnswer === 'string' && selectedAnswer.length > 10) {
         // Tahap 2: Jika Keyword gagal (mungkin user pakai sinonim), kita panggil AI Evaluator
-        isCorrect = await evaluateEssay(question.prompt, correctAnswerObj?.text || "", selectedAnswer);
+        let aiResult = false;
+        try {
+          aiResult = await evaluateEssay(question.prompt, correctAnswerObj?.text || "", selectedAnswer);
+        } catch (err) {
+          console.error('[essay-eval] AI evaluator threw error', { userId: params.userId, questionId: question.id, err });
+          // fallback keep aiResult false
+        }
+        console.debug('[essay-eval] aiDecision', { userId: params.userId, questionId: question.id, aiResult });
+        isCorrect = aiResult;
       }
     }
 

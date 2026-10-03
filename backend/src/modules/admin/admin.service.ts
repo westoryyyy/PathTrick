@@ -37,13 +37,17 @@ export async function createUniversity(userId: string, data: any) {
   return prisma.university.create({
     data: {
       name: data.name,
-      country: data.location || "Indonesia",
-      facultyTags: data.riasecCode ? [data.riasecCode] : [],
+      country: data.country || "Indonesia",
+      facultyTags: Array.isArray(data.facultyTags) ? data.facultyTags : [],
       location: data.location,
       riasecCode: data.riasecCode,
       accreditation: data.accreditation,
       description: data.description,
       coverImageUrl: data.coverImage,
+      website: data.website,
+      admissionRequirements: data.admissionRequirements,
+      estimatedCostMin: data.estimatedCostMin ? Number(data.estimatedCostMin) : null,
+      estimatedCostMax: data.estimatedCostMax ? Number(data.estimatedCostMax) : null,
       createdByUserId: userId,
     },
   });
@@ -54,13 +58,17 @@ export async function updateUniversity(id: string, data: any) {
     where: { id },
     data: {
       name: data.name,
-      country: data.location || "Indonesia",
-      facultyTags: data.riasecCode ? [data.riasecCode] : [],
+      country: data.country || "Indonesia",
+      facultyTags: Array.isArray(data.facultyTags) ? data.facultyTags : [],
       location: data.location,
       riasecCode: data.riasecCode,
       accreditation: data.accreditation,
       description: data.description,
       coverImageUrl: data.coverImage,
+      website: data.website,
+      admissionRequirements: data.admissionRequirements,
+      estimatedCostMin: data.estimatedCostMin ? Number(data.estimatedCostMin) : null,
+      estimatedCostMax: data.estimatedCostMax ? Number(data.estimatedCostMax) : null,
     },
   });
 }
@@ -70,7 +78,7 @@ export async function createScholarship(userId: string, data: any) {
     data: {
       // Frontend sends 'title', DB stores 'name'
       name: data.title || data.name,
-      country: "Indonesia",
+      country: data.country || "Indonesia",
       deadline: parseDeadline(data.deadline),
       // Frontend sends requirements as string[], DB stores as single String (comma-joined)
       requirements: Array.isArray(data.requirements)
@@ -92,6 +100,7 @@ export async function updateScholarship(id: string, data: any) {
     where: { id },
     data: {
       name: data.title || data.name,
+      country: data.country || "Indonesia",
       deadline: parseDeadline(data.deadline),
       requirements: Array.isArray(data.requirements)
         ? data.requirements.join(', ')

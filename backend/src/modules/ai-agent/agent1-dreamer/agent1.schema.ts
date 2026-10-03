@@ -16,7 +16,7 @@ export const agent1InputSchema = z.object({
   persona: z.literal("DREAMER"),
   preferences: z.object({
     // null kalau user pakai jalur RIASEC (belum tahu fakultas)
-    fakultas: z.string().nullable(),
+    fakultas: z.union([z.string(), z.array(z.string())]).nullable(),
     riasecTopCode: z.string().nullable(),
     budgetRange: z
       .object({ min: z.number().int(), max: z.number().int() })
@@ -24,7 +24,7 @@ export const agent1InputSchema = z.object({
         message: "budgetRange.min tidak boleh lebih besar dari budgetRange.max",
       })
       .nullable(),
-    countryPreference: z.enum(["dalam_negeri", "luar_negeri", "keduanya"]),
+    countryPreference: z.array(z.string()),
   }),
   candidateUniversities: z.array(
     z.object({
@@ -39,6 +39,7 @@ export const agent1InputSchema = z.object({
       id: z.string(),
       name: z.string(),
       scope: z.string(),
+      country: z.string().nullable().optional(),
       facultyTags: z.array(z.string()),
     })
   ),

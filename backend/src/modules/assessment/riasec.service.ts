@@ -83,6 +83,39 @@ export const STUDYFIELD_TO_HOUSE: Record<string, string> = {
   "Kehutanan & Lingkungan": "House of Agriculture",
 };
 
+export const STUDYFIELD_TO_SHORTCODE: Record<string, string> = {
+  'Agribisnis & Pertanian': 'agr_farm',
+  'Akuntansi & Keuangan': 'biz_acc',
+  'Bisnis & Manajemen': 'biz_mgmt',
+  'Data Science & AI': 'data_ai',
+  'Desain & Seni Rupa': 'arts_design',
+  'Fisika, Kimia & Biologi': 'sci_natural',
+  'Hubungan Internasional': 'soc_ir',
+  'Ilmu Hukum': 'law',
+  'Ilmu Komunikasi': 'soc_comm',
+  'Ilmu Komputer & TI': 'cs_it',
+  'Ilmu Politik & Publik': 'law_public',
+  'Kedokteran Umum/Gigi': 'med_doctor',
+  'Kehutanan & Lingkungan': 'agr_env',
+  'Keperawatan & Farmasi': 'med_nurse',
+  'Matematika & Statistika': 'sci_math',
+  'Mesin & Elektro': 'eng_mech',
+  'Pendidikan Guru': 'edu_teacher',
+  'Psikologi': 'soc_psy',
+  'Sastra & Bahasa': 'arts_lang',
+  'Sipil & Arsitektur': 'eng_civil',
+  'Teknologi Pendidikan': 'edu_tech'
+};
+
+export const RIASEC_TO_SHORTCODES: Record<RiasecCategory, string[]> = {
+  R: ["eng_mech", "eng_civil", "agr_farm", "agr_env"],
+  I: ["cs_it", "data_ai", "sci_natural", "sci_math"],
+  A: ["arts_design", "arts_lang", "edu_pedagogy"],
+  S: ["soc_psy", "edu_teacher", "edu_tech", "med_nurse", "med_doctor"],
+  E: ["biz_mgmt", "soc_comm", "soc_ir", "law_public"],
+  C: ["biz_acc", "law", "business_management"],
+};
+
 export const ALL_STUDYFIELDS = Object.keys(STUDYFIELD_TO_HOUSE);
 
 const RIASEC_LABELS: Record<RiasecCategory, string> = {
@@ -98,6 +131,15 @@ export function mapTopCodeToFacultyTags(topCode: string): string[] {
   const tags = new Set<string>();
   for (const letter of topCode) {
     const mapped = RIASEC_TO_FACULTY_TAGS[letter as RiasecCategory];
+    if (mapped) mapped.forEach((tag) => tags.add(tag));
+  }
+  return [...tags];
+}
+
+export function mapTopCodeToShortCodes(topCode: string): string[] {
+  const tags = new Set<string>();
+  for (const letter of topCode) {
+    const mapped = RIASEC_TO_SHORTCODES[letter as RiasecCategory];
     if (mapped) mapped.forEach((tag) => tags.add(tag));
   }
   return [...tags];

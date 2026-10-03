@@ -1,10 +1,21 @@
 import { prisma } from "../../lib/prisma";
 
-const CANDIDATE_LIMIT = 8;
+const CANDIDATE_LIMIT = 20;
+const FETCH_LIMIT = 100;
 
 export interface CandidateQueryResult<T> {
   candidates: T[];
   relaxed: boolean; // true kalau filter ketat gagal & terpaksa dilonggarkan
+}
+
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 // -----------------------------------------------------------------------
@@ -23,15 +34,12 @@ export interface CandidateQueryResult<T> {
 
 export async function findCandidateUniversities(params: {
   facultyTags: string[];
-  countryPreference: "dalam_negeri" | "luar_negeri" | "keduanya";
+  countryPreference: string[];
   budgetRange: { min: number; max: number } | null;
 }): Promise<CandidateQueryResult<{ id: string; name: string; country: string; facultyTags: string[] }>> {
-  const countryFilter =
-    params.countryPreference === "dalam_negeri"
-      ? { country: { equals: "Indonesia", mode: "insensitive" as const } }
-      : params.countryPreference === "luar_negeri"
-        ? { country: { not: { equals: "Indonesia", mode: "insensitive" as const } } }
-        : {};
+  const countryFilter = params.countryPreference.length > 0
+    ? { country: { in: params.countryPreference, mode: "insensitive" as const } }
+    : {};
 
   // Budget dianggap "pertimbangan tambahan, bukan filter keras" (sesuai
   // instruksi ke Agent 1 di agent1.prompt.ts) -- jadi longgarkan 20% di
@@ -48,50 +56,65 @@ export async function findCandidateUniversities(params: {
   let candidates = await prisma.university.findMany({
     where: { facultyTags: { hasSome: params.facultyTags }, ...countryFilter, ...budgetFilter },
     select: { id: true, name: true, country: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    take: FETCH_LIMIT,
   });
-  if (candidates.length >= 3) return { candidates, relaxed: false };
+  if (candidates.length >= 3) return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: false };
 
   candidates = await prisma.university.findMany({
     where: { facultyTags: { hasSome: params.facultyTags } },
     select: { id: true, name: true, country: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    take: FETCH_LIMIT,
   });
-  if (candidates.length >= 1) return { candidates, relaxed: true };
+  if (candidates.length >= 1) return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: true };
 
   candidates = await prisma.university.findMany({
     select: { id: true, name: true, country: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    take: FETCH_LIMIT,
   });
-  return { candidates, relaxed: true };
+  return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: true };
 }
 
 export async function findCandidateScholarships(params: {
   facultyTags: string[];
-  countryPreference: "dalam_negeri" | "luar_negeri" | "keduanya";
-}): Promise<CandidateQueryResult<{ id: string; name: string; scope: string; facultyTags: string[] }>> {
-  const scopeFilter =
-    params.countryPreference === "keduanya" ? {} : { scope: { in: [params.countryPreference, "keduanya"] } };
+  countryPreference: string[];
+}): Promise<CandidateQueryResult<{ id: string; name: string; scope: string; country?: string | null; facultyTags: string[] }>> {
+  const hasIndo = params.countryPreference.includes('indonesia');
+  const hasForeign = params.countryPreference.some(c => c !== 'indonesia');
+  
+  const scopeFilter = hasIndo && hasForeign 
+    ? {} 
+    : (hasIndo ? { scope: { in: ["dalam_negeri", "keduanya"] } } : (hasForeign ? { scope: { in: ["luar_negeri", "keduanya"] } } : {}));
+
+  const countryFilter = params.countryPreference.length > 0
+    ? {
+        OR: [
+          { country: { in: params.countryPreference, mode: "insensitive" as const } },
+          { country: { equals: "Global", mode: "insensitive" as const } },
+          { country: { equals: "Keduanya", mode: "insensitive" as const } },
+          ...(hasIndo ? [{ country: { equals: "Indonesia", mode: "insensitive" as const } }] : [])
+        ]
+      }
+    : {};
 
   let candidates = await prisma.scholarship.findMany({
-    where: { facultyTags: { hasSome: params.facultyTags }, ...scopeFilter },
-    select: { id: true, name: true, scope: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    where: { facultyTags: { hasSome: params.facultyTags }, ...scopeFilter, ...countryFilter },
+    select: { id: true, name: true, scope: true, country: true, facultyTags: true },
+    take: FETCH_LIMIT,
   });
-  if (candidates.length >= 3) return { candidates, relaxed: false };
+  if (candidates.length >= 3) return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: false };
 
   candidates = await prisma.scholarship.findMany({
     where: { facultyTags: { hasSome: params.facultyTags } },
-    select: { id: true, name: true, scope: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    select: { id: true, name: true, scope: true, country: true, facultyTags: true },
+    take: FETCH_LIMIT,
   });
-  if (candidates.length >= 1) return { candidates, relaxed: true };
+  if (candidates.length >= 1) return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: true };
 
   candidates = await prisma.scholarship.findMany({
-    select: { id: true, name: true, scope: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    select: { id: true, name: true, scope: true, country: true, facultyTags: true },
+    take: FETCH_LIMIT,
   });
-  return { candidates, relaxed: true };
+  return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: true };
 }
 
 export async function findCandidateCoursesByFacultyTags(
@@ -100,16 +123,16 @@ export async function findCandidateCoursesByFacultyTags(
   let candidates = await prisma.course.findMany({
     where: { isPublished: true, facultyTags: { hasSome: facultyTags } },
     select: { id: true, title: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    take: FETCH_LIMIT,
   });
-  if (candidates.length >= 1) return { candidates, relaxed: false };
+  if (candidates.length >= 3) return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: false };
 
   candidates = await prisma.course.findMany({
     where: { isPublished: true },
     select: { id: true, title: true, facultyTags: true },
-    take: CANDIDATE_LIMIT,
+    take: FETCH_LIMIT,
   });
-  return { candidates, relaxed: true };
+  return { candidates: shuffleArray(candidates).slice(0, CANDIDATE_LIMIT), relaxed: true };
 }
 
 // Course untuk Chaser difilter longgar lewat kecocokan teks major/jobPreference

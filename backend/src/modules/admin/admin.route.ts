@@ -90,7 +90,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
                 correctAnswer: q.correctAnswer || '',
                 points: q.points || 1,
                 order: q.order || i + 1,
-                type: 'MULTIPLE_CHOICE' as const
+                type: (q as any).type === 'ESSAY' ? 'ESSAY' as const : 'MULTIPLE_CHOICE' as const
               }))
             });
           }
@@ -122,15 +122,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
                   quiz: {
                     include: {
                       questions: {
-                        select: {
-                          id: true,
-                          prompt: true,
-                          options: true,
-                          correctAnswer: true, // Admin can see correctAnswer
-                          points: true,
-                          difficulty: true,
-                          order: true,
-                        }
+                        orderBy: { order: 'asc' }
                       }
                     }
                   }
@@ -150,7 +142,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
     { preHandler: [fastify.authenticate, requireAdmin] },
     async (_request, reply) => {
       const courses = await prisma.course.findMany({
-        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+        orderBy: [{ createdAt: 'desc' }],
         include: { chapters: { include: { sections: true } } }
       });
       const mapped = courses.map((c) => {
@@ -179,15 +171,6 @@ export default async function adminRoutes(fastify: FastifyInstance) {
     async (_request, reply) => {
       const universities = await prisma.university.findMany({
         orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          name: true,
-          location: true,
-          riasecCode: true,
-          accreditation: true,
-          description: true,
-          coverImageUrl: true,
-        },
       });
       const mapped = universities.map((u) => ({
         ...u,
@@ -258,6 +241,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
           deadline: true,
           amount: true,
           scope: true,
+          country: true,
           requirements: true,
           officialUrl: true,
           coverImageUrl: true,
@@ -273,6 +257,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
         deadline: s.deadline ? s.deadline.toISOString() : null,
         coverage: s.amount,    // DB: amount -> frontend: coverage
         scope: s.scope,
+        country: s.country,
         requirements: s.requirements ? s.requirements.split(',').map(r => r.trim()).filter(Boolean) : [],
         url: s.officialUrl ?? '',  // DB: officialUrl -> frontend: url
         coverImage: s.coverImageUrl,

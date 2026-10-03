@@ -1,4 +1,4 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
 import { prisma } from "../../lib/prisma";
 import { submitAssessmentSchema } from "./assessment.schema";
 import {
@@ -7,6 +7,9 @@ import {
   submitDreamerRiasec,
   submitChaserProfile,
 } from "./assessment.service";
+
+import fs from 'fs';
+import path from 'path';
 
 export default async function assessmentRoutes(fastify: FastifyInstance) {
   fastify.post(

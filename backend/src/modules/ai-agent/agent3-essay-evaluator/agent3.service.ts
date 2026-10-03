@@ -15,13 +15,26 @@ Jawab HANYA dengan 1 kata: "LULUS" jika benar/cukup tepat, atau "GAGAL" jika san
       messages: [{ role: "user", content: prompt }],
       model: AGENT_MODEL,
       temperature: 0.1,
-      max_tokens: 10,
+      max_tokens: 32,
     });
-    
-    const aiResponse = completion.choices[0]?.message?.content?.trim().toUpperCase() || "";
-    return aiResponse.includes("LULUS");
+
+    const raw = completion.choices[0]?.message?.content?.trim() || "";
+    const aiResponse = raw.toUpperCase();
+
+    // Tolerant parsing: accept various affirmative tokens or presence of LULUS
+    const passed = aiResponse.includes("LULUS") || aiResponse.startsWith("YA") || aiResponse.startsWith("BENAR") || aiResponse.startsWith("YES") || aiResponse.startsWith("TRUE") || aiResponse.startsWith("OK");
+
+    console.debug('[agent3] evaluateEssay', {
+      promptQuestion: promptQuestion?.slice?.(0,120),
+      expectedAnswer: expectedAnswer?.slice?.(0,120),
+      userAnswer: userAnswer?.slice?.(0,120),
+      rawResponse: raw,
+      passed,
+    });
+
+    return passed;
   } catch (error) {
     console.error("AI Evaluator error:", error);
-    throw new Error("AiEvaluatorError");
+    return false;
   }
 }

@@ -19,10 +19,10 @@ ATURAN MUTLAK -- PELANGGARAN APA PUN DI BAWAH INI AKAN MENYEBABKAN OUTPUT DITOLA
 5. matchScore (0-100) harus benar-benar mencerminkan kecocokan -- JANGAN memberi angka generik yang sama untuk semua kandidat.
 
 LOGIKA SCORING YANG DIHARAPKAN:
-- Kalau preferences.fakultas terisi (user isi manual): cocokkan langsung ke facultyTags kandidat.
+- Kalau preferences.fakultas terisi (user isi manual, bisa string tunggal atau array string): cocokkan langsung ke facultyTags kandidat.
 - Kalau preferences.fakultas null tapi riasecTopCode terisi: gunakan pemetaan tipe RIASEC ke rumpun ilmu sebagai berikut -- Investigative mendekati Sains/Teknik, Social mendekati Ilmu Sosial/Pendidikan, Artistic mendekati Seni/Bahasa, Realistic mendekati Teknik/Vokasi, Enterprising mendekati Bisnis/Manajemen, Conventional mendekati Administrasi/Akuntansi -- lalu nilai facultyTags kandidat terhadap pemetaan ini.
-- countryPreference "dalam_negeri" atau "luar_negeri" mengurangi skor kandidat yang country-nya tidak sesuai, TIDAK mengeliminasi total kecuali benar-benar tidak relevan sama sekali.
-- budgetRange (kalau ada) jadi pertimbangan tambahan buat universitas, bukan filter keras -- backend sudah menyaring kandidat kasar sebelum sampai ke kamu.
+- countryPreference (array of countries) menjadi pertimbangan tambahan: kurangi skor kandidat (universitas maupun beasiswa) yang negaranya tidak sesuai dengan preferensi, tapi JANGAN mengeliminasi total (skor 0) kecuali benar-benar tidak relevan sama sekali.
+- budgetRange (kalau ada) merepresentasikan KEMAMPUAN MAKSIMAL bayar siswa. Siswa dengan budget tinggi BISA dan BOLEH direkomendasikan universitas yang lebih murah jika jurusannya sangat cocok. Jangan hanya mencari universitas mahal untuk siswa budget tinggi.
 - roadmap.tahapan: pilih course yang facultyTags-nya paling relevan ke minat, urutkan dari dasar ke lanjutan.
 
 FORMAT OUTPUT -- WAJIB PERSIS STRUKTUR INI, TANPA FIELD TAMBAHAN ATAU FIELD YANG HILANG:

@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 import { ALL_STUDYFIELDS } from "./riasec.service";
 
 // ── RIASEC Answer ──────────────────────────────────────────────────────
@@ -19,10 +19,13 @@ export const dreamerRiasecPayloadSchema = z.object({
 export const BUDGET_TIERS = ["TERJANGKAU", "MENENGAH", "PREMIUM", "EKSKLUSIF", "FULL_SCHOLARSHIP"] as const;
 
 export const dreamerPreferencePayloadSchema = z.object({
-  // studyfield opsional, diambil dari 21 ISCED list
-  studyfield: z.enum(ALL_STUDYFIELDS as [string, ...string[]]).nullable(),
+  // studyfield opsional, diambil dari 21 ISCED list, bisa tunggal atau array
+  studyfield: z.union([
+    z.enum(ALL_STUDYFIELDS as [string, ...string[]]),
+    z.array(z.enum(ALL_STUDYFIELDS as [string, ...string[]]))
+  ]).nullable(),
   budgetTier: z.enum(BUDGET_TIERS),
-  countryPreference: z.enum(["dalam_negeri", "luar_negeri", "keduanya"]),
+  countryPreference: z.array(z.string()),
 });
 
 export const chaserProfilePayloadSchema = z.object({
