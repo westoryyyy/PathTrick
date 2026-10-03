@@ -49,7 +49,7 @@
 - [Repository Structure](#repository-structure)
 - [Hackathon](#hackathon)
 - [Team](#team)
-- [Contributing](#contributing)
+
 - [License](#license)
 
 ---
@@ -401,24 +401,7 @@ What this submission delivers:
 | **Grace Yoelanda Turnip** | Frontend Engineer |
 | **Nabilah Aprilia Darwin** | Visual & Assets Artist |
 
----
 
-## CONTRIBUTING
-
-Issues and PRs are welcome. Before opening a PR, please run:
-
-```bash
-# Smart contract
-cd smart-contract && forge fmt && forge test
-
-# Frontend
-cd frontend && npm run lint && npm run build
-
-# Backend
-cd backend && npx prisma generate && npm run build
-```
-
----
 
 ## LICENSE
 
