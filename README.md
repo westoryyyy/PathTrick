@@ -21,7 +21,7 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs)](https://nextjs.org)
 [![Fastify 5](https://img.shields.io/badge/Fastify-5-202020?logo=fastify)](https://fastify.dev)
 [![Groq](https://img.shields.io/badge/AI-Groq%20LLM-F55036)](https://groq.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./smart-contract/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 🏆 **Indonesia Web3 Hackathon Submission**
 
@@ -416,6 +416,6 @@ cd backend && npx prisma generate && npm run build
 
 ## LICENSE
 
-[MIT](./smart-contract/LICENSE) © 2026 KETUPAT
+[MIT](./LICENSE) © 2026 KETUPAT
 
 <p align="center"><i>Building the future of verifiable, AI-driven education on BNB Chain.</i></p>
