@@ -128,7 +128,12 @@ export default function DocsPage() {
                 <p className={styles.text} style={{ marginBottom: '24px', textAlign: 'justify' }} dangerouslySetInnerHTML={{ __html: t('docsContent.p_59') }} />
                 <p className={styles.text} style={{ marginBottom: '36px', textAlign: 'justify' }} dangerouslySetInnerHTML={{ __html: t('docsContent.p_60') }} />
                 <div className={styles.callout} style={{ textAlign: 'justify' }}>
-                  <strong>PathTrick adalah jembatan dari “Saya tidak tahu harus mulai dari mana” menjadi “Saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya punya bukti untuk menunjukkannya.”</strong>
+                  <strong>
+                    {locale === 'en'
+                      ? <>\u201cPathTrick is the bridge from \u2018I don\u2019t know where to start\u2019 to \u2018I know my next step, I\u2019ve done it, and I have proof to show for it.\u2019\u201d</>
+                      : <>\u201cPathTrick adalah jembatan dari \u2018Saya tidak tahu harus mulai dari mana\u2019 menjadi \u2018Saya tahu langkah berikutnya, saya sudah mengerjakannya, dan saya punya bukti untuk menunjukkannya.\u2019\u201d</>
+                    }
+                  </strong>
                 </div>
                 <p className={styles.text} style={{ marginTop: '24px', textAlign: 'justify' }}>
                   {locale === 'en' ? (
@@ -232,7 +237,7 @@ export default function DocsPage() {
                     </div>
                     <div>
                       <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3e2723', marginBottom: '8px', lineHeight: '1.4' }}>
-                        Privy (Sang Resepsionis)
+                        {locale === 'en' ? <>Privy (The Receptionist)</> : <>Privy (Sang Resepsionis)</>}
                       </h4>
                       <p className={styles.text} style={{ textAlign: 'justify', fontSize: '1rem', lineHeight: '1.6', margin: 0 }} dangerouslySetInnerHTML={{ __html: t('docsContent.p_66') }} />
                     </div>
@@ -244,7 +249,7 @@ export default function DocsPage() {
                     </div>
                     <div>
                       <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3e2723', marginBottom: '8px', lineHeight: '1.4' }}>
-                        Wallet Provider + Ethers (Sang Kurir Transaksi)
+                        {locale === 'en' ? <>Wallet Provider + Ethers (The Transaction Courier)</> : <>Wallet Provider + Ethers (Sang Kurir Transaksi)</>}
                       </h4>
                       <p className={styles.text} style={{ textAlign: 'justify', fontSize: '1rem', lineHeight: '1.6', margin: 0 }} dangerouslySetInnerHTML={{ __html: t('docsContent.p_67') }} />
                     </div>
@@ -435,13 +440,21 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>1</div>
                     <div className={styles.timelineContent}>
-                      <strong>Membaca Gulungan Teori:</strong> Petualangan di setiap world selalu dimulai dengan mempelajari materi naratif. Kami menggunakan analogi sederhana dunia nyata agar konsep teknis sekalipun mudah dicerna oleh para pemula.
+                      <strong>{locale === 'en' ? <>Reading the Theory Scrolls:</> : <>Membaca Gulungan Teori:</>}</strong>{' '}
+                      {locale === 'en'
+                        ? <>Every adventure in each world begins by studying the narrative material. We use simple real-world analogies so that even technical concepts can be easily digested by beginners.</>
+                        : <>Petualangan di setiap world selalu dimulai dengan mempelajari materi naratif. Kami menggunakan analogi sederhana dunia nyata agar konsep teknis sekalipun mudah dicerna oleh para pemula.</>
+                      }
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>2</div>
                     <div className={styles.timelineContent}>
-                      <strong>Ujian Pemahaman Cepat:</strong> Sebuah kuis singkat akan muncul secara otomatis. Jika tebakan Anda meleset, penjaga world akan ramah mengarahkan Anda kembali ke ruang baca sebelum mengizinkan Anda mencoba lagi.
+                      <strong>{locale === 'en' ? <>Quick Comprehension Test:</> : <>Ujian Pemahaman Cepat:</>}</strong>{' '}
+                      {locale === 'en'
+                        ? <>A short quiz will appear automatically. If you miss a question, the world guardian will kindly guide you back to the reading room before letting you try again.</>
+                        : <>Sebuah kuis singkat akan muncul secara otomatis. Jika tebakan Anda meleset, penjaga world akan ramah mengarahkan Anda kembali ke ruang baca sebelum mengizinkan Anda mencoba lagi.</>
+                      }
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
@@ -453,7 +466,11 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>4</div>
                     <div className={styles.timelineContent}>
-                      <strong>Pertarungan Melawan Boss:</strong> Ini adalah ujian akhir. Mini project Anda akan dievaluasi dengan ketat oleh wasit AI (Agent 3  -  Essay Evaluator). Jika berhasil meraih skor kelulusan, sistem akan langsung menempakan medali abadi (SBT) ke dalam dompet Anda.
+                      <strong>{locale === 'en' ? <>Boss Battle:</> : <>Pertarungan Melawan Boss:</>}</strong>{' '}
+                      {locale === 'en'
+                        ? <>This is the final exam. Your mini project will be strictly evaluated by the AI referee (Agent 3 – Essay Evaluator). If you achieve a passing score, the system will immediately place a permanent medal (SBT) into your wallet.</>
+                        : <>Ini adalah ujian akhir. Mini project Anda akan dievaluasi dengan ketat oleh wasit AI (Agent 3 – Essay Evaluator). Jika berhasil meraih skor kelulusan, sistem akan langsung menempakan medali abadi (SBT) ke dalam dompet Anda.</>
+                      }
                     </div>
                   </div>
                 </div>
@@ -538,7 +555,11 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>2</div>
                     <div className={styles.timelineContent}>
-                      <strong>Mata Elang AI:</strong> AI lalu merapal mantra Named Entity Recognition, menyisir setiap kata untuk menemukan harta karun tersembunyi: dari mulai barisan hard skill, bahasa pemrograman, hingga riwayat panjang magang dan sertifikasi masa lalu.
+                      <strong>{locale === 'en' ? <>AI Eagle Eye:</> : <>Mata Elang AI:</>}</strong>{' '}
+                      {locale === 'en'
+                        ? <>The AI then casts a Named Entity Recognition spell, combing through every word to find hidden treasures: from hard skills and programming languages to a long history of internships and past certifications.</>
+                        : <>AI lalu merapal mantra Named Entity Recognition, menyisir setiap kata untuk menemukan harta karun tersembunyi: dari mulai barisan hard skill, bahasa pemrograman, hingga riwayat panjang magang dan sertifikasi masa lalu.</>
+                      }
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
