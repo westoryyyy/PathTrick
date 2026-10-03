@@ -200,7 +200,7 @@ export default function UniversityHub() {
                         ? (FACULTIES.find(f => f.value === uni.facultyTags![0])?.label || uni.facultyTags[0]) 
                         : 'Program Umum')}
                     </h3>
-                    <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                       {uni.name}
                     </p>
                   </div>
@@ -209,19 +209,26 @@ export default function UniversityHub() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <img src="/Map.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location || uni.country || '-'}</span>
+                    <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.location || uni.country || '-'}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <img src="/Journall.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6', wordBreak: 'break-all' }}>{uni.website ? <a href={uni.website.startsWith('http') ? uni.website : `https://${uni.website}`} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>{uni.website}</a> : (uni.accreditation ? `Akreditasi: ${uni.accreditation}` : 'Website: -')}</span>
+                    <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6', wordBreak: 'break-all' }}>{uni.website ? <a href={uni.website.startsWith('http') ? uni.website : `https://${uni.website}`} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>{uni.website}</a> : (uni.accreditation ? `Akreditasi: ${uni.accreditation}` : 'Website: -')}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '2px' }}>💰</span>
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.estimatedCostMin && uni.estimatedCostMax ? `Rp ${(uni.estimatedCostMin/1000000).toFixed(0)}Jt - ${(uni.estimatedCostMax/1000000).toFixed(0)}Jt / smtr` : 'Estimasi Biaya: -'}</span>
+                    <span style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>{uni.estimatedCostMin && uni.estimatedCostMax ? `Rp ${(uni.estimatedCostMin/1000000).toFixed(0)}Jt - ${(uni.estimatedCostMax/1000000).toFixed(0)}Jt / smtr` : 'Estimasi Biaya: -'}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <img src="/Scroll.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0, marginTop: '4px' }} />
-                    <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.9rem', color: '#d4d4d8', lineHeight: '1.6' }}>Jalur Masuk: {uni.admissionRequirements || '-'}</span>
+                    <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                      <span style={{ fontWeight: 'bold' }}>Jalur Masuk:</span>
+                      <ul style={{ margin: '4px 0 0', paddingLeft: '20px', listStyleType: 'disc' }}>
+                        {(uni.admissionRequirements || '-').split(';').map((req, idx) => (
+                          <li key={idx} style={{ paddingLeft: '4px', marginBottom: '4px' }}>{req.trim()}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -283,7 +290,7 @@ export default function UniversityHub() {
                   <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b', marginBottom: '8px', lineHeight: '1.4' }}>
                     ROADMAP: {selectedUni.facultyTags && selectedUni.facultyTags.length > 0 ? selectedUni.facultyTags[0] : 'Program Umum'}
                   </h2>
-                  <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '1rem', color: '#5a3a29', fontWeight: 'bold' }}>
+                  <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#5a3a29', fontWeight: 'bold', margin: '8px 0 0' }}>
                     {selectedUni.name}
                   </p>
                 </div>
@@ -297,7 +304,7 @@ export default function UniversityHub() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.95rem', color: '#3b261b', lineHeight: '1.6' }}>
+                <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#3b261b', lineHeight: '1.6' }}>
                   Selesaikan urutan modul berikut untuk menguasai kompetensi yang diuji di seleksi masuk {selectedUni.name}.
                 </p>
 
@@ -323,7 +330,7 @@ export default function UniversityHub() {
                         <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', marginBottom: '8px' }}>
                           {item.title}
                         </h4>
-                        <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.85rem', color: '#5a3a29', lineHeight: '1.4', margin: 0, marginTop: '4px' }}>
+                        <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.1rem', color: '#5a3a29', lineHeight: '1.4', margin: 0, marginTop: '4px' }}>
                           {item.desc}
                         </p>
                       </div>
