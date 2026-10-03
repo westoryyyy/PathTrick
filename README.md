@@ -6,6 +6,18 @@ It evaluates skills through an objective AI engine, signs graduation proofs secu
 🏆 **Indonesia Web3 Hackathon Submission**
 ---
 
+## Table of Contents
+- [What Pathtrick Is](#what-pathtrick-is)
+- [Problem & Solution](#problem--solution)
+- [Tech Stack](#tech-stack)
+- [How It Works (Mechanism)](#how-it-works-mechanism)
+- [Backend API & AI Agents](#backend-api--ai-agents)
+- [Quickstart](#quickstart)
+- [On-Chain (BNB Smart Chain Testnet, Chain 97)](#on-chain-bnb-smart-chain-testnet-chain-97)
+- [Team](#team)
+
+---
+
 ## WHAT PATHTRICK IS
 
 Pathtrick is an autonomous career coaching and certification platform built on three commitments:
@@ -35,7 +47,7 @@ We do not just place a certificate on the blockchain; we mathematically guarante
 
 ---
 
-## HOW IT WORKS
+## HOW IT WORKS (MECHANISM)
 
 The platform seamlessly bridges AI evaluation (off-chain) with Smart Contract verification (on-chain) in a completely trustless manner.
 
