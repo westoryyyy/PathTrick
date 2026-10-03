@@ -172,9 +172,9 @@ Everything below is verified on BNB Smart Chain Testnet.
 
 | Name | Role |
 |------|------|
-| **Rotua Paulina** | Smart Contract Engineer and Product Manager |
-| **Renatha Amelia Manggala Putri** | Backend Engineer and AI Engineer |
-| **Grace Yoelanda Turnip** | Frontend Engineer |
 | **Nabilah Aprilia Darwin** | Visual and Assets Artist |
+| **Renatha Amelia Manggala Putri** | Backend Engineer and AI Engineer |
+| **Rotua Paulina** | Smart Contract Engineer and Product Manager |
+| **Grace Yoelanda Turnip** | Frontend Engineer |
 
 *Building the future of verifiable, AI-driven education on BNB Chain.*
