@@ -15,6 +15,7 @@ import { clearAuthToken, getAuthHeaders } from '@/hooks/useAuthSync';
 import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
 import { API_BASE_URL } from '@/config/pathtrick';
+import WalletPanel from '@/components/ui/WalletPanel';
 
 const NAV_KEYS: { href: string; labelKey: string; icon: string; badge?: string }[] = [
   { href: '/dreamer/dashboard', labelKey: 'nav.sma.dashboard', icon: '📊' },
@@ -34,6 +35,8 @@ export default function SMALayout({
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [isWalletAnimating, setIsWalletAnimating] = useState(false);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
   const activeWallet = wallets[0];
@@ -227,6 +230,7 @@ export default function SMALayout({
                   }
                   setIsNotificationsOpen(!isNotificationsOpen); 
                   setIsDropdownOpen(false); 
+                  setIsWalletOpen(false);
                 }}
                 onMouseEnter={playHoverSound}
               >
@@ -273,10 +277,56 @@ export default function SMALayout({
               )}
             </div>
 
+            {/* ─── WALLET BUTTON ─── */}
+            <div style={{ position: 'relative' }}>
+              <div
+                className={`${styles.iconBtn} group`}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  setIsNotificationsOpen(false);
+                  setIsWalletAnimating(true);
+                  setTimeout(() => {
+                    setIsWalletOpen(prev => !prev);
+                    setIsWalletAnimating(false);
+                  }, 150);
+                }}
+                onMouseEnter={playHoverSound}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px', position: 'relative' }}
+              >
+                <Image
+                  src={isWalletAnimating ? (isWalletOpen ? '/Wallet.png' : '/Open Wallet.png') : (isWalletOpen ? '/Open Wallet.png' : '/Wallet.png')}
+                  alt={isWalletOpen ? 'Open Wallet' : 'Wallet'}
+                  width={28}
+                  height={28}
+                  style={{
+                    imageRendering: 'pixelated',
+                    transform: isWalletAnimating ? 'scale(0.6) rotate(-15deg)' : 'scale(1) rotate(0deg)',
+                    transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease',
+                    opacity: isWalletAnimating ? 0 : 1,
+                  }}
+                />
+
+                {/* Custom RPG Tooltip */}
+                <div className="absolute z-[150] top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-max px-3 py-2 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+                  <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a]">
+                    {isWalletOpen ? 'Tutup Wallet' : 'Buka Wallet'}
+                  </p>
+                  <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-[#6a4734]"></div>
+                </div>
+              </div>
+
+              {isWalletOpen && (
+                <WalletPanel
+                  walletAddress={activeWallet?.address}
+                  onClose={() => setIsWalletOpen(false)}
+                />
+              )}
+            </div>
+
             <div style={{ position: 'relative' }}>
               <div
                 className={styles.profileChip}
-                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); }}
+                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); setIsWalletOpen(false); }}
                 onMouseEnter={playHoverSound}
                 style={{ cursor: 'pointer' }}
               >

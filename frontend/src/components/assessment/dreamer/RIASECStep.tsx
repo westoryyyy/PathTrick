@@ -102,19 +102,18 @@ export default function RIASECStep() {
                 );
               })}
 
-              {/* Labels */}
               <span className="font-pixel" style={{
                 position: 'absolute', bottom: '5px', left: '8px',
                 fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                 textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
-              }}>Sangat Tidak Suka</span>
+              }}>Sangat Tidak Setuju</span>
               <span className="font-pixel" style={{
                 position: 'absolute', bottom: '5px', right: '8px',
                 fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                 textShadow: '1px 1px 0 #3b261b',
                 whiteSpace: 'nowrap', pointerEvents: 'none',
-              }}>Sangat Suka</span>
+              }}>Sangat Setuju</span>
             </div>
 
             {/* Score badge */}

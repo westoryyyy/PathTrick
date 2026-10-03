@@ -234,6 +234,7 @@ export default function MahasiswaLayout({
                   }
                   setIsNotificationsOpen(!isNotificationsOpen); 
                   setIsDropdownOpen(false); 
+                  setIsWalletOpen(false);
                 }}
                 onMouseEnter={playHoverSound}
               >
@@ -283,7 +284,7 @@ export default function MahasiswaLayout({
             {/* ─── WALLET BUTTON ─── */}
             <div style={{ position: 'relative' }}>
               <div
-                className={styles.iconBtn}
+                className={`${styles.iconBtn} group`}
                 onClick={() => {
                   setIsDropdownOpen(false);
                   setIsNotificationsOpen(false);
@@ -294,8 +295,7 @@ export default function MahasiswaLayout({
                   }, 150);
                 }}
                 onMouseEnter={playHoverSound}
-                title={isWalletOpen ? 'Tutup Wallet' : 'Buka Wallet'}
-                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px', position: 'relative' }}
               >
                 <Image
                   src={isWalletAnimating ? (isWalletOpen ? '/Wallet.png' : '/Open Wallet.png') : (isWalletOpen ? '/Open Wallet.png' : '/Wallet.png')}
@@ -309,6 +309,14 @@ export default function MahasiswaLayout({
                     opacity: isWalletAnimating ? 0 : 1,
                   }}
                 />
+
+                {/* Custom RPG Tooltip */}
+                <div className="absolute z-[150] top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-max px-3 py-2 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+                  <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a]">
+                    {isWalletOpen ? 'Tutup Wallet' : 'Buka Wallet'}
+                  </p>
+                  <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-[#6a4734]"></div>
+                </div>
               </div>
 
               {isWalletOpen && (
@@ -322,7 +330,7 @@ export default function MahasiswaLayout({
             <div style={{ position: 'relative' }}>
               <div
                 className={styles.profileChip}
-                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); }}
+                onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); setIsWalletOpen(false); }}
                 onMouseEnter={playHoverSound}
                 style={{ cursor: 'pointer' }}
               >
