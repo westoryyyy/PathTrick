@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { audioController } from '@/utils/audio';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -16,8 +17,13 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
-
 export default function MissionFlowPage() {
+  useEffect(() => {
+    audioController.preload('/mission completed.ogg');
+    audioController.preload('/Poin.ogg');
+    audioController.preload('/NyawaBerkurang.ogg');
+    audioController.preload('/LoveAbis.ogg');
+  }, []);
   const { missionId } = useParams();
   const searchParams = useSearchParams();
   const isNotRecommended = searchParams.get('isNotRecommended') === 'true';
@@ -188,11 +194,7 @@ export default function MissionFlowPage() {
     if (onConfirm) onConfirm();
   };
   const handleLevelComplete = async () => {
-    try {
-      const audio = new Audio('/mission completed.ogg');
-      audio.volume = 0.5;
-      audio.play().catch(() => { });
-    } catch (e) { }
+    audioController.play('/mission completed.ogg');
 
     try {
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
@@ -517,29 +519,32 @@ export default function MissionFlowPage() {
         const data = await response.json();
         
         if (response.ok && data.passed) {
+          audioController.play('/Poin.ogg');
           showDialog('success', data.message || 'Luar biasa! Analisis kasusmu sangat tepat sasaran dan telah disetujui oleh Sistem Evaluator. Jawabanmu benar!', () => {
             completeDynamicNode(missionId as string);
             setPhase('CLAIM');
           });
         } else {
           const newHp = playerHp - 1;
-          setPlayerHp(newHp);
-          if (newHp > 0) {
-            if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
-              showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
-              setPlayerHp(playerHp); // Do not reduce HP for system error
-            } else {
+          
+          if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+            showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+            setPlayerHp(playerHp); // Do not reduce HP for system error
+          } else {
+            audioController.play(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+            setPlayerHp(newHp);
+            if (newHp > 0) {
               const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis masih kurang tepat atau kurang lengkap. Coba perbaiki lagi!';
               showDialog('error', `${errorMessage}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+            } else {
+              const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis salah.';
+              showDialog('error', `${errorMessage}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
+                setPlayerHp(3);
+                setPhase('MATERIAL');
+                setMaterialPage(0);
+                resetMissionState();
+              });
             }
-          } else {
-            const errorMessage = data.message || data.error || 'Analisis/Essay yang kamu tulis salah.';
-            showDialog('error', `${errorMessage}\n\nNyawamu habis. Kamu harus mengulang dari awal materi!`, () => {
-              setPlayerHp(3);
-              setPhase('MATERIAL');
-              setMaterialPage(0);
-              resetMissionState();
-            });
           }
         }
       }
@@ -745,11 +750,7 @@ export default function MissionFlowPage() {
                       className={styles.optionBtn}
                       onClick={() => {
                         if (opt.isCorrect) {
-                          try {
-                            const audio = new Audio('/Poin.ogg');
-                            audio.volume = 0.5;
-                            audio.play().catch(() => { });
-                          } catch (e) { }
+                          audioController.play('/Poin.ogg');
                           showDialog('success', opt.feedback, () => {
                             if (quizIndex < quizArray.length - 1) {
                               setQuizIndex(quizIndex + 1);
@@ -760,11 +761,7 @@ export default function MissionFlowPage() {
                           });
                         } else {
                           const newHp = playerHp - 1;
-                          try {
-                            const audio = new Audio(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
-                            audio.volume = 0.5;
-                            audio.play().catch(() => { });
-                          } catch (e) { }
+                          audioController.play(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
                           setPlayerHp(newHp);
                           if (newHp > 0) {
                             showDialog('error', `Tebakanmu meleset!\n${opt.feedback}\nSisa nyawa: ${'♥'.repeat(newHp)}`);
