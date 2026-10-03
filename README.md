@@ -97,10 +97,12 @@ The system utilizes a specialized multi-agent architecture built on Groq API to 
    - **Role:** Assesses students or fresh graduates.
    - **Input:** User's initial onboarding essay/answers.
    - **Output:** Classifies the user into RIASEC types and generates a tailored "Career Path" with beginner-friendly missions.
+
 2. **Agent 2: The Chaser (Skill Evaluator)**
    - **Role:** Assesses professionals or those with existing skill sets.
    - **Input:** User's technical onboarding answers.
    - **Output:** Identifies current skill gaps and generates a specific "Learning Path" focused on upskilling.
+
 3. **Agent 3: The AI Judge (Essay Evaluator)**
    - **Role:** The strict, objective grader for all in-game quests and course exams.
    - **Input:** User's answer to a specific course question + the grading rubric.
