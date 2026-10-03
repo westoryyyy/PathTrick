@@ -345,39 +345,33 @@ export default function DocsPage() {
               </p>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle} dangerouslySetInnerHTML={{ __html: t('docsContent.h3_28') }} />
-                <div className={styles.featureGridTwoCol}>
-                  <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}>
-                      <div className={styles.cardTitle}>{locale === 'en' ? <>AI Skill Gap Analysis</> : <>Analisis Skill Gap AI</>}</div>
-                    </div>
-                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      {locale === 'en' ? <>Their battle started with a CV. Once uploaded, our intelligent AI system will dissect the CV layer by layer, discover the gaps between their current capabilities and the harsh industry standards, and create a precise roadmap to catch up.</> : <>Pertempuran mereka dimulai dengan selembar CV. Begitu diunggah, sistem AI cerdas kita akan membedah CV tersebut lapis demi lapis, menemukan jurang kesenjangan antara kemampuan mereka saat ini dengan kejamnya standar industri, dan menyusun peta jalan presisi untuk mengejar ketertinggalan.</>}
-                    </div>
-                  </div>
-                  <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}>
-                      <div className={styles.cardTitle}>{locale === 'en' ? <>Career Center</> : <>Pusat Karir</>}</div>
-                    </div>
-                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      {locale === 'en' ? <>This is their main command center. A centralized dashboard that proudly displays their Career Score, accurately tracks learning progress on each competency, and displays a sparkling collection of token certificates they've won.</> : <>Ini adalah pusat komando utama mereka. Sebuah dashboard terpusat yang dengan bangga memamerkan Career Score mereka, melacak secara akurat progres belajar pada setiap kompetensi, dan memajang gemerlap koleksi token sertifikat yang telah mereka menangkan.</>}
-                    </div>
-                  </div>
-                  <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}>
-                      <div className={styles.cardTitle}>{locale === 'en' ? <>Learning Mission</> : <>Misi Belajar</>}</div>
-                    </div>
-                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      {locale === 'en' ? <>Leaving the world of fairy tales, they enter a high-level learning mission completely adapted from the syllabus of the real industrial world. Each mission is tactically designed to close skill gaps that have previously been detected by our artificial intelligence.</> : <>Meninggalkan dunia dongeng, mereka memasuki misi belajar tingkat tinggi yang sepenuhnya diadaptasi dari silabus dunia industri sungguhan. Setiap misi dirancang secara taktis untuk menutup celah gap skill yang sebelumnya telah diendus oleh kecerdasan buatan kita.</>}
-                    </div>
-                  </div>
-                  <div className={styles.featureCard}>
-                    <div className={styles.cardHeader}>
-                      <div className={styles.cardTitle}>{locale === 'en' ? <>Skill Badges</> : <>Lencana Skill</>}</div>
-                    </div>
-                    <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      {locale === 'en' ? <>This is the adventurer's proud gallery space. A place to display Skill Badges and valuable certificates that have been achieved. These achievements can at any time be shared as a public link to recruiters to prove directly over the blockchain network that their abilities are real.</> : <>Inilah ruang galeri kebanggaan sang petualang. Sebuah tempat memajang Skill Badges dan sertifikat berharga yang telah diraih. Pencapaian ini kapan saja bisa dibagikan sebagai tautan publik kepada rekruter untuk membuktikan langsung di atas jaringan blockchain bahwa kemampuan mereka adalah nyata.</>}
-                    </div>
-                  </div>
+                <div className={styles.tableScroll}>
+                  <table className={styles.techTable}>
+                    <thead>
+                      <tr>
+                        <th>{locale === 'en' ? 'Feature' : 'Fitur'}</th>
+                        <th>{locale === 'en' ? 'Description' : 'Deskripsi'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ whiteSpace: 'nowrap' }}><strong>{locale === 'en' ? <>AI Skill Gap Analysis</> : <>Analisis Skill Gap AI</>}</strong></td>
+                        <td style={{ textAlign: 'justify' }}>{locale === 'en' ? <>Their battle started with a CV. Once uploaded, our intelligent AI system will dissect the CV layer by layer, discover the gaps between their current capabilities and the harsh industry standards, and create a precise roadmap to catch up.</> : <>Pertempuran mereka dimulai dengan selembar CV. Begitu diunggah, sistem AI cerdas kita akan membedah CV tersebut lapis demi lapis, menemukan jurang kesenjangan antara kemampuan mereka saat ini dengan kejamnya standar industri, dan menyusun peta jalan presisi untuk mengejar ketertinggalan.</>}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ whiteSpace: 'nowrap' }}><strong>{locale === 'en' ? <>Career Center</> : <>Pusat Karir</>}</strong></td>
+                        <td style={{ textAlign: 'justify' }}>{locale === 'en' ? <>This is their main command center. A centralized dashboard that proudly displays their Career Score, accurately tracks learning progress on each competency, and displays a sparkling collection of token certificates they've won.</> : <>Ini adalah pusat komando utama mereka. Sebuah dashboard terpusat yang dengan bangga memamerkan Career Score mereka, melacak secara akurat progres belajar pada setiap kompetensi, dan memajang gemerlap koleksi token sertifikat yang telah mereka menangkan.</>}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ whiteSpace: 'nowrap' }}><strong>{locale === 'en' ? <>Learning Mission</> : <>Misi Belajar</>}</strong></td>
+                        <td style={{ textAlign: 'justify' }}>{locale === 'en' ? <>Leaving the world of fairy tales, they enter a high-level learning mission completely adapted from the syllabus of the real industrial world. Each mission is tactically designed to close skill gaps that have previously been detected by our artificial intelligence.</> : <>Meninggalkan dunia dongeng, mereka memasuki misi belajar tingkat tinggi yang sepenuhnya diadaptasi dari silabus dunia industri sungguhan. Setiap misi dirancang secara taktis untuk menutup celah gap skill yang sebelumnya telah diendus oleh kecerdasan buatan kita.</>}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ whiteSpace: 'nowrap' }}><strong>{locale === 'en' ? <>Skill Badges</> : <>Lencana Skill</>}</strong></td>
+                        <td style={{ textAlign: 'justify' }}>{locale === 'en' ? <>This is the adventurer's proud gallery space. A place to display Skill Badges and valuable certificates that have been achieved. These achievements can at any time be shared as a public link to recruiters to prove directly over the blockchain network that their abilities are real.</> : <>Inilah ruang galeri kebanggaan sang petualang. Sebuah tempat memajang Skill Badges dan sertifikat berharga yang telah diraih. Pencapaian ini kapan saja bisa dibagikan sebagai tautan publik kepada rekruter untuk membuktikan langsung di atas jaringan blockchain bahwa kemampuan mereka adalah nyata.</>}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </section>
             </>
