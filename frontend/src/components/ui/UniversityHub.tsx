@@ -224,9 +224,14 @@ export default function UniversityHub() {
                     <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                       <span style={{ fontWeight: 'bold' }}>Jalur Masuk:</span>
                       <ul style={{ margin: '4px 0 0', paddingLeft: '20px', listStyleType: 'disc' }}>
-                        {(uni.admissionRequirements || '-').split(';').map((req, idx) => (
+                        {(uni.admissionRequirements || '-').split(';').slice(0, 1).map((req, idx) => (
                           <li key={idx} style={{ paddingLeft: '4px', marginBottom: '4px' }}>{req.trim()}</li>
                         ))}
+                        {(uni.admissionRequirements || '-').split(';').length > 1 && (
+                          <li style={{ paddingLeft: '4px', marginBottom: '4px', fontStyle: 'italic', color: '#a1a1aa', listStyleType: 'none', marginLeft: '-20px' }}>
+                            + {(uni.admissionRequirements || '-').split(';').length - 1} detail lainnya...
+                          </li>
+                        )}
                       </ul>
                     </div>
                   </div>
