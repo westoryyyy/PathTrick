@@ -17,7 +17,7 @@ import rolesRoutes from "./modules/roles/roles.route";
 import certificatesRoutes from "./modules/gamification/certificates.route";
 import notificationsRoutes from "./modules/notifications/notifications.route";
 import questsRoutes from "./modules/quests/quests.route";
-
+import cvRoutes from "./modules/cv/cv.route";
 export function buildApp() {
   const app = Fastify({
     bodyLimit: 20 * 1024 * 1024, // 20MB limit
@@ -55,7 +55,7 @@ export function buildApp() {
   app.register(certificatesRoutes);
   app.register(notificationsRoutes);
   app.register(questsRoutes);
-
+  app.register(cvRoutes);
   app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 
   return app;

@@ -48,9 +48,18 @@ export default async function usersRoutes(fastify: FastifyInstance) {
 
       try {
         const { userId } = request.user;
+        const data = { ...parsed.data };
+        if (data.walletAddress) {
+          const owner = await prisma.user.findUnique({
+            where: { walletAddress: data.walletAddress },
+            select: { id: true },
+          });
+          // Wallet sudah dipakai akun lain (mis. akun Dreamer) -> jangan update wallet
+          if (owner && owner.id !== userId) delete data.walletAddress;
+        }
         const updated = await prisma.user.update({
           where: { id: userId },
-          data: parsed.data,
+          data,
         });
         return reply.code(200).send(updated);
       } catch (err: unknown) {

@@ -407,6 +407,7 @@ model Course {
   // Frontend fallback ke template default kalau tidak diisi.
   mapBackgroundUrl String?
   facultyTags      String[] // relevansi ke fakultas (Dreamer)
+  skillTags        String[] @default([])
   // contentType: "material" | "lab" | "project" â€” sesuai Stage.contentType di frontend
   contentType      String   @default("material")
   level            String? // "beginner" | "intermediate" | "advanced"
