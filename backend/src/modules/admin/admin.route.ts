@@ -140,14 +140,46 @@ export default async function adminRoutes(fastify: FastifyInstance) {
   fastify.get(
     "/api/admin/courses",
     { preHandler: [fastify.authenticate, requireAdmin] },
-    async (_request, reply) => {
+    async (request, reply) => {
+      // audience=dreamer -> course dengan House; audience=chaser (Skills) -> tanpa House
+      const { audience, limit, page } = request.query as { audience?: string; limit?: string; page?: string };
+      const where =
+        audience === 'chaser' ? { houseId: null } :
+        audience === 'dreamer' ? { houseId: { not: null } } : {};
+
+      // Pagination params (default limit to 50)
+      const take = Math.min(parseInt(limit || '50', 10) || 50, 200);
+      const pageNum = Math.max(parseInt(page || '1', 10) || 1, 1);
+      const skip = (pageNum - 1) * take;
+
+      // Use _count on chapters -> sections to avoid loading all section rows.
       const courses = await prisma.course.findMany({
+        where,
         orderBy: [{ createdAt: 'desc' }],
-        include: { chapters: { include: { sections: true } } }
+        take,
+        skip,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          isPublished: true,
+          isFallback: true,
+          facultyTags: true,
+          skillTags: true,
+          houseId: true,
+          order: true,
+          chapters: {
+            select: {
+              _count: { select: { sections: true } }
+            }
+          }
+        }
       });
+
       const mapped = courses.map((c) => {
+        // Sum section counts across chapters without loading section rows
         let sectionCount = 0;
-        c.chapters.forEach(ch => sectionCount += ch.sections.length);
+        (c.chapters || []).forEach((ch: any) => { sectionCount += ch._count?.sections || 0; });
         return {
           id: c.id,
           title: c.title,
@@ -156,11 +188,15 @@ export default async function adminRoutes(fastify: FastifyInstance) {
           isFallback: c.isFallback,
           sections: sectionCount,
           facultyTags: c.facultyTags,
+          skillTags: (c as any).skillTags ?? [],
           houseId: c.houseId || '',
           order: (c as any).order ?? 0 // casting to any to bypass TS error if prisma client is stale
         };
       });
-      return reply.send(mapped);
+
+      // Also return pagination meta
+      const total = await prisma.course.count({ where });
+      return reply.send({ data: mapped, meta: { total, page: pageNum, limit: take } });
     }
   );
 

@@ -7,10 +7,66 @@ import { evaluateEssay } from "../ai-agent/agent3-essay-evaluator/agent3.service
 // -----------------------------------------------------------------------
 
 /**
+ * Chaser: modul = Skills yang dibuat admin (Course tanpa House, published).
+ * Alasan rekomendasi diambil dari roadmap aktif bila course tsb ada di sana.
+ */
+async function getSkillModulesForChaser(userId: string) {
+  const [roadmap, skills] = await Promise.all([
+    prisma.roadmap.findFirst({
+      where: { userId, status: "ACTIVE" },
+      include: { courses: true },
+    }),
+    prisma.course.findMany({
+      where: { isPublished: true, houseId: null },
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      select: {
+        id: true,
+        onChainId: true,
+        title: true,
+        description: true,
+        coverImageUrl: true,
+        level: true,
+        facultyTags: true,
+        skillTags: true,
+        houseId: true,
+        skills: { select: { id: true, name: true, coverImageUrl: true } },
+        chapters: { orderBy: { order: "asc" }, select: { id: true, order: true, _count: { select: { sections: true } } } },
+      },
+    }),
+  ]);
+
+  const reasonMap = new Map((roadmap?.courses ?? []).map((rc) => [rc.courseId, rc.reasonRecommended]));
+  const progressList = await prisma.courseProgress.findMany({
+    where: { userId, courseId: { in: skills.map((s) => s.id) } },
+    select: { courseId: true, status: true, currentChapterOrder: true, currentSectionOrder: true, finalScore: true },
+  });
+  const progressMap = new Map(progressList.map((p) => [p.courseId, p]));
+
+  return {
+    roadmapId: roadmap?.id ?? null,
+    courses: skills.map((c, idx) => ({
+      order: idx + 1,
+      reasonRecommended: reasonMap.get(c.id) ?? null,
+      ...c,
+      sectionCount: c.chapters.reduce((sum, ch) => sum + ch._count.sections, 0),
+      progress: progressMap.get(c.id) ?? {
+        status: "NOT_STARTED",
+        currentChapterOrder: 1,
+        currentSectionOrder: 1,
+        finalScore: null,
+      },
+    })),
+  };
+}
+
+/**
  * Ambil daftar course dari roadmap aktif user.
  * Diurutkan berdasar `order` di RoadmapCourse.
  */
 export async function getCoursesForUser(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: { select: { name: true } } } });
+  if (user?.role?.name === "CHASER") return getSkillModulesForChaser(userId);
+
   // Cari roadmap aktif
   const roadmap = await prisma.roadmap.findFirst({
     where: { userId, status: "ACTIVE" },
@@ -132,8 +188,8 @@ export async function getCourseDetail(courseId: string, userId: string) {
       const isLocked =
         chapter.order > progress!.currentChapterOrder ||
         (chapter.order === progress!.currentChapterOrder && section.order > progress!.currentSectionOrder);
-        
-      const isCompleted = progress!.status === "COMPLETED" || 
+
+      const isCompleted = progress!.status === "COMPLETED" ||
         chapter.order < progress!.currentChapterOrder ||
         (chapter.order === progress!.currentChapterOrder && section.order < progress!.currentSectionOrder);
 
@@ -251,7 +307,7 @@ export async function submitQuiz(params: {
       }
       isCorrect = selectedAnswer !== undefined && selectedAnswer === expectedCorrect;
     } else if (question.type === 'ESSAY') {
-      const correctAnswerObj = question.correctAnswer as { text: string; keywords: string[] } | null;
+      const correctAnswerObj = question.correctAnswer as { text?: string; keywords?: string[]; minKeywordMatches?: number; minKeywordPercent?: number } | null;
       const keywords = correctAnswerObj?.keywords || [];
       const rawUserText = (selectedAnswer || "").toString();
 
@@ -266,7 +322,7 @@ export async function submitQuiz(params: {
       const userText = normalize(rawUserText);
       const userTokens = new Set(userText.split(' ').filter(Boolean));
 
-      // Tahap 1: Cek Lokal dengan Keyword (Minimal 50% keywords terpenuhi)
+      // Tahap 1: Cek Lokal dengan Keyword (gabungan absolute OR percent)
       let keywordScore = 0;
       const matchedKeywords: string[] = [];
       for (const kw of keywords) {
@@ -289,7 +345,10 @@ export async function submitQuiz(params: {
         }
       }
 
-      const threshold = keywords.length > 0 ? Math.ceil(keywords.length * 0.5) : 0;
+      const minAbsolute = typeof correctAnswerObj?.minKeywordMatches === 'number' ? correctAnswerObj!.minKeywordMatches! : 3;
+      const minPercent = typeof correctAnswerObj?.minKeywordPercent === 'number' ? correctAnswerObj!.minKeywordPercent! : 0.5;
+      const requiredByPercent = keywords.length > 0 ? Math.ceil(keywords.length * minPercent) : 0;
+
       // Debug logging to help investigate keyword vs sentence mismatch
       console.debug('[essay-eval] quiz check', {
         userId: params.userId,
@@ -297,12 +356,15 @@ export async function submitQuiz(params: {
         keywords,
         matchedKeywords,
         keywordScore,
-        threshold,
-        selectedAnswer: typeof selectedAnswer === 'string' ? (selectedAnswer.length > 200 ? selectedAnswer.slice(0,200)+'...' : selectedAnswer) : selectedAnswer,
+        minAbsolute,
+        minPercent,
+        requiredByPercent,
+        selectedAnswer: typeof selectedAnswer === 'string' ? (selectedAnswer.length > 200 ? selectedAnswer.slice(0, 200) + '...' : selectedAnswer) : selectedAnswer,
         normalizedAnswer: userText,
       });
+      const passByKeywords = keywords.length > 0 && (keywordScore >= minAbsolute || keywordScore >= requiredByPercent);
 
-      if (keywords.length > 0 && keywordScore >= threshold) {
+      if (passByKeywords) {
         isCorrect = true; // Lulus murni lokal!
       } else if (selectedAnswer && typeof selectedAnswer === 'string' && selectedAnswer.length > 10) {
         // Tahap 2: Jika Keyword gagal (mungkin user pakai sinonim), kita panggil AI Evaluator
@@ -363,7 +425,7 @@ export async function submitQuiz(params: {
     });
 
     // Cek apakah section ini sudah diselesaikan sebelumnya
-    const isAlreadyCompleted = 
+    const isAlreadyCompleted =
       progress!.status === "COMPLETED" ||
       progress!.currentChapterOrder > section.courseChapter.order ||
       (progress!.currentChapterOrder === section.courseChapter.order && progress!.currentSectionOrder > section.order);
@@ -539,15 +601,15 @@ export async function submitProject(params: {
   let passed = false;
   let message = '';
   const userText = (params.code || "").toLowerCase();
-  
+
   const expectedKeywords = (section.expectedKeywords as string[]) || [];
   let keywordScore = 0;
   for (const kw of expectedKeywords) {
     if (userText.includes(kw.toLowerCase())) keywordScore++;
   }
-  
+
   const threshold = expectedKeywords.length > 0 ? Math.ceil(expectedKeywords.length * 0.5) : 0;
-  
+
   if (!userText.trim()) {
     passed = false;
     message = 'Jawaban tidak boleh kosong. Silakan tuliskan analisamu!';
@@ -585,7 +647,7 @@ export async function submitProject(params: {
       });
 
       const isLastSectionInChapter = section.order >= sectionsInChapter;
-      
+
       // Update progress if this was the current active section
       if (progress.currentChapterOrder === section.courseChapter.order && progress.currentSectionOrder === section.order) {
         if (isLastSectionInChapter) {
@@ -676,17 +738,17 @@ export async function getRoadmapNodes(userId: string) {
   const progressMap = new Map(progressList.map(p => [p.courseId, p]));
 
   const nodes: any[] = [];
-  
+
   for (const rc of roadmap.courses) {
     const course = rc.course;
     const progress = progressMap.get(course.id) || { currentChapterOrder: 1, currentSectionOrder: 1, status: 'NOT_STARTED' };
-    
+
     for (const chapter of course.chapters) {
       for (const section of chapter.sections) {
-        const isLocked = chapter.order > progress.currentChapterOrder || 
+        const isLocked = chapter.order > progress.currentChapterOrder ||
           (chapter.order === progress.currentChapterOrder && section.order > progress.currentSectionOrder);
-        
-        const isCompleted = chapter.order < progress.currentChapterOrder || 
+
+        const isCompleted = chapter.order < progress.currentChapterOrder ||
           (chapter.order === progress.currentChapterOrder && section.order < progress.currentSectionOrder) || progress.status === 'COMPLETED';
 
         nodes.push({
@@ -723,7 +785,7 @@ export async function getMissionBySectionSlug(missionId: string, userId: string)
 
   // We can reuse getCourseDetail to get the properly formatted structure
   const courseData = await getCourseDetail(section.courseChapter.courseId, userId);
-  
+
   if (!courseData) return null;
 
   // Find the specific chapter and section from the formatted data to inherit its 'locked' status
@@ -831,7 +893,7 @@ export async function completeSection(params: { userId: string; courseId: string
 
   await prisma.$transaction(async (tx) => {
     // Cek apakah section ini sudah diselesaikan sebelumnya
-    const isAlreadyCompleted = 
+    const isAlreadyCompleted =
       progress!.status === "COMPLETED" ||
       progress!.currentChapterOrder > section.courseChapter.order ||
       (progress!.currentChapterOrder === section.courseChapter.order && progress!.currentSectionOrder > section.order);

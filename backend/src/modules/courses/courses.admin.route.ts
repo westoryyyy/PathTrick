@@ -17,6 +17,7 @@ export default async function adminCoursesRoutes(fastify: FastifyInstance) {
     mapBackgroundUrl: z.string().optional(),
     houseId: z.string().nullable().optional(),
     facultyTags: z.array(z.string()).default([]),
+    skillTags: z.array(z.string().trim().min(1)).default([]),
     contentType: z.string().default("material"),
     level: z.string().optional(),
     isPublished: z.boolean().default(true),
@@ -32,7 +33,15 @@ export default async function adminCoursesRoutes(fastify: FastifyInstance) {
       if (!parsedBody.success) {
         return reply.code(400).send({ error: "ValidationError", details: parsedBody.error.flatten() });
       }
-      const data = await prisma.course.create({ data: parsedBody.data });
+      const body = parsedBody.data;
+      // Skill path Chaser (tanpa House) = 1 BAB langsung ke map 6 level,
+      // jadi otomatis buatkan BAB tunggalnya supaya admin tinggal isi level.
+      const data = await prisma.course.create({
+        data: {
+          ...body,
+          ...(body.houseId ? {} : { chapters: { create: { title: body.title, order: 1 } } }),
+        },
+      });
       return reply.code(201).send(data);
     }
   );
