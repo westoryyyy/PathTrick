@@ -41,7 +41,7 @@ import LevelUpModal from '@/components/ui/LevelUpModal';
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${pressStart2P.variable} ${inter.variable} ${pixelifySans.variable} ${vt323.variable}`} suppressHydrationWarning>
-      <head>
+      <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
         <Script
           id="block-bis-skin-checked"
           strategy="beforeInteractive"
@@ -57,8 +57,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             `
           }}
         />
-      </head>
-      <body style={{ fontFamily: "var(--font-inter), sans-serif" }} suppressHydrationWarning>
         <GlobalAudio />
         <LevelUpModal />
         <Providers>{children}</Providers>

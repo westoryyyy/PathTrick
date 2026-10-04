@@ -4,6 +4,7 @@ import styles from '@/components/ui/Dashboard.module.css';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Scholarship {
   id: string;
@@ -19,12 +20,12 @@ interface Scholarship {
 }
 
 /** Format backend ISO date → readable "15 Okt 2026" */
-function fmtDeadline(iso: string | null | undefined): string {
+function fmtDeadline(iso: string | null | undefined, locale = 'id'): string {
   if (!iso) return '-';
   try {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString(locale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
   } catch { return iso; }
 }
 
@@ -72,6 +73,7 @@ const MOCK_SCHOLARSHIPS: Scholarship[] = [
 ];
 
 export default function ScholarshipHub() {
+  const { t, locale } = useTranslation();
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
@@ -108,10 +110,10 @@ export default function ScholarshipHub() {
       {/* Header */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          SCHOLARSHIP HUB
+          {t('sma.scholarshipHub.title')}
         </h2>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '900px' }}>
-          Berdasarkan profil RIASEC dan misi yang telah kamu selesaikan, AI kami telah menemukan peluang beasiswa terbaik untuk perjalanan kuliahmu.
+          {t('sma.scholarshipHub.subtitle')}
         </p>
       </div>
 
@@ -134,7 +136,7 @@ export default function ScholarshipHub() {
                     fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
                     whiteSpace: 'nowrap', position: 'relative', zIndex: 2
                   }}>
-                    {scholarship.matchScore}% MATCH
+                    {scholarship.matchScore}{t('sma.scholarshipHub.match')}
                   </div>
                   <div style={{
                     position: 'absolute', top: '100%', right: '0', width: 0, height: 0,
@@ -222,7 +224,7 @@ export default function ScholarshipHub() {
                 }}
                 onClick={() => setSelectedScholarship(scholarship)}
               >
-                VIEW DETAILS
+                {t('sma.scholarshipHub.viewDetails')}
               </button>
             </div>
           ))}
@@ -234,7 +236,7 @@ export default function ScholarshipHub() {
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label={`${selectedScholarship.name} details`}
+            aria-label={`${selectedScholarship.name} ${t('sma.scholarshipHub.detailsLabel')}`}
             onClick={() => setSelectedScholarship(null)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -280,7 +282,7 @@ export default function ScholarshipHub() {
                 <button
                   type="button"
                   onClick={() => setSelectedScholarship(null)}
-                  aria-label="Close scholarship details"
+                  aria-label={t('sma.scholarshipHub.closeDetails')}
                   style={{ background: '#b91c1c', border: '3px solid #450a0a', color: '#fff', padding: '8px 12px', fontFamily: '"Press Start 2P"', cursor: 'pointer', boxShadow: '3px 3px 0 #3b261b' }}
                 >
                   X
@@ -290,12 +292,12 @@ export default function ScholarshipHub() {
                 {selectedScholarship.coverage && (
                   <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                    <span>COVERAGE: {selectedScholarship.coverage}</span>
+                    <span>{t('sma.scholarshipHub.coverage')}: {selectedScholarship.coverage}</span>
                   </div>
                 )}
                 <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <img src="/Hourglass.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />
-                  <span>DEADLINE: {fmtDeadline(selectedScholarship.deadline)}</span>
+                  <span>{t('sma.scholarshipHub.deadlineUpper')}: {fmtDeadline(selectedScholarship.deadline, locale)}</span>
                 </div>
                 {parseReqs(selectedScholarship.requirements).length > 0 && (
                   <div style={{ padding: '14px', background: 'rgba(255,255,255,0.22)', border: '2px solid #8c5d41', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
@@ -334,7 +336,7 @@ export default function ScholarshipHub() {
                     textDecoration: 'none',
                   }}
                 >
-                  OPEN OFFICIAL QUEST ↗
+                  {t('sma.scholarshipHub.openOfficial')}
                 </a>
               ) : (
                 <div style={{
@@ -347,7 +349,7 @@ export default function ScholarshipHub() {
                   fontSize: '1.1rem',
                   color: '#5a3a29',
                 }}>
-                  Link pendaftaran belum tersedia
+                  {t('sma.scholarshipHub.noLink')}
                 </div>
               )}
             </motion.div>

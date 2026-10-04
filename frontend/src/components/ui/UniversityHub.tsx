@@ -4,6 +4,7 @@ import styles from '@/components/ui/Dashboard.module.css';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface University {
   id: string;
@@ -82,6 +83,7 @@ const MOCK_UNIVERSITIES: University[] = [
 ];
 
 export default function UniversityHub() {
+  const { t } = useTranslation();
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUni, setSelectedUni] = useState<University | null>(null);
@@ -151,10 +153,10 @@ export default function UniversityHub() {
       {/* Header */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          UNIVERSITY HUB
+          {t('sma.universityHub.title')}
         </h2>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '900px' }}>
-          Berdasarkan profil RIASEC (Investigative/Realistic) dan minat teknologimu, AI kami merekomendasikan program-program universitas terbaik ini.
+          {t('sma.universityHub.subtitle')}
         </p>
       </div>
 
@@ -177,7 +179,7 @@ export default function UniversityHub() {
                     fontSize: '0.65rem', fontFamily: '"Press Start 2P"', padding: '8px 12px', textAlign: 'center', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', 
                     whiteSpace: 'nowrap', position: 'relative', zIndex: 2 
                   }}>
-                    {uni.matchScore}% MATCH
+                    {uni.matchScore}{t('sma.universityHub.match')}
                   </div>
                   {/* 3D Fold under the right ribbon */}
                   <div style={{ 
@@ -198,7 +200,7 @@ export default function UniversityHub() {
                     <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b', margin: 0 }}>
                       {uni.title || (uni.facultyTags && uni.facultyTags.length > 0 
                         ? (FACULTIES.find(f => f.value === uni.facultyTags![0])?.label || uni.facultyTags[0]) 
-                        : 'Program Umum')}
+                        : t('sma.universityHub.generalProgram'))}
                     </h3>
                     <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.15rem', color: '#e4e4e7', lineHeight: '1.6', margin: 0 }}>
                       {uni.name}
@@ -264,7 +266,7 @@ export default function UniversityHub() {
                 onMouseEnter={playHoverSound}
                 onClick={() => setSelectedUni(uni)}
               >
-                VIEW ROADMAP
+                {t('sma.universityHub.viewRoadmap')}
               </button>
             </div>
           ))}
@@ -293,7 +295,7 @@ export default function UniversityHub() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px', marginBottom: '24px' }}>
                 <div>
                   <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b', marginBottom: '8px', lineHeight: '1.4' }}>
-                    ROADMAP: {selectedUni.facultyTags && selectedUni.facultyTags.length > 0 ? selectedUni.facultyTags[0] : 'Program Umum'}
+                    {t('sma.universityHub.roadmap')}: {selectedUni.facultyTags && selectedUni.facultyTags.length > 0 ? selectedUni.facultyTags[0] : t('sma.universityHub.generalProgram')}
                   </h2>
                   <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#5a3a29', fontWeight: 'bold', margin: '8px 0 0' }}>
                     {selectedUni.name}
@@ -315,10 +317,10 @@ export default function UniversityHub() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {[
-                    { step: 1, title: 'Matematika Dasar & Logika', desc: 'Selesaikan House of Algorithms (3 Modul)', done: true },
-                    { step: 2, title: 'Pemrograman Fundamental', desc: 'Selesaikan House of Tech (3 Modul)', done: false },
-                    { step: 3, title: 'Portofolio Akhir', desc: 'Kerjakan AI-Graded Project', done: false },
-                    { step: 4, title: 'Tryout Mandiri SIMAK/UTUL', desc: 'Simulasi ujian tulis', done: false }
+                    { step: 1, title: t('sma.universityHub.step1Title'), desc: t('sma.universityHub.step1Desc'), done: true },
+                    { step: 2, title: t('sma.universityHub.step2Title'), desc: t('sma.universityHub.step2Desc'), done: false },
+                    { step: 3, title: t('sma.universityHub.step3Title'), desc: t('sma.universityHub.step3Desc'), done: false },
+                    { step: 4, title: t('sma.universityHub.step4Title'), desc: t('sma.universityHub.step4Desc'), done: false }
                   ].map((item, idx) => (
                     <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                       <div style={{ 
@@ -348,7 +350,7 @@ export default function UniversityHub() {
                   onMouseEnter={playHoverSound}
                   style={{ background: '#10b981', border: '2px solid #064e3b', color: '#fff', padding: '16px', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '4px 4px 0 #064e3b', marginTop: '16px' }}
                 >
-                  LANJUTKAN BELAJAR
+                  {t('sma.universityHub.continueLearning')}
                 </button>
               </div>
             </motion.div>

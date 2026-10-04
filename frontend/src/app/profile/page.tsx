@@ -12,7 +12,7 @@ import styles from './page.module.css';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, linkWallet } = usePrivy();
+  const { user } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, avatarUrl, setProfile, setAvatar } = useUserStore();
   const role = useOnboardingStore((s) => s.selectedRole);
@@ -26,19 +26,7 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
-  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
   const avatarOptions = ['/char_dreamer.png', '/char_chaser.png', '/char_scholar.png', '/Main Character.png'];
-
-  const handleConnectWallet = async () => {
-    try {
-      setIsConnectingWallet(true);
-      await linkWallet();
-    } catch (error) {
-      console.error('[Profile] Wallet connect error:', error);
-    } finally {
-      setIsConnectingWallet(false);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +47,15 @@ export default function ProfilePage() {
         body: JSON.stringify(body),
       });
 
-      const data = await res.json().catch(() => ({}));
-      console.log('[Profile] API response:', res.status, data);
+      const rawText = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(rawText); } catch(e) {}
+      
+      console.log('[Profile] API response:', res.status, rawText);
 
       if (!res.ok) {
-        console.error('[Profile] Failed to save:', data);
+        console.error('[Profile] Failed to save:', rawText, data);
+        alert(`Failed to save profile (HTTP ${res.status}):\n${data.message || data.error || rawText}`);
       } else {
         setProfile(name.trim(), privyEmail);
         setIsSaved(true);
@@ -157,21 +149,6 @@ export default function ProfilePage() {
                 disabled
                 style={{ opacity: 0.7, cursor: 'not-allowed', flex: 1 }}
               />
-              {!wallets[0]?.address && (
-                <button
-                  type="button"
-                  className={styles.changeAvatarBtn}
-                  onClick={handleConnectWallet}
-                  disabled={isConnectingWallet}
-                  style={{
-                    minWidth: '160px',
-                    opacity: isConnectingWallet ? 0.7 : 1,
-                    cursor: isConnectingWallet ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
-                </button>
-              )}
             </div>
           </div>
 
@@ -194,13 +171,6 @@ export default function ProfilePage() {
             {isSaving ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE CHANGES'}
           </button>
 
-          <button 
-            type="button" 
-            className={styles.connectWalletBtn}
-            disabled={isConnectingWallet}
-          >
-            {isConnectingWallet ? 'CONNECTING...' : 'CONNECT WALLET'}
-          </button>
         </form>
       </div>
     </div>

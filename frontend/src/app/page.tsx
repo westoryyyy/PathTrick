@@ -195,7 +195,7 @@ export default function LandingPage() {
                     width={120}
                     height={36}
                     unoptimized
-                    style={{ objectFit: 'contain', imageRendering: 'pixelated', opacity: (!ready || isSyncing) ? 0.7 : 1 }}
+                    style={{ width: 120, height: 36, objectFit: 'contain', imageRendering: 'pixelated', opacity: (!ready || isSyncing) ? 0.7 : 1 }}
                   />
                 ) : (
                   <Image
@@ -204,7 +204,7 @@ export default function LandingPage() {
                     width={120}
                     height={36}
                     unoptimized
-                    style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+                    style={{ width: 120, height: 36, objectFit: 'contain', imageRendering: 'pixelated' }}
                   />
                 )}
               </button>
@@ -229,12 +229,13 @@ export default function LandingPage() {
             alt="Discover Your Path, Build Your Future"
             width={700}
             height={320}
+            priority
             unoptimized
             className={styles.heroTitleFloat}
-            style={{ objectFit: 'contain', imageRendering: 'pixelated', maxWidth: '100%', display: 'block', marginTop: '48px' }}
+            style={{ width: 700, height: 320, objectFit: 'contain', imageRendering: 'pixelated', maxWidth: '100%', display: 'block', marginTop: '48px' }}
           />
           <button onClick={handleStart} className={styles.ctaImgBtn} id="hero-start-btn" style={{ marginTop: '30px', marginLeft: '-60px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            <Image src="/StartLearn.png" alt="Start Learning" width={260} height={78} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
+            <Image src="/StartLearn.png" alt="Start Learning" width={260} height={78} style={{ width: 260, height: 78, objectFit: 'contain', imageRendering: 'pixelated' }} />
           </button>
         </div>
 
@@ -273,7 +274,7 @@ export default function LandingPage() {
               return (
                 <div key={i} className={`${styles.courseCard} ${!hasText ? styles.courseCardNoText : ''}`} id={`course-${i}`}>
                   <div className={hasText ? styles.courseCardImg : styles.courseCardImgNoText}>
-                    <Image src={locale === 'en' && c.img_en ? c.img_en : c.img} alt={c.title || 'Course'} fill style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
+                    <Image src={locale === 'en' && c.img_en ? c.img_en : c.img} alt={c.title || 'Course'} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
                   </div>
                   {hasText && (
                     <div className={styles.courseCardBody}>
@@ -300,7 +301,7 @@ export default function LandingPage() {
             </div>
 
             <button onClick={handleStart} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
+              <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ width: 240, height: 70, objectFit: 'contain', imageRendering: 'pixelated' }} />
             </button>
           </div>
         </div>
@@ -328,16 +329,16 @@ export default function LandingPage() {
         {/* Floating background elements */}
         {/* USER: Ganti atribut src="..." di bawah ini dengan gambar Anda */}
         <div className={styles.floatingItem1}>
-          <Image src="/Blue Potions 1.png" alt="Blue Potion" width={60} height={80} style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />
+          <Image src="/Blue Potions 1.png" alt="Blue Potion" width={60} height={80} style={{ width: 60, height: 80, imageRendering: 'pixelated', objectFit: 'contain' }} />
         </div>
         <div className={styles.floatingItem2}>
-          <Image src="/Red Potion 1.png" alt="Red Potion" width={50} height={70} style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />
+          <Image src="/Red Potion 1.png" alt="Red Potion" width={50} height={70} style={{ width: 50, height: 70, imageRendering: 'pixelated', objectFit: 'contain' }} />
         </div>
         <div className={styles.floatingItem3}>
-          <Image src="/Hourglass 1.png" alt="Hourglass" width={50} height={70} style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />
+          <Image src="/Hourglass 1.png" alt="Hourglass" width={50} height={70} style={{ width: 50, height: 70, imageRendering: 'pixelated', objectFit: 'contain' }} />
         </div>
         <div className={styles.floatingItem4}>
-          <Image src="/Essence 1.png" alt="Blue Flame" width={50} height={70} style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />
+          <Image src="/Essence 1.png" alt="Blue Flame" width={50} height={70} style={{ width: 50, height: 70, imageRendering: 'pixelated', objectFit: 'contain' }} />
         </div>
 
 

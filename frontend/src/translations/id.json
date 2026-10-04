@@ -81,7 +81,7 @@
       "unlocked": "Terbuka",
       "active": "Aktif",
       "aiJobMatch": "KECOCOKAN KERJA AI",
-      "jobsFoundThisWeek": "5 pekerjaan cocok ditemukan minggu ini!",
+      "jobsFoundThisWeek": "{count} pekerjaan cocok ditemukan!",
       "viewAllMatches": "LIHAT SEMUA KECOCOKAN"
     },
     "applications": {
@@ -184,6 +184,53 @@
     "notifications": {
       "levelUp": "Naik Kelas!",
       "reachedLevel2": "Kamu sekarang Level 2."
+    },
+    "dashboardExtra": {
+      "noMatchYet": "Belum Ada Kecocokan",
+      "tbd": "Belum ditentukan",
+      "noData": "Belum Ada Data",
+      "anonymous": "Anonim",
+      "assessmentFeedback": "Ikuti assessment untuk mendapatkan feedback.",
+      "universityDefaultFeedback": "Tingkatkan lagi belajarmu!",
+      "scholarshipDefaultFeedback": "Persiapkan dokumenmu dari sekarang."
+    },
+    "scholarshipHub": {
+      "title": "PUSAT BEASISWA",
+      "subtitle": "Berdasarkan profil RIASEC dan misi yang telah kamu selesaikan, AI kami telah menemukan peluang beasiswa terbaik untuk perjalanan kuliahmu.",
+      "match": "% COCOK",
+      "deadline": "Batas Waktu",
+      "reqs": "Syarat",
+      "viewDetails": "LIHAT DETAIL",
+      "detailsLabel": "detail",
+      "closeDetails": "Tutup detail beasiswa",
+      "coverage": "CAKUPAN",
+      "deadlineUpper": "BATAS WAKTU",
+      "requirements": "PERSYARATAN",
+      "openOfficial": "BUKA QUEST RESMI ↗",
+      "noLink": "Link pendaftaran belum tersedia"
+    },
+    "universityHub": {
+      "title": "PUSAT UNIVERSITAS",
+      "subtitle": "Berdasarkan profil RIASEC (Investigative/Realistic) dan minat teknologimu, AI kami merekomendasikan program-program universitas terbaik ini.",
+      "match": "% COCOK",
+      "generalProgram": "Program Umum",
+      "accreditation": "Akreditasi: {value}",
+      "websiteNone": "Website: -",
+      "costNone": "Estimasi Biaya: -",
+      "costRange": "Rp {min}Jt - {max}Jt / smtr",
+      "entryPath": "Jalur Masuk",
+      "viewRoadmap": "LIHAT ROADMAP",
+      "roadmap": "ROADMAP",
+      "roadmapIntro": "Selesaikan urutan modul berikut untuk menguasai kompetensi yang diuji di seleksi masuk {name}.",
+      "step1Title": "Matematika Dasar & Logika",
+      "step1Desc": "Selesaikan House of Algorithms (3 Modul)",
+      "step2Title": "Pemrograman Fundamental",
+      "step2Desc": "Selesaikan House of Tech (3 Modul)",
+      "step3Title": "Portofolio Akhir",
+      "step3Desc": "Kerjakan AI-Graded Project",
+      "step4Title": "Tryout Mandiri SIMAK/UTUL",
+      "step4Desc": "Simulasi ujian tulis",
+      "continueLearning": "LANJUTKAN BELAJAR"
     }
   },
   "landing": {

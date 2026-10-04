@@ -289,9 +289,9 @@ function MapContent() {
         <PlayerHUD
           playerName={playerName}
           xp={totalXP}
-          xpToNext={level * 2500}
+          xpToNext={1000}
           level={level}
-            sbtCount={badgeCount}
+          sbtCount={badgeCount}
           nearbyNodeTitle={nearbyNode?.title ?? null}
         />
 

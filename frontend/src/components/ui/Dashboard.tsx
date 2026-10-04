@@ -151,7 +151,7 @@ export default function Dashboard() {
                 country: uMatch.university.country,
                 matchPercentage: uMatch.matchScore,
                 targetTier: uMatch.matchScore >= 80 ? 'Top Applicant' : uMatch.matchScore >= 60 ? 'Good Match' : 'Reachable',
-                aiFeedback: uMatch.reasoning || 'Tingkatkan lagi belajarmu!',
+                aiFeedback: uMatch.reasoning || t('sma.dashboardExtra.universityDefaultFeedback'),
               });
             }
             if (activeRoadmap.scholarshipMatches && activeRoadmap.scholarshipMatches.length > 0) {
@@ -162,7 +162,7 @@ export default function Dashboard() {
                 matchPercentage: sMatch.matchScore,
                 currentTier: sMatch.matchScore >= 80 ? 'High Match' : sMatch.matchScore >= 60 ? 'Medium Match' : 'Basic Match',
                 officialLink: sMatch.scholarship.officialUrl || '#',
-                aiFeedback: sMatch.reasoning || 'Persiapkan dokumenmu dari sekarang.',
+                aiFeedback: sMatch.reasoning || t('sma.dashboardExtra.scholarshipDefaultFeedback'),
               });
             }
           }
@@ -290,11 +290,11 @@ export default function Dashboard() {
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
               <PixelIcon icon="👨‍🎓" size={72} className="drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
-              <span className={styles.tierName}>{universityMatch?.targetTier || 'No Match Yet'}</span>
+              <span className={styles.tierName}>{universityMatch?.targetTier || t('sma.dashboardExtra.noMatchYet')}</span>
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                {t('sma.dashboard.target')}{universityMatch?.name || 'TBD'}
+                {t('sma.dashboard.target')}{universityMatch?.name || t('sma.dashboardExtra.tbd')}
               </p>
             </div>
             <div className={styles.readinessContainer}>
@@ -306,7 +306,7 @@ export default function Dashboard() {
                 <div className={styles.readinessBarFill} style={{ width: `${universityMatch?.matchPercentage || 0}%` }} />
               </div>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
-                {universityMatch?.aiFeedback || 'Ikuti assessment untuk mendapatkan feedback.'}
+                {universityMatch?.aiFeedback || t('sma.dashboardExtra.assessmentFeedback')}
               </p>
             </div>
           </div>
@@ -322,11 +322,11 @@ export default function Dashboard() {
           <div className={styles.rankContent}>
             <div className={styles.tierBadge}>
               <PixelIcon icon="🏆" size={72} className="drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
-              <span className={styles.tierName}>{scholarshipMatch?.currentTier || 'No Match Yet'}</span>
+              <span className={styles.tierName}>{scholarshipMatch?.currentTier || t('sma.dashboardExtra.noMatchYet')}</span>
             </div>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', lineHeight: '1.6', color: '#d4d4d8' }}>
-                {t('sma.dashboard.target')}{scholarshipMatch?.name || 'TBD'}
+                {t('sma.dashboard.target')}{scholarshipMatch?.name || t('sma.dashboardExtra.tbd')}
               </p>
             </div>
             <div className={styles.readinessContainer}>
@@ -338,7 +338,7 @@ export default function Dashboard() {
                 <div className={styles.readinessBarFill} style={{ width: `${scholarshipMatch?.matchPercentage || 0}%` }} />
               </div>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', lineHeight: '1.6', color: '#fbbf24', marginTop: '8px', textAlign: 'center' }}>
-                {scholarshipMatch?.aiFeedback || 'Ikuti assessment untuk mendapatkan feedback.'}
+                {scholarshipMatch?.aiFeedback || t('sma.dashboardExtra.assessmentFeedback')}
               </p>
             </div>
           </div>
@@ -418,7 +418,7 @@ export default function Dashboard() {
             <div className={styles.lbList}>
               {leaderboard.length > 0 ? leaderboard.slice(0, 5).map((lb: any) => {
                 const score = typeof lb.score === 'number' ? lb.score : (typeof lb.xp === 'number' ? lb.xp : 0);
-                const labelName = lb.name || 'Anonymous';
+                const labelName = lb.name || t('sma.dashboardExtra.anonymous');
 
                 return (
                   <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
@@ -434,7 +434,7 @@ export default function Dashboard() {
                 );
               }) : (
                 <div style={{ padding: '12px', fontSize: '0.8rem', color: '#999', textAlign: 'center', fontFamily: '"Press Start 2P"' }}>
-                  No Data
+                  {t('sma.dashboardExtra.noData')}
                 </div>
               )}
             </div>
