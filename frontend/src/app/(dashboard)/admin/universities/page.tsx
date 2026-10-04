@@ -26,7 +26,6 @@ const FACULTIES = [
   { value: 'soc_psy', label: 'Psikologi' },
   { value: 'arts_lang', label: 'Sastra & Bahasa' },
   { value: 'eng_civil', label: 'Sipil & Arsitektur' },
-  { value: 'edu_tech', label: 'Teknologi Pendidikan' },
 ];
 
 const COLUMNS: Column<University>[] = [
@@ -34,8 +33,6 @@ const COLUMNS: Column<University>[] = [
   { key: 'title', label: 'Fakultas / Program' },
   { key: 'name', label: 'Nama Kampus' },
   { key: 'location', label: 'Lokasi' },
-  { key: 'country', label: 'Negara', render: row => row.country || '-' },
-  { key: 'website', label: 'Website' },
   { key: 'facultyTags', label: 'Fakultas / Jurusan', render: row => (
     <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
       {row.facultyTags?.map((tag, i) => {

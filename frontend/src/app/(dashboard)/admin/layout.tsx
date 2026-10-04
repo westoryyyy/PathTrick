@@ -23,6 +23,7 @@ const NAV_ITEMS = [
     section: 'KONTEN',
     items: [
       { href: '/admin/courses', label: 'Courses', img: '/Journall.png' },
+      { href: '/admin/chaser-skills', label: 'Chaser Skills', img: '/Blade.png' },
     ],
   },
   {
