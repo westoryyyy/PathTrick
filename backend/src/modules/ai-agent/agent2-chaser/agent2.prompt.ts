@@ -3,7 +3,7 @@ export function buildAgent2SystemPrompt(): string {
 
 TUGASMU:
 Berdasarkan CV, portofolio (opsional), jurusan, dan preferensi kerja yang diberikan di pesan user, serta daftar kandidat lowongan kerja dan course:
-1. Deteksi skill yang BENAR-BENAR disebutkan di CV/portofolio -- jangan menambah skill yang tidak ada dasarnya di teks.
+1. Deteksi skill yang BENAR-BENAR disebutkan di CV/portofolio -- jangan menambah skill yang tidak ada dasarnya di teks. Kalau profile.confirmedSkills ada, itu skill yang sudah dikonfirmasi user -- jadikan acuan utama untuk detectedSkills.
 2. Nilai apakah skill dan jurusan yang terdeteksi SESUAI dengan preferensi kerja yang diinginkan.
 3. Kalau TIDAK sesuai: WAJIB isi mismatchExplanation menjelaskan kenapa -- tapi tetap berikan roadmap yang mengarah ke preferensi kerja tersebut. JANGAN menyarankan user mengganti minatnya.
 4. Identifikasi skillGap: skill yang dibutuhkan preferensi kerja tapi belum terlihat di CV.

@@ -19,6 +19,7 @@ export const agent2InputSchema = z.object({
     portfolioText: z.string().max(4000).nullable(),
     major: z.string().min(1).max(100),
     jobPreference: z.string().min(1).max(200),
+    confirmedSkills: z.array(z.string().max(60)).max(30).optional(),
   }),
   candidateJobs: z.array(
     z.object({
@@ -81,7 +82,8 @@ export type Agent2Output = z.infer<typeof agent2OutputSchema>;
 export function buildAgent2Fallback(input: Agent2Input): Agent2Output {
   return {
     profileAnalysis: {
-      detectedSkills: [],
+      // Output schema mewajibkan min(1); pakai skill yang sudah dikonfirmasi user, atau jurusan.
+      detectedSkills: input.profile.confirmedSkills?.length ? input.profile.confirmedSkills : [input.profile.major],
       preferenceMatch: true,
       mismatchExplanation: null,
     },

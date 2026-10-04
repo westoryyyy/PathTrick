@@ -3,6 +3,62 @@ import { prisma } from "../../lib/prisma";
 const CANDIDATE_LIMIT = 20;
 const FETCH_LIMIT = 100;
 
+const SKILL_ALIASES: Record<string, string> = {
+  "nodejs": "node.js",
+  "node.js": "node.js",
+  "javascript": "javascript",
+  "js": "javascript",
+  "typescript": "typescript",
+  "ts": "typescript",
+  "python": "python",
+  "py": "python",
+  "sql": "sql",
+  "postgresql": "postgresql",
+  "postgre sql": "postgresql",
+  "html": "html",
+  "css": "css",
+  "tailwindcss": "tailwind css",
+  "tailwind": "tailwind css",
+  "figma": "figma",
+  "uxui": "ux/ui",
+  "ux ui": "ux/ui",
+  "reactjs": "react",
+  "react js": "react",
+  "nextjs": "next.js",
+  "next js": "next.js",
+  "machine learning": "machine learning",
+  "ml": "machine learning",
+  "ai": "artificial intelligence",
+  "artificialintelligence": "artificial intelligence",
+  "data analysis": "data analysis",
+  "dataanalyst": "data analysis",
+  "problem solving": "problem solving",
+  "problem-solving": "problem solving",
+};
+
+function normalizeSkillName(raw: string): string {
+  const cleaned = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9+.#\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned) return "";
+  return SKILL_ALIASES[cleaned] ?? cleaned;
+}
+
+function normalizePreferenceTokens(raw: string): string[] {
+  return Array.from(
+    new Set(
+      raw
+        .toLowerCase()
+        .split(/[^a-z0-9+#.]+/)
+        .map((token) => normalizeSkillName(token))
+        .filter(Boolean)
+    )
+  );
+}
+
 export interface CandidateQueryResult<T> {
   candidates: T[];
   relaxed: boolean; // true kalau filter ketat gagal & terpaksa dilonggarkan
@@ -140,15 +196,24 @@ export async function findCandidateCoursesByFacultyTags(
 // yang lebih akurat (berdasar skill gap) baru diketahui SETELAH Agent 2
 // jalan (skill gap adalah bagian dari OUTPUT, bukan input), jadi di titik
 // ini kita cuma bisa filter kasar berdasar teks yang sudah ada.
+// Saat ini sektor Chaser yang aktif hanya Information Technology, jadi kandidat
+// course (termasuk fallback) dibatasi ke facultyTags IT.
+const CHASER_ALLOWED_FACULTY_TAGS = ["cs_it", "data_ai"];
+
 export async function findCandidateCoursesForChaser(
   major: string,
   jobPreference: string
 ): Promise<CandidateQueryResult<{ id: string; title: string; facultyTags: string[] }>> {
-  const keywords = [major, jobPreference].filter(Boolean);
+  const keywords = Array.from(new Set([
+    normalizeSkillName(major),
+    ...normalizePreferenceTokens(jobPreference),
+  ].filter(Boolean)));
+  const itFilter = { houseId: null };
 
   let candidates = await prisma.course.findMany({
     where: {
       isPublished: true,
+      ...itFilter,
       OR: keywords.flatMap((keyword) => [
         { title: { contains: keyword, mode: "insensitive" as const } },
         { skills: { some: { name: { contains: keyword, mode: "insensitive" as const } } } },
@@ -160,7 +225,7 @@ export async function findCandidateCoursesForChaser(
   if (candidates.length >= 1) return { candidates, relaxed: false };
 
   candidates = await prisma.course.findMany({
-    where: { isPublished: true },
+    where: { isPublished: true, ...itFilter },
     select: { id: true, title: true, facultyTags: true },
     take: CANDIDATE_LIMIT,
   });
@@ -168,28 +233,31 @@ export async function findCandidateCoursesForChaser(
 }
 
 export async function findCandidateJobs(
-  jobPreference: string
+  jobPreference: string,
+  userSkills: string[] = []
 ): Promise<CandidateQueryResult<{ id: string; title: string; company: string; skillsRequired: string[] }>> {
-  const keywords = jobPreference
-    .split(/\s+/)
-    .map((word) => word.trim())
-    .filter((word) => word.length >= 3); // buang kata terlalu pendek ("di", "ke") biar filter nggak terlalu longgar
+  const keywords = normalizePreferenceTokens(jobPreference);
+  const skillSet = new Set(userSkills.map((s) => normalizeSkillName(s)));
 
-  let candidates = await prisma.job.findMany({
-    where: {
-      OR:
-        keywords.length > 0
-          ? keywords.map((keyword) => ({ title: { contains: keyword, mode: "insensitive" as const } }))
-          : [{ title: { contains: jobPreference, mode: "insensitive" as const } }],
-    },
+  const jobs = await prisma.job.findMany({
     select: { id: true, title: true, company: true, skillsRequired: true },
-    take: CANDIDATE_LIMIT,
+    take: 200,
   });
-  if (candidates.length >= 1) return { candidates, relaxed: false };
 
-  candidates = await prisma.job.findMany({
-    select: { id: true, title: true, company: true, skillsRequired: true },
-    take: CANDIDATE_LIMIT,
-  });
-  return { candidates, relaxed: true };
+  // Skor = overlap skill (bobot 2) + keyword preferensi di judul (bobot 1).
+  const scored = jobs
+    .map((job) => {
+      const normalizedRequired = (job.skillsRequired ?? []).map((skill) => normalizeSkillName(skill));
+      const skillHits = normalizedRequired.filter((s) => skillSet.has(s)).length;
+      const title = job.title.toLowerCase();
+      const keywordHits = keywords.filter((k) => title.includes(k)).length;
+      return { job, score: skillHits * 2 + keywordHits };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const relevant = scored.filter((s) => s.score > 0);
+  if (relevant.length >= 1) {
+    return { candidates: relevant.slice(0, CANDIDATE_LIMIT).map((s) => s.job), relaxed: false };
+  }
+  return { candidates: scored.slice(0, CANDIDATE_LIMIT).map((s) => s.job), relaxed: true };
 }
