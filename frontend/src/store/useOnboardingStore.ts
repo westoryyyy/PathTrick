@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { GICSSectorCode } from '@/data/gicsData';
+import { GICSSectorCode, GICS_SECTORS } from '@/data/gicsData';
 import { ClassifiedSkill } from '@/data/wefSkillData';
 
 /* ═══════════════════════════════════════════════
@@ -202,7 +202,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
   isSubmitting: false,
   onboardingCompleted: false,
   submitAssessment: async () => {
-    set({ isSubmitting: true });
+    set({ isSubmitting: true, onboardingCompleted: false });
     const { selectedRole, dreamerAssessment, chaserAssessment } = get();
     try {
       let requestBody: any;
@@ -216,16 +216,21 @@ export const useOnboardingStore = create<OnboardingStore>()(
           payload: { answers },
         };
       } else if (selectedRole === 'chaser') {
-        const gicsNames = chaserAssessment.preferredGICS.join(', ');
+        // Kirim NAMA sektor (bukan kode seperti "IT") supaya bermakna bagi AI & pencarian lowongan.
+        const gicsNames = chaserAssessment.preferredGICS
+          .map((code) => GICS_SECTORS.find((s) => s.code === code)?.nameID.replace('\n', ' ') ?? code)
+          .join(', ');
         const workTypes = chaserAssessment.workInterests.join(', ');
-        const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`;
+        const jobPreferenceStr = `Industri: ${gicsNames}. Tipe Kerja: ${workTypes}`.slice(0, 200);
+        const confirmedSkills = (chaserAssessment.cvExtractedData?.skills ?? []).map((s) => s.name);
         requestBody = {
           type: 'CHASER_PROFILE',
           payload: {
-            cvText: chaserAssessment.cvText || '',
-            portfolioText: chaserAssessment.portfolioText || null,
+            cvText: (chaserAssessment.cvText || '').slice(0, 8000),
+            portfolioText: chaserAssessment.portfolioText ? chaserAssessment.portfolioText.slice(0, 4000) : null,
             major: 'Lulusan S1/Sederajat',
             jobPreference: jobPreferenceStr,
+            confirmedSkills,
           },
         };
       }
@@ -402,6 +407,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       set({ onboardingCompleted: true });
     } catch (e) {
       console.error('[Onboarding] Submission failed:', e);
+      set({ onboardingCompleted: false });
     } finally {
       set({ isSubmitting: false });
     }

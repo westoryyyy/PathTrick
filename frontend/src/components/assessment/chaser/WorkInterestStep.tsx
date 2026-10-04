@@ -32,6 +32,9 @@ export default function WorkInterestStep() {
     setField('preferredGICS', toggleInArray(preferredGICS, code));
   };
 
+  const allowedMvpSectorCodes: GICSSectorCode[] = ['IT'];
+  const enabledSectorCodes = new Set(allowedMvpSectorCodes);
+
   /* ── Work interest type toggle ── */
   const handleAddInterest = (interest: string) => {
     setField('workInterests', toggleInArray(workInterests, interest));
@@ -71,7 +74,7 @@ export default function WorkInterestStep() {
       {/* ── GICS Sector Picker ── */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">Bidang Industri Pilihanmu</h3>
+          <h3 className="font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">Sektor Industri</h3>
           <span className="font-pixel text-[0.5rem] text-[#fdf6e3]" style={{
             color: preferredGICS.length >= MAX_SECTORS ? '#ef4444' : undefined
           }}>
@@ -79,35 +82,44 @@ export default function WorkInterestStep() {
           </span>
         </div>
         <p className="font-pixel text-[0.55rem] text-[#fdf6e3] m-0 leading-[1.6]">
-          Standar industri global membagi seluruh bidang karir jadi 11 sektor utama.<br/>
-          Nah, kamu paling tertarik terjun ke sektor yang mana nih?
+          Saat ini untuk MVP, hanya sektor Teknologi Informasi yang aktif.<br/>
+          Sektor lain masih dalam tahap Coming Soon.
         </p>
 
         <div className="flex flex-wrap gap-2.5 sm:gap-3">
           {GICS_SECTORS.map(sector => {
+            const isEnabled = enabledSectorCodes.has(sector.code);
             const isSelected = preferredGICS.includes(sector.code);
-            const isDisabled = !isSelected && preferredGICS.length >= MAX_SECTORS;
+            const isDisabled = !isEnabled || (!isSelected && preferredGICS.length >= MAX_SECTORS);
             return (
               <button
                 key={sector.code}
                 type="button"
-                className={`group relative flex flex-col justify-center items-center gap-2 py-3 px-2 w-[130px] sm:w-[140px] h-[105px] sm:h-[110px] bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] cursor-pointer text-white transition-all duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),3px_3px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] -translate-x-[1px] -translate-y-[1px]' : ''} ${isDisabled ? 'opacity-50 cursor-not-allowed hover:bg-[#bc8f65] hover:border-[#5a3a29] hover:translate-x-0 hover:translate-y-0 hover:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)]' : ''}`}
+                className={`group relative flex flex-col justify-center items-center gap-2 py-3 px-2 w-[130px] sm:w-[140px] h-[105px] sm:h-[110px] bg-[#bc8f65] border-2 border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)] cursor-pointer text-white transition-all duration-100 hover:bg-[#cba37b] hover:border-[#6a4734] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),3px_3px_0_0_rgba(0,0,0,0.5)] ${isSelected ? '!bg-[#d4a373] !border-[#f59e0b] !shadow-[inset_0_0_8px_rgba(0,0,0,0.3),0_0_0_2px_rgba(245,158,11,0.6)] -translate-x-[1px] -translate-y-[1px]' : ''} ${isDisabled ? 'opacity-50 cursor-not-allowed hover:bg-[#bc8f65] hover:border-[#5a3a29] hover:translate-x-0 hover:translate-y-0 hover:shadow-[inset_0_0_8px_rgba(0,0,0,0.3),2px_2px_0_0_rgba(0,0,0,0.5)]' : ''} ${!isEnabled ? '!bg-[#3b2a1c] !border-[#2a1d13] grayscale' : ''}`}
                 style={{ '--ind-color': sector.accentColor } as React.CSSProperties}
-                onClick={() => handleToggleSector(sector.code)}
+                onClick={() => isEnabled && handleToggleSector(sector.code)}
                 disabled={isDisabled}
               >
                 <PixelIcon icon={sector.icon} size={40} />
-                <span className={`font-pixel text-[0.5rem] text-white tracking-[0.05em] text-center leading-[1.4] drop-shadow-[1px_1px_0_#3b261b] whitespace-pre-line ${isSelected ? 'text-white' : ''}`}>{locale === 'en' ? sector.nameEN : sector.nameID}</span>
+                <span className={`font-pixel text-[0.5rem] text-white tracking-[0.05em] text-center leading-[1.4] drop-shadow-[1px_1px_0_#3b261b] whitespace-pre-line ${isSelected ? 'text-white' : ''} ${!isEnabled ? 'opacity-50' : ''}`}>{locale === 'en' ? sector.nameEN : sector.nameID}</span>
                 {isSelected && <span className="absolute top-1.5 right-2 font-pixel text-[0.55rem] text-[color:var(--ind-color)] animate-[checkPop_0.25s_cubic-bezier(0.22,1,0.36,1)]">✓</span>}
-                
-                {/* Custom RPG Tooltip */}
-                <div className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[180px] p-2.5 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
-                  <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a]">
-                    {sector.description}
-                  </p>
-                  {/* Tooltip Arrow */}
-                  <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[#6a4734]"></div>
-                </div>
+
+                {!isEnabled && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] z-10">
+                    <span className="font-pixel text-[0.45rem] text-[#fde047] bg-[#3b2416] px-2 py-1 border-2 border-[#6a4734] shadow-lg transform -rotate-12 whitespace-nowrap">
+                      Coming Soon
+                    </span>
+                  </div>
+                )}
+
+                {isEnabled && (
+                  <div className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[180px] p-2.5 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+                    <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a]">
+                      {sector.description}
+                    </p>
+                    <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[#6a4734]"></div>
+                  </div>
+                )}
               </button>
             );
           })}
@@ -159,7 +171,7 @@ export default function WorkInterestStep() {
               'On-site': 'Wajib ngantor! Harus datang langsung ke tempat kerja setiap harinya.'
             };
             const desc = descriptions[type] || '';
-            
+
             return (
               <button
                 key={type}
@@ -168,12 +180,10 @@ export default function WorkInterestStep() {
                 onClick={() => handleAddInterest(type)}
               >
                 {type}
-                {/* Custom RPG Tooltip */}
                 <div className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[160px] p-2.5 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
                   <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a] whitespace-pre-wrap">
                     {desc}
                   </p>
-                  {/* Tooltip Arrow */}
                   <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[#6a4734]"></div>
                 </div>
               </button>

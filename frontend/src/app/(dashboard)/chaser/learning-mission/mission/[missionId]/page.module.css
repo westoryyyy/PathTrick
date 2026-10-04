@@ -7,13 +7,10 @@
   flex-direction: column;
   gap: 16px;
   max-width: 1600px;
-  /* Make it wider */
   width: 95%;
-  /* Adjust width on smaller screens */
   margin: 0 auto;
   align-items: center;
   padding: 24px 24px 32px 24px;
-  /* Move content higher up */
 }
 
 /* ── Top Bar ── */
@@ -28,9 +25,7 @@
 .backBtn {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
-  /* Increased size */
   padding: 12px 24px;
-  /* Increased padding */
   background: #3b261b;
   border: 4px solid #5a3a29;
   border-radius: 12px;
@@ -41,7 +36,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  /* Add gap for the arrow */
 }
 
 .backBtn:hover {
@@ -66,7 +60,6 @@
   border-radius: 12px;
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.5), 4px 4px 0 rgba(0, 0, 0, 0.8);
   margin-right: 48px;
-  /* Offset by the width of the bookmark tabs to align with the book body */
 }
 
 /* ── Quest Book Container ── */
@@ -76,10 +69,9 @@
   flex-direction: row;
   filter: drop-shadow(8px 8px 0 #1a0f08);
   height: 85vh;
-  /* Taller */
   max-height: 900px;
-  /* Allow it to be much taller */
   min-height: 600px;
+  min-width: 0;
 }
 
 /* ── Book Content (Two Pages) ── */
@@ -92,6 +84,8 @@
   z-index: 1;
   display: flex;
   flex-direction: row;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .leftPage,
@@ -103,6 +97,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .leftPage {
@@ -135,13 +131,9 @@
   display: flex;
   flex-direction: column;
   width: 48px;
-  /* z-index removed so it doesn't form a restrictive stacking context */
   margin-left: 0;
-  /* sit exactly outside book content border */
   padding: 32px 0;
-  /* Keeps tabs away from the very top/bottom */
   gap: 8px;
-  /* Slight gap between tabs looks cleaner */
 }
 
 /* Custom Scrollbar for overflowing text */
@@ -171,59 +163,47 @@
   font-family: 'Pixelify Sans', sans-serif;
   font-size: 1.2rem;
   padding: 16px 8px;
-  /* color defined in specific tab classes */
   border-radius: 0 12px 12px 0;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
-  /* Stronger shadow */
   cursor: pointer;
   filter: brightness(0.9) saturate(0.85);
-  /* Dimmer and less saturated when inactive */
   writing-mode: vertical-rl;
   text-orientation: mixed;
   border: none;
   position: relative;
   z-index: -1;
-  /* Sit behind the bookContent */
 }
 
 .activeTab {
   filter: brightness(1.05) saturate(1.1);
-  /* Cozy effect: slightly brighter when active */
-  /* Make it much brighter when active */
   width: 64px;
-  /* Expands to the right without detaching */
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
   z-index: 2;
-  /* Sit ABOVE the bookContent (which is z-index 1) */
   border-left: none;
 }
 
 /* Custom Tab Colors */
 .tabTeori {
   background: #c89f2d;
-  /* Mustard / Gold */
   color: #3b261b;
 }
 
 .tabKuis {
   background: #33a579;
-  /* Sea Green */
   color: #114227;
 }
 
 .tabBoss {
   background: #a285fc;
-  /* Lavender / Light Purple */
   color: #351c75;
 }
 
 .tabReward {
   background: #c9651c;
-  /* Bronze / Orange */
   color: #4a1f00;
 }
 
@@ -510,5 +490,4 @@
   line-height: 1.6;
   margin: 0;
   white-space: pre-wrap;
-  /* Allows \n to render correctly */
 }

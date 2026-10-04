@@ -26,7 +26,7 @@ export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       totalXP: 0,
-      level: 1,
+      level: 0,
       dailyBountyClaimed: false,
       hasCompletedQuizToday: false,
       displayName: '',
@@ -52,7 +52,7 @@ export const useUserStore = create<UserState>()(
       setProfile: (name, email) => set({ displayName: name, displayEmail: email }),
       setAvatar: (avatarUrl) => set({ avatarUrl }),
       clearLevelUpFlag: () => set({ hasJustLeveledUp: false }),
-      hydrateUser: (xp: number, level: number, name: string, email: string) => set({ totalXP: xp, level, displayName: name, displayEmail: email }),
+      hydrateUser: (xp: number, level: number, name: string, email: string) => set({ totalXP: xp, level: Math.max(0, level), displayName: name, displayEmail: email }),
     }),
     {
       name: 'pathtrick-user-storage-v2',

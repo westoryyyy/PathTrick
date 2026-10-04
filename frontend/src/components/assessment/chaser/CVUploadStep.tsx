@@ -14,23 +14,29 @@ const ACCEPTED_TYPES = [
 ];
 const MAX_SIZE_MB = 10;
 
-/** Mock AI extraction — replaced by real backend/AI Engineer API later */
-async function mockExtractCV() {
-  await new Promise((r) => setTimeout(r, 1200));
-  await new Promise((r) => setTimeout(r, 2200));
-
+/** Panggil backend (AI Agent 2) untuk mengekstrak skill/pengalaman dari teks CV & portfolio. */
+async function extractCVFromBackend(cvText: string, portfolioText: string) {
+  const { API_BASE_URL } = await import('@/config/pathtrick');
+  const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+  const res = await fetch(`${API_BASE_URL}/api/assessment/chaser/analyze-cv`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ cvText, portfolioText: portfolioText || null }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
   return {
-    skills: classifySkills([
-      'JavaScript', 'React', 'Node.js', 'Python',
-      'SQL', 'Git', 'REST API', 'Figma',
-      'Critical Thinking', 'Teamwork', 'Adaptability',
-    ]),
-    experience: [
-      'Frontend Developer Intern — PT Tech Indonesia (6 bulan)',
-      'Freelance Web Developer — 10+ proyek',
-      'Asisten Lab Pemrograman — Universitas XYZ',
-    ],
-    education: 'S1 Teknik Informatika — Universitas XYZ (2021–2025)',
+    skills: classifySkills([]).concat(
+      (data.skills ?? []).map((s: { name: string; level: number }) => ({
+        name: s.name,
+        level: Math.min(5, Math.max(1, s.level || 3)) as 1 | 2 | 3 | 4 | 5,
+      }))
+    ),
+    experience: (data.experience ?? []) as string[],
+    education: (data.education ?? '') as string,
   };
 }
 
@@ -81,15 +87,15 @@ export default function CVUploadStep() {
 
       setChaserField('cvText', text);
       
-      // Untuk sementara waktu, kita mock data extracted agar UI tidak rusak sampai integrasi backend selesai
-      const data = await mockExtractCV();
+      // Ekstraksi skill oleh AI Agent 2 di backend
+      const data = await extractCVFromBackend(text, useOnboardingStore.getState().chaserAssessment.portfolioText);
       setCVExtractedData(data);
       
       setChaserField('cvExtractionStatus', 'done');
     } catch (err) {
       console.error(err);
       setChaserField('cvExtractionStatus', 'error');
-      setValidationError('Gagal membaca PDF. Pastikan file tidak rusak.');
+      setValidationError(err instanceof Error && err.message ? `Gagal menganalisis CV: ${err.message}` : 'Gagal membaca PDF. Pastikan file tidak rusak.');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

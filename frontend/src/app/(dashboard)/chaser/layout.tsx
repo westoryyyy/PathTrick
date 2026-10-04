@@ -58,54 +58,6 @@ export default function MahasiswaLayout({
     } catch (_) {}
   };
 
-  useEffect(() => {
-    if (!ready) return;
-    if (!user) {
-      const storedToken = localStorage.getItem('pathtrick_token');
-      if (!storedToken) {
-        router.replace('/');
-      }
-      return;
-    }
-    const token = getAuthHeaders()['Authorization'];
-    if (!token) {
-      router.replace('/select-role');
-      return;
-    }
-    let cancelled = false;
-    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
-      .then(async (res) => {
-        if (cancelled) return;
-        if (!res.ok) { router.replace('/select-role'); return; }
-        const data = await res.json() as any;
-        if (cancelled) return;
-        
-        if (data.gamification) {
-          const calculatedLevel = Math.max(0, Math.floor(data.gamification.xp / 1000));
-          useUserStore.getState().hydrateUser(data.gamification.xp, calculatedLevel, data.name || '', data.email || '');
-        }
-        
-        const roleName = data?.role?.name?.toUpperCase();
-        if (!roleName) {
-          router.replace('/select-role');
-        } else if (roleName === 'CHASER') {
-          setIsCheckingAuth(false);
-        } else if (roleName === 'DREAMER') {
-          router.replace('/dreamer/dashboard');
-        } else if (roleName === 'ADMIN') {
-          router.replace('/admin/dashboard');
-        } else {
-          router.replace('/select-role');
-        }
-      })
-      .catch(() => {
-        if (cancelled) return;
-        router.replace('/select-role');
-      });
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
   const handleMarkAllRead = async () => {
     try {
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
@@ -159,7 +111,12 @@ export default function MahasiswaLayout({
     fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
       .then(async (res) => {
         if (cancelled) return;
-        if (!res.ok) { router.replace('/select-role'); return; }
+        if (!res.ok) {
+          // Hanya 401/403 yang berarti sesi/role bermasalah; error 5xx jangan lempar ke select-role.
+          if (res.status === 401 || res.status === 403) router.replace('/select-role');
+          else setIsCheckingAuth(false);
+          return;
+        }
         const data = await res.json() as any;
         if (cancelled) return;
         
@@ -183,7 +140,8 @@ export default function MahasiswaLayout({
       })
       .catch(() => {
         if (cancelled) return;
-        router.replace('/select-role');
+        // Backend/jaringan sedang bermasalah: tetap di halaman, jangan paksa pilih role ulang.
+        setIsCheckingAuth(false);
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

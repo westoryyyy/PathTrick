@@ -730,7 +730,7 @@ export default function MissionFlowPage() {
                 Reward XP dan item telah ditambahkan ke akunmu.
               </p>
             </div>
-            <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
+            <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
               KLAIM REWARD & KEMBALI KE PETA
             </button>
           </div>
@@ -745,7 +745,7 @@ export default function MissionFlowPage() {
     <div className={styles.wrapper}>
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
-        <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
+        <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}>
           ← KEMBALI KE PETA
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
@@ -892,7 +892,7 @@ export default function MissionFlowPage() {
                                 setIsClaiming(true);
                                 addXP(sectionData?.xpReward ?? 100);
                                 completeQuiz();
-                                setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                                setTimeout(() => router.push(`/map?chapter=${baseChapterId}&role=chaser`), 1200);
                               }
                             }}
                             disabled={isClaiming}
@@ -903,7 +903,7 @@ export default function MissionFlowPage() {
                         <button onMouseEnter={playHoverSound}
                           className={styles.secondaryBtn}
                           style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
-                          onClick={() => router.push(`/map?chapter=${baseChapterId}`)}
+                          onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}
                         >
                           KEMBALI KE PETA
                         </button>
@@ -921,7 +921,7 @@ export default function MissionFlowPage() {
                             triggerLevelUp();
                           }
                           completeQuiz();
-                          setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                          setTimeout(() => router.push(`/map?chapter=${baseChapterId}&role=chaser`), 1200);
                         }
                       }}
                       disabled={isClaiming}

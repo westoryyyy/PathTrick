@@ -69,6 +69,10 @@ export default function AssessmentWizard() {
     if (!canNext) return;
     if (isLast) {
       await submitAssessment();
+      if (!useOnboardingStore.getState().onboardingCompleted) {
+        alert('Gagal menyimpan asesmen ke server. Periksa koneksi lalu coba lagi.');
+        return;
+      }
       if (role === 'dreamer') {
         router.push('/dreamer/dashboard');
       } else {
