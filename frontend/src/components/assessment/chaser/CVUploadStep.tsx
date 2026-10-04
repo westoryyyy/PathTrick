@@ -238,7 +238,7 @@ export default function CVUploadStep() {
               <div className="flex flex-wrap gap-2.5">
                 {(cState.cvExtractedData?.skills ?? []).map((skill, i) => (
                   <span key={i} className="font-pixel text-[0.55rem] text-white bg-[#4c1d95] border-2 border-[#a855f7] shadow-[2px_2px_0_rgba(0,0,0,0.5)] px-2.5 py-1.5 animate-[tagIn_0.35s_steps(4)_both]" style={{ animationDelay: `${i * 0.08}s` }}>
-                    {skill.name} <span className="text-[#34d399]">Lv.{skill.level}</span>
+                    {skill.name}
                   </span>
                 ))}
               </div>

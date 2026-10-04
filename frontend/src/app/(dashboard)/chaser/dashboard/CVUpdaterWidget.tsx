@@ -93,6 +93,13 @@ export default function CVUpdaterWidget() {
       
       const cvText = await extractTextFromPDF(file);
 
+      // Basic validation: ensure extracted text is non-empty
+      if (!cvText || !cvText.trim()) {
+        setErrorMsg('Teks CV tidak ditemukan. Pastikan file berisi teks (PDF berbasis teks, bukan gambar).');
+        setStatus('error');
+        return;
+      }
+
       const headers = getAuthHeaders();
 
       const res = await fetch(`${API_BASE_URL}/api/cv/update`, {
@@ -102,8 +109,17 @@ export default function CVUpdaterWidget() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Gagal memproses CV');
+        // Try parse backend error message, but handle gracefully
+        let errMsg = 'Gagal memproses CV';
+        try {
+          const err = await res.json();
+          if (err && (err.error || err.message)) errMsg = err.error || err.message;
+        } catch (e) {
+          // ignore parse errors
+        }
+        setErrorMsg(errMsg);
+        setStatus('error');
+        return;
       }
 
       const data = await res.json();
