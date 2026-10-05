@@ -251,17 +251,6 @@ export default function LearningProgress() {
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
           Jelajahi 10 House dan kuasai ilmu baru. Klik House untuk mulai petualanganmu!
         </p>
-        <button
-          onClick={() => {
-            import('@/store/useOnboardingStore').then(({ useOnboardingStore }) => {
-              useOnboardingStore.setState({ selectedRole: 'dreamer' });
-              router.push('/assessment');
-            });
-          }}
-          style={{ alignSelf: 'flex-start', padding: '8px 16px', background: '#3b82f6', color: 'white', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', borderRadius: '8px', cursor: 'pointer', border: '2px solid #2563eb' }}
-        >
-          ULANGI ASESMEN
-        </button>
       </div>
 
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>

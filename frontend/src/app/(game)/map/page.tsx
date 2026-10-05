@@ -76,9 +76,33 @@ function MapContent() {
     if (chapterId) {
       if (roleQuery === 'chaser' || role === 'MAHASISWA') {
         useMapStore.setState({ activeChapterId: chapterId });
-        fetchRoadmap(chapterId).then(() => {
+        fetchRoadmap(chapterId).then(async () => {
           const fetchedNodes = useMapStore.getState().nodes;
-          setDynamicNodes(fetchedNodes);
+          if (fetchedNodes.length > 0) {
+            setDynamicNodes(fetchedNodes);
+            return;
+          }
+          // Chapter not in the active roadmap -> load it directly from the chapter API
+          try {
+            const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+            const { API_BASE_URL } = await import('@/config/pathtrick');
+            const res = await fetch(`${API_BASE_URL}/api/chapters/${chapterId}`, { headers: getAuthHeaders() });
+            const chapterData = await res.json();
+            if (chapterData && !chapterData.error && chapterData.sections?.length) {
+              const tChapter = {
+                id: chapterData.id,
+                name: chapterData.title,
+                duration: `${chapterData.sections.length} Levels`,
+                sections: chapterData.sections,
+              };
+              generateNodesForChapter(tChapter, null, null, chapterId);
+              return;
+            }
+          } catch (e) {
+            console.error('Chaser chapter fallback failed:', e);
+          }
+          useMapStore.setState({ isLoading: false, activeChapterId: undefined });
+          router.push('/map');
         });
         return;
       }

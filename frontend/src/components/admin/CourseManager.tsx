@@ -77,12 +77,13 @@ export default function CourseManager({ audience }: { audience: 'dreamer' | 'cha
   const [loading, setLoading] = useState(true);
   const storageKey = isSkills ? 'adminSkillFilter' : 'adminCourseFilter';
   
-  const [page, setPage] = useState(() => {
+  const [page, setPage] = useState(1);
+  
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      return parseInt(sessionStorage.getItem(storageKey + '_page') || '1', 10);
+      setPage(parseInt(sessionStorage.getItem(storageKey + '_page') || '1', 10));
     }
-    return 1;
-  });
+  }, [storageKey]);
   
   const handlePageChange = (val: number | ((p: number) => number)) => {
     setPage(p => {
@@ -167,12 +168,13 @@ export default function CourseManager({ audience }: { audience: 'dreamer' | 'cha
     load();
   };
 
-  const [activeFacultyTab, setActiveFacultyTab] = useState(() => {
+  const [activeFacultyTab, setActiveFacultyTab] = useState('all');
+  
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      return sessionStorage.getItem(storageKey) || 'all';
+      setActiveFacultyTab(sessionStorage.getItem(storageKey) || 'all');
     }
-    return 'all';
-  });
+  }, [storageKey]);
 
   const handleFilterChange = (val: string) => {
     setActiveFacultyTab(val);

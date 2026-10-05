@@ -55,6 +55,12 @@ export default async function questsRoutes(fastify: FastifyInstance) {
         const effectiveTarget = q.type === 'DAILY_LOGIN' ? 1 : q.targetCount;
         const isCompleted = currentProgress >= effectiveTarget;
         
+        const todayKey = new Date().toISOString().split('T')[0];
+        const claimedToday = !!p?.completedAt && p.completedAt.toISOString().split('T')[0] === todayKey;
+        const isRewardClaimed = q.type === 'DAILY_LOGIN'
+          ? !!p?.isRewardClaimed && claimedToday
+          : (p?.isRewardClaimed || false);
+
         return {
           id: q.id,
           type: q.type,
@@ -64,7 +70,7 @@ export default async function questsRoutes(fastify: FastifyInstance) {
           targetCount: effectiveTarget,
           progress: currentProgress,
           isCompleted,
-          isRewardClaimed: p?.isRewardClaimed || false
+          isRewardClaimed
         };
       });
 
@@ -119,7 +125,12 @@ export default async function questsRoutes(fastify: FastifyInstance) {
             create: { userId, questId: id, progress: currentProgress, isCompleted: true }
           });
 
-          if (userProgress.isRewardClaimed) {
+          const todayKey = new Date().toISOString().split('T')[0];
+          const claimedToday = !!userProgress.completedAt && userProgress.completedAt.toISOString().split('T')[0] === todayKey;
+          const alreadyClaimed = quest.type === 'DAILY_LOGIN'
+            ? userProgress.isRewardClaimed && claimedToday
+            : userProgress.isRewardClaimed;
+          if (alreadyClaimed) {
             throw new Error("ALREADY_CLAIMED");
           }
 

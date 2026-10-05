@@ -398,6 +398,39 @@
     "sol_closing": "On both paths, every achievement is recorded as a <strong>Soulbound Token (SBT)</strong> on <strong>BNB Chain</strong>, a permanent digital certificate that <strong>cannot be transferred or falsified</strong>. Users have undeniable proof, and recruiters can verify it directly on-chain. The trust problem that has long burdened both sides is solved by the design of the system itself."
   },
   "docsMenu": {
+
+  },
+  "tracks": {
+    "header": {
+      "title": "Explore Career Tracks",
+      "desc": "Discover AI-generated learning roadmaps tailored to your RIASEC score and goals. Choose from specialized career paths in tech."
+    },
+    "filter": {
+      "label": "Filter by Category:"
+    },
+    "noTracks": {
+      "heading": "No tracks found",
+      "desc": "Try selecting a different category or check back soon for new tracks!",
+      "viewAll": "View All Tracks"
+    },
+    "cta": "Explore Track"
+  },
+  "bgm": {
+    "play": "PLAY MUSIC",
+    "mute": "MUTE MUSIC",
+    "onAlt": "Music On",
+    "offAlt": "Music Off"
+  },
+  "certificate": {
+    "viewPdf": "📄 VIEW PDF",
+    "generating": "GENERATING PDF...",
+    "viewOnBscScan": "🔍 VIEW ON BSCSCAN",
+    "pdfError": "PDF failed to generate. Please try again.",
+    "status": {
+      "minted": "MINTED",
+      "pending": "PENDING"
+    }
+  },
     "title": "SYSTEM DOCUMENTATION",
     "back": "◀ BACK",
     "tableOfContents": "Table of Contents",

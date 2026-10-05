@@ -119,6 +119,7 @@ export default function MissionFlowPage() {
   const [isBossMinted, setIsBossMinted] = useState(false);
   const [dbSection, setDbSection] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(!MISSION_CONTENT[missionId as string]);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -194,6 +195,8 @@ export default function MissionFlowPage() {
     if (onConfirm) onConfirm();
   };
   const handleLevelComplete = async () => {
+    if (isCompleting) return;
+    setIsCompleting(true);
     audioController.play('/mission completed.ogg');
 
     try {
@@ -231,6 +234,7 @@ export default function MissionFlowPage() {
 
     completeDynamicNode(missionId as string);
     setPhase('CLAIM');
+    setIsCompleting(false);
   };
   // Helper to convert chapter ID string to uint256-compatible number for SBT Minting
   const generateCourseId = (str: string) => {
@@ -976,6 +980,15 @@ export default function MissionFlowPage() {
 
   return (
     <div className={styles.wrapper}>
+      {isCompleting && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(44,24,16,0.88)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+          <div style={{ width: 48, height: 48, border: '6px solid #fbbf24', borderTopColor: 'transparent', borderRadius: '50%', animation: 'chaserSpin 0.8s linear infinite' }} />
+          <p style={{ fontFamily: 'var(--font-vt323), sans-serif', color: '#fbbf24', fontSize: '1.8rem', textShadow: '2px 2px 0 #000' }}>
+            Menyimpan progres &amp; menyiapkan reward...
+          </p>
+          <style>{`@keyframes chaserSpin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button className={styles.backBtn} onMouseEnter={playHoverSound} onClick={() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`)}>

@@ -122,6 +122,7 @@ export default function MissionFlowPage() {
   const [highestPhaseReached, setHighestPhaseReached] = useState<number>(0);
   const [isClaiming, setIsClaiming] = useState(false);
   const [dbSection, setDbSection] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(!MISSION_CONTENT[missionId as string]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -172,7 +173,8 @@ export default function MissionFlowPage() {
           .then(data => {
              if (data && !data.error) setDbSection(data);
           })
-          .catch(() => {});
+          .catch(() => {})
+          .finally(() => setIsLoading(false));
       });
     });
   }, [missionId]);
@@ -196,7 +198,10 @@ export default function MissionFlowPage() {
     if (onConfirm) onConfirm();
   };
 
+  const [isCompleting, setIsCompleting] = useState(false);
   const handleLevelComplete = async () => {
+    if (isCompleting) return;
+    setIsCompleting(true);
     try {
       const audio = new Audio('/mission completed.ogg');
       audio.volume = 0.5;
@@ -215,11 +220,22 @@ export default function MissionFlowPage() {
             selectedAnswer: correctOpt ? (correctOpt.rawAnswer || correctOpt.id || correctOpt.text) : ''
           };
         });
-        await fetch(`${API_BASE_URL}/api/missions/${missionId}/quiz/submit`, {
+        const quizRes = await fetch(`${API_BASE_URL}/api/missions/${missionId}/quiz/submit`, {
           method: 'POST',
           headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers })
         });
+        let passed = false;
+        if (quizRes.ok) {
+          const quizData = await quizRes.json().catch(() => ({}));
+          passed = quizData?.passed !== false;
+        }
+        if (!passed) {
+          await fetch(`${API_BASE_URL}/api/missions/${missionId}/complete`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+          });
+        }
       } else {
         await fetch(`${API_BASE_URL}/api/missions/${missionId}/complete`, {
           method: 'POST',
@@ -235,6 +251,7 @@ export default function MissionFlowPage() {
     if (dbSection?.id) completeDynamicNode(dbSection.id);
     if (dbSection?.missionId) completeDynamicNode(dbSection.missionId);
     setPhase('CLAIM');
+    setIsCompleting(false);
   };
 
   // 3D Page flip animation variants for Right Page
@@ -765,14 +782,33 @@ export default function MissionFlowPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', background: '#2c1810' }}>
+        <h1 style={{ fontFamily: 'var(--font-vt323), sans-serif', color: '#fbbf24', fontSize: '2rem', textShadow: '2px 2px 0 #000' }}>
+          Menyiapkan Halaman Buku...
+        </h1>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.wrapper}>
+      {isCompleting && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(44,24,16,0.88)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+          <div style={{ width: 48, height: 48, border: '6px solid #fbbf24', borderTopColor: 'transparent', borderRadius: '50%', animation: 'chaserSpin 0.8s linear infinite' }} />
+          <p style={{ fontFamily: 'var(--font-vt323), sans-serif', color: '#fbbf24', fontSize: '1.8rem', textShadow: '2px 2px 0 #000' }}>
+            Menyimpan progres &amp; menyiapkan reward...
+          </p>
+          <style>{`@keyframes chaserSpin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}>
           ← KEMBALI KE PETA
         </button>
-        <div className={styles.missionId}>MISI: {missionId}</div>
+        <div className={styles.missionId}>{dbSection?.title || currentChapter?.name || 'MISI BELAJAR'}</div>
       </div>
 
       {/* ── QUEST BOOK ── */}
