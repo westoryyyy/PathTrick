@@ -1,20 +1,20 @@
 import { FastifyInstance } from "fastify";
 import { getCourseDetail, getCoursesForUser, submitQuiz, submitProject, getRoadmapNodes, getMissionBySectionSlug, submitQuizByMissionId, submitProjectByMissionId, completeMissionById } from "./courses.service";
 import { z } from "zod";
-
+import { sanitizeTextInput } from "../../utils/sanitize";
 const submitQuizBodySchema = z.object({
   answers: z
     .array(
       z.object({
         questionId: z.string().min(1),
-        selectedAnswer: z.string().min(1, "selectedAnswer wajib diisi (A/B/C/D)"),
+        selectedAnswer: z.string().min(1, "selectedAnswer wajib diisi (A/B/C/D)").transform(sanitizeTextInput),
       })
     )
     .min(1, "Minimal 1 jawaban harus dikirim"),
 });
 
 const submitProjectBodySchema = z.object({
-  code: z.string().min(1, 'Kode tidak boleh kosong'),
+  code: z.string().min(1, 'Kode tidak boleh kosong').transform(sanitizeTextInput),
 });
 
 export default async function coursesRoutes(fastify: FastifyInstance) {

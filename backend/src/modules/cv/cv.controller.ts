@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { processCVUpdate } from "./cv.service";
+import { sanitizeTextInput } from "../../utils/sanitize";
 
 export async function cvUpdateHandler(req: FastifyRequest, reply: FastifyReply) {
   try {
@@ -8,7 +9,7 @@ export async function cvUpdateHandler(req: FastifyRequest, reply: FastifyReply) 
       return reply.status(400).send({ error: "Teks CV tidak ditemukan." });
     }
 
-    const result = await processCVUpdate(req.user.userId, cvText);
+    const result = await processCVUpdate(req.user.userId, sanitizeTextInput(cvText));
 
     return reply.status(200).send(result);
   } catch (error: any) {
