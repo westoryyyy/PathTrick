@@ -81,7 +81,7 @@
       "unlocked": "Unlocked",
       "active": "Active",
       "aiJobMatch": "AI JOB MATCH",
-      "jobsFoundThisWeek": "5 suitable jobs found this week!",
+      "jobsFoundThisWeek": "{count} suitable jobs found!",
       "viewAllMatches": "VIEW ALL MATCHES"
     },
     "applications": {
@@ -184,6 +184,53 @@
     "notifications": {
       "levelUp": "Level Up!",
       "reachedLevel2": "You reached Level 2."
+    },
+    "dashboardExtra": {
+      "noMatchYet": "No Match Yet",
+      "tbd": "TBD",
+      "noData": "No Data",
+      "anonymous": "Anonymous",
+      "assessmentFeedback": "Take the assessment to get feedback.",
+      "universityDefaultFeedback": "Keep improving your learning!",
+      "scholarshipDefaultFeedback": "Prepare your documents now."
+    },
+    "scholarshipHub": {
+      "title": "SCHOLARSHIP HUB",
+      "subtitle": "Based on your RIASEC profile and the missions you've completed, our AI has found the best scholarship opportunities for your college journey.",
+      "match": "% MATCH",
+      "deadline": "Deadline",
+      "reqs": "Reqs",
+      "viewDetails": "VIEW DETAILS",
+      "detailsLabel": "details",
+      "closeDetails": "Close scholarship details",
+      "coverage": "COVERAGE",
+      "deadlineUpper": "DEADLINE",
+      "requirements": "REQUIREMENTS",
+      "openOfficial": "OPEN OFFICIAL QUEST ↗",
+      "noLink": "Registration link not available yet"
+    },
+    "universityHub": {
+      "title": "UNIVERSITY HUB",
+      "subtitle": "Based on your RIASEC profile (Investigative/Realistic) and your tech interests, our AI recommends these top university programs.",
+      "match": "% MATCH",
+      "generalProgram": "General Program",
+      "accreditation": "Accreditation: {value}",
+      "websiteNone": "Website: -",
+      "costNone": "Estimated Cost: -",
+      "costRange": "Rp {min}M - {max}M / semester",
+      "entryPath": "Admission Path",
+      "viewRoadmap": "VIEW ROADMAP",
+      "roadmap": "ROADMAP",
+      "roadmapIntro": "Complete the following modules in order to master the competencies tested in the {name} entrance selection.",
+      "step1Title": "Basic Math & Logic",
+      "step1Desc": "Complete House of Algorithms (3 Modules)",
+      "step2Title": "Fundamental Programming",
+      "step2Desc": "Complete House of Tech (3 Modules)",
+      "step3Title": "Final Portfolio",
+      "step3Desc": "Complete the AI-Graded Project",
+      "step4Title": "Independent Tryout SIMAK/UTUL",
+      "step4Desc": "Written exam simulation",
+      "continueLearning": "CONTINUE LEARNING"
     }
   },
   "landing": {

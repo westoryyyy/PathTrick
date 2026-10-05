@@ -183,12 +183,21 @@ export default function AdminCRUDTable<T extends { id: string }>({
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const filtered = data.filter(row =>
     searchKeys.length === 0 || searchKeys.some(key =>
       String(row[key] ?? '').toLowerCase().includes(search.toLowerCase())
     )
   );
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search, data.length]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+  const paginatedData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openAdd = () => { setFormData({}); setModal('add'); };
   const openEdit = (row: T) => {
@@ -291,14 +300,14 @@ export default function AdminCRUDTable<T extends { id: string }>({
                   <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 </td>
               </tr>
-            ) : filtered.length === 0 ? (
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + 1} style={{ textAlign: 'center', padding: '40px', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: 'rgba(255,255,255,0.3)' }}>
                   Tidak ada data
                 </td>
               </tr>
             ) : (
-              filtered.map((row, i) => (
+              paginatedData.map((row, i) => (
                 <tr key={row.id} style={{ borderBottom: '1px solid rgba(139,26,26,0.3)', background: i % 2 === 0 ? 'transparent' : 'rgba(139,26,26,0.07)' }}>
                   {columns.map(col => (
                     <td key={String(col.key)} style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', color: '#f5f5f5', padding: '12px 16px', lineHeight: '1.6' }}>
@@ -317,6 +326,34 @@ export default function AdminCRUDTable<T extends { id: string }>({
           </tbody>
         </table>
       </div>
+
+      {/* ── Pagination Controls ── */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(139,26,26,0.15)', border: '3px solid #5a3a29', padding: '12px 20px', boxShadow: '4px 4px 0 rgba(0,0,0,0.5)' }}>
+          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>
+            Menampilkan {Math.min(filtered.length, (currentPage - 1) * itemsPerPage + 1)} - {Math.min(filtered.length, currentPage * itemsPerPage)} dari total {filtered.length}
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              style={{ fontFamily: '"Pixelify Sans"', fontSize: '0.9rem', background: currentPage === 1 ? 'rgba(90,58,41,0.5)' : '#78350f', border: '2px solid #5a3a29', color: currentPage === 1 ? 'rgba(255,255,255,0.3)' : '#fbbf24', padding: '6px 14px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+            >
+              &lt; PREV
+            </button>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.9rem', color: '#fff', background: '#4a2410', border: '2px solid #5a3a29', padding: '6px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '40px' }}>
+              {currentPage} / {totalPages}
+            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              style={{ fontFamily: '"Pixelify Sans"', fontSize: '0.9rem', background: currentPage === totalPages ? 'rgba(90,58,41,0.5)' : '#78350f', border: '2px solid #5a3a29', color: currentPage === totalPages ? 'rgba(255,255,255,0.3)' : '#fbbf24', padding: '6px 14px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+            >
+              NEXT &gt;
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Modal (Add/Edit) ── */}
       {(modal === 'add' || modal === 'edit') && (

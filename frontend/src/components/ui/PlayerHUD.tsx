@@ -21,7 +21,10 @@ export default function PlayerHUD({
   sbtCount,
   nearbyNodeTitle,
 }: PlayerHUDProps) {
-  const xpPercent = Math.min((xp / xpToNext) * 100, 100);
+  const XP_PER_LEVEL = 1000;
+  const xpInCurrentLevel = Math.max(0, xp - level * XP_PER_LEVEL);
+  const effectiveXpToNext = Math.max(1, xpToNext || XP_PER_LEVEL);
+  const xpPercent = Math.min((xpInCurrentLevel / effectiveXpToNext) * 100, 100);
   const avatarUrl = useUserStore((state) => state.avatarUrl);
 
   return (
@@ -74,7 +77,7 @@ export default function PlayerHUD({
                   style={{ width: `${xpPercent}%` }}
                 />
               </div>
-              <span className={styles.xpLabel}>{xp}/{xpToNext} XP</span>
+              <span className={styles.xpLabel}>{xpInCurrentLevel}/{effectiveXpToNext} XP</span>
             </div>
           </div>
         </div>

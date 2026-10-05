@@ -116,6 +116,7 @@ async function hydrateFrontendState(
 // Module-level singleton: ensures sync runs only once per user per session,
 // even if useAuthSync() is mounted in multiple components simultaneously.
 let _syncedForUser: string | null = null;
+let _syncInFlight: Promise<void> | null = null;
 
 /**
  * Syncs the Privy session with our backend.
@@ -130,90 +131,106 @@ let _syncedForUser: string | null = null;
 export function useAuthSync() {
   const { authenticated, ready, getAccessToken, user } = usePrivy();
   const { wallets } = useWallets();
-  // isSyncing: true while the backend sync + hydrate is in progress.
-  // Exposed as reactive state so consumers can show a loading indicator.
   const [isSyncing, setIsSyncing] = useState(false);
 
   const syncAuth = useCallback(async () => {
     if (!authenticated || !ready || !user) return;
 
-    // Don't re-sync for the same Privy user within this session
-    if (_syncedForUser === user.id) return;
+    const existingToken = localStorage.getItem(TOKEN_KEY);
+    if (existingToken && _syncedForUser === user.id) return;
 
-    setIsSyncing(true);
-    try {
-      const privyToken = await getAccessToken();
-      if (!privyToken) {
-        console.warn('[AuthSync] Could not obtain Privy access token');
-        return;
-      }
+    const syncGuardKey = `auth_sync_pending_${user.id}`;
+    if (sessionStorage.getItem(syncGuardKey) === '1') return;
+    if (_syncInFlight) {
+      await _syncInFlight;
+      return;
+    }
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${privyToken}`,
-        },
-        body: JSON.stringify({
-          email: user.email?.address ?? user.google?.email ?? undefined,
-          name: user.google?.name ?? undefined,
-        }),
-      });
+    const runSync = async () => {
+      sessionStorage.setItem(syncGuardKey, '1');
+      setIsSyncing(true);
+      try {
+        const privyToken = await getAccessToken();
+        if (!privyToken) {
+          console.warn('[AuthSync] Could not obtain Privy access token');
+          return;
+        }
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        console.error('[AuthSync] Backend sync failed:', response.status, err);
-        return;
-      }
+        const response = await fetch(`${API_BASE_URL}/api/auth/sync`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${privyToken}`,
+          },
+          body: JSON.stringify({
+            email: user.email?.address ?? user.google?.email ?? undefined,
+            name: user.google?.name ?? undefined,
+          }),
+        });
 
-      const data = await response.json();
-      if (data.token) {
-        localStorage.setItem(TOKEN_KEY, data.token);
-        _syncedForUser = user.id;
-        console.log('[AuthSync] JWT stored successfully for user:', data.user?.name ?? user.id);
-        const { routeRole } = await hydrateFrontendState(data.token, user);
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          console.error('[AuthSync] Backend sync failed:', response.status, err);
+          return;
+        }
 
-        // ── Post-login redirect ──
-        // Only redirect from the landing page (/) or if user has no role at all.
-        // Admin redirect is handled inside hydrateFrontendState via window.location.replace.
-        const currentPath = window.location.pathname;
-        const isOnLanding = currentPath === '/';
+        const data = await response.json();
+        if (data.token) {
+          localStorage.setItem(TOKEN_KEY, data.token);
+          _syncedForUser = user.id;
+          console.log('[AuthSync] JWT stored successfully for user:', data.user?.name ?? user.id);
+          const { routeRole } = await hydrateFrontendState(data.token, user);
 
-        if (routeRole && routeRole !== 'admin') {
-          const isOnOnboarding = currentPath.startsWith('/assessment') || currentPath.startsWith('/select-role');
-          const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
-          const shouldSkipRedirect = currentPath === '/' && sessionStorage.getItem('pt_stay_on_landing') === '1';
-          if (isFreshLogin && !isOnOnboarding) {
-            sessionStorage.removeItem('pt_fresh_login');
-            const { onboardingCompleted } = useOnboardingStore.getState();
-            if (onboardingCompleted) {
-              window.location.replace(`/${routeRole}/dashboard`);
-            } else {
-              window.location.replace('/assessment');
+          const currentPath = window.location.pathname;
+          const isOnLanding = currentPath === '/';
+
+          if (routeRole && routeRole !== 'admin') {
+            const isOnOnboarding = currentPath.startsWith('/assessment') || currentPath.startsWith('/select-role');
+            const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
+            const shouldSkipRedirect = currentPath === '/' && sessionStorage.getItem('pt_stay_on_landing') === '1';
+            if (isFreshLogin && !isOnOnboarding) {
+              sessionStorage.removeItem('pt_fresh_login');
+              const { onboardingCompleted } = useOnboardingStore.getState();
+              if (onboardingCompleted) {
+                window.location.replace(`/${routeRole}/dashboard`);
+              } else {
+                window.location.replace('/assessment');
+              }
+            } else if (isOnOnboarding) {
+              sessionStorage.removeItem('pt_fresh_login');
+            } else if (isOnLanding && !shouldSkipRedirect && !sessionStorage.getItem('pt_retain_dashboard')) {
+              sessionStorage.setItem('pt_retain_dashboard', '1');
             }
-          } else if (isOnOnboarding) {
-            sessionStorage.removeItem('pt_fresh_login');
-          } else if (isOnLanding && !shouldSkipRedirect && !sessionStorage.getItem('pt_retain_dashboard')) {
-            sessionStorage.setItem('pt_retain_dashboard', '1');
-          }
-        } else if (!routeRole) {
-          const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
-          if (isFreshLogin && !currentPath.startsWith('/select-role')) {
-            sessionStorage.removeItem('pt_fresh_login');
-            window.location.replace('/select-role');
+          } else if (!routeRole) {
+            const isFreshLogin = sessionStorage.getItem('pt_fresh_login') === '1';
+            if (isFreshLogin && !currentPath.startsWith('/select-role')) {
+              sessionStorage.removeItem('pt_fresh_login');
+              window.location.replace('/select-role');
+            }
           }
         }
+      } catch (error) {
+        console.error('[AuthSync] Network error:', error);
+      } finally {
+        sessionStorage.removeItem(syncGuardKey);
+        setIsSyncing(false);
+        _syncInFlight = null;
       }
-    } catch (error) {
-      console.error('[AuthSync] Network error:', error);
-    } finally {
-      setIsSyncing(false);
-    }
+    };
+
+    _syncInFlight = runSync();
+    await _syncInFlight;
   }, [authenticated, ready, user, wallets, getAccessToken]);
 
   useEffect(() => {
-    setTimeout(() => void syncAuth(), 0);
-  }, [syncAuth]);
+    if (!authenticated || !ready || !user) return;
+    const existingToken = localStorage.getItem(TOKEN_KEY);
+    if (existingToken && _syncedForUser === user.id) return;
+    const timer = window.setTimeout(() => {
+      void syncAuth();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [authenticated, ready, user?.id, syncAuth]);
 
   // Separate effect to ensure we capture the wallet address,
   // since Privy sometimes populates `wallets` a few moments *after* authentication.

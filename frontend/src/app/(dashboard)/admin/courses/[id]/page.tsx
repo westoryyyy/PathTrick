@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
@@ -19,6 +19,9 @@ const BTN_PRIMARY: React.CSSProperties = { ...BTN_BASE, background: '#7c3aed', b
 
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const pathname = usePathname();
+  const baseAdminPath = pathname?.startsWith('/admin/skills') ? '/admin/skills' : '/admin/courses';
+  const isSkill = baseAdminPath === '/admin/skills';
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -221,7 +224,7 @@ export default function CourseDetailPage() {
   if (error || !course) return (
     <div style={{ ...px, padding: '32px', color: '#f87171' }}>
       {error || 'Course tidak ditemukan'}<br />
-      <Link href="/admin/courses" style={{ color: '#fbbf24', marginTop: '12px', display: 'inline-block' }}>← Kembali</Link>
+      <Link href={baseAdminPath} style={{ color: '#fbbf24', marginTop: '12px', display: 'inline-block' }}>← Kembali</Link>
     </div>
   );
 
@@ -231,7 +234,7 @@ export default function CourseDetailPage() {
       <div style={{ background: 'rgba(139,26,26,0.15)', border: '3px solid #5a3a29', padding: '16px 20px', boxShadow: '4px 4px 0 rgba(0,0,0,0.5)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <Link href="/admin/courses" style={{ ...px, fontSize: '0.8rem', color: '#a78bfa', textDecoration: 'none' }}>← Kembali ke Daftar Course</Link>
+                  <Link href={baseAdminPath} style={{ ...px, fontSize: '0.8rem', color: '#a78bfa', textDecoration: 'none' }}>{baseAdminPath === '/admin/skills' ? '← Kembali ke Daftar Skill' : '← Kembali ke Daftar Course'}</Link>
             
             {editingCourse ? (
               <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -273,26 +276,35 @@ export default function CourseDetailPage() {
       </div>
 
       {/* Chapters */}
-      {course.chapters.map(chapter => (
-        <div key={chapter.id} style={{ background: '#2e1608', border: '3px solid #5a3a29', boxShadow: '4px 4px 0 rgba(0,0,0,0.5)' }}>
+      {course.chapters.map((chapter, cIdx) => (
+        <div key={chapter.id} style={{ background: '#2e1608', border: '3px solid #5a3a29', boxShadow: '4px 4px 0 rgba(0,0,0,0.5)', marginTop: isSkill && cIdx > 0 ? '20px' : '0' }}>
           {/* Chapter header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', cursor: 'pointer', borderBottom: expandedChapters.has(chapter.id) ? '2px solid #5a3a29' : 'none' }} onClick={() => toggleChapter(chapter.id)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ color: '#fbbf24', fontSize: '1rem' }}>{expandedChapters.has(chapter.id) ? '▾' : '▸'}</span>
-              <span style={{ ...px, color: '#fbbf24', fontSize: '1rem' }}>Chapter {chapter.order}: {chapter.title}</span>
-              <span style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>{chapter.sections.length} sections</span>
+          {!isSkill && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', cursor: 'pointer', borderBottom: expandedChapters.has(chapter.id) ? '2px solid #5a3a29' : 'none' }} onClick={() => toggleChapter(chapter.id)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ color: '#fbbf24', fontSize: '1rem' }}>{expandedChapters.has(chapter.id) ? '▾' : '▸'}</span>
+                <span style={{ ...px, color: '#fbbf24', fontSize: '1rem' }}>Chapter {chapter.order}: {chapter.title}</span>
+                <span style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>{chapter.sections.length} sections</span>
+              </div>
+              <button style={BTN_DANGER} onClick={e => { e.stopPropagation(); deleteChapter(chapter.id); }} disabled={saving}>Hapus Chapter</button>
             </div>
-            <button style={BTN_DANGER} onClick={e => { e.stopPropagation(); deleteChapter(chapter.id); }} disabled={saving}>Hapus Chapter</button>
-          </div>
+          )}
 
           {/* Sections */}
-          {expandedChapters.has(chapter.id) && (
+          {(isSkill || expandedChapters.has(chapter.id)) && (
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {chapter.sections.map(section => (
+              {isSkill && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '4px' }}>
+                   <button style={{ ...BTN_DANGER, padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => deleteChapter(chapter.id)}>Hapus Seluruh Level Skill (Reset)</button>
+                </div>
+              )}
+              {chapter.sections.map((section, sIdx) => (
                 <div key={section.id} style={{ background: '#2a140a', border: '2px solid #3a2010', padding: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <div>
-                      <span style={{ ...px, color: '#e2c08d', fontSize: '0.95rem' }}>Section {section.order}: {section.title}</span>
+                      <span style={{ ...px, color: '#e2c08d', fontSize: '0.95rem' }}>
+                        {isSkill ? `Level ${sIdx + 1}: ${section.title}` : `Section ${section.order}: ${section.title}`}
+                      </span>
                       <span style={{ ...px, fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', marginLeft: '10px' }}>{section.xpReward} XP</span>
                       {section.quiz && <span style={{ ...px, fontSize: '0.75rem', background: '#1d4ed8', border: '1px solid #60a5fa', color: '#fff', padding: '2px 6px', marginLeft: '8px' }}>QUIZ</span>}
                     </div>
@@ -383,13 +395,34 @@ export default function CourseDetailPage() {
                           {q.type === 'ESSAY' ? (
                             <>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <label style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Expected Answer (contoh paragraf / jawaban lengkap):</label>
+                                <textarea placeholder="Contoh jawaban lengkap atau ringkasan yang diharapkan..." rows={4} style={{ ...px, background: '#1a0d05', border: '1px solid #5a3a29', color: '#fff', padding: '6px 8px', fontSize: '0.85rem', resize: 'vertical' }}
+                                  value={q.correctAnswer?.text || ''}
+                                  onChange={e => setEditingQuiz(prev => { 
+                                    const qs = [...prev[section.id].questions]; 
+                                    const ans = qs[qi].correctAnswer || { text: '', keywords: [] };
+                                    qs[qi] = { ...qs[qi], correctAnswer: { ...ans, text: e.target.value } }; 
+                                    return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; 
+                                  })} />
+
                                 <label style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Keywords (wajib, pisahkan koma):</label>
                                 <input placeholder="Contoh: let, variable, var" style={{ ...px, background: '#1a0d05', border: '1px solid #5a3a29', color: '#fff', padding: '5px 8px', fontSize: '0.85rem' }}
                                   value={q.correctAnswer?.keywords?.join(', ') || ''}
                                   onChange={e => setEditingQuiz(prev => { 
                                     const qs = [...prev[section.id].questions]; 
-                                    const ans = qs[qi].correctAnswer;
+                                    const ans = qs[qi].correctAnswer || { text: '', keywords: [] };
                                     qs[qi] = { ...qs[qi], correctAnswer: { ...ans, keywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean) } }; 
+                                    return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; 
+                                  })} />
+
+                                <label style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '6px' }}>Min Keyword Matches (angka kosong = default 3):</label>
+                                <input type="number" min={0} placeholder="3" style={{ ...px, width: '120px', background: '#1a0d05', border: '1px solid #5a3a29', color: '#fff', padding: '5px 8px', fontSize: '0.85rem' }}
+                                  value={q.correctAnswer?.minKeywordMatches ?? ''}
+                                  onChange={e => setEditingQuiz(prev => { 
+                                    const qs = [...prev[section.id].questions]; 
+                                    const ans = qs[qi].correctAnswer || { text: '', keywords: [] };
+                                    const v = e.target.value.trim();
+                                    qs[qi] = { ...qs[qi], correctAnswer: { ...ans, minKeywordMatches: v === '' ? undefined : parseInt(v, 10) } }; 
                                     return { ...prev, [section.id]: { ...prev[section.id], questions: qs } }; 
                                   })} />
                               </div>
@@ -450,9 +483,9 @@ export default function CourseDetailPage() {
 
               {/* Add Section Form */}
               <div style={{ background: '#1a0d05', border: '1px dashed #5a3a29', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <span style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>+ Tambah Section (Level) Baru</span>
+                <span style={{ ...px, fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>{isSkill ? '+ Tambah Level Baru' : '+ Tambah Section Baru'}</span>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <input placeholder="Judul section..." style={{ ...px, flex: '1 1 180px', background: '#2a140a', border: '1px solid #5a3a29', color: '#fff', padding: '6px 10px', fontSize: '0.9rem' }}
+                  <input placeholder={isSkill ? "Judul level..." : "Judul section..."} style={{ ...px, flex: '1 1 180px', background: '#2a140a', border: '1px solid #5a3a29', color: '#fff', padding: '6px 10px', fontSize: '0.9rem' }}
                     value={newSectionData[chapter.id]?.title ?? ''}
                     onChange={e => setNewSectionData(prev => ({ ...prev, [chapter.id]: { ...prev[chapter.id], title: e.target.value, content: prev[chapter.id]?.content ?? '', xpReward: prev[chapter.id]?.xpReward ?? '100', missionId: prev[chapter.id]?.missionId ?? '' } }))} />
                   <input placeholder="XP" type="number" style={{ ...px, width: '80px', background: '#2a140a', border: '1px solid #5a3a29', color: '#fff', padding: '6px 10px', fontSize: '0.9rem' }}
@@ -471,18 +504,22 @@ export default function CourseDetailPage() {
       ))}
 
       {/* Add Chapter */}
-      <div style={{ background: '#1a0d05', border: '2px dashed #5a3a29', padding: '16px' }}>
-        {addingChapter ? (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input autoFocus placeholder="Judul chapter baru..." style={{ ...px, flex: '1 1 200px', background: '#2a140a', border: '1px solid #5a3a29', color: '#fff', padding: '8px 12px', fontSize: '0.95rem' }}
-              value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)} onKeyDown={e => e.key === 'Enter' && addChapter()} />
-            <button style={BTN_PRIMARY} onClick={addChapter} disabled={saving || !newChapterTitle.trim()}>{saving ? 'Menyimpan…' : 'Buat Chapter'}</button>
-            <button style={BTN_BASE} onClick={() => { setAddingChapter(false); setNewChapterTitle(''); }}>Batal</button>
-          </div>
-        ) : (
-          <button style={{ ...BTN_PRIMARY, width: '100%', padding: '12px', fontSize: '0.95rem' }} onClick={() => setAddingChapter(true)}>+ Tambah Chapter Baru</button>
-        )}
-      </div>
+      {(!isSkill || course.chapters.length === 0) && (
+        <div style={{ background: '#1a0d05', border: '2px dashed #5a3a29', padding: '16px' }}>
+          {addingChapter ? (
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <input autoFocus placeholder={isSkill ? "Nama Base Skill (Bebas)..." : "Judul chapter baru..."} style={{ ...px, flex: '1 1 200px', background: '#2a140a', border: '1px solid #5a3a29', color: '#fff', padding: '8px 12px', fontSize: '0.95rem' }}
+                value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)} onKeyDown={e => e.key === 'Enter' && addChapter()} />
+              <button style={BTN_PRIMARY} onClick={addChapter} disabled={saving || !newChapterTitle.trim()}>{saving ? 'Menyimpan…' : (isSkill ? 'Inisiasi Base Skill' : 'Buat Chapter')}</button>
+              <button style={BTN_BASE} onClick={() => { setAddingChapter(false); setNewChapterTitle(''); }}>Batal</button>
+            </div>
+          ) : (
+            <button style={{ ...BTN_PRIMARY, width: '100%', padding: '12px', fontSize: '0.95rem' }} onClick={() => setAddingChapter(true)}>
+              {isSkill ? '+ Inisiasi Skill (Buka Level Pertama)' : '+ Tambah Chapter Baru'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

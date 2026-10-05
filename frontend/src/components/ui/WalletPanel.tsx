@@ -35,7 +35,8 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
     setIsLoadingBalance(true);
     setIsSpinning(true);
     try {
-      const res = await fetch('https://bsc-testnet-rpc.publicnode.com', {
+      const rpcUrl = process.env.NEXT_PUBLIC_BNB_TESTNET_RPC_URL || 'https://data-seed-prebsc-1-s1.binance.org:8545';
+      const res = await fetch(rpcUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getBalance', params: [walletAddress, 'latest'], id: 1 }),

@@ -196,9 +196,44 @@ export default function MissionFlowPage() {
     if (onConfirm) onConfirm();
   };
 
-  const handleLevelComplete = () => {
-    audioController.play('/mission completed.ogg');
+  const handleLevelComplete = async () => {
+    try {
+      const audio = new Audio('/mission completed.ogg');
+      audio.volume = 0.5;
+      audio.play().catch(() => { });
+    } catch (e) { }
+
+    try {
+      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+      const { API_BASE_URL } = await import('@/config/pathtrick');
+
+      if (content.quiz && content.quiz.length > 0 && content.quiz[0]?.id) {
+        const answers = content.quiz.map((q: any) => {
+          const correctOpt = q.options?.find((o: any) => o.isCorrect);
+          return {
+            questionId: q.id || '0',
+            selectedAnswer: correctOpt ? (correctOpt.rawAnswer || correctOpt.id || correctOpt.text) : ''
+          };
+        });
+        await fetch(`${API_BASE_URL}/api/missions/${missionId}/quiz/submit`, {
+          method: 'POST',
+          headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+      } else {
+        await fetch(`${API_BASE_URL}/api/missions/${missionId}/complete`, {
+          method: 'POST',
+          headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        });
+      }
+    } catch (err) {
+      console.error('Failed to sync progress with backend', err);
+    }
+
     completeDynamicNode(missionId as string);
+    // Peta memakai id section sebagai prerequisite level berikutnya
+    if (dbSection?.id) completeDynamicNode(dbSection.id);
+    if (dbSection?.missionId) completeDynamicNode(dbSection.missionId);
     setPhase('CLAIM');
   };
 
@@ -243,11 +278,21 @@ export default function MissionFlowPage() {
       </div>
     ],
     quiz: dbSection.quiz?.questions?.map((q: any, i: number) => ({
-      question: `Pertanyaan ${i + 1}: ${q.pertanyaan || q.question}`,
+      id: q.id,
+      question: `Pertanyaan ${i + 1}: ${q.pertanyaan || q.prompt || q.question}`,
       options: (q.pilihan || q.options || []).map((opt: any) => {
-        const isCorrect = (opt.id === q.jawabanBenar) || opt.isCorrect === true;
+        const optText = typeof opt === 'string' ? opt : (opt.teks || opt.text || opt.id || '');
+        const optId = typeof opt === 'string' ? opt : (opt.id || '');
+        const isCorrect =
+          (optId && optId === q.jawabanBenar) ||
+          (optId && optId === q.correctOptionId) ||
+          (optId && optId === q.correctAnswer) ||
+          (optText === q.correctAnswer) ||
+          opt.isCorrect === true;
         return {
-          text: (opt.id ? `${opt.id}. ` : '') + (opt.teks || opt.text),
+          id: optId,
+          rawAnswer: q.correctAnswer || optId || optText,
+          text: typeof opt === 'string' ? opt : ((opt.id ? `${opt.id}. ` : '') + optText),
           isCorrect,
           feedback: isCorrect ? 'Benar! Kerja bagus.' : 'Masih kurang tepat. Coba ingat lagi materinya.'
         };
@@ -500,16 +545,9 @@ export default function MissionFlowPage() {
       case 'MATERIAL':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
-            {materialPage === 0 && (
-              <div className={styles.cardHeader}>
-                <h2 className={styles.title}>{currentChapter.name}</h2>
-              </div>
-            )}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: materialPage === 0 ? '20px' : '0', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
-              {materials[materialPage * 2]}
-            </div>
+            <div style={{ flex: 1 }} />
 
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto' }}>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', marginTop: 'auto', position: 'relative', zIndex: 20 }}>
               {materialPage > 0 && (
                 <button onMouseEnter={playHoverSound} className={styles.secondaryBtn} onClick={() => { playSwipeSound(); setMaterialPage(p => p - 1); }}>
                   ← SEBELUMNYA
@@ -599,16 +637,10 @@ export default function MissionFlowPage() {
       case 'MATERIAL':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '16px' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingRight: '8px' }} className={styles.scrollableContent}>
-              {materials[materialPage * 2 + 1] || (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8c5d41', opacity: 0.5, marginTop: '100px' }}>
-                  <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem' }}>[ Halaman Kosong ]</p>
-                </div>
-              )}
-            </div>
+            <div style={{ flex: 1 }} />
 
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
-              {materialPage < Math.ceil(materials.length / 2) - 1 ? (
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px', position: 'relative', zIndex: 20 }}>
+              {materialPage < totalPages - 1 ? (
                 <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setMaterialPage(p => p + 1); }}>
                   LANJUT ➔
                 </button>
@@ -722,7 +754,7 @@ export default function MissionFlowPage() {
                 Reward XP dan item telah ditambahkan ke akunmu.
               </p>
             </div>
-            <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
+            <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
               KLAIM REWARD & KEMBALI KE PETA
             </button>
           </div>
@@ -737,7 +769,7 @@ export default function MissionFlowPage() {
     <div className={styles.wrapper}>
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
-        <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}`)}>
+        <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}>
           ← KEMBALI KE PETA
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
@@ -911,7 +943,7 @@ export default function MissionFlowPage() {
                                 setIsClaiming(true);
                                 addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                                 completeQuiz();
-                                setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                                setTimeout(() => router.push(`/map?chapter=${baseChapterId}&role=chaser`), 1200);
                               }
                             }}
                             disabled={isClaiming}
@@ -922,7 +954,7 @@ export default function MissionFlowPage() {
                         <button onMouseEnter={playHoverSound}
                           className={styles.secondaryBtn}
                           style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
-                          onClick={() => router.push(`/map?chapter=${baseChapterId}`)}
+                          onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}
                         >
                           KEMBALI KE PETA
                         </button>
@@ -940,7 +972,7 @@ export default function MissionFlowPage() {
                             triggerLevelUp();
                           }
                           completeQuiz();
-                          setTimeout(() => router.push(`/map?chapter=${baseChapterId}`), 1200);
+                          setTimeout(() => router.push(`/map?chapter=${baseChapterId}&role=chaser`), 1200);
                         }
                       }}
                       disabled={isClaiming}

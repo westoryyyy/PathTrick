@@ -4,21 +4,19 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '@/components/ui/Dashboard.module.css';
 import { useTranslation } from '@/hooks/useTranslation';
+import { API_BASE_URL } from '@/config/pathtrick';
+import { getAuthHeaders } from '@/hooks/useAuthSync';
+import { extractTextFromPDF } from '@/lib/pdfExtractor';
 
 const MAX_SIZE_MB = 10;
 const ACCEPTED_TYPES = [
   'application/pdf',
 ];
 
-// Mock skill upgrade result
-const MOCK_NEW_SKILLS = ['TypeScript', 'Docker', 'AWS Basics'];
-const MOCK_UPGRADE_SKILLS = ['React Lv.3 → Lv.4', 'Node.js Lv.2 → Lv.3'];
-const MOCK_MISSING_SKILLS = ['Kubernetes', 'GraphQL', 'CI/CD Pipeline'];
-const MOCK_XP_GAIN = 350;
-
 export default function CVUpdaterWidget() {
   const { t } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'uploading' | 'extracting' | 'done' | 'error'>('idle');
+  const [result, setResult] = useState<{newSkills: string[], missingSkills: string[], xpGained: number} | null>(null);
   const [fileName, setFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
@@ -89,6 +87,51 @@ export default function CVUpdaterWidget() {
     setFileName(file.name);
     setErrorMsg('');
     setStatus('uploading');
+
+    try {
+      setStatus('extracting');
+      
+      const cvText = await extractTextFromPDF(file);
+
+      // Basic validation: ensure extracted text is non-empty
+      if (!cvText || !cvText.trim()) {
+        setErrorMsg('Teks CV tidak ditemukan. Pastikan file berisi teks (PDF berbasis teks, bukan gambar).');
+        setStatus('error');
+        return;
+      }
+
+      const headers = getAuthHeaders();
+
+      const res = await fetch(`${API_BASE_URL}/api/cv/update`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ cvText }),
+      });
+
+      if (!res.ok) {
+        // Try parse backend error message, but handle gracefully
+        let errMsg = 'Gagal memproses CV';
+        try {
+          const err = await res.json();
+          if (err && (err.error || err.message)) errMsg = err.error || err.message;
+        } catch (e) {
+          // ignore parse errors
+        }
+        setErrorMsg(errMsg);
+        setStatus('error');
+        return;
+      }
+
+      const data = await res.json();
+      setResult(data);
+      setStatus('done');
+      
+      // Update global user/gamification data if needed by triggering an event or reload
+    } catch (error: any) {
+      console.error(error);
+      setErrorMsg(error.message);
+      setStatus('error');
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); };
@@ -103,7 +146,7 @@ export default function CVUpdaterWidget() {
     if (file) handleFileUpload(file);
   };
   const handleReset = () => {
-    setStatus('idle'); setFileName(''); setErrorMsg('');
+    setStatus('idle'); setFileName(''); setErrorMsg(''); setResult(null);
     setUploadProgress(0); setExtractProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -319,7 +362,7 @@ export default function CVUpdaterWidget() {
                   display: 'flex', alignItems: 'center', gap: '8px',
                 }}>
                   <Image src="/Coin.png" alt="" width={15} height={15} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
-                  +{MOCK_XP_GAIN} XP GAINED
+                  +{result?.xpGained || 0} XP GAINED
                 </div>
               </>
             )}
@@ -412,32 +455,15 @@ export default function CVUpdaterWidget() {
                     Skill Baru Terdeteksi
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {MOCK_NEW_SKILLS.map((skill, i) => (
+                    {result?.newSkills.length === 0 ? (
+                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>Tidak ada skill baru</span>
+                    ) : result?.newSkills.map((skill: string, i: number) => (
                       <span key={i} style={{
                         fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff',
                         background: '#78350f', border: '2px solid #fbbf24',
                         padding: '4px 10px', boxShadow: '2px 2px 0 rgba(0,0,0,0.4)',
                       }}>
                         + {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Skill Level Upgrades */}
-                <div style={{ background: 'rgba(59,38,27,0.6)', border: '2px solid #b45309', padding: '12px 16px' }}>
-                  <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#fbbf24', margin: '0 0 8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Image src="/Healing Potions.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
-                    Skill Diupgrade
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {MOCK_UPGRADE_SKILLS.map((skill, i) => (
-                      <span key={i} style={{
-                        fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff',
-                        display: 'flex', alignItems: 'center', gap: '8px',
-                      }}>
-                        <span style={{ width: '8px', height: '8px', background: '#fbbf24', display: 'inline-block', flexShrink: 0, border: '1px solid #b45309' }} />
-                        {skill}
                       </span>
                     ))}
                   </div>
@@ -450,7 +476,9 @@ export default function CVUpdaterWidget() {
                     Skill yang Masih Kurang
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {MOCK_MISSING_SKILLS.map((skill, i) => (
+                    {result?.missingSkills.length === 0 ? (
+                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>Sudah lengkap!</span>
+                    ) : result?.missingSkills.map((skill: string, i: number) => (
                       <span key={i} style={{
                         fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff',
                         background: '#450a0a', border: '2px solid #991b1b',

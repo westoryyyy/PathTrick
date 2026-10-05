@@ -98,6 +98,32 @@ export const useScholarStore = create<ScholarState>((set, get) => ({
   fetchProfileData: async () => {
     set({ isLoading: true });
     try {
+      const dashRes = await fetch(`${API_BASE_URL}/api/chaser/dashboard`, { headers: getAuthHeaders() });
+      if (dashRes.ok) {
+        const dash = await dashRes.json();
+        const skills: string[] = dash.detectedSkills ?? [];
+        set({
+          xp: dash.xp ?? 0,
+          classifiedSkills: classifySkills(skills),
+          earnedSBTs: skills,
+        });
+        const matches = (dash.jobMatches ?? []).map((j: any) => ({
+          id: j.id,
+          title: j.title,
+          company: j.company,
+          // DB Job tidak punya field gicsSector
+          gicsSector: 'IT' as GICSSectorCode,
+          requiredSkills: j.requiredSkills || [],
+          matchPercentage: j.matchPercentage ?? 0,
+          coverImage: j.coverImage || '/Blade.png',
+        }));
+        if (matches.length > 0) {
+          set({ matchedJobs: matches, targetJob: matches[0], isLoading: false });
+          return;
+        }
+      }
+
+      // Fallback: belum ada hasil AI -> tampilkan daftar lowongan biasa
       const res = await fetch(`${API_BASE_URL}/api/jobs`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
@@ -107,8 +133,7 @@ export const useScholarStore = create<ScholarState>((set, get) => ({
             id: j.id,
             title: j.title,
             company: j.company,
-            // Fallback ke IT karena DB Job tidak punya field gicsSector
-            gicsSector: 'IT' as GICSSectorCode, 
+            gicsSector: 'IT' as GICSSectorCode,
             requiredSkills: j.skillsRequired || [],
             matchPercentage: 0,
             coverImage: j.coverImageUrl || '/Blade.png',
@@ -117,7 +142,7 @@ export const useScholarStore = create<ScholarState>((set, get) => ({
         }
       }
     } catch (e) {
-      console.error('Failed to fetch jobs', e);
+      console.error('Failed to fetch chaser data', e);
     }
     set({ isLoading: false });
   },
