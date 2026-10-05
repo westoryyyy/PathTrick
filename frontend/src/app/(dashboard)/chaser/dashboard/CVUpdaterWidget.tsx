@@ -104,7 +104,10 @@ export default function CVUpdaterWidget() {
 
       const res = await fetch(`${API_BASE_URL}/api/cv/update`, {
         method: 'POST',
-        headers: headers,
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ cvText }),
       });
 
