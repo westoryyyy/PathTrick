@@ -32,7 +32,22 @@ export function buildApp() {
   });
 
   app.register(cors, {
-    origin: env.CORS_ORIGIN,
+    origin: (origin, cb) => {
+      if (!origin) {
+        cb(null, true);
+        return;
+      }
+      if (env.CORS_ORIGIN === '*') {
+        cb(null, true);
+        return;
+      }
+      const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (allowedOrigins.includes(origin)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Not allowed by CORS'), false);
+      }
+    },
     credentials: true,
   });
 
