@@ -189,8 +189,8 @@ export default function Dashboard() {
           setBounties(questList.map((quest: any) => ({
             id: quest.id,
             type: quest.type,
-            task: quest.title,
-            desc: quest.description,
+            task: t(`sma.dashboard.quests.${quest.type}.title`) !== `sma.dashboard.quests.${quest.type}.title` ? t(`sma.dashboard.quests.${quest.type}.title`) : quest.title,
+            desc: t(`sma.dashboard.quests.${quest.type}.desc`) !== `sma.dashboard.quests.${quest.type}.desc` ? t(`sma.dashboard.quests.${quest.type}.desc`) : quest.description,
             reward: `+${quest.rewardXp} XP`,
             done: !!quest.isCompleted,
             claimed: !!quest.isRewardClaimed,
@@ -206,7 +206,7 @@ export default function Dashboard() {
   }, []);
   const { logout, user } = usePrivy();
   const { wallets } = useWallets();
-  const { displayName: savedName, avatarUrl, totalXP, level } = useUserStore();
+  const { displayName: savedName, avatarUrl, totalXP, level, addXP } = useUserStore();
 
   // Real user display name - same priority as layouts
   const activeWallet = wallets[0];
@@ -374,7 +374,11 @@ export default function Dashboard() {
                         headers: getAuthHeaders(),
                       });
                       if (res.ok) {
+                        const data = await res.json();
                         setBounties(prev => prev.map(item => item.id === bounty.id ? { ...item, claimed: true } : item));
+                        if (data.rewardXp) {
+                          addXP(data.rewardXp);
+                        }
                       }
                     } catch (error) {
                       console.error('Failed to claim quest:', error);
@@ -388,16 +392,17 @@ export default function Dashboard() {
                     <span className={`${styles.questTitle} ${bounty.claimed ? styles.questTitleDone : ''}`}>
                       {bounty.task}
                     </span>
-                    <span className={styles.questDesc}>{bounty.desc}</span>
+                    <span className={`${styles.questDesc} ${bounty.claimed ? styles.questDescDone : ''}`}>{bounty.desc}</span>
                   </div>
                   <span className={styles.questReward} style={
                     bounty.claimed 
-                      ? { background: '#a3a3a3', borderColor: '#525252', color: '#fff', opacity: 0.8 } 
+                      ? { background: '#525252', borderColor: '#404040', color: '#e5e5e5', opacity: 0.9, padding: '4px 8px', fontSize: '0.65rem' } 
+ 
                       : (bounty.done 
-                          ? { background: '#047857', borderColor: '#064e3b', color: '#fff' } 
-                          : {})
+                          ? { background: '#047857', borderColor: '#064e3b', color: '#fff', padding: '4px 8px', fontSize: '0.65rem' } 
+                          : { padding: '4px 8px', fontSize: '0.65rem' })
                   }>
-                    {bounty.claimed ? t('sma.dashboard.claimed') : (bounty.done ? t('sma.dashboard.claim') : bounty.reward)}
+                    {bounty.claimed ? `${t('sma.dashboard.claimed')} (${bounty.reward})` : (bounty.done ? `${t('sma.dashboard.claim')} (${bounty.reward})` : bounty.reward)}
                   </span>
                 </div>
               ))}

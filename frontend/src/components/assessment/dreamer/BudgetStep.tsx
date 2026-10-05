@@ -2,6 +2,7 @@
 
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const BUDGET_OPTIONS = [
   { value: 'under5',    label: '< Rp 5 jt / semester',  icon: '/Coin.png', desc: 'Terjangkau' },
@@ -12,13 +13,14 @@ const BUDGET_OPTIONS = [
 ];
 
 export default function BudgetStep() {
+  const { locale } = useTranslation();
   const budget = useOnboardingStore((s) => s.dreamerAssessment.budgetPreference);
   const setField = useOnboardingStore((s) => s.setDreamerField);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[500px] mx-auto">
       <p className="font-pixel text-[0.7rem] text-[rgba(240,232,255,0.7)] text-center m-0 leading-[1.6] uppercase">
-        Pilih satu rentang biaya kuliah yang sesuai dengan rencana keluargamu.
+        {locale === 'id' ? 'Pilih satu rentang biaya kuliah yang sesuai dengan rencana keluargamu.' : 'Select one tuition fee range that fits your family plan.'}
       </p>
       <div className="flex flex-col gap-4">
         {BUDGET_OPTIONS.map((opt) => {
@@ -36,10 +38,18 @@ export default function BudgetStep() {
               </span>
               <div className="flex flex-col gap-1.5 flex-1">
                 <span className="font-pixel text-[0.85rem] text-white tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b]">
-                  {opt.label}
+                  {opt.value === 'under5' ? (locale === 'id' ? opt.label : '< 5M IDR / semester') :
+                   opt.value === '5to15' ? (locale === 'id' ? opt.label : '5 - 15M IDR') :
+                   opt.value === '15to30' ? (locale === 'id' ? opt.label : '15 - 30M IDR') :
+                   opt.value === 'above30' ? (locale === 'id' ? opt.label : '> 30M IDR') :
+                   locale === 'id' ? opt.label : 'Full Scholarship'}
                 </span>
                 <span className="font-pixel text-[0.55rem] text-white drop-shadow-[1px_1px_0_#3b261b]">
-                  {opt.desc}
+                  {opt.value === 'under5' ? (locale === 'id' ? opt.desc : 'Affordable') :
+                   opt.value === '5to15' ? (locale === 'id' ? opt.desc : 'Medium') :
+                   opt.value === '15to30' ? (locale === 'id' ? opt.desc : 'Premium') :
+                   opt.value === 'above30' ? (locale === 'id' ? opt.desc : 'Exclusive') :
+                   locale === 'id' ? opt.desc : 'Full Scholarship'}
                 </span>
               </div>
               {isSelected && (

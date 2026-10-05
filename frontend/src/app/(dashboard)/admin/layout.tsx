@@ -156,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
                     onMouseEnter={playHoverSound}
                   >
-                    <Image src={item.img} alt="" width={18} height={18} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
+                    <Image src={item.img} alt="" width={18} height={18} style={{ imageRendering: 'pixelated', flexShrink: 0, height: 18 }} />
                     <span>{item.label}</span>
                   </Link>
                 );

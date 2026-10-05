@@ -131,6 +131,24 @@
       "viewAll": "VIEW ALL",
       "universityAiFeedback": "Complete 2 more courses to reach 100% readiness!",
       "scholarshipAiFeedback": "Perfect match for your RIASEC profile & financial needs.",
+      "quests": {
+        "MODULE_COMPLETED": {
+          "title": "Complete 1 Module",
+          "desc": "Earn XP from your first module"
+        },
+        "DAILY_LOGIN": {
+          "title": "Daily Login",
+          "desc": "Log in to PathTrick today"
+        },
+        "QUIZ_BOSS_COMPLETED": {
+          "title": "Defeat the Module Boss",
+          "desc": "Complete the final evaluation of a House"
+        },
+        "SBT_CLAIMED": {
+          "title": "Claim Certificate (SBT)",
+          "desc": "Mint your Web3 achievement certificate"
+        }
+      },
       "mantras": {
         "0": "You doubt yourself, yet secretly many admire your progress. Stop being your own harshest critic.",
         "1": "Feeling like an impostor because you're not an expert yet? It's not a sign of weakness. It means you dared to step into a room bigger than your comfort zone.",
@@ -258,7 +276,7 @@
     },
     "stats": {
       "activeLearners": "Active Learners",
-      "questsCleared": "Quests Cleared",
+      "questsCleared": "Mission Cleared",
       "satisfaction": "Satisfaction",
       "avgToStart": "Avg. To Start"
     },

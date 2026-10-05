@@ -13,12 +13,14 @@ import { MISSION_CONTENT } from '@/data/missionContent';
 import { getQuizForMission } from '@/data/quizBank';
 import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 
 export default function MissionFlowPage() {
   const { missionId } = useParams();
   const router = useRouter();
+  const { t, locale } = useTranslation();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, displayName: savedName } = useUserStore();
   const { user } = usePrivy();
@@ -854,10 +856,10 @@ export default function MissionFlowPage() {
                   style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', background: '#fdf6e3', border: '4px dashed #059669', padding: '48px 32px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
                 >
                   <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontSize: '1.2rem', lineHeight: '1.6' }}>
-                    MISSION CLEARED!
+                    {locale === 'id' ? 'MISSION CLEARED!' : 'MISSION CLEARED!'}
                   </h2>
                   <p className={styles.text} style={{ textAlign: 'center', fontSize: '0.75rem', lineHeight: '1.8' }}>
-                    Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.
+                    {locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.' : 'Amazing, Knight! You have successfully conquered the challenge in this chapter.'}
                   </p>
                   <div style={{ textAlign: 'center', padding: '24px 0' }}>
                     <motion.div
@@ -870,7 +872,7 @@ export default function MissionFlowPage() {
                       <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))' }} />
                     </motion.div>
                     <p className={styles.text} style={{ marginTop: '16px', fontSize: '0.65rem', color: '#92400e' }}>
-                      Reward XP dan item telah ditambahkan ke akunmu.
+                      {locale === 'id' ? 'Reward XP dan item telah ditambahkan ke akunmu.' : 'XP Reward and items have been added to your account.'}
                     </p>
                   </div>
 
@@ -890,7 +892,7 @@ export default function MissionFlowPage() {
                     }}
                     disabled={isClaiming}
                   >
-                    {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI KE PETA'}
+                    {isClaiming ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') : (locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP')}
                   </button>
                 </motion.div>
               </AnimatePresence>

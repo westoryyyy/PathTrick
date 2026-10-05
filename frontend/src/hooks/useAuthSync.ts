@@ -140,14 +140,13 @@ export function useAuthSync() {
     if (existingToken && _syncedForUser === user.id) return;
 
     const syncGuardKey = `auth_sync_pending_${user.id}`;
-    if (sessionStorage.getItem(syncGuardKey) === '1') return;
+    sessionStorage.removeItem(syncGuardKey); // legacy guard could get stuck; in-flight promise below is enough
     if (_syncInFlight) {
       await _syncInFlight;
       return;
     }
 
     const runSync = async () => {
-      sessionStorage.setItem(syncGuardKey, '1');
       setIsSyncing(true);
       try {
         const privyToken = await getAccessToken();
@@ -190,12 +189,7 @@ export function useAuthSync() {
             const shouldSkipRedirect = currentPath === '/' && sessionStorage.getItem('pt_stay_on_landing') === '1';
             if (isFreshLogin && !isOnOnboarding) {
               sessionStorage.removeItem('pt_fresh_login');
-              const { onboardingCompleted } = useOnboardingStore.getState();
-              if (onboardingCompleted) {
-                window.location.replace(`/${routeRole}/dashboard`);
-              } else {
-                window.location.replace('/assessment');
-              }
+              window.location.replace(await resolveHomePath(routeRole));
             } else if (isOnOnboarding) {
               sessionStorage.removeItem('pt_fresh_login');
             } else if (isOnLanding && !shouldSkipRedirect && !sessionStorage.getItem('pt_retain_dashboard')) {
@@ -267,6 +261,25 @@ export function useAuthSync() {
     /** Force re-sync (e.g. after role change) */
     resync: syncAuth,
   };
+}
+
+/**
+ * Resolve where a logged-in dreamer/chaser should land.
+ * Dashboard only if the backend confirms the assessment was completed (roadmap exists),
+ * otherwise /assessment so unfinished onboarding can't be skipped via refresh/back.
+ */
+export async function resolveHomePath(slug: string): Promise<string> {
+  if (slug === 'admin') return '/admin/dashboard';
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    const res = await fetch(`${API_BASE_URL}/api/users/me`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (res.ok) {
+      const data = await res.json();
+      if (!(Array.isArray(data?.roadmaps) && data.roadmaps.length > 0)) return '/assessment';
+      useOnboardingStore.setState({ onboardingCompleted: true });
+    }
+  } catch { /* fall through to dashboard on network error */ }
+  return `/${slug}/dashboard`;
 }
 
 /**

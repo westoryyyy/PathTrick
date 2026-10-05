@@ -508,20 +508,27 @@
 .questTitle {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.8rem;
-  color: #fff;
+  color: #3b261b;
   transition: color 0.2s;
   line-height: 1.4;
 }
 
 .questTitleDone {
-  color: #34d399;
+  color: #f3f4f6;
+  text-shadow: 1px 1px 0 #525252;
 }
 
 .questDesc {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.6rem;
-  color: #d4a373;
+  color: #fff;
+  opacity: 0.8;
   line-height: 1.4;
+}
+
+.questDescDone {
+  color: #d4d4d8;
+  text-shadow: 1px 1px 0 #525252;
 }
 
 .questReward {
@@ -627,7 +634,7 @@
 .lbRankNum {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.7rem;
-  color: #d4a373;
+  color: #5a3a29;
   width: 24px;
 }
 
@@ -639,9 +646,12 @@
 
 .lbScore {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.7rem;
-  color: #34d399;
-  text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+  font-size: 0.6rem;
+  color: #fff;
+  background: #047857;
+  padding: 4px 8px;
+  border: 2px solid #064e3b;
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
 }
 
 /* Achievement Vault */

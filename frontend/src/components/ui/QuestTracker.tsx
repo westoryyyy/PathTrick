@@ -64,7 +64,7 @@ export default function QuestTracker({ nodes, onSelectNode }: QuestTrackerProps)
                 <p className={styles.questXp}>+{n.xp} XP</p>
               </div>
               <span className={styles.questStatus}>
-                <Image src={n.status === 'in_progress' ? '/Book.png' : '/Energy Shard.png'} alt="" width={20} height={20} />
+                <Image src={n.status === 'in_progress' ? '/Book.png' : '/Energy Shard.png'} alt="" width={20} height={20} style={{ height: 20 }} />
               </span>
             </button>
           ))}

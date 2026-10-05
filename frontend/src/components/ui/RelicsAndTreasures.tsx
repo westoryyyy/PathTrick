@@ -23,7 +23,7 @@ const BADGE_ASSET_MAP = {
 } as const;
 
 export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'BADGES UNLOCKED' }: Props = {}) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
   const badgeCount = useMapStore(state => state.badgeCount);
   const fetchAchievements = useMapStore(state => state.fetchAchievements);
@@ -43,14 +43,14 @@ export default function RelicsAndTreasures({ hideHeader = false, statsLabel = 'B
   }, [fetchAchievements]);
   
   const VAULT_SBTS = [
-    { id: 1, name: 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: BADGE_ASSET_MAP.mission_completer },
-    { id: 2, name: 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: BADGE_ASSET_MAP.early_bird },
-    { id: 3, name: 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: BADGE_ASSET_MAP.streak_warrior },
-    { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: BADGE_ASSET_MAP.quiz_master },
-    { id: 5, name: 'Quick Learner', desc: t('badges.quickLearner'), earned: unlockedKeys.includes('quick_learner'), icon: BADGE_ASSET_MAP.quick_learner },
-    { id: 6, name: 'Course Master', desc: t('badges.courseMaster'), earned: unlockedKeys.includes('course_master'), icon: BADGE_ASSET_MAP.course_master },
-    { id: 8, name: 'First Step', desc: t('badges.firstStep'), earned: unlockedKeys.includes('first_step'), icon: BADGE_ASSET_MAP.first_step },
-    { id: 9, name: 'Night Owl', desc: t('badges.nightOwl'), earned: unlockedKeys.includes('night_owl'), icon: BADGE_ASSET_MAP.night_owl },
+    { id: 1, name: locale === 'id' ? 'Penakluk Misi' : 'Mission Completer', desc: t('badges.missionCompleter'), earned: unlockedKeys.includes('mission_completer'), icon: BADGE_ASSET_MAP.mission_completer },
+    { id: 2, name: locale === 'id' ? 'Si Burung Pagi' : 'Early Bird', desc: t('badges.earlyBird'), earned: unlockedKeys.includes('early_bird'), icon: BADGE_ASSET_MAP.early_bird },
+    { id: 3, name: locale === 'id' ? 'Pejuang Konsisten' : 'Streak Warrior', desc: t('badges.streakWarrior'), earned: unlockedKeys.includes('streak_warrior'), icon: BADGE_ASSET_MAP.streak_warrior },
+    { id: 4, name: locale === 'id' ? 'Ahli Kuis' : 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: BADGE_ASSET_MAP.quiz_master },
+    { id: 5, name: locale === 'id' ? 'Si Cepat Paham' : 'Quick Learner', desc: t('badges.quickLearner'), earned: unlockedKeys.includes('quick_learner'), icon: BADGE_ASSET_MAP.quick_learner },
+    { id: 6, name: locale === 'id' ? 'Master Kursus' : 'Course Master', desc: t('badges.courseMaster'), earned: unlockedKeys.includes('course_master'), icon: BADGE_ASSET_MAP.course_master },
+    { id: 8, name: locale === 'id' ? 'Langkah Pertama' : 'First Step', desc: t('badges.firstStep'), earned: unlockedKeys.includes('first_step'), icon: BADGE_ASSET_MAP.first_step },
+    { id: 9, name: locale === 'id' ? 'Si Burung Hantu' : 'Night Owl', desc: t('badges.nightOwl'), earned: unlockedKeys.includes('night_owl'), icon: BADGE_ASSET_MAP.night_owl },
   ];
 
   return (

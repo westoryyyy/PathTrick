@@ -10,18 +10,10 @@ import CVUploadStep from './chaser/CVUploadStep';
 import WorkInterestStep from './chaser/WorkInterestStep';
 import { useRouter } from 'next/navigation';
 
-const DREAMER_STEPS = [
-  { title: 'Asesmen RIASEC',           desc: 'Jawab setiap pertanyaan untuk mengetahui profil minat & bakatmu (RIASEC).' },
-  { title: 'Preferensi Budget',         desc: 'Pilih rentang biaya kuliah yang sesuai dengan rencana keluargamu.' },
-  { title: 'Preferensi Jurusan & Negara', desc: 'Tambahkan preferensi jurusan dan negara tujuan (opsional).' },
-];
-
-const CHASER_STEPS = [
-  { title: 'Upload CV',              desc: 'Upload CV-mu dan biarkan AI menganalisis skill & pengalamanmu.' },
-  { title: 'Minat Kerja',            desc: 'Konfirmasi skill-mu dan pilih industri yang kamu minati.' },
-];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AssessmentWizard() {
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const role = useOnboardingStore((s) => s.selectedRole);
   const currentStep = useOnboardingStore((s) => s.currentStep);
@@ -39,6 +31,17 @@ export default function AssessmentWizard() {
   const preferredGICS = useOnboardingStore((s) => s.chaserAssessment.preferredGICS);
 
   if (!role) return null;
+
+  const DREAMER_STEPS = [
+    { title: locale === 'id' ? 'Asesmen RIASEC' : 'RIASEC Assessment',           desc: locale === 'id' ? 'Jawab setiap pertanyaan untuk mengetahui profil minat & bakatmu (RIASEC).' : 'Answer each question to discover your interest & talent profile (RIASEC).' },
+    { title: locale === 'id' ? 'Preferensi Budget' : 'Budget Preference',         desc: locale === 'id' ? 'Pilih rentang biaya kuliah yang sesuai dengan rencana keluargamu.' : 'Select the tuition fee range that fits your family plan.' },
+    { title: locale === 'id' ? 'Preferensi Jurusan & Negara' : 'Major & Country Preference', desc: locale === 'id' ? 'Tambahkan preferensi jurusan dan negara tujuan (opsional).' : 'Add your preferred major and study destination (optional).' },
+  ];
+
+  const CHASER_STEPS = [
+    { title: locale === 'id' ? 'Upload CV' : 'Upload CV',              desc: locale === 'id' ? 'Upload CV-mu dan biarkan AI menganalisis skill & pengalamanmu.' : 'Upload your CV and let AI analyze your skills & experience.' },
+    { title: locale === 'id' ? 'Minat Kerja' : 'Work Interest',            desc: locale === 'id' ? 'Konfirmasi skill-mu dan pilih industri yang kamu minati.' : 'Confirm your skills and select your industry of interest.' },
+  ];
 
   const steps = role === 'dreamer' ? DREAMER_STEPS : CHASER_STEPS;
   const step = steps[currentStep];
@@ -70,7 +73,7 @@ export default function AssessmentWizard() {
     if (isLast) {
       await submitAssessment();
       if (!useOnboardingStore.getState().onboardingCompleted) {
-        alert('Gagal menyimpan asesmen ke server. Periksa koneksi lalu coba lagi.');
+        alert(locale === 'id' ? 'Gagal menyimpan asesmen ke server. Periksa koneksi lalu coba lagi.' : 'Failed to save assessment to server. Check your connection and try again.');
         return;
       }
       if (role === 'dreamer') {
@@ -114,7 +117,7 @@ export default function AssessmentWizard() {
       stepDescription={step.desc}
       optionalFrom={role === 'dreamer' ? 2 : undefined}
       canNext={canNext}
-      nextLabel={isLast ? 'Mulai Petualangan' : undefined}
+      nextLabel={isLast ? (locale === 'id' ? 'Mulai Petualangan' : 'Start Adventure') : undefined}
       onNext={handleNext}
       onBack={prevStep}
       isSubmitting={isSubmitting}

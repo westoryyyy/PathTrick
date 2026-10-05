@@ -4,6 +4,52 @@ import { useEffect, useState, useMemo } from 'react';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import { API_BASE_URL } from '@/config/pathtrick';
 import PixelIcon from '@/components/ui/PixelIcon';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const RIASEC_EN: Record<string, string> = {
+  q01: "I like working independently",
+  q02: "I like organizing things (books, stationery, room)",
+  q03: "I like setting goals for myself",
+  q04: "I like solving puzzles",
+  q05: "I like tinkering with tools/equipment",
+  q06: "I like working in groups",
+  q07: "I like reading books about art and music",
+  q08: "I like doing things with clear instructions",
+  q09: "I like convincing friends to follow my way",
+  q10: "I like doing experiments",
+  q11: "I like building blocks/LEGO",
+  q12: "I like explaining things to friends",
+  q13: "I like creating written works",
+  q14: "I don't mind working beyond the given time",
+  q15: "I like selling things",
+  q16: "I like science",
+  q17: "I like taking care of animals",
+  q18: "I like helping others solve problems",
+  q19: "I am a creative person",
+  q20: "I like paying attention to details",
+  q21: "I like getting new challenges",
+  q22: "I like finding out how tools work",
+  q23: "I like assembling or building things",
+  q24: "I like entertaining friends",
+  q25: "I like playing musical instruments or singing",
+  q26: "I like organizing notes",
+  q27: "I want to open my own business someday",
+  q28: "I like finding out the cause of an event",
+  q29: "I like cooking",
+  q30: "I like learning about cultures of various regions",
+  q31: "I like role-playing/drama",
+  q32: "I like tidying up my room",
+  q33: "I like leading a group or class",
+  q34: "I like solving math or graph problems",
+  q35: "I like practicing what I've learned",
+  q36: "I like discussing things happening around me",
+  q37: "I like drawing",
+  q38: "I like indoor activities with a desk and chair",
+  q39: "I like public speaking",
+  q40: "I like calculating/counting",
+  q41: "I like outdoor activities",
+  q42: "I like helping people"
+};
 
 interface RiasecQuestion {
   id: string;
@@ -16,6 +62,7 @@ const QUESTIONS_PER_PAGE = 6;
 const DEFAULT_CARD_COLOR = '#3b82f6'; // We can use blue for all questions since category is hidden
 
 export default function RIASECStep() {
+  const { locale } = useTranslation();
   const [questions, setQuestions] = useState<RiasecQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -135,7 +182,7 @@ export default function RIASECStep() {
                 textShadow: '1px 1px 0 #3b261b',
                 flex: 1,
               }}>
-                {q.order}. {q.text}
+                {q.order}. {locale === 'id' ? q.text : (RIASEC_EN[q.id] || q.text)}
               </p>
 
               {/* Gem rating bar */}
@@ -181,13 +228,13 @@ export default function RIASECStep() {
                   fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                   textShadow: '1px 1px 0 #3b261b',
                   whiteSpace: 'nowrap', pointerEvents: 'none',
-                }}>Sangat Tidak Setuju</span>
+                }}>{locale === 'id' ? 'Sangat Tidak Setuju' : 'Strongly Disagree'}</span>
                 <span className="font-pixel" style={{
                   position: 'absolute', bottom: '5px', right: '8px',
                   fontSize: '0.48rem', color: 'rgba(255,255,255,0.85)',
                   textShadow: '1px 1px 0 #3b261b',
                   whiteSpace: 'nowrap', pointerEvents: 'none',
-                }}>Sangat Setuju</span>
+                }}>{locale === 'id' ? 'Sangat Setuju' : 'Strongly Agree'}</span>
               </div>
 
               {/* Score badge */}

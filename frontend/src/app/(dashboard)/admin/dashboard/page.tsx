@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
         {STAT_CARDS.map((stat) => (
           <div key={stat.label} className={styles.statCard} style={{ borderColor: stat.border }}>
             <div className={styles.statIcon} style={{ background: `${stat.color}22`, border: `3px solid ${stat.color}` }}>
-              <Image src={stat.img} alt="" width={28} height={28} style={{ imageRendering: 'pixelated', objectFit: 'contain', width: '28px', height: '28px' }} />
+              <Image src={stat.img} alt="" width={28} height={28} style={{ imageRendering: 'pixelated', objectFit: 'contain', width: '28px', height: 28 }} />
             </div>
             <div className={styles.statInfo}>
               <span className={styles.statValue} style={{ color: stat.color }}>
@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
           <div className={styles.quickLinksGrid}>
             {QUICK_LINKS.map((link) => (
               <Link key={link.href} href={link.href} className={styles.quickCard}>
-                <Image src={link.img} alt="" width={22} height={22} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
+                <Image src={link.img} alt="" width={22} height={22} style={{ imageRendering: 'pixelated', flexShrink: 0, height: 22 }} />
                 <div>
                   <div className={styles.quickLabel}>{link.label}</div>
                   <div className={styles.quickDesc}>{link.desc}</div>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sanitizeTextInput } from "../../utils/sanitize";
 import { ALL_STUDYFIELDS } from "./riasec.service";
 
 // ── RIASEC Answer ──────────────────────────────────────────────────────
@@ -25,14 +26,14 @@ export const dreamerPreferencePayloadSchema = z.object({
     z.array(z.enum(ALL_STUDYFIELDS as [string, ...string[]]))
   ]).nullable(),
   budgetTier: z.enum(BUDGET_TIERS),
-  countryPreference: z.array(z.string()),
+  countryPreference: z.array(z.string().trim().max(60)).max(20),
 });
 
 export const chaserProfilePayloadSchema = z.object({
-  cvText: z.string().min(1).max(8000),
-  portfolioText: z.string().max(4000).nullable(),
-  major: z.string().min(1).max(100),
-  jobPreference: z.string().min(1).max(200),
+  cvText: z.string().min(1).max(8000).transform(sanitizeTextInput),
+  portfolioText: z.string().max(4000).transform(val => val ? sanitizeTextInput(val) : val).nullable(),
+  major: z.string().min(1).max(100).transform(sanitizeTextInput),
+  jobPreference: z.string().min(1).max(200).transform(sanitizeTextInput),
   // Skill hasil ekstraksi AI yang sudah dikonfirmasi/diedit user di step Minat Kerja.
   confirmedSkills: z.array(z.string().max(60)).max(30).optional(),
 });

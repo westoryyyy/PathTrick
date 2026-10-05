@@ -165,7 +165,7 @@ export default function ScholarshipHub() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '16px', border: '2px solid #5a3a29' }}>
                   {scholarship.coverage && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <img src="/Coin.png" alt="" style={{ width: '18px', height: '18px', imageRendering: 'pixelated', flexShrink: 0 }} />

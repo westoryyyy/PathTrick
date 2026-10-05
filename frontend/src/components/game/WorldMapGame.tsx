@@ -8,19 +8,23 @@ interface WorldMapGameProps {
   onNodeSelected: (node: CourseNodeData) => void;
   onNodeNearby:   (node: CourseNodeData) => void;
   onNodeLeave:    () => void;
+  onReady?:       () => void;
 }
 
 export default function WorldMapGame({
   onNodeSelected,
   onNodeNearby,
   onNodeLeave,
+  onReady,
 }: WorldMapGameProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gameRef = useRef<any>(null);
+  // Set on unmount so an in-flight async initGame() doesn't create an orphan Phaser game
+  const disposedRef = useRef(false);
 
   const initGame = useCallback(async () => {
-    if (!containerRef.current || gameRef.current) return;
+    if (!containerRef.current || gameRef.current || disposedRef.current) return;
 
     // Dynamically import Phaser (browser-only, avoid SSR)
     const Phaser = (await import('phaser')).default;
@@ -28,7 +32,7 @@ export default function WorldMapGame({
     const { GAME_CONFIG } = await import('@/phaser/config');
 
     const container = containerRef.current;
-    if (!container || gameRef.current) return;
+    if (!container || gameRef.current || disposedRef.current) return;
 
     const config: Phaser.Types.Core.GameConfig = {
       ...GAME_CONFIG,
@@ -50,9 +54,11 @@ export default function WorldMapGame({
     game.events.on(WORLD_MAP_EVENTS.NODE_SELECTED, onNodeSelected);
     game.events.on(WORLD_MAP_EVENTS.NODE_NEARBY,   onNodeNearby);
     game.events.on(WORLD_MAP_EVENTS.NODE_LEAVE,    onNodeLeave);
-  }, [onNodeSelected, onNodeNearby, onNodeLeave]);
+    if (onReady) game.events.once(WORLD_MAP_EVENTS.READY, onReady);
+  }, [onNodeSelected, onNodeNearby, onNodeLeave, onReady]);
 
   useEffect(() => {
+    disposedRef.current = false;
     initGame();
     // Ensure the container gets focus so keyboard input (WASD) works immediately
     if (containerRef.current) {
@@ -60,10 +66,12 @@ export default function WorldMapGame({
     }
 
     return () => {
+      disposedRef.current = true;
       if (gameRef.current) {
         gameRef.current.events?.off(WORLD_MAP_EVENTS.NODE_SELECTED, onNodeSelected);
         gameRef.current.events?.off(WORLD_MAP_EVENTS.NODE_NEARBY,   onNodeNearby);
         gameRef.current.events?.off(WORLD_MAP_EVENTS.NODE_LEAVE,    onNodeLeave);
+        if (onReady) gameRef.current.events?.off(WORLD_MAP_EVENTS.READY, onReady);
         gameRef.current.destroy(true);
         gameRef.current = null;
       }

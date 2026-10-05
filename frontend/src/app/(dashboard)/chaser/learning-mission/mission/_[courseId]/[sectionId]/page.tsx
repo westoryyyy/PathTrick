@@ -13,6 +13,7 @@ import { getQuizForMission } from '@/data/quizBank';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const generateCourseId = (str: string) => {
   let hash = 0;
@@ -29,6 +30,7 @@ type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
 export default function MissionFlowPage() {
   const { courseId, sectionId } = useParams();
   const router = useRouter();
+  const { t, locale } = useTranslation();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, completeQuiz, displayName: savedName } = useUserStore();
   const { user } = usePrivy();
@@ -807,12 +809,12 @@ export default function MissionFlowPage() {
                   style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', background: '#fdf6e3', border: '4px dashed #059669', padding: '48px 32px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
                 >
                   <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.4rem', lineHeight: '1.6' }}>
-                    {isBossLevel ? 'BOSS DEFEATED!' : 'MISSION CLEARED!'}
+                    {isBossLevel ? (locale === 'id' ? 'BOSS DEFEATED!' : 'BOSS DEFEATED!') : (locale === 'id' ? 'MISSION CLEARED!' : 'MISSION CLEARED!')}
                   </h2>
                   <p className={styles.text} style={{ textAlign: 'center', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.1rem', lineHeight: '1.6' }}>
                     {isBossLevel
-                      ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.'
-                      : 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di misi ini.'}
+                      ? (locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.' : 'Amazing, Knight! You have defeated the Boss and fully mastered this chapter.')
+                      : (locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di misi ini.' : 'Amazing, Knight! You have successfully conquered the challenges in this mission.')}
                   </p>
                   {/* ─── CERTIFICATE CARD (same style as OnChainCertificates) ─── */}
                   {isBossLevel && (
@@ -863,7 +865,7 @@ export default function MissionFlowPage() {
                         <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated' }} />
                       </motion.div>
                       <p className={styles.text} style={{ marginTop: '12px', fontSize: '0.65rem', color: '#92400e' }}>
-                        Reward XP dan item telah ditambahkan ke akunmu.
+                        {locale === 'id' ? 'Reward XP dan item telah ditambahkan ke akunmu.' : 'XP Reward and items have been added to your account.'}
                       </p>
                     </div>
                   )}
@@ -897,7 +899,7 @@ export default function MissionFlowPage() {
                             }}
                             disabled={isClaiming}
                           >
-                            {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
+                            {isClaiming ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') : (locale === 'id' ? 'NANTI AJA' : 'MAYBE LATER')}
                           </button>
                       ) : (
                         <button onMouseEnter={playHoverSound}
@@ -905,7 +907,7 @@ export default function MissionFlowPage() {
                           style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
                           onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}
                         >
-                          KEMBALI KE PETA
+                          {locale === 'id' ? 'KEMBALI KE PETA' : 'RETURN TO MAP'}
                         </button>
                       )}
                     </div>
@@ -926,7 +928,7 @@ export default function MissionFlowPage() {
                       }}
                       disabled={isClaiming}
                     >
-                      {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI KE PETA'}
+                      {isClaiming ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') : (locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP')}
                     </button>
                   )}
                 </motion.div>

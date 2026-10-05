@@ -5,25 +5,7 @@ import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
 import { useTranslation } from '@/hooks/useTranslation';
-
-interface University {
-  id: string;
-  name: string;
-  country?: string;
-  location?: string;
-  coverImageUrl?: string | null;
-  facultyTags?: string[];
-  estimatedCostMin?: number;
-  estimatedCostMax?: number;
-  admissionRequirements?: string | null;
-  description?: string | null;
-  accreditation?: string | null;
-  title?: string | null;
-  website?: string | null;
-  
-  // Frontend injected fields
-  matchScore?: number;
-}
+import { usePrivy } from '@privy-io/react-auth';
 
 const FACULTIES = [
   { value: 'agr_farm', label: 'Agribisnis & Pertanian' },
@@ -48,6 +30,66 @@ const FACULTIES = [
   { value: 'eng_civil', label: 'Sipil & Arsitektur' },
   { value: 'edu_tech', label: 'Teknologi Pendidikan' },
 ];
+
+/**
+ * Checklist template shared by all universities. Each university enriches it with its own
+ * data (faculty, admissionRequirements, website) so no per-university content is hardcoded.
+ */
+function buildChecklist(uni: { name: string; facultyTags?: string[]; admissionRequirements?: string | null; website?: string | null }, locale: string) {
+  const id = locale === 'id';
+  const majorTag = uni.facultyTags?.[0];
+  const majorLabel = majorTag ? (FACULTIES.find(f => f.value === majorTag)?.label || majorTag) : null;
+  
+  return [
+    {
+      key: 'basics',
+      title: id ? 'Taklukkan Ujian Utama' : 'Conquer the Core Trials',
+      desc: id
+        ? `Kuasai fondasi pengetahuan yang diuji untuk masuk ke ${majorLabel || 'program ini'}.`
+        : `Master the foundational knowledge tested for ${majorLabel || 'this program'}.`,
+    },
+    {
+      key: 'documents',
+      title: id ? 'Siapkan berkas administrasi' : 'Prepare admission documents',
+      desc: uni.admissionRequirements
+        ? (id ? 'Persyaratan: ' : 'Requirements: ') + uni.admissionRequirements
+        : (id ? 'Rapor, ijazah/SKL, KTP/KK, pas foto, dan dokumen pendukung.' : 'Transcript, diploma, ID, photo, and supporting documents.'),
+    },
+    {
+      key: 'register',
+      title: id ? 'Daftar ujian masuk' : 'Register for the entrance exam',
+      desc: uni.website
+        ? (id ? `Daftar melalui ${uni.website}` : `Register via ${uni.website}`)
+        : (id ? `Cek jadwal & portal pendaftaran resmi ${uni.name}.` : `Check the schedule & official portal of ${uni.name}.`),
+    },
+    {
+      key: 'exam',
+      title: id ? 'Ikuti ujian masuk' : 'Take the entrance exam',
+      desc: id ? 'Hadir tepat waktu dan bawa perlengkapan yang diminta.' : 'Arrive on time and bring the required items.',
+    },
+  ];
+}
+
+interface University {
+  id: string;
+  name: string;
+  country?: string;
+  location?: string;
+  coverImageUrl?: string | null;
+  facultyTags?: string[];
+  estimatedCostMin?: number;
+  estimatedCostMax?: number;
+  admissionRequirements?: string | null;
+  description?: string | null;
+  accreditation?: string | null;
+  title?: string | null;
+  website?: string | null;
+  
+  // Frontend injected fields
+  matchScore?: number;
+}
+
+// FACULTIES moved to top
 
 const MOCK_UNIVERSITIES: University[] = [
   {
@@ -83,10 +125,48 @@ const MOCK_UNIVERSITIES: University[] = [
 ];
 
 export default function UniversityHub() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const { user } = usePrivy();
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUni, setSelectedUni] = useState<University | null>(null);
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+
+  const storageKey = selectedUni ? `pt_uni_checklist_${user?.id ?? 'guest'}_${selectedUni.id}` : null;
+
+  useEffect(() => {
+    if (!storageKey || !selectedUni) return;
+    let cancelled = false;
+    // 1) instant: local cache
+    try {
+      setChecked(JSON.parse(localStorage.getItem(storageKey) || '{}'));
+    } catch { setChecked({}); }
+    // 2) source of truth: backend (synced across devices)
+    fetch(`${API_BASE_URL}/api/universities/checklist`, { headers: getAuthHeaders() })
+      .then(r => (r.ok ? r.json() : null))
+      .then((data: { progress?: Record<string, string[]> } | null) => {
+        const steps = data?.progress?.[selectedUni.id];
+        if (cancelled || !steps) return;
+        const remote = Object.fromEntries(steps.map(k => [k, true]));
+        setChecked(remote);
+        try { localStorage.setItem(storageKey, JSON.stringify(remote)); } catch {}
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  const toggleItem = (key: string) => {
+    if (!storageKey || !selectedUni) return;
+    const next = { ...checked, [key]: !checked[key] };
+    setChecked(next);
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
+    fetch(`${API_BASE_URL}/api/universities/${selectedUni.id}/checklist`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({ completedSteps: Object.keys(next).filter(k => next[k]) }),
+    }).catch(() => {});
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -295,7 +375,7 @@ export default function UniversityHub() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px dashed #5a3a29', paddingBottom: '16px', marginBottom: '24px' }}>
                 <div>
                   <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#3b261b', marginBottom: '8px', lineHeight: '1.4' }}>
-                    {t('sma.universityHub.roadmap')}: {selectedUni.facultyTags && selectedUni.facultyTags.length > 0 ? selectedUni.facultyTags[0] : t('sma.universityHub.generalProgram')}
+                    {t('sma.universityHub.roadmap')}: {selectedUni.facultyTags && selectedUni.facultyTags.length > 0 ? (FACULTIES.find(f => f.value === selectedUni.facultyTags![0])?.label || selectedUni.facultyTags[0]) : t('sma.universityHub.generalProgram')}
                   </h2>
                   <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#5a3a29', fontWeight: 'bold', margin: '8px 0 0' }}>
                     {selectedUni.name}
@@ -312,38 +392,55 @@ export default function UniversityHub() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#3b261b', lineHeight: '1.6' }}>
-                  Selesaikan urutan modul berikut untuk menguasai kompetensi yang diuji di seleksi masuk {selectedUni.name}.
+                  {locale === 'id'
+                    ? `Centang tiap langkah setelah kamu selesaikan. Progres ini hanya kamu yang atur untuk ${selectedUni.name}.`
+                    : `Tick each step once you complete it. Only you manage this progress for ${selectedUni.name}.`}
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {[
-                    { step: 1, title: t('sma.universityHub.step1Title'), desc: t('sma.universityHub.step1Desc'), done: true },
-                    { step: 2, title: t('sma.universityHub.step2Title'), desc: t('sma.universityHub.step2Desc'), done: false },
-                    { step: 3, title: t('sma.universityHub.step3Title'), desc: t('sma.universityHub.step3Desc'), done: false },
-                    { step: 4, title: t('sma.universityHub.step4Title'), desc: t('sma.universityHub.step4Desc'), done: false }
-                  ].map((item, idx) => (
-                    <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                      <div style={{ 
-                        width: '40px', height: '40px', 
-                        background: item.done ? '#047857' : '#fbbf24', 
-                        border: '2px solid #3b261b', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                        fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: item.done ? '#fff' : '#3b261b',
-                        boxShadow: '2px 2px 0 #3b261b'
-                      }}>
-                        {item.done ? '✓' : item.step}
+                {(() => {
+                  const items = buildChecklist(selectedUni, locale);
+                  const doneCount = items.filter(i => checked[i.key]).length;
+                  return (
+                    <>
+                      <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#3b261b', margin: 0 }}>
+                        {doneCount}/{items.length} {locale === 'id' ? 'selesai' : 'done'}
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {items.map((item) => {
+                          const done = !!checked[item.key];
+                          return (
+                            <label key={item.key} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={done}
+                                onChange={() => toggleItem(item.key)}
+                                style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                              />
+                              <div style={{
+                                width: '40px', height: '40px', flexShrink: 0,
+                                background: done ? '#047857' : '#fbbf24',
+                                border: '2px solid #3b261b',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff',
+                                boxShadow: '2px 2px 0 #3b261b'
+                              }}>
+                                {done ? '✓' : ''}
+                              </div>
+                              <div style={{ flex: 1, background: done ? 'rgba(4,120,87,0.15)' : 'rgba(255,255,255,0.5)', padding: '12px', border: '2px solid #5a3a29' }}>
+                                <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', marginBottom: '8px', textDecoration: done ? 'line-through' : 'none' }}>
+                                  {item.title}
+                                </h4>
+                                <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.1rem', color: '#5a3a29', lineHeight: '1.4', margin: 0, marginTop: '4px' }}>
+                                  {item.desc}
+                                </p>
+                              </div>
+                            </label>
+                          );
+                        })}
                       </div>
-                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.5)', padding: '12px', border: '2px solid #5a3a29' }}>
-                        <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#3b261b', marginBottom: '8px' }}>
-                          {item.title}
-                        </h4>
-                        <p style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.1rem', color: '#5a3a29', lineHeight: '1.4', margin: 0, marginTop: '4px' }}>
-                          {item.desc}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    </>
+                  );
+                })()}
 
                 <button 
                   onClick={() => setSelectedUni(null)}

@@ -11,19 +11,32 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { useTranslation } from '@/hooks/useTranslation';
+import StartAssessmentButton from '@/components/ui/StartAssessmentButton';
 
 // Removed hardcoded MAHASISWA_MODULES
 
 export default function MahasiswaLearningProgress() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { totalXP, level, dailyBountyClaimed, hasCompletedQuizToday, claimDailyBounty, completeQuiz, addXP, setDailyBountyClaimed, setHasCompletedQuizToday } = useUserStore();
   const { fetchProfileData, analyzeSkillGap, earnedSBTs, matchedJobs } = useScholarStore();
 
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
 
   const searchParams = useSearchParams();
-  const jobId = searchParams.get('jobId');
+  const queryJobId = searchParams.get('jobId');
+
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (queryJobId) {
+      sessionStorage.setItem('active_training_job_id', queryJobId);
+      setActiveJobId(queryJobId);
+    } else {
+      const saved = sessionStorage.getItem('active_training_job_id');
+      if (saved) setActiveJobId(saved);
+    }
+  }, [queryJobId]);
 
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,7 +95,7 @@ export default function MahasiswaLearningProgress() {
   const norm = (s: string) => s.trim().toLowerCase();
 
   // Lowongan yang dipilih dari Career Hub ("Train Missing Skills").
-  const targetJob = jobId ? matchedJobs.find(j => j.id === jobId) : undefined;
+  const targetJob = activeJobId ? matchedJobs.find(j => j.id === activeJobId) : undefined;
 
   const missingSkills = useMemo(() => {
     const owned = new Set(earnedSBTs.map(norm));
@@ -129,33 +142,30 @@ export default function MahasiswaLearningProgress() {
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
           {t('common.aiSkillGapAnalysis')}
         </p>
-        <button
-          onClick={() => {
-            import('@/store/useOnboardingStore').then(({ useOnboardingStore }) => {
-              const store = useOnboardingStore.getState();
-              store.setRole('chaser', store.savedPrivyUserId ?? undefined); // reset currentStep=0, totalSteps
-              useOnboardingStore.setState({
-                chaserAssessment: {
-                  cvFile: null,
-                  cvFileName: '',
-                  cvExtractionStatus: 'idle',
-                  cvExtractedData: null,
-                  cvText: '',
-                  portfolioFile: null,
-                  portfolioFileName: '',
-                  portfolioText: '',
-                  workInterests: [],
-                  preferredGICS: [],
-                },
-                onboardingCompleted: false,
-              });
-              router.push('/assessment');
-            });
-          }}
-          style={{ alignSelf: 'flex-start', padding: '8px 16px', background: '#3b82f6', color: 'white', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', borderRadius: '8px', cursor: 'pointer', border: '2px solid #2563eb' }}
-        >
-          ULANGI ASESMEN
-        </button>
+        
+        {targetJob && (
+          <div style={{ background: '#7f1d1d', border: '2px solid #ef4444', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+            <span style={{ fontFamily: '"Pixelify Sans", sans-serif', color: '#fca5a5', fontSize: '1.1rem' }}>
+              🎯 Target Training: <strong style={{ color: '#fff' }}>{targetJob.title}</strong>
+            </span>
+            <button 
+              onClick={() => {
+                sessionStorage.removeItem('active_training_job_id');
+                setActiveJobId(null);
+                router.replace('/chaser/learning-mission');
+              }}
+              style={{
+                background: '#ef4444', color: '#fff', border: '2px solid #991b1b', padding: '8px 16px',
+                fontFamily: '"Press Start 2P"', fontSize: '0.6rem', cursor: 'pointer', boxShadow: '2px 2px 0 #991b1b'
+              }}
+            >
+              UNTRAIN LOWONGAN
+            </button>
+          </div>
+        )}
+        {!isLoading && matchedJobs.length === 0 && (
+          <StartAssessmentButton role="chaser" />
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
@@ -280,11 +290,11 @@ export default function MahasiswaLearningProgress() {
                   opacity: currentPage === 1 ? 0.5 : 1
                 }}
               >
-                ◀ PREV
+                ◀ {locale === 'id' ? 'KEMBALI' : 'PREV'}
               </button>
 
               <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24', textShadow: '2px 2px 0 #3b261b' }}>
-                PAGE {currentPage}/{totalPages}
+                {locale === 'id' ? 'HAL' : 'PAGE'} {currentPage}/{totalPages}
               </div>
 
               <button onMouseEnter={playHoverSound}
@@ -300,7 +310,7 @@ export default function MahasiswaLearningProgress() {
                   opacity: currentPage === totalPages ? 0.5 : 1
                 }}
               >
-                NEXT ▶
+                {locale === 'id' ? 'LANJUT' : 'NEXT'} ▶
               </button>
             </div>
           )}
@@ -331,69 +341,88 @@ export default function MahasiswaLearningProgress() {
 
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}><PixelIcon icon="🏆" size={18} /> DAILY BOUNTY</span>
+              <span className={styles.cardTitle}><PixelIcon icon="⚔️" size={18} /> {locale === 'id' ? 'BOUNTY HARIAN' : 'DAILY BOUNTY'}</span>
             </div>
-            <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', textAlign: 'center' }}>
-              <span style={{ fontSize: '3rem', filter: dailyBountyClaimed ? 'grayscale(100%)' : 'none' }}>📦</span>
-              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.6' }}>
-                {dailyBountyClaimed
-                  ? t('common.bountyClaimedMsg')
-                  : (hasCompletedQuizToday
-                    ? t('common.quizCompletedMsg')
-                    : t('common.quizDailyQuest'))}
+
+            <div style={{ background: '#d4a373', border: '4px solid #5a3a29', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.2), inset -4px -4px 8px rgba(0,0,0,0.3)' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div style={{ width: '48px', height: '48px', background: '#fff', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
+                  🏅
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3b261b', lineHeight: '1.6', margin: 0 }}>
+                    Daily Skill Builder
+                  </h4>
+                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#047857', background: '#fff', padding: '6px 12px', border: '1px solid #064e3b' }}>
+                    150 XP
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.8' }}>
+                {locale === 'id' ? 'Selesaikan 1 modul quiz untuk mendapatkan +150 XP' : 'Complete 1 quiz module to earn +150 XP'}
               </p>
 
-              <button onMouseEnter={playHoverSound}
-                disabled={!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty}
+              <button
+                disabled={dailyBountyClaimed || isClaimingBounty}
                 onClick={async () => {
-                  if (!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty) {
+                  if (dailyBountyClaimed || isClaimingBounty) {
                     return;
                   }
 
-                  if (!dailyBountyClaimed && !isClaimingBounty) {
-                    setIsClaimingBounty(true);
-
-                    try {
-                      const res = await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
+                  setIsClaimingBounty(true);
+                  try {
+                    if (dailyQuest) {
+                      const { getAuthHeaders: getHeaders } = await import('@/hooks/useAuthSync');
+                      await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
                         method: 'POST',
-                        headers: getAuthHeaders(),
+                        headers: getHeaders(),
                       });
-
-                      if (res.ok) {
-                        setTimeout(() => {
-                          claimDailyBounty();
-                          addXP(dailyQuest.rewardXp || 150);
-                          setIsClaimingBounty(false);
-                        }, 800);
-                      } else {
-                        setIsClaimingBounty(false);
-                      }
-                    } catch (e) {
-                      setIsClaimingBounty(false);
                     }
+                    setTimeout(() => {
+                      addXP(dailyQuest?.rewardXp || 150);
+                      claimDailyBounty();
+                      setDailyBountyClaimed(true);
+                      setIsClaimingBounty(false);
+                    }, 1200);
+                  } catch (e) {
+                    setTimeout(() => {
+                      addXP(dailyQuest?.rewardXp || 150);
+                      claimDailyBounty();
+                      setDailyBountyClaimed(true);
+                      setIsClaimingBounty(false);
+                    }, 1200);
                   }
                 }}
+                onMouseEnter={playHoverSound}
                 style={{
-                  background: dailyBountyClaimed ? '#737373' : (!dailyQuest?.isCompleted ? '#f59e0b' : '#10b981'),
-                  color: dailyBountyClaimed ? '#a3a3a3' : (!dailyQuest?.isCompleted ? '#3b261b' : '#fff'),
-                  border: `4px solid ${dailyBountyClaimed ? '#404040' : (!dailyQuest?.isCompleted ? '#b45309' : '#059669')}`,
-                  borderRadius: '12px',
-                  padding: '12px 16px',
-                  fontFamily: '"Press Start 2P"',
-                  fontSize: '0.6rem',
-                  cursor: dailyBountyClaimed || isClaimingBounty || !dailyQuest?.isCompleted ? 'not-allowed' : 'pointer',
                   width: '100%',
-                  boxShadow: dailyBountyClaimed ? 'none' : 'inset -2px -2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.8)',
-                  transform: isClaimingBounty ? 'scale(0.95)' : 'scale(1)',
-                  transition: 'transform 0.1s',
-                  animation: (dailyQuest?.isCompleted && !dailyBountyClaimed && !isClaimingBounty) ? 'pulseGlow 2s infinite' : 'none'
+                  padding: '24px',
+                  fontFamily: '"Press Start 2P"',
+                  fontSize: '0.8rem',
+                  color: dailyBountyClaimed ? '#a3a3a3' : '#fff',
+                  background: dailyBountyClaimed ? '#525252' : '#047857',
+                  border: `2px solid ${dailyBountyClaimed ? '#404040' : '#064e3b'}`,
+                  boxShadow: dailyBountyClaimed ? 'none' : '4px 4px 0 rgba(0,0,0,0.5)',
+                  cursor: dailyBountyClaimed || isClaimingBounty ? 'not-allowed' : 'pointer',
+                  transform: dailyBountyClaimed ? 'none' : 'active:translate(2px, 2px)',
+                  marginTop: '8px',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                {isClaimingBounty
-                  ? t('common.claimingBtn')
-                  : (dailyBountyClaimed
-                    ? t('common.claimedBtn')
-                    : (!dailyQuest?.isCompleted ? 'LOGIN DAILY' : t('common.claimXpBtn')))}
+                {isClaimingBounty ? (
+                  <motion.span
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ repeat: Infinity, duration: 0.8 }}
+                  >
+                    {locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...'}
+                  </motion.span>
+                ) : dailyBountyClaimed ? (
+                  locale === 'id' ? 'KLAIM BESOK' : 'CLAIM TOMORROW'
+                ) : (
+                  locale === 'id' ? 'KLAIM XP HARIAN' : 'CLAIM DAILY XP'
+                )}
               </button>
 
               {/* HIDDEN DEV BUTTON TO SIMULATE COMPLETING QUIZ */}
