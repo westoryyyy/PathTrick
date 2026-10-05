@@ -44,7 +44,7 @@ jobs:
         run: npm install -g npm@11.6.4
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Lint
         run: npm run lint
@@ -77,7 +77,7 @@ jobs:
         run: npm install -g npm@11.6.4
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Prisma generate
         run: npx prisma generate
