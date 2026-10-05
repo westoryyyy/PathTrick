@@ -32,7 +32,7 @@ const PIXEL_ICON_ASSETS: Record<string, string> = {
   // Agriculture & Environment
   '🌾': '/gics_staples.png',
   '🌲': '/gics_material.png',
-  
+
   // Others / Defaults
   '👨‍🎓': '/NPC University Student.png',
   '📊': '/px-icon-book.jpg',
@@ -84,7 +84,7 @@ export default function PixelIcon({
       width={size}
       height={size}
       className={className}
-      style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+      style={{ objectFit: 'contain', imageRendering: 'pixelated', height: 'auto' }}
     />
   );
 }

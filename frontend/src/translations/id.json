@@ -131,6 +131,24 @@
       "viewAll": "LIHAT SEMUA",
       "universityAiFeedback": "Selesaikan 2 kursus lagi untuk mencapai 100% kesiapan!",
       "scholarshipAiFeedback": "Sangat cocok dengan profil RIASEC & kebutuhan finansialmu.",
+      "quests": {
+        "MODULE_COMPLETED": {
+          "title": "Selesaikan 1 Modul",
+          "desc": "Dapatkan XP dari modul pertama"
+        },
+        "DAILY_LOGIN": {
+          "title": "Login Harian",
+          "desc": "Login ke dalam PathTrick hari ini"
+        },
+        "QUIZ_BOSS_COMPLETED": {
+          "title": "Kalahkan Boss Modul",
+          "desc": "Selesaikan evaluasi akhir pada sebuah House"
+        },
+        "SBT_CLAIMED": {
+          "title": "Klaim Sertifikat (SBT)",
+          "desc": "Mint Web3 sertifikat pencapaianmu"
+        }
+      },
       "mantras": {
         "0": "Kamu meragukan dirimu sendiri, padahal diam-diam banyak yang mengagumi progresmu. Berhentilah menjadi kritikus paling kejam untuk dirimu sendiri.",
         "1": "Merasa seperti penipu karena belum jago? Itu bukan tanda kamu lemah. Itu tanda kamu berani masuk ke ruangan yang lebih besar dari zona nyamanmu.",
@@ -258,7 +276,7 @@
     },
     "stats": {
       "activeLearners": "Pelajar Aktif",
-      "questsCleared": "Quest Selesai",
+      "questsCleared": "Misi Selesai",
       "satisfaction": "Kepuasan",
       "avgToStart": "Rata-rata Mulai"
     },

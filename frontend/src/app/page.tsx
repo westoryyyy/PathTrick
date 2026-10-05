@@ -12,12 +12,11 @@ import PixelIcon from '@/components/ui/PixelIcon';
 import LanguageToggle from '@/components/ui/LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
 
-/* ─── Feature icon cards ─── */
 const FEATURE_ICONS = [
-  { img: '/ai-career.png?v=3', label: '', noBorder: true },
-  { img: '/learning-mission.png?v=3', label: '', noBorder: true },
-  { img: '/university-scholar.png?v=3', label: '', noBorder: true },
-  { img: '/achievement-vault.png?v=3', label: '', noBorder: true },
+  { img: '/ai-career.png?v=3', img_id: '/ai-career-id.png', label: '', noBorder: true },
+  { img: '/learning-mission.png?v=3', img_id: '/learning-mission-id.png', label: '', noBorder: true },
+  { img: '/university-scholar.png?v=3', img_id: '/university-scholar-id.png', label: '', noBorder: true },
+  { img: '/achievement-vault.png?v=3', img_id: '/Achievement-vault-id.png', label: '', noBorder: true },
 ];
 
 /* ─── Featured courses ─── */
@@ -95,10 +94,9 @@ export default function LandingPage() {
         const roleName = data?.role?.name?.toUpperCase();
         if (roleName === 'ADMIN') {
           router.replace('/admin/dashboard');
-        } else if (roleName === 'CHASER') {
-          router.replace('/chaser/dashboard');
-        } else if (roleName === 'DREAMER') {
-          router.replace('/dreamer/dashboard');
+        } else if (roleName === 'CHASER' || roleName === 'DREAMER') {
+          const done = Array.isArray(data?.roadmaps) && data.roadmaps.length > 0;
+          router.replace(done ? `/${roleName.toLowerCase()}/dashboard` : '/assessment');
         } else {
           router.replace('/select-role');
         }
@@ -166,7 +164,7 @@ export default function LandingPage() {
               width={200}
               height={50}
               unoptimized
-              style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+              style={{ objectFit: 'contain', imageRendering: 'pixelated', height: 'auto' }}
             />
           </Link>
           <div className={styles.navLinks}>
@@ -250,7 +248,7 @@ export default function LandingPage() {
           {FEATURE_ICONS.map((f, i) => (
             <div key={i} className={styles.featureIconCard} id={`feature-${i}`}>
               <div className={f.noBorder ? styles.featureIconNoBorder : styles.featureIconImgWrap}>
-                <Image src={f.img} alt={f.label || "Feature"} fill unoptimized style={{ objectFit: f.noBorder ? 'contain' : 'cover', imageRendering: 'pixelated' }} />
+                <Image src={locale === 'id' && (f as any).img_id ? (f as any).img_id : f.img} alt={f.label || "Feature"} fill unoptimized style={{ objectFit: f.noBorder ? 'contain' : 'cover', imageRendering: 'pixelated' }} />
               </div>
               {f.label && (
                 <span className={styles.featureIconLabel}>
@@ -301,7 +299,7 @@ export default function LandingPage() {
             </div>
 
             <button onClick={handleStart} className={styles.exploreAllBtn} id="explore-all-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <Image src="/CTA.png" alt="Explore all courses" width={240} height={70} style={{ width: 240, height: 70, objectFit: 'contain', imageRendering: 'pixelated' }} />
+              <Image src={locale === 'id' ? "/CTA-id.png" : "/CTA.png"} alt="Explore all courses" width={240} height={70} style={{ width: 240, height: 70, objectFit: 'contain', imageRendering: 'pixelated' }} />
             </button>
           </div>
         </div>
@@ -316,7 +314,7 @@ export default function LandingPage() {
           </p>
           <div className={styles.worldMapWrap}>
             <div className={styles.worldMapInner}>
-              <Image src="/map1.png" alt="PathTrick world map" fill
+              <Image src="/map1.png" alt="PathTrick world map" fill sizes="100vw"
                 style={{ objectFit: 'cover', imageRendering: 'pixelated' }} />
             </div>
           </div>
@@ -390,7 +388,7 @@ export default function LandingPage() {
             {HEROES.map((hero, i) => (
               <div key={i} className={styles.heroCard}>
                 <div className={styles.heroAvatarWrap}>
-                  <Image src={hero.avatar} alt={hero.name} fill
+                  <Image src={hero.avatar} alt={hero.name} fill sizes="(max-width: 768px) 100vw, 33vw"
                     style={{ objectFit: 'cover', imageRendering: 'pixelated' }} />
                 </div>
                 <div className={styles.heroInfo}>
@@ -442,7 +440,7 @@ export default function LandingPage() {
         <div className={styles.footerContent}>
           {/* Logo */}
           <div className={styles.footerLogo}>
-            <Image src="/PathTrick.png" alt="PathTrick" width={249} height={75} style={{ objectFit: 'contain', imageRendering: 'pixelated' }} />
+            <Image src="/PathTrick.png" alt="PathTrick" width={249} height={75} style={{ objectFit: 'contain', imageRendering: 'pixelated', height: 'auto' }} />
           </div>
 
           <p className={styles.footerTagline}>{t('landing.footer.tagline')}</p>

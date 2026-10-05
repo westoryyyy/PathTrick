@@ -454,7 +454,7 @@ export default function CVUpdaterWidget() {
                 {/* New Skills Detected */}
                 <div style={{ background: 'rgba(59,38,27,0.6)', border: '2px solid #78350f', padding: '12px 16px' }}>
                   <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#fbbf24', margin: '0 0 8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Image src="/Energy Shard.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
+                    <Image src="/Energy Shard.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated', height: 14 }} />
                     Skill Baru Terdeteksi
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>

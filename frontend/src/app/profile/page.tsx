@@ -129,7 +129,7 @@ export default function ProfilePage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>EMAIL ADDRESS (Verified via {user?.google ? 'Google' : 'OTP'})</label>
+            <label className={styles.label}>EMAIL ADDRESS</label>
             <input 
               type="email" 
               className={styles.input} 

@@ -31,7 +31,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       config={{
         defaultChain: bscTestnet,
         supportedChains: [bscTestnet],
-        loginMethods: ["email", "google", "wallet"],
+        loginMethods: ["google", "wallet"],
         appearance: {
           theme: "dark",
           accentColor: "#DD1A21",
