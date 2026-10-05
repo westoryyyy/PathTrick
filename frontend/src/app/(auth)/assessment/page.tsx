@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
 import AssessmentWizard from '@/components/assessment/AssessmentWizard';
+import LanguageToggle from '@/components/ui/LanguageToggle';
 import styles from './page.module.css';
 
 export default function AssessmentPage() {
@@ -23,10 +24,13 @@ export default function AssessmentPage() {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <Image src="/PathTrick.png" alt="PathTrick" width={200} height={50} className={styles.logoImg} priority />
-        <span className={styles.roleBadge}>
-          {role === 'dreamer' ? 'The Dreamer' : 'The Chaser'}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Image src="/PathTrick.png" alt="PathTrick" width={200} height={50} className={styles.logoImg} priority />
+          <span className={styles.roleBadge}>
+            {role === 'dreamer' ? 'The Dreamer' : 'The Chaser'}
+          </span>
+        </div>
+        <LanguageToggle />
       </div>
 
       {/* Main Wizard */}

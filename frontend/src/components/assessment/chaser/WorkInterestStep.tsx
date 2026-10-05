@@ -50,8 +50,8 @@ export default function WorkInterestStep() {
       {extractedData && extractedData.skills.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
-            <h3 className="flex items-center gap-2 font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">Skill Hasil Scan CV-mu</h3>
-            <span className="font-pixel text-[0.5rem] text-[#fdf6e3]">Ada yang kurang pas? Klik ✕ buat hapus aja.</span>
+            <h3 className="flex items-center gap-2 font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">{locale === 'id' ? 'Skill Hasil Scan CV-mu' : 'Skills Scanned from CV'}</h3>
+            <span className="font-pixel text-[0.5rem] text-[#fdf6e3]">{locale === 'id' ? 'Ada yang kurang pas? Klik ✕ buat hapus aja.' : 'Not quite right? Click ✕ to remove.'}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {extractedData.skills.map(skill => (
@@ -74,16 +74,19 @@ export default function WorkInterestStep() {
       {/* ── GICS Sector Picker ── */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">Sektor Industri</h3>
+          <h3 className="font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">{locale === 'id' ? 'Sektor Industri' : 'Industry Sector'}</h3>
           <span className="font-pixel text-[0.5rem] text-[#fdf6e3]" style={{
             color: preferredGICS.length >= MAX_SECTORS ? '#ef4444' : undefined
           }}>
-            Boleh pilih sampai {MAX_SECTORS} sektor ({preferredGICS.length}/{MAX_SECTORS})
+            {locale === 'id' ? `Boleh pilih sampai ${MAX_SECTORS} sektor` : `You can select up to ${MAX_SECTORS} sectors`} ({preferredGICS.length}/{MAX_SECTORS})
           </span>
         </div>
         <p className="font-pixel text-[0.55rem] text-[#fdf6e3] m-0 leading-[1.6]">
-          Saat ini untuk MVP, hanya sektor Teknologi Informasi yang aktif.<br/>
-          Sektor lain masih dalam tahap Coming Soon.
+          {locale === 'id' ? (
+            <>Saat ini untuk MVP, hanya sektor Teknologi Informasi yang aktif.<br/>Sektor lain masih dalam tahap Coming Soon.</>
+          ) : (
+            <>Currently for MVP, only the Information Technology sector is active.<br/>Other sectors are Coming Soon.</>
+          )}
         </p>
 
         <div className="flex flex-wrap gap-2.5 sm:gap-3">
@@ -156,13 +159,13 @@ export default function WorkInterestStep() {
       {/* ── Work Interest / Type ── */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="flex items-center gap-2 font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">Tipe Pekerjaan</h3>
+          <h3 className="flex items-center gap-2 font-pixel text-[0.85rem] text-[#fde047] drop-shadow-[2px_2px_0_#3b261b] m-0 tracking-[0.06em]">{locale === 'id' ? 'Tipe Pekerjaan' : 'Job Type'}</h3>
         </div>
-        <p className="font-pixel text-[0.55rem] text-[#fdf6e3] m-0 leading-[1.5]">Kamu lebih tertarik bekerja sebagai...</p>
+        <p className="font-pixel text-[0.55rem] text-[#fdf6e3] m-0 leading-[1.5]">{locale === 'id' ? 'Kamu lebih tertarik bekerja sebagai...' : 'You are more interested in working as...'}</p>
         <div className="flex flex-wrap gap-2">
           {['Full-time', 'Internship / Magang', 'Freelance', 'Remote', 'Hybrid', 'On-site'].map(type => {
             const isSelected = workInterests.includes(type);
-            const descriptions: Record<string, string> = {
+            const descriptionsId: Record<string, string> = {
               'Full-time': 'Kerja tetap full 40 jam seminggu. Biasanya Senin-Jumat dari pagi sampai sore.',
               'Internship / Magang': 'Cocok buat nambah jam terbang dan pengalaman sebelum beneran lulus.',
               'Freelance': 'Kerja bebas! Ambil proyek sesukamu tanpa harus terikat ngantor tiap hari.',
@@ -170,7 +173,15 @@ export default function WorkInterestStep() {
               'Hybrid': 'Fleksibel abis! Bisa ngantor, bisa juga kerja dari rumah (remote) gantian.',
               'On-site': 'Wajib ngantor! Harus datang langsung ke tempat kerja setiap harinya.'
             };
-            const desc = descriptions[type] || '';
+            const descriptionsEn: Record<string, string> = {
+              'Full-time': 'Regular full-time work, 40 hours a week. Usually Monday to Friday from morning to evening.',
+              'Internship / Magang': 'Perfect for gaining experience and flight hours before graduating.',
+              'Freelance': 'Free work! Take projects as you wish without being tied to an office everyday.',
+              'Remote': 'Fully online work! Work from home, cafe, or anywhere as long as there is internet.',
+              'Hybrid': 'Super flexible! You can go to the office or work from home (remote) alternately.',
+              'On-site': 'Must go to the office! You must come directly to the workplace every day.'
+            };
+            const desc = locale === 'id' ? (descriptionsId[type] || '') : (descriptionsEn[type] || '');
 
             return (
               <button

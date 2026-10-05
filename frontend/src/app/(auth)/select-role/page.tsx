@@ -11,7 +11,7 @@ import {
   getApiError,
   readApiResponse,
 } from '@/config/pathtrick';
-import { getAuthHeaders, useAuthSync } from '@/hooks/useAuthSync';
+import { getAuthHeaders, useAuthSync, resolveHomePath } from '@/hooks/useAuthSync';
 import { type RoleOption } from '@/data/roles';
 
 /**
@@ -26,17 +26,43 @@ const ROLE_TO_ROUTE: Record<string, UserRole> = {
   'DREAMER': 'dreamer',
   'CHASER': 'chaser',
 };
+
+const ROLE_TRANSLATIONS: Record<string, { description: { id: string, en: string }, perks: { id: string[], en: string[] } }> = {
+  'role-dreamer': {
+    description: {
+      id: 'Masih SMA & bingung mau kuliah apa? Temukan jurusan & karier sesuai bakatmu.',
+      en: 'Still in high school & confused about college? Find majors & careers based on your talents.'
+    },
+    perks: {
+      id: ['Asesmen Minat & Bakat', 'Tes RIASEC', 'Rekomendasi Jurusan', 'Info Beasiswa'],
+      en: ['Talent & Interest Assessment', 'RIASEC Test', 'Major Recommendations', 'Scholarship Info']
+    }
+  },
+  'role-chaser': {
+    description: {
+      id: 'Mahasiswa atau baru lulus? Upload CV-mu dan biarkan AI membuatkan roadmap kariermu.',
+      en: 'College student or recent grad? Upload your CV and let AI create your career roadmap.'
+    },
+    perks: {
+      id: ['Asesmen Karier AI', 'CV Analysis', 'Job Matching', 'Career Roadmap'],
+      en: ['AI Career Assessment', 'CV Analysis', 'Job Matching', 'Career Roadmap']
+    }
+  }
+};
+
 import PixelIcon from '@/components/ui/PixelIcon';
 import styles from './page.module.css';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SelectRolePage() {
   const router = useRouter();
+  const { t, locale } = useTranslation();
 
   // Privy hooks — must come first as other hooks depend on `user`
-  const { user } = usePrivy();
+  const { user, ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const { displayName: savedName, setProfile } = useUserStore();
-  const { isSynced } = useAuthSync();
+  useAuthSync();
 
   // Store
   const setRole = useOnboardingStore((s) => s.setRole);
@@ -65,15 +91,26 @@ export default function SelectRolePage() {
   // - Zustand store is stale (different account, corrupt data)
   // - User closed the tab before completing role selection
   useEffect(() => {
-    if (!user || !isSynced) return; // wait for Privy and AuthSync
-    const token = getAuthHeaders()['Authorization'];
-    if (!token) {
-      // No JWT yet — cannot verify against backend; fall through to Zustand guard
-      setIsVerifyingRole(false);
-      return;
-    }
+    if (!ready) return;
+    if (!authenticated || !user) { setIsVerifyingRole(false); return; }
     let cancelled = false;
-    fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders() })
+    const controller = new AbortController();
+    const failsafe = window.setTimeout(() => {
+      if (!cancelled) setIsVerifyingRole(false);
+    }, 10000);
+    const waitForToken = async () => {
+      // JWT is written by useAuthSync; poll up to ~6s instead of depending on a flag
+      for (let i = 0; i < 30 && !getAuthHeaders()['Authorization']; i++) {
+        if (cancelled) return false;
+        await new Promise(r => setTimeout(r, 200));
+      }
+      return !!getAuthHeaders()['Authorization'];
+    };
+    const fetchTimer = window.setTimeout(() => controller.abort(), 8000);
+    waitForToken().then((hasToken) => {
+      if (cancelled) return;
+      if (!hasToken) { setIsVerifyingRole(false); return; }
+      return fetch(`${API_BASE_URL}/api/users/me`, { headers: getAuthHeaders(), signal: controller.signal })
       .then(async (res) => {
         if (!res.ok || cancelled) { setIsVerifyingRole(false); return; }
         const data = await res.json() as { name?: string | null, role?: { name?: string } | null };
@@ -114,11 +151,18 @@ export default function SelectRolePage() {
           resetOnboarding();
           setIsVerifyingRole(false);
         }
-      })
-      .catch(() => { if (!cancelled) setIsVerifyingRole(false); });
-    return () => { cancelled = true; };
+      });
+    })
+      .catch(() => { if (!cancelled) setIsVerifyingRole(false); })
+      .finally(() => { window.clearTimeout(fetchTimer); window.clearTimeout(failsafe); });
+    return () => {
+      cancelled = true;
+      controller.abort();
+      window.clearTimeout(fetchTimer);
+      window.clearTimeout(failsafe);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, isSynced]);
+  }, [ready, authenticated, user?.id]);
 
   // ── Load available roles from backend ──
   useEffect(() => {
@@ -189,7 +233,7 @@ export default function SelectRolePage() {
           router.replace('/admin/dashboard');
         } else {
           setRole(existingRoleSlug as UserRole, user?.id);
-          router.replace(`/${existingRoleSlug}/dashboard`);
+          router.replace(await resolveHomePath(existingRoleSlug));
         }
       }
     }
@@ -245,7 +289,7 @@ export default function SelectRolePage() {
     return (
       <div className={styles.page}>
         <div className={styles.boardContainer}>
-          <p>Memverifikasi sesi...</p>
+          <p>{locale === 'id' ? 'Memverifikasi sesi...' : 'Verifying session...'}</p>
         </div>
       </div>
     );
@@ -280,21 +324,23 @@ export default function SelectRolePage() {
               <PixelIcon icon="⚔️" size={56} />
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fbbf24', marginBottom: '8px', lineHeight: 1.6 }}>
-                  CHOOSE YOUR
+                  {locale === 'id' ? 'TENTUKAN NAMA' : 'CHOOSE YOUR'}
                 </p>
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', color: '#fff', lineHeight: 1.6 }}>
-                  ADVENTURER NAME
+                  {locale === 'id' ? 'PETUALANGMU' : 'ADVENTURER NAME'}
                 </p>
               </div>
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.4rem', color: '#d4a96a', textAlign: 'center', lineHeight: 1.8 }}>
-                Nama ini akan tertera di Sertifikat Web3 (SBT) kamu dan ditampilkan di seluruh platform PathTrick.
+                {locale === 'id' 
+                  ? 'Nama ini akan tampil di Sertifikat Web3 (SBT) milikmu dan dapat dilihat di seluruh platform PathTrick.' 
+                  : 'This name will appear on your Web3 Certificate (SBT) and be displayed across the PathTrick platform.'}
               </p>
               <input
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleNicknameConfirm()}
-                placeholder="Masukkan nickname..."
+                placeholder={locale === 'id' ? 'Masukkan namamu...' : 'Enter nickname...'}
                 maxLength={24}
                 autoFocus
                 style={{
@@ -335,7 +381,9 @@ export default function SelectRolePage() {
                 onMouseUp={(e) => { e.currentTarget.style.transform = 'none'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
               >
-                {isSavingNickname ? '⏳ SAVING...' : '✅ CONFIRM & CONTINUE'}
+                {isSavingNickname 
+                  ? (locale === 'id' ? '⏳ MENYIMPAN...' : '⏳ SAVING...') 
+                  : (locale === 'id' ? '✅ KONFIRMASI & LANJUTKAN' : '✅ CONFIRM & CONTINUE')}
               </button>
               {wallets[0] && (
                 <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#a87b51', textAlign: 'center' }}>
@@ -351,16 +399,16 @@ export default function SelectRolePage() {
 
       <div className={styles.boardContainer}>
         <div className={styles.boardHeader}>
-          <h1 className={styles.boardTitle}>Pilih Role Anda</h1>
+          <h1 className={styles.boardTitle}>{locale === 'id' ? 'Pilih Role Anda' : 'Choose Your Role'}</h1>
 
         </div>
         <div className={styles.boardContent}>
-          {isLoadingRoles && <p>Memuat role...</p>}
+          {isLoadingRoles && <p>{locale === 'id' ? 'Memuat role...' : 'Loading roles...'}</p>}
           {!isLoadingRoles && rolesError && (
             <p role="alert">
               {rolesError}{' '}
               <button type="button" onClick={() => window.location.reload()}>
-                Coba lagi
+                {locale === 'id' ? 'Coba lagi' : 'Try again'}
               </button>
             </p>
           )}
@@ -374,7 +422,7 @@ export default function SelectRolePage() {
                   onClick={() => setSelected(role.id)}
                 >
                   <div className={styles.panelHeader}>
-                    Peran: {role.displayName}
+                    {locale === 'id' ? 'Peran:' : 'Role:'} {role.displayName}
                   </div>
                   <div className={styles.panelBody}>
                     <Image
@@ -387,8 +435,8 @@ export default function SelectRolePage() {
                     />
                   </div>
                   <div className={styles.panelFooter}>
-                    <p>{role.description}</p>
-                    {role.perks.length > 0 && <small>{role.perks.join(' • ')}</small>}
+                    <p>{ROLE_TRANSLATIONS[role.id]?.description?.[locale as 'id' | 'en'] || role.description}</p>
+                    {role.perks.length > 0 && <small>{ROLE_TRANSLATIONS[role.id]?.perks?.[locale as 'id' | 'en']?.join(' • ') || role.perks.join(' • ')}</small>}
                   </div>
                 </button>
               </div>
@@ -402,11 +450,11 @@ export default function SelectRolePage() {
           disabled={!selected || entering}
         >
           {entering ? (
-            <><span className={styles.spinner} /> Memulai Petualangan...</>
+            <><span className={styles.spinner} /> {locale === 'id' ? 'Memulai Petualangan...' : 'Starting Adventure...'}</>
           ) : selected ? (
-            <>Mulai sebagai {roles.find(r => r.id === selected)?.displayName}</>
+            <>{locale === 'id' ? 'Mulai sebagai' : 'Start as'} {roles.find(r => r.id === selected)?.displayName}</>
           ) : (
-            'Pilih karaktermu dulu →'
+            locale === 'id' ? 'Pilih karaktermu dulu →' : 'Select your character first →'
           )}
         </button>
       </div>

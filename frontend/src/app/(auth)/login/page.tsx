@@ -20,21 +20,13 @@ export default function LoginPage() {
     },
   });
 
-  const [email, setEmail]     = useState('');
   const [loading, setLoading] = useState<string | null>(null);
-  const [step, setStep]       = useState<'login' | 'otp'>('login');
-  const [otp, setOtp]         = useState(['', '', '', '', '', '']);
 
   if (ready && authenticated) {
     router.push('/select-role');
     return null;
   }
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    login({ loginMethods: ['email'], prefill: { type: 'email', value: email } });
-  };
 
   const handleSocialLogin = (provider: string) => {
     if (provider === 'google') {
@@ -44,20 +36,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (value && index < 5) {
-      const next = document.getElementById(`otp-${index + 1}`) as HTMLInputElement;
-      next?.focus();
-    }
-    if (newOtp.every(v => v !== '') && index === 5) {
-      setLoading('otp');
-      setTimeout(() => router.push('/'), 1000);
-    }
-  };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden p-6 bg-[#0b1437]">
@@ -84,8 +63,6 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="w-full max-w-[540px] min-h-[480px] bg-transparent bg-[url('/Login\ Card.png')] bg-[length:100%_100%] bg-center bg-no-repeat p-[85px] relative flex flex-col justify-center drop-shadow-[0_12px_24px_rgba(0,0,0,0.4)]">
-          {step === 'login' ? (
-            <>
               <h1 className="font-pixel text-[1.1rem] text-[#3e2723] text-center leading-[1.4] mb-2 drop-shadow-none">
                 Gerbang PathTrick
               </h1>
@@ -122,84 +99,6 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 my-5 text-[#8b5a2b] text-[0.6rem] font-pixel uppercase tracking-widest before:content-[''] before:flex-1 before:h-[2px] before:bg-[#8b5a2b] after:content-[''] after:flex-1 after:h-[2px] after:bg-[#8b5a2b]">
-                <span>ATAU PAKAI SUREL</span>
-              </div>
-
-              {/* Email form */}
-              <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3.5">
-                <div className="flex flex-col gap-3.5">
-                  <label htmlFor="login-email" className="hidden">Email</label>
-                  <input
-                    id="login-email"
-                    type="email"
-                    placeholder="Alamat Surel (Email)"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    disabled={!!loading}
-                    className="w-full py-3.5 px-4 border-2 border-[#8b5a2b] bg-[#e6ccab] font-pixelify text-[0.95rem] text-[#3e2723] outline-none transition-colors duration-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1),2px_2px_0_0_rgba(0,0,0,0.1)] focus:border-[#5d4037] focus:bg-[#f1ebd8] placeholder-[#8d6e63]"
-                  />
-                </div>
-                <button
-                  id="login-email-btn"
-                  type="submit"
-                  disabled={!!loading || !email}
-                  className="w-full p-4 mt-2 border-3 border-[#5d4037] rounded-lg bg-gradient-to-b from-[#ffd700] to-[#daa520] text-[#3e2723] font-pixel text-[0.7rem] drop-shadow-[0_1px_0_rgba(255,255,255,0.4)] cursor-pointer tracking-widest uppercase transition-all duration-100 shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_6px_0_#8b5a2b,0_8px_12px_rgba(0,0,0,0.3)] hover:-translate-y-[2px] hover:bg-gradient-to-b hover:from-[#ffdf33] hover:to-[#e8b122] hover:shadow-[inset_0_2px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.2),0_8px_0_#8b5a2b,0_12px_16px_rgba(0,0,0,0.4)] active:translate-y-[6px] active:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_0_0_#8b5a2b,0_2px_4px_rgba(0,0,0,0.2)] disabled:bg-gradient-to-b disabled:from-[#d4c47b] disabled:to-[#bfa256] disabled:border-[#8b7d6b] disabled:text-[#7a6e5e] disabled:drop-shadow-none disabled:shadow-[inset_0_2px_0_rgba(255,255,255,0.2),inset_0_-2px_0_rgba(0,0,0,0.1),0_4px_0_#7a6e5e] disabled:cursor-not-allowed"
-                >
-                  {loading === 'email' ? (
-                    <span className="flex items-center justify-center gap-2 text-[0.6rem]">
-                      <span className="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> MENGIRIM KODE...
-                    </span>
-                  ) : (
-                    'Kirim Sihir OTP'
-                  )}
-                </button>
-              </form>
-            </>
-          ) : (
-            /* OTP Step */
-            <div className="flex flex-col items-center gap-4 mt-2">
-              <div className="text-[2rem] leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,0.3)]">📜</div>
-              <h1 className="font-pixel text-[0.95rem] text-[#3e2723] text-center leading-[1.4] mb-0 drop-shadow-none">
-                Gulungan Pesan Diterima!
-              </h1>
-              <p className="font-pixelify text-[0.85rem] text-[#5d4037] text-center leading-[1.5] mb-4">
-                Masukkan 6 rune sihir rahasia yang<br/>kami kirim ke <strong className="text-[#8b0000]">{email}</strong>
-              </p>
-
-              <div className="flex gap-2">
-                {otp.map((val, i) => (
-                  <input
-                    key={i}
-                    id={`otp-${i}`}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={val}
-                    onChange={e => handleOtpChange(i, e.target.value)}
-                    disabled={!!loading}
-                    aria-label={`Rune ke-${i + 1}`}
-                    className="w-[42px] h-[52px] bg-[#e6ccab] border-2 border-[#8b5a2b] text-[#3e2723] font-pixel text-[1rem] text-center outline-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),2px_2px_0_0_rgba(0,0,0,0.2)] focus:border-[#5d4037] focus:bg-[#f1ebd8] focus:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1),0_0_0_2px_rgba(93,64,55,0.4)] transition-all"
-                  />
-                ))}
-              </div>
-
-              {loading === 'otp' && (
-                <div className="flex items-center gap-3 mt-4 text-[0.7rem] text-[#3e2723] font-pixel animate-pulse">
-                  <span className="inline-block w-4 h-4 border-2 border-[#3e2723]/30 border-t-[#3e2723] rounded-full animate-spin" /> Merapalkan Mantra...
-                </div>
-              )}
-
-              <button
-                onClick={() => { setStep('login'); setOtp(['','','','','','']); }}
-                id="login-back-to-email"
-                className="text-[0.65rem] text-[#8b5a2b] mt-4 cursor-pointer bg-none border-none font-pixel underline hover:text-[#5d4037] drop-shadow-none"
-              >
-                ← Salah Mantra? Ulangi
-              </button>
-            </div>
-          )}
         </div>
 
         <p className="font-pixelify text-[0.8rem] text-white text-center leading-[1.8] mt-6 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] shadow-black max-w-[400px]">

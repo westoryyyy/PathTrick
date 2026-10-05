@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useOnboardingStore } from '@/store/useOnboardingStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 import { classifySkills } from '@/data/wefSkillData';
 import { extractTextFromPDF } from '@/lib/pdfExtractor';
@@ -41,6 +42,7 @@ async function extractCVFromBackend(cvText: string, portfolioText: string) {
 }
 
 export default function CVUploadStep() {
+  const { locale } = useTranslation();
   const store = useOnboardingStore();
   const {
     chaserAssessment: cState,
@@ -55,8 +57,8 @@ export default function CVUploadStep() {
 
   /* ── File Validation ── */
   const validateFile = (file: File): string | null => {
-    if (!ACCEPTED_TYPES.includes(file.type)) return 'Format tidak didukung. Gunakan PDF, DOC, atau DOCX.';
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) return `Ukuran file melebihi ${MAX_SIZE_MB}MB.`;
+    if (!ACCEPTED_TYPES.includes(file.type)) return locale === 'id' ? 'Format tidak didukung. Gunakan PDF, DOC, atau DOCX.' : 'Format not supported. Use PDF, DOC, or DOCX.';
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) return locale === 'id' ? `Ukuran file melebihi ${MAX_SIZE_MB}MB.` : `File size exceeds ${MAX_SIZE_MB}MB.`;
     return null;
   };
 
@@ -80,7 +82,7 @@ export default function CVUploadStep() {
       const text = await extractTextFromPDF(file, 8000);
       
       if (text.length < 50) {
-        setValidationError('PDF tidak dapat dibaca (mungkin hasil scan). Coba PDF dari Word/Google Docs.');
+        setValidationError(locale === 'id' ? 'PDF tidak dapat dibaca (mungkin hasil scan). Coba PDF dari Word/Google Docs.' : 'PDF cannot be read (might be a scanned image). Try a text-based PDF.');
         setChaserField('cvExtractionStatus', 'error');
         return;
       }
@@ -95,7 +97,7 @@ export default function CVUploadStep() {
     } catch (err) {
       console.error(err);
       setChaserField('cvExtractionStatus', 'error');
-      setValidationError(err instanceof Error && err.message ? `Gagal menganalisis CV: ${err.message}` : 'Gagal membaca PDF. Pastikan file tidak rusak.');
+      setValidationError(err instanceof Error && err.message ? (locale === 'id' ? `Gagal menganalisis CV: ${err.message}` : `Failed to analyze CV: ${err.message}`) : (locale === 'id' ? 'Gagal membaca PDF. Pastikan file tidak rusak.' : 'Failed to read PDF. Ensure the file is not corrupted.'));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -177,9 +179,9 @@ export default function CVUploadStep() {
         {status === 'idle' && (
           <div className="flex flex-col items-center gap-4 p-10 sm:p-7 text-center">
             <Image src="/Scroll.png" alt="" width={48} height={48} className="object-contain drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)] animate-[iconFloat_2s_ease-in-out_infinite]" />
-            <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">Drag & Drop CV-mu di sini</p>
-            <p className="font-pixel text-[0.6rem] text-white m-0 uppercase drop-shadow-[1px_1px_0_#3b261b]">atau klik untuk browse file</p>
-            <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF ONLY • Maks {MAX_SIZE_MB}MB</p>
+            <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.05em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">{locale === 'id' ? 'Drag & Drop CV-mu di sini' : 'Drag & Drop your CV here'}</p>
+            <p className="font-pixel text-[0.6rem] text-white m-0 uppercase drop-shadow-[1px_1px_0_#3b261b]">{locale === 'id' ? 'atau klik untuk browse file' : 'or click to browse files'}</p>
+            <p className="font-pixel text-[0.55rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">PDF ONLY • {locale === 'id' ? 'Maks' : 'Max'} {MAX_SIZE_MB}MB</p>
           </div>
         )}
 
@@ -189,7 +191,7 @@ export default function CVUploadStep() {
             <div className="w-12 h-12 flex items-center justify-center">
               <span className="block w-9 h-9 border-4 border-[#4c1d95] border-t-[#a855f7] animate-[spin_0.8s_steps(4)_infinite]" />
             </div>
-            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">Mengunggah...</p>
+            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">{locale === 'id' ? 'Mengunggah...' : 'Uploading...'}</p>
             <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{cState.cvFileName}</p>
             <div className="w-[250px] h-4 bg-[#1e1b4b] border-4 border-[#4c1d95] shadow-[inset_4px_4px_0_rgba(0,0,0,0.4)] relative">
               <div className="h-full bg-[#a855f7] transition-[width] duration-500 ease-[steps(10)]" style={{ width: '60%' }} />
@@ -204,7 +206,7 @@ export default function CVUploadStep() {
               <Image src="/NPC Wizard.png" alt="" width={48} height={48} className="relative z-10 object-contain" />
               <div className="absolute left-0 right-0 h-1 bg-[#2dd4bf] shadow-[0_0_16px_#2dd4bf] animate-[scanMove_1.5s_steps(10)_infinite]" />
             </div>
-            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">AI SEDANG MENGANALISIS SCROLL-MU...</p>
+            <p className="font-pixel text-[0.8rem] text-[#a855f7] m-0 tracking-[0.06em] uppercase drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">{locale === 'id' ? 'AI SEDANG MENGANALISIS SCROLL-MU...' : 'AI IS ANALYZING YOUR SCROLL...'}</p>
             <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0">{cState.cvFileName}</p>
             <div className="flex gap-1.5">
               <span className="w-2.5 h-2.5 bg-[#7c3aed] border-2 border-white animate-[dotBounce_0.6s_steps(2)_infinite]" />
@@ -220,7 +222,7 @@ export default function CVUploadStep() {
             <div className="flex items-center gap-4">
               <Image src="/Healing Potions.png" alt="" width={48} height={48} className="shrink-0 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
               <div>
-                <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">CV Berhasil Dianalisis!</p>
+                <p className="font-pixel text-[0.85rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b] leading-[1.6]">{locale === 'id' ? 'CV Berhasil Dianalisis!' : 'CV Successfully Analyzed!'}</p>
                 <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.7)] m-0 mt-2">{cState.cvFileName}</p>
               </div>
               <button
@@ -228,13 +230,13 @@ export default function CVUploadStep() {
                 className="ml-auto font-pixel text-[0.6rem] text-white bg-[#b91c1c] border-2 border-[#f87171] px-3 py-2 cursor-pointer shadow-[2px_2px_0_rgba(0,0,0,0.5)] transition-transform duration-100 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                 onClick={(e) => { e.stopPropagation(); handleRetry(); }}
               >
-                🔄 Ganti
+                🔄 {locale === 'id' ? 'Ganti' : 'Change'}
               </button>
             </div>
 
             {/* Extracted Skills */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">{locale === 'id' ? 'Skills Terdeteksi (Hasil AI Ekstraksi CV & Portfolio)' : 'Detected Skills (AI Extraction Results)'}</p>
               <div className="flex flex-wrap gap-2.5">
                 {(cState.cvExtractedData?.skills ?? []).map((skill, i) => (
                   <span key={i} className="font-pixel text-[0.55rem] text-white bg-[#4c1d95] border-2 border-[#a855f7] shadow-[2px_2px_0_rgba(0,0,0,0.5)] px-2.5 py-1.5 animate-[tagIn_0.35s_steps(4)_both]" style={{ animationDelay: `${i * 0.08}s` }}>
@@ -246,7 +248,7 @@ export default function CVUploadStep() {
 
             {/* Extracted Experience */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pengalaman</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">{locale === 'id' ? 'Pengalaman' : 'Experience'}</p>
               <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
                 {cState.cvExtractedData.experience.map((exp, i) => (
                   <li key={i} className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] pl-5 relative leading-[1.8] animate-[tagIn_0.35s_steps(4)_both] before:content-['>'] before:absolute before:left-0 before:text-[#34d399]" style={{ animationDelay: `${0.5 + i * 0.1}s` }}>{exp}</li>
