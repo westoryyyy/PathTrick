@@ -269,7 +269,7 @@ export default function NodeInfoPanel({
                       onClick={handleStartCourse}
                       onMouseEnter={playHoverSound}
                     >
-                      {role === 'MAHASISWA' ? '📖 Review Skill' : '📖 Review Materi'}
+                      📖 Review Materi
                     </button>
                   )}
                   {displayNode.status === 'locked' && (
@@ -322,7 +322,7 @@ export default function NodeInfoPanel({
                       onClick={handleStartCourse}
                       onMouseEnter={playHoverSound}
                     >
-                      {role === 'MAHASISWA' ? '📖 Review Skill' : '📖 Review Materi'}
+                      📖 Review Materi
                     </button>
                   )}
                   {displayNode.status === 'locked' && (

@@ -425,7 +425,7 @@ export const useMapStore = create<MapState>()(
         nodes: mappedNodes,
         isLoading: false,
         activeChapterId: chapterId,
-        completedDynamicNodes: Array.from(new Set([...get().completedDynamicNodes, ...normalizedCompletedIds])),
+        completedDynamicNodes: normalizedCompletedIds,
       });
     } catch (err: unknown) {
       console.error('fetchRoadmap error:', err);

@@ -398,39 +398,6 @@
     "sol_closing": "Di kedua jalur, setiap pencapaian dicatat sebagai <strong>Soulbound Token (SBT)</strong> di <strong>BNB Chain</strong>, sertifikat digital permanen yang <strong>tidak dapat dipindahtangankan maupun dipalsukan</strong>. Pengguna punya bukti yang tidak terbantahkan, dan perekrut bisa memverifikasinya langsung secara on-chain. Masalah kepercayaan yang selama ini membebani kedua sisi selesai lewat desain sistemnya sendiri."
   },
   "docsMenu": {
-
-  },
-  "tracks": {
-    "header": {
-      "title": "Jelajahi Jalur Karier",
-      "desc": "Temukan roadmap belajar yang dibuat AI, disesuaikan dengan skor RIASEC dan tujuanmu. Pilih jalur karier spesialis di bidang teknologi."
-    },
-    "filter": {
-      "label": "Filter berdasarkan Kategori:"
-    },
-    "noTracks": {
-      "heading": "Tidak ada jalur",
-      "desc": "Coba pilih kategori lain atau kembali nanti untuk jalur baru!",
-      "viewAll": "Lihat Semua Jalur"
-    },
-    "cta": "Jelajahi Jalur"
-  },
-  "bgm": {
-    "play": "PUTAR MUSIK",
-    "mute": "MATIKAN MUSIK",
-    "onAlt": "Musik Menyala",
-    "offAlt": "Musik Mati"
-  },
-  "certificate": {
-    "viewPdf": "📄 LIHAT PDF",
-    "generating": "MENCETAK PDF...",
-    "viewOnBscScan": "🔍 LIHAT DI BSCSCAN",
-    "pdfError": "PDF gagal dibuat. Silakan coba lagi.",
-    "status": {
-      "minted": "TERCETAK",
-      "pending": "MENUNGGU"
-    }
-  },
     "title": "DOKUMENTASI SISTEM",
     "back": "◀ KEMBALI",
     "tableOfContents": "Daftar Isi",

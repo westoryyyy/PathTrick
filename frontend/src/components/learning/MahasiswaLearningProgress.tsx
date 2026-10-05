@@ -129,6 +129,33 @@ export default function MahasiswaLearningProgress() {
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
           {t('common.aiSkillGapAnalysis')}
         </p>
+        <button
+          onClick={() => {
+            import('@/store/useOnboardingStore').then(({ useOnboardingStore }) => {
+              const store = useOnboardingStore.getState();
+              store.setRole('chaser', store.savedPrivyUserId ?? undefined); // reset currentStep=0, totalSteps
+              useOnboardingStore.setState({
+                chaserAssessment: {
+                  cvFile: null,
+                  cvFileName: '',
+                  cvExtractionStatus: 'idle',
+                  cvExtractedData: null,
+                  cvText: '',
+                  portfolioFile: null,
+                  portfolioFileName: '',
+                  portfolioText: '',
+                  workInterests: [],
+                  preferredGICS: [],
+                },
+                onboardingCompleted: false,
+              });
+              router.push('/assessment');
+            });
+          }}
+          style={{ alignSelf: 'flex-start', padding: '8px 16px', background: '#3b82f6', color: 'white', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', borderRadius: '8px', cursor: 'pointer', border: '2px solid #2563eb' }}
+        >
+          ULANGI ASESMEN
+        </button>
       </div>
 
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>

@@ -6,7 +6,6 @@ import { CareerTrack } from '@/types/backend';
 import PixelIcon from '@/components/ui/PixelIcon';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
-import { useTranslation } from '@/hooks/useTranslation';
 
 // categoryIcons removed
 const categories = [
@@ -35,7 +34,6 @@ const difficultyLabels: Record<string, string> = {
 };
 
 export default function ExploreTracks() {
-  const { t } = useTranslation();
   const [careerTracks, setCareerTracks] = useState<CareerTrack[]>([]);
   const [metadata, setMetadata] = useState<any>({ riasecScore: 'N/A', primaryTrack: 'N/A', targetCountry: 'N/A' });
   const [isLoading, setIsLoading] = useState(true);
@@ -107,10 +105,10 @@ export default function ExploreTracks() {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight mb-3">
-                {t('tracks.header.title')}
+                Explore Career Tracks
               </h1>
               <p className="text-base sm:text-lg text-slate-600 font-medium max-w-2xl leading-relaxed mb-6">
-                {t('tracks.header.desc')}
+                Discover AI-generated learning roadmaps tailored to your RIASEC score and goals. Choose from specialized career paths in tech.
               </p>
 
               {/* RIASEC & Primary Track Info */}
@@ -134,7 +132,7 @@ export default function ExploreTracks() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="flex items-center gap-3 flex-wrap"
             >
-              <span className="text-sm font-bold text-slate-600 uppercase tracking-wider">{t('tracks.filter.label')}</span>
+              <span className="text-sm font-bold text-slate-600 uppercase tracking-wider">Filter by Category:</span>
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
                   <button
@@ -164,10 +162,10 @@ export default function ExploreTracks() {
               <div className="animate-bounce"><PixelIcon icon={mascot} size={64} /></div>
               <div>
                 <h3 className="font-extrabold text-xl text-slate-900 mb-1">
-                  {t('tracks.header.title')}
+                  Ready to Level Up?
                 </h3>
                 <p className="text-sm text-slate-600 font-medium">
-                  {t('tracks.header.desc')}
+                  Choose your next adventure and master new skills with our expert-curated tracks.
                 </p>
               </div>
               <div className="flex gap-2 text-lg mt-2">
@@ -187,7 +185,7 @@ export default function ExploreTracks() {
           className="mb-6"
         >
           <p className="text-sm font-semibold text-slate-600">
-            Showing <span className="text-blue-600 font-extrabold">{filteredTracks.length}</span> {filteredTracks.length !== 1 ? t('tracks.cta').toLowerCase() + 's' : t('tracks.cta').toLowerCase()} in{' '}
+            Showing <span className="text-blue-600 font-extrabold">{filteredTracks.length}</span> track{filteredTracks.length !== 1 ? 's' : ''} in{' '}
             <span className="text-blue-600 font-extrabold">{selectedCategory}</span>
           </p>
         </motion.div>
@@ -260,7 +258,7 @@ export default function ExploreTracks() {
 
                 {/* CTA Button */}
                 <button className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-sm hover:shadow-lg hover:scale-105 active:scale-95 transition-all mt-2">
-                  {t('tracks.cta')}
+                  Explore Track
                 </button>
               </div>
             </motion.div>
@@ -276,15 +274,15 @@ export default function ExploreTracks() {
             className="flex flex-col items-center justify-center py-16 text-center"
           >
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-2xl font-extrabold text-slate-900 mb-2">{t('tracks.noTracks.heading')}</h3>
+            <h3 className="text-2xl font-extrabold text-slate-900 mb-2">No tracks found</h3>
             <p className="text-slate-600 font-medium mb-6">
-              {t('tracks.noTracks.desc')}
+              Try selecting a different category or check back soon for new tracks!
             </p>
             <button
               onClick={() => setSelectedCategory('All')}
               className="px-6 py-3 rounded-xl bg-blue-600 text-white font-extrabold hover:bg-blue-700 transition-colors"
             >
-              {t('tracks.noTracks.viewAll')}
+              View All Tracks
             </button>
           </motion.div>
         )}
