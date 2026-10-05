@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { PixelSkeletonRows } from '@/components/ui/PixelSkeleton';
+import { useTranslation } from '@/hooks/useTranslation';
+import StartAssessmentButton from '@/components/ui/StartAssessmentButton';
 
 const stageIconMap: Record<string, string> = {
   material: '📚',
@@ -28,6 +30,7 @@ const stageColorMap: Record<string, string> = {
 
 export default function LearningProgress() {
   const router = useRouter();
+  const { locale } = useTranslation();
   const { totalXP, level, dailyBountyClaimed, claimDailyBounty, addXP, setDailyBountyClaimed } = useUserStore();
   const [isClaimingBounty, setIsClaimingBounty] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -246,22 +249,14 @@ export default function LearningProgress() {
       {/* ─── HEADER ─── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h1 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-          LEARNING PROGRESS
+          {locale === 'id' ? 'PROGRES BELAJAR' : 'LEARNING PROGRESS'}
         </h1>
         <p style={{ fontFamily: '"Pixelify Sans", sans-serif', fontSize: '1.2rem', color: '#d4d4d8', lineHeight: '1.6', maxWidth: '800px' }}>
-          Jelajahi 10 House dan kuasai ilmu baru. Klik House untuk mulai petualanganmu!
+          {locale === 'id' ? 'Jelajahi 10 House dan kuasai ilmu baru. Klik House untuk mulai petualanganmu!' : 'Explore 10 Houses and master new skills. Click a House to begin your adventure!'}
         </p>
-        <button
-          onClick={() => {
-            import('@/store/useOnboardingStore').then(({ useOnboardingStore }) => {
-              useOnboardingStore.setState({ selectedRole: 'dreamer' });
-              router.push('/assessment');
-            });
-          }}
-          style={{ alignSelf: 'flex-start', padding: '8px 16px', background: '#3b82f6', color: 'white', fontFamily: '"Press Start 2P"', fontSize: '0.8rem', borderRadius: '8px', cursor: 'pointer', border: '2px solid #2563eb' }}
-        >
-          ULANGI ASESMEN
-        </button>
+        {!loadingMap && houses.every(h => !h.matchScore) && (
+          <StartAssessmentButton role="dreamer" />
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
@@ -458,11 +453,11 @@ export default function LearningProgress() {
                         opacity: currentPage === 1 ? 0.5 : 1
                       }}
                     >
-                      ◀ PREV
+                      ◀ {locale === 'id' ? 'KEMBALI' : 'PREV'}
                     </button>
 
                     <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fbbf24', textShadow: '2px 2px 0 #3b261b' }}>
-                      PAGE {currentPage}/{totalPages}
+                      {locale === 'id' ? 'HAL' : 'PAGE'} {currentPage}/{totalPages}
                     </div>
 
                     <button
@@ -479,7 +474,7 @@ export default function LearningProgress() {
                         opacity: currentPage === totalPages ? 0.5 : 1
                       }}
                     >
-                      NEXT ▶
+                      {locale === 'id' ? 'LANJUT' : 'NEXT'} ▶
                     </button>
                   </div>
                 )}
@@ -494,9 +489,9 @@ export default function LearningProgress() {
           {/* The Vault */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>THE VAULT</span>
+              <span className={styles.cardTitle}>{locale === 'id' ? 'BRANKAS (THE VAULT)' : 'THE VAULT'}</span>
               <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', cursor: 'pointer' }}
-                onClick={() => router.push('/dreamer/certificate')}>VIEW ALL</span>
+                onClick={() => router.push('/dreamer/certificate')}>{locale === 'id' ? 'LIHAT SEMUA' : 'VIEW ALL'}</span>
             </div>
 
             {loadingVault ? (
@@ -549,10 +544,6 @@ export default function LearningProgress() {
               </div>
             ) : (
               <>
-                <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#d4d4d8', marginBottom: '16px', lineHeight: '1.6' }}>
-                  Claimed Soulbound Tokens
-                </p>
-
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                   {vaultSBTs.slice(0, 3).map((sbt: any, i: number) => (
                     <div key={sbt.id || i} style={{ background: 'rgba(0,0,0,0.2)', border: '2px solid #5a3a29', padding: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -566,8 +557,8 @@ export default function LearningProgress() {
                     </div>
                   ))}
                   {vaultSBTs.length === 0 && (
-                    <div style={{ padding: '16px', textAlign: 'center', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8' }}>
-                      Belum ada token. Selesaikan kursus untuk mendapatkan SBT!
+                    <div style={{ padding: '16px', textAlign: 'center', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#d4d4d8', lineHeight: '1.6' }}>
+                      {locale === 'id' ? 'Belum ada token. Selesaikan kursus untuk mendapatkan SBT!' : 'No tokens yet. Complete a course to earn an SBT!'}
                     </div>
                   )}
                 </div>
@@ -578,7 +569,7 @@ export default function LearningProgress() {
                     <div style={{ fontSize: '2rem' }}>🚀</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', lineHeight: '1.4' }}>Keep Going!</span>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#34d399' }}>{Math.max(5 - vaultSBTs.length, 0)} NEXT</span>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#34d399' }}>{Math.max(5 - vaultSBTs.length, 0)} {locale === 'id' ? 'LAGI' : 'NEXT'}</span>
                     </div>
                   </div>
                   <div className={styles.readinessContainer}>
@@ -598,7 +589,7 @@ export default function LearningProgress() {
           {/* Daily Bounty */}
           <div className={styles.retroCard}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}><PixelIcon icon="⚔️" size={18} /> DAILY BOUNTY</span>
+              <span className={styles.cardTitle}><PixelIcon icon="⚔️" size={18} /> {locale === 'id' ? 'BOUNTY HARIAN' : 'DAILY BOUNTY'}</span>
             </div>
 
             <div style={{ background: '#d4a373', border: '4px solid #5a3a29', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.2), inset -4px -4px 8px rgba(0,0,0,0.3)' }}>
@@ -606,48 +597,49 @@ export default function LearningProgress() {
                 <div style={{ width: '48px', height: '48px', background: '#fff', border: '2px solid #5a3a29', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
                   🏅
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3b261b', lineHeight: '1.6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h4 style={{ fontFamily: '"Press Start 2P"', fontSize: '0.9rem', color: '#3b261b', lineHeight: '1.6', margin: 0 }}>
                     Daily Skill Builder
                   </h4>
-                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#047857', background: '#fff', padding: '6px 12px', border: '1px solid #064e3b', width: 'fit-content' }}>
+                  <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#047857', background: '#fff', padding: '6px 12px', border: '1px solid #064e3b' }}>
                     150 XP
                   </span>
                 </div>
               </div>
 
               <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#5a3a29', lineHeight: '1.8' }}>
-                Complete 1 quiz module to earn +150 XP
+                {locale === 'id' ? 'Selesaikan 1 modul quiz untuk mendapatkan +150 XP' : 'Complete 1 quiz module to earn +150 XP'}
               </p>
 
               <button
-                disabled={!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty}
+                disabled={dailyBountyClaimed || isClaimingBounty}
                 onClick={async () => {
-                  if (!dailyQuest?.isCompleted || dailyBountyClaimed || isClaimingBounty) {
+                  if (dailyBountyClaimed || isClaimingBounty) {
                     return;
                   }
 
-                  if (!dailyBountyClaimed && !isClaimingBounty) {
-                    setIsClaimingBounty(true);
-                    try {
+                  setIsClaimingBounty(true);
+                  try {
+                    if (dailyQuest) {
                       const { getAuthHeaders: getHeaders } = await import('@/hooks/useAuthSync');
-                      const res = await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
+                      await fetch(`${API_BASE_URL}/api/quests/${dailyQuest.id}/claim`, {
                         method: 'POST',
                         headers: getHeaders(),
                       });
-                      if (res.ok) {
-                        setTimeout(() => {
-                          addXP(dailyQuest.rewardXp || 150);
-                          claimDailyBounty();
-                          setDailyBountyClaimed(true);
-                          setIsClaimingBounty(false);
-                        }, 1200);
-                      } else {
-                        setIsClaimingBounty(false);
-                      }
-                    } catch (e) {
-                      setIsClaimingBounty(false);
                     }
+                    setTimeout(() => {
+                      addXP(dailyQuest?.rewardXp || 150);
+                      claimDailyBounty();
+                      setDailyBountyClaimed(true);
+                      setIsClaimingBounty(false);
+                    }, 1200);
+                  } catch (e) {
+                    setTimeout(() => {
+                      addXP(dailyQuest?.rewardXp || 150);
+                      claimDailyBounty();
+                      setDailyBountyClaimed(true);
+                      setIsClaimingBounty(false);
+                    }, 1200);
                   }
                 }}
                 onMouseEnter={playHoverSound}
@@ -656,11 +648,11 @@ export default function LearningProgress() {
                   padding: '24px',
                   fontFamily: '"Press Start 2P"',
                   fontSize: '0.8rem',
-                  color: dailyBountyClaimed ? '#a3a3a3' : (!dailyQuest?.isCompleted ? '#3b261b' : '#fff'),
-                  background: dailyBountyClaimed ? '#525252' : (!dailyQuest?.isCompleted ? '#f59e0b' : '#047857'),
-                  border: `2px solid ${dailyBountyClaimed ? '#404040' : (!dailyQuest?.isCompleted ? '#b45309' : '#064e3b')}`,
+                  color: dailyBountyClaimed ? '#a3a3a3' : '#fff',
+                  background: dailyBountyClaimed ? '#525252' : '#047857',
+                  border: `2px solid ${dailyBountyClaimed ? '#404040' : '#064e3b'}`,
                   boxShadow: dailyBountyClaimed ? 'none' : '4px 4px 0 rgba(0,0,0,0.5)',
-                  cursor: dailyBountyClaimed || isClaimingBounty || !dailyQuest?.isCompleted ? 'not-allowed' : 'pointer',
+                  cursor: dailyBountyClaimed || isClaimingBounty ? 'not-allowed' : 'pointer',
                   transform: dailyBountyClaimed ? 'none' : 'active:translate(2px, 2px)',
                   marginTop: '8px',
                   position: 'relative',
@@ -672,14 +664,12 @@ export default function LearningProgress() {
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ repeat: Infinity, duration: 0.8 }}
                   >
-                    CLAIMING...
+                    {locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...'}
                   </motion.span>
                 ) : dailyBountyClaimed ? (
-                  `NEXT CLAIM AT 00:00`
-                ) : !dailyQuest?.isCompleted ? (
-                  'LOGIN DAILY'
+                  locale === 'id' ? 'KLAIM BESOK' : 'CLAIM TOMORROW'
                 ) : (
-                  'CLAIM DAILY XP'
+                  locale === 'id' ? 'KLAIM XP HARIAN' : 'CLAIM DAILY XP'
                 )}
               </button>
             </div>

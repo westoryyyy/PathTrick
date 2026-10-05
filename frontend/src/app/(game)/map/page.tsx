@@ -44,6 +44,9 @@ function MapContent() {
   const [showSBT,      setShowSBT]      = useState(false);
   const [sbtData]      = useState<{ name: string; emoji: string; xp: number; badgeImage?: string } | null>(null);
   const [houseId,      setHouseId]      = useState<string | null>(null);
+  const [sceneReady,   setSceneReady]   = useState(false);
+  const [loadError,    setLoadError]    = useState<string | null>(null);
+  const [reloadKey,    setReloadKey]    = useState(0);
   const badgeCount = useMapStore(state => state.badgeCount);
   const fetchAchievements = useMapStore(state => state.fetchAchievements);
 
@@ -73,13 +76,40 @@ function MapContent() {
       useMapStore.setState({ role: 'MAHASISWA' });
     }
 
+    setLoadError(null);
+
     if (chapterId) {
       if (roleQuery === 'chaser' || role === 'MAHASISWA') {
         useMapStore.setState({ activeChapterId: chapterId });
-        fetchRoadmap(chapterId).then(() => {
+        const failLoad = (msg: string) => {
+          useMapStore.setState({ isLoading: false });
+          setLoadError(msg);
+        };
+        fetchRoadmap(chapterId).then(async () => {
           const fetchedNodes = useMapStore.getState().nodes;
-          setDynamicNodes(fetchedNodes);
-        });
+          if (fetchedNodes.length > 0) {
+            setDynamicNodes(fetchedNodes);
+            return;
+          }
+          // Roadmap aktif tidak memuat bab ini (atau request gagal) -> ambil langsung dari /api/chapters
+          try {
+            const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+            const { API_BASE_URL } = await import('@/config/pathtrick');
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 20000);
+            const res = await fetch(`${API_BASE_URL}/api/chapters/${chapterId}`, { headers: getAuthHeaders(), signal: ctrl.signal });
+            clearTimeout(timer);
+            const chapterData = await res.json();
+            if (res.ok && chapterData && !chapterData.error && chapterData.sections?.length) {
+              const tChapter = { id: chapterData.id, name: chapterData.title, duration: `${chapterData.sections.length} Levels`, sections: chapterData.sections };
+              generateNodesForChapter(tChapter, null, null, chapterId);
+            } else {
+              failLoad('Peta untuk skill path ini belum tersedia.');
+            }
+          } catch {
+            failLoad('Gagal memuat peta. Periksa koneksi lalu coba lagi.');
+          }
+        }).catch(() => failLoad('Gagal memuat peta. Periksa koneksi lalu coba lagi.'));
         return;
       }
 
@@ -235,7 +265,7 @@ function MapContent() {
         fetchRoadmap();
       }
     }
-  }, [moduleId, chapterId, role, roleQuery, fetchRecommendedCourses, fetchRoadmap]);
+  }, [moduleId, chapterId, role, roleQuery, fetchRecommendedCourses, fetchRoadmap, reloadKey]);
 
   useEffect(() => {
     // populate shared badge count
@@ -254,6 +284,8 @@ function MapContent() {
     setNearbyNode(null);
   }, []);
 
+  const handleSceneReady = useCallback(() => setSceneReady(true), []);
+
   const isNotRecommended = searchParams.get('isNotRecommended');
 
   const handleStartCourse = useCallback(async (node: CourseNodeData) => {
@@ -271,17 +303,41 @@ function MapContent() {
     }
   }, [role, router, isNotRecommended, chapterId]);
 
+  if (loadError) {
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, background: '#0a0e1a', padding: 24, textAlign: 'center' }}>
+        <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '0.7rem', color: '#fbbf24', lineHeight: 1.8 }}>{loadError}</p>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button
+            onClick={() => { useMapStore.setState({ isLoading: true }); setDynamicNodes([]); setReloadKey(k => k + 1); }}
+            style={{ padding: '12px 20px', background: '#fbbf24', border: '3px solid #3b261b', color: '#3b261b', fontFamily: '"Press Start 2P", monospace', fontSize: '0.55rem', cursor: 'pointer' }}
+          >COBA LAGI</button>
+          <button
+            onClick={() => router.push(roleQuery === 'chaser' || role === 'MAHASISWA' ? '/chaser/learning-mission' : '/dreamer/learning-progress')}
+            style={{ padding: '12px 20px', background: '#3b261b', border: '3px solid #5a3a29', color: '#fbbf24', fontFamily: '"Press Start 2P", monospace', fontSize: '0.55rem', cursor: 'pointer' }}
+          >KEMBALI</button>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading || (chapterId && dynamicNodes.length === 0)) {
     return <GameLoadingScreen statusText="Menyiapkan Data Peta..." />;
   }
 
   return (
     <>
+      {!sceneReady && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 500 }}>
+          <GameLoadingScreen statusText="Memuat Aset Peta..." />
+        </div>
+      )}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <WorldMapGame 
           onNodeSelected={handleNodeSelected}
           onNodeNearby={handleNodeNearby}
           onNodeLeave={handleNodeLeave}
+          onReady={handleSceneReady}
         />
       </div>
 

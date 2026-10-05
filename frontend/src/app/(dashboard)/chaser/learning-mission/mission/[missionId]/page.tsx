@@ -14,6 +14,7 @@ import { getQuizForMission } from '@/data/quizBank';
 import MintSBTButton from '@/components/ui/MintSBTButton';
 import CertificatePreview from '@/components/ui/CertificatePreview';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 const generateCourseId = (str: string) => {
@@ -40,6 +41,7 @@ export default function MissionFlowPage() {
   const isNotRecommended = searchParams.get('isNotRecommended') === 'true';
   const penaltyFactor = isNotRecommended ? 0.5 : 1;
   const router = useRouter();
+  const { t, locale } = useTranslation();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, completeQuiz, displayName: savedName } = useUserStore();
   const { user } = usePrivy();
@@ -197,11 +199,7 @@ export default function MissionFlowPage() {
   };
 
   const handleLevelComplete = async () => {
-    try {
-      const audio = new Audio('/mission completed.ogg');
-      audio.volume = 0.5;
-      audio.play().catch(() => { });
-    } catch (e) { }
+    setIsSubmitting(true);
 
     try {
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
@@ -229,6 +227,14 @@ export default function MissionFlowPage() {
     } catch (err) {
       console.error('Failed to sync progress with backend', err);
     }
+
+    setIsSubmitting(false);
+
+    try {
+      const audio = new Audio('/mission completed.ogg');
+      audio.volume = 0.5;
+      audio.play().catch(() => { });
+    } catch (e) { }
 
     completeDynamicNode(missionId as string);
     // Peta memakai id section sebagai prerequisite level berikutnya
@@ -862,8 +868,8 @@ export default function MissionFlowPage() {
                   </h2>
                   <p className={styles.text} style={{ textAlign: 'center', fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', lineHeight: '1.6' }}>
                     {isBossLevel
-                      ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.'
-                      : 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di misi ini.'}
+                      ? (locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah menaklukkan Boss dan menguasai bab ini sepenuhnya.' : 'Amazing, Knight! You have defeated the Boss and fully mastered this chapter.')
+                      : (locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di misi ini.' : 'Amazing, Knight! You have successfully conquered the challenges in this mission.')}
                   </p>
                   {/* ─── CERTIFICATE CARD (same style as OnChainCertificates) ─── */}
                   {isBossLevel && (
@@ -914,7 +920,7 @@ export default function MissionFlowPage() {
                         <img src="/Coin.png" alt="Reward" style={{ width: '64px', height: '64px', objectFit: 'contain', imageRendering: 'pixelated' }} />
                       </motion.div>
                       <p className={styles.text} style={{ marginTop: '8px', fontSize: '1.1rem', color: '#92400e' }}>
-                        Reward XP dan item telah ditambahkan ke akunmu.
+                        {locale === 'id' ? 'Reward XP dan item telah ditambahkan ke akunmu.' : 'XP Reward and items have been added to your account.'}
                       </p>
                     </div>
                   )}
@@ -948,7 +954,7 @@ export default function MissionFlowPage() {
                             }}
                             disabled={isClaiming}
                           >
-                            {isClaiming ? 'MENGKLAIM...' : 'NANTI AJA'}
+                            {isClaiming ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') : (locale === 'id' ? 'NANTI AJA' : 'MAYBE LATER')}
                           </button>
                       ) : (
                         <button onMouseEnter={playHoverSound}
@@ -956,7 +962,7 @@ export default function MissionFlowPage() {
                           style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
                           onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}
                         >
-                          KEMBALI KE PETA
+                          {locale === 'id' ? 'KEMBALI KE PETA' : 'RETURN TO MAP'}
                         </button>
                       )}
                     </div>
@@ -977,7 +983,7 @@ export default function MissionFlowPage() {
                       }}
                       disabled={isClaiming}
                     >
-                      {isClaiming ? 'MENGKLAIM...' : 'KLAIM REWARD & KEMBALI KE PETA'}
+                      {isClaiming ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') : (locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP')}
                     </button>
                   )}
                 </motion.div>

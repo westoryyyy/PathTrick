@@ -14,6 +14,7 @@ import { MISSION_CONTENT } from '@/data/missionContent';
 import { getQuizForMission } from '@/data/quizBank';
 import Image from 'next/image';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 type Phase = 'MATERIAL' | 'QUIZ' | 'PROJECT' | 'CLAIM';
@@ -29,6 +30,7 @@ export default function MissionFlowPage() {
   const isNotRecommended = searchParams.get('isNotRecommended') === 'true';
   const penaltyFactor = isNotRecommended ? 0.5 : 1;
   const router = useRouter();
+  const { t, locale } = useTranslation();
   const { completeDynamicNode } = useMapStore();
   const { addXP, triggerLevelUp, displayName: savedName } = useUserStore();
   const { user } = usePrivy();
@@ -118,8 +120,11 @@ export default function MissionFlowPage() {
   const [isClaiming, setIsClaiming] = useState(false);
   const [isBossMinted, setIsBossMinted] = useState(false);
   const [dbSection, setDbSection] = useState<any>(null);
+  // Snapshot of completion status at page load; backend flips `completed` once this session finishes the level
+  const [wasCompleted, setWasCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(!MISSION_CONTENT[missionId as string]);
 
+  const completedSnapshotRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -130,7 +135,7 @@ export default function MissionFlowPage() {
         fetch(`${API_BASE_URL}/api/missions/${missionId as string}?_t=${Date.now()}`, { headers: getAuthHeaders() })
           .then(res => res.json())
           .then(data => {
-             if (data && !data.error) setDbSection(data);
+             if (data && !data.error) { setDbSection(data); if (!completedSnapshotRef.current) { completedSnapshotRef.current = true; setWasCompleted(!!data.completed); } }
           })
           .catch(() => {})
           .finally(() => setIsLoading(false));
@@ -194,14 +199,15 @@ export default function MissionFlowPage() {
     if (onConfirm) onConfirm();
   };
   const handleLevelComplete = async () => {
-    audioController.play('/mission completed.ogg');
+    setIsSubmitting(true);
 
     try {
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
       const { API_BASE_URL } = await import('@/config/pathtrick');
       
-      if (content.quiz && content.quiz.length > 0) {
-        const answers = content.quiz.map((q: any) => {
+      const quizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+      if (quizArray.length > 0) {
+        const answers = quizArray.map((q: any) => {
           if (q.type === 'ESSAY') {
             return {
               questionId: q.id || "0",
@@ -229,6 +235,8 @@ export default function MissionFlowPage() {
       console.error("Failed to sync progress with backend", err);
     }
 
+    setIsSubmitting(false);
+    audioController.play('/mission completed.ogg');
     completeDynamicNode(missionId as string);
     setPhase('CLAIM');
   };
@@ -269,6 +277,13 @@ export default function MissionFlowPage() {
     } catch (e) { }
   };
 
+  // Essay detection yang toleran: tipe 'ESSAY'/'essay'/'esai'/'uraian' atau soal tanpa pilihan jawaban.
+  const isEssayQuestion = (q: any) =>
+    /^(essay|esai|uraian)/i.test(String(q?.type || q?.tipe || '')) ||
+    !((q?.options || q?.pilihan || []).length);
+  const dbQuestions: any[] = dbSection?.quiz?.questions || [];
+  const dbIsBoss = isBossLevel || dbSection?.category === 'milestone';
+
   // Get dynamic content or generate a fallback template
   let content = dbSection ? {
     materials: [
@@ -281,7 +296,7 @@ export default function MissionFlowPage() {
         </div>
       </div>
     ],
-    quiz: dbSection.quiz?.questions?.filter((q: any) => q.type !== 'ESSAY').map((q: any, i: number) => ({
+    quiz: dbQuestions.filter((q: any) => !isEssayQuestion(q)).map((q: any, i: number) => ({
       id: q.id,
       type: q.type || 'MULTIPLE_CHOICE',
       question: `**Pertanyaan ${i + 1}:**\n\n${q.prompt || q.pertanyaan || q.question}`,
@@ -305,7 +320,7 @@ export default function MissionFlowPage() {
       })
     })) || [],
     project: (() => {
-      const essayQ = dbSection.quiz?.questions?.find((q: any) => q.type === 'ESSAY');
+      const essayQ = dbQuestions.find((q: any) => isEssayQuestion(q));
       if (essayQ) {
         return {
           type: 'essay',
@@ -323,6 +338,14 @@ export default function MissionFlowPage() {
           },
           successMsg: `Luar biasa, pemahamanmu terbukti!`,
           errorMsg: `Hasil karyamu masih kurang tepat. Ingat konsep utamanya!`,
+        };
+      }
+      if (dbIsBoss || essayAnswer.length > 0) {
+        // Boss level tanpa soal essay di database -> tetap tampilkan kotak jawaban agar tidak buntu
+        return {
+          type: 'essay',
+          id: undefined,
+          instruction: `**Tantangan Boss:**\n\nTuliskan ringkasan/analisis dengan kata-katamu sendiri tentang apa yang telah kamu pelajari di bab ini (minimal 10 karakter).`,
         };
       }
       return null;
@@ -493,11 +516,28 @@ export default function MissionFlowPage() {
   const handleBossSubmit = async () => {
     setIsSubmitting(true);
     try {
-      if ((content.project as any)?.type === 'essay') {
+      const projectType = (content.project as any)?.type;
+      if (projectType === 'essay' && !(content.project as any)?.id) {
+        // Essay fallback (tidak ada soal essay di DB): validasi panjang minimal lalu tandai selesai
+        if (essayAnswer.trim().length < 10) {
+          showDialog('error', 'Jawaban terlalu singkat! Tulis minimal 10 karakter.');
+        } else {
+          await handleLevelComplete();
+        }
+      } else if (projectType === 'code') {
+        const ok = (content.project as any).codeValidation?.(essayAnswer);
+        if (ok) {
+          audioController.play('/Poin.ogg');
+          showDialog('success', (content.project as any).successMsg || 'Berhasil!', () => { handleLevelComplete(); });
+        } else {
+          showDialog('error', (content.project as any).errorMsg || 'Jawabanmu masih kurang tepat. Coba lagi!');
+        }
+      } else if (projectType === 'essay') {
         const { getAuthHeaders } = await import('@/hooks/useAuthSync');
         const { API_BASE_URL } = await import('@/config/pathtrick');
         
-        const mcqAnswers = (content.quiz || []).map((q: any) => {
+        const mcqQuizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+        const mcqAnswers = mcqQuizArray.map((q: any) => {
           const correctOpt = q.options?.find((o: any) => o.isCorrect);
           return {
             questionId: q.id || "0",
@@ -605,9 +645,14 @@ export default function MissionFlowPage() {
               <h2 className={styles.title} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.8rem' }}>{currentChapter.name} - KUIS</h2>
             </div>
 
-            {content.quiz && content.quiz.length > 0 ? (() => {
-              const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
-              const currentQuiz = quizArray[quizIndex];
+            {(() => {
+              const quizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+              if (quizArray.length === 0) return (
+                <div style={{ flex: 1 }}>
+                  <p className={styles.text}>Kuis belum tersedia untuk level ini.</p>
+                </div>
+              );
+              const currentQuiz = quizArray[quizIndex] as any;
               return (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -620,15 +665,11 @@ export default function MissionFlowPage() {
                     </div>
                   )}
                   <div className={`${styles.dialogueBox} prose-content no-scrollbar`} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.05rem', lineHeight: '1.5', flex: '0 1 auto', overflowY: 'auto' }}>
-                    <ReactMarkdown>{currentQuiz.question}</ReactMarkdown>
+                    <ReactMarkdown>{String(currentQuiz.question)}</ReactMarkdown>
                   </div>
                 </>
               );
-            })() : (
-              <div style={{ flex: 1 }}>
-                <p className={styles.text}>Kuis belum tersedia untuk level ini.</p>
-              </div>
-            )}
+            })()}
           </div>
         );
 
@@ -707,9 +748,14 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ height: '48px', marginBottom: '16px' }}></div>
-            {content.quiz && content.quiz.length > 0 ? (() => {
-              const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
-              const currentQuiz = quizArray[quizIndex];
+            {(() => {
+              const quizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+              if (quizArray.length === 0) return (
+                <div style={{ textAlign: 'center' }}>
+                  <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setPhaseWithProgress('PROJECT'); }}>LANJUT TANTANGAN ➔</button>
+                </div>
+              );
+              const currentQuiz = quizArray[quizIndex] as any;
               return currentQuiz.type === 'ESSAY' ? (
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', overflowY: 'auto', paddingRight: '8px' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -782,11 +828,7 @@ export default function MissionFlowPage() {
                   ))}
                 </div>
               );
-            })() : (
-              <div style={{ textAlign: 'center' }}>
-                <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => { playSwipeSound(); setPhaseWithProgress('PROJECT'); }}>LANJUT TANTANGAN ➔</button>
-              </div>
-            )}
+            })()}
           </div>
         );
 
@@ -873,7 +915,7 @@ export default function MissionFlowPage() {
                 {/* Non-boss: coin reward */}
                 {!isBossLevel && (
                   <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                    {!dbSection?.completed && (
+                    {!wasCompleted && (
                       <motion.div
                         key="coin-anim"
                         initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
@@ -885,7 +927,7 @@ export default function MissionFlowPage() {
                       </motion.div>
                     )}
                     <p className={styles.text} style={{ marginTop: '12px', fontSize: '0.65rem', color: '#92400e' }}>
-                      {dbSection?.completed 
+                      {wasCompleted 
                         ? 'Kamu sudah pernah menyelesaikan misi ini sebelumnya, Ksatria.'
                         : 'Reward XP dan item telah ditambahkan ke akunmu.'}
                     </p>
@@ -901,7 +943,7 @@ export default function MissionFlowPage() {
                         }}
                         onSuccess={() => {
                           setIsBossMinted(true);
-                          if (!dbSection?.completed) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
+                          if (!wasCompleted) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                         }}
                         certificate={{ userName: displayName, moduleName: currentChapter.name, walletAddress: walletShort, date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }}
                         onAlreadyMinted={() => setIsBossMinted(true)}
@@ -913,7 +955,7 @@ export default function MissionFlowPage() {
                           onClick={() => {
                             if (!isClaiming) {
                               setIsClaiming(true);
-                              if (!dbSection?.completed) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
+                              if (!wasCompleted) addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                               setTimeout(() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`), 1200);
                             }
                           }}
@@ -938,7 +980,7 @@ export default function MissionFlowPage() {
                     onClick={() => {
                       if (!isClaiming) {
                         setIsClaiming(true);
-                        if (!dbSection?.completed) {
+                        if (!wasCompleted) {
                           addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                         }
                         if (isBossLevel) {
@@ -949,7 +991,7 @@ export default function MissionFlowPage() {
                     }}
                     disabled={isClaiming}
                   >
-                    {dbSection?.completed 
+                    {wasCompleted 
                       ? (isClaiming ? 'KEMBALI...' : 'KEMBALI KE PETA')
                       : (isClaiming ? 'MENGKLAIM...' : (isBossLevel ? 'KLAIM & LANJUT BAB BERIKUTNYA' : 'KLAIM REWARD & KEMBALI'))}
                   </button>
@@ -1067,15 +1109,15 @@ export default function MissionFlowPage() {
                   style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', background: '#fdf6e3', border: '4px dashed #059669', padding: '24px 32px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
                 >
                   <h2 className={styles.title} style={{ color: '#059669', textAlign: 'center', fontSize: '1.8rem', lineHeight: '1.4' }}>
-                    {dbSection?.completed ? 'LEVEL SELESAI' : 'MISSION CLEARED!'}
+                    {wasCompleted ? (locale === 'id' ? 'LEVEL SELESAI' : 'LEVEL COMPLETED') : 'MISSION CLEARED!'}
                   </h2>
                   <p className={styles.text} style={{ textAlign: 'center', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                    {dbSection?.completed 
-                      ? 'Kamu sudah pernah menyelesaikan tantangan di bab ini sebelumnya.' 
-                      : 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.'}
+                    {wasCompleted 
+                      ? (locale === 'id' ? 'Kamu sudah pernah menyelesaikan tantangan di bab ini sebelumnya.' : 'You have previously completed the challenge in this chapter.') 
+                      : (locale === 'id' ? 'Luar biasa, Ksatria! Kamu telah berhasil menaklukkan tantangan di bab ini.' : 'Amazing, Knight! You have successfully conquered the challenge in this chapter.')}
                   </p>
                   <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                    {!dbSection?.completed && (
+                    {!wasCompleted && (
                       <motion.div
                         key="coin-anim"
                         initial={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
@@ -1087,9 +1129,9 @@ export default function MissionFlowPage() {
                       </motion.div>
                     )}
                     <p className={styles.text} style={{ marginTop: '8px', fontSize: '1.1rem', color: '#92400e' }}>
-                      {dbSection?.completed 
-                        ? 'Reward sudah pernah diklaim.' 
-                        : 'Reward XP dan item telah ditambahkan ke akunmu.'}
+                      {wasCompleted 
+                        ? (locale === 'id' ? 'Reward sudah pernah diklaim.' : 'Reward has already been claimed.') 
+                        : (locale === 'id' ? 'Reward XP dan item telah ditambahkan ke akunmu.' : 'XP Reward and items have been added to your account.')}
                     </p>
                   </div>
 
@@ -1100,10 +1142,10 @@ export default function MissionFlowPage() {
                     onClick={() => {
                       if (!isClaiming) {
                         setIsClaiming(true);
-                        if (!dbSection?.completed) {
+                        if (!wasCompleted) {
                           addXP(Math.floor((dbSection?.xpReward ?? 100) * penaltyFactor));
                         }
-                        if (isBossLevel && !dbSection?.completed) {
+                        if (isBossLevel && !wasCompleted) {
                           triggerLevelUp();
                         }
                         setTimeout(() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`), 1200);
@@ -1111,9 +1153,15 @@ export default function MissionFlowPage() {
                     }}
                     disabled={isClaiming}
                   >
-                    {dbSection?.completed 
-                      ? (isClaiming ? 'KEMBALI...' : 'KEMBALI KE PETA')
-                      : (isClaiming ? 'MENGKLAIM...' : (isBossLevel ? 'KLAIM & LANJUT BAB BERIKUTNYA' : 'KLAIM REWARD & KEMBALI KE PETA'))}
+                    {wasCompleted 
+                      ? (isClaiming 
+                          ? (locale === 'id' ? 'KEMBALI...' : 'RETURNING...') 
+                          : (locale === 'id' ? 'KEMBALI KE PETA' : 'RETURN TO MAP'))
+                      : (isClaiming 
+                          ? (locale === 'id' ? 'MENGKLAIM...' : 'CLAIMING...') 
+                          : (isBossLevel 
+                              ? (locale === 'id' ? 'KLAIM & LANJUT BAB BERIKUTNYA' : 'CLAIM & PROCEED TO NEXT CHAPTER') 
+                              : (locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP')))}
                   </button>
                 </motion.div>
               </AnimatePresence>
