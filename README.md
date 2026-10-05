@@ -398,7 +398,7 @@ What this submission delivers:
 |------|------|
 | **Rotua Paulina** | Product Manager & Smart Contract Engineer |
 | **Renatha Amelia Manggala Putri** | Backend Engineer & AI Engineer |
-| **Grace Yoelanda Turnip** | Frontend Engineer |
+| **Grace Yoelanda Turnip** | Frontend Engineer & Backend Engineer |
 | **Nabilah Aprilia Darwin** | Visual & Assets Artist |
 
 
