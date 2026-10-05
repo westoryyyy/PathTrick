@@ -134,6 +134,7 @@ model User {
   questProgress  UserQuestProgress[]
   loginEvents    UserLoginEvent[]
   gamification   Gamification?
+  universityChecklists UniversityChecklistProgress[]
 
   // Back-relations untuk master data yang di-create admin
   universitiesCreated University[]  @relation("UniversityCreatedBy")
@@ -248,6 +249,7 @@ model University {
   createdAt             DateTime @default(now())
 
   matches UniversityMatch[]
+  checklistProgress UniversityChecklistProgress[]
 
   @@index([country])
 }
@@ -722,6 +724,22 @@ model CourseKnowledge {
 
   @@unique([facultyTag, title, chunkIndex])
   @@index([facultyTag])
+}
+
+// Progres checklist persiapan masuk universitas, dikelola sendiri oleh user.
+// Satu baris per (user, universitas); completedSteps berisi key langkah yang dicentang.
+model UniversityChecklistProgress {
+  id             String     @id @default(cuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  universityId   String
+  university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  completedSteps String[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([userId, universityId])
+  @@index([userId])
 }
 
 model Notification {

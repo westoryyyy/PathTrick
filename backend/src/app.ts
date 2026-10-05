@@ -1,5 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import rateLimit from "@fastify/rate-limit";
 import { env } from "./config/env";
 import authPlugin from "./plugins/auth";
 import authRoutes from "./modules/auth/auth.route";
@@ -11,6 +13,7 @@ import adminRoutes from "./modules/admin/admin.route";
 import gamificationRoutes from "./modules/gamification/gamification.route";
 import housesRoutes from "./modules/houses/houses.route";
 import universitiesRoutes from "./modules/universities/universities.route";
+import universityChecklistRoutes from "./modules/universities/checklist.route";
 import scholarshipsRoutes from "./modules/scholarships/scholarships.route";
 import jobsRoutes from "./modules/jobs/jobs.route";
 import rolesRoutes from "./modules/roles/roles.route";
@@ -51,6 +54,17 @@ export function buildApp() {
     credentials: true,
   });
 
+  // Security headers (API only, so CSP can be strict)
+  app.register(helmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: "cross-origin" } });
+
+  // Global rate limit per IP; AI/auth endpoints are cheap to abuse.
+  app.register(rateLimit, {
+    global: true,
+    max: 300,
+    timeWindow: "1 minute",
+    allowList: (req) => req.url === "/health",
+  });
+
   // Plugins
   app.register(authPlugin);
 
@@ -64,6 +78,7 @@ export function buildApp() {
   app.register(gamificationRoutes);
   app.register(housesRoutes);
   app.register(universitiesRoutes);
+  app.register(universityChecklistRoutes);
   app.register(scholarshipsRoutes);
   app.register(jobsRoutes);
   app.register(rolesRoutes);
