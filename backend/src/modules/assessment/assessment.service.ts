@@ -291,7 +291,7 @@ export async function submitChaserProfile(userId: string, payload: ChaserProfile
 
   const [courses, jobs] = await Promise.all([
     findCandidateCoursesForChaser(payload.major, payload.jobPreference),
-    findCandidateJobs(payload.jobPreference),
+    findCandidateJobs(payload.jobPreference, payload.confirmedSkills ?? []),
   ]);
 
   const result = await runAgent2(userId, {
@@ -301,6 +301,7 @@ export async function submitChaserProfile(userId: string, payload: ChaserProfile
       portfolioText: payload.portfolioText,
       major: payload.major,
       jobPreference: payload.jobPreference,
+      confirmedSkills: payload.confirmedSkills,
     },
     candidateJobs: jobs.candidates,
     candidateCourses: courses.candidates,

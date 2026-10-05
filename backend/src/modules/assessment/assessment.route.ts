@@ -7,6 +7,7 @@ import {
   submitDreamerRiasec,
   submitChaserProfile,
 } from "./assessment.service";
+import { analyzeCv, analyzeCvInputSchema, getChaserDashboard } from "./chaser.service";
 
 import fs from 'fs';
 import path from 'path';
@@ -78,6 +79,36 @@ export default async function assessmentRoutes(fastify: FastifyInstance) {
         request.log.error(error, "Unexpected error di POST /api/assessment");
         return reply.code(500).send({ error: "InternalError", message: "Terjadi kesalahan tak terduga" });
       }
+    }
+  );
+
+  // ── POST /api/assessment/chaser/analyze-cv ──────────────────────────
+  // Step 1 onboarding Chaser: AI Agent 2 mengekstrak skill dari teks CV/portfolio.
+  fastify.post(
+    "/api/assessment/chaser/analyze-cv",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const parsed = analyzeCvInputSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: "ValidationError", details: parsed.error.flatten() });
+      }
+      try {
+        return reply.code(200).send(await analyzeCv(parsed.data));
+      } catch (error) {
+        request.log.error(error, "Gagal analisis CV");
+        return reply.code(503).send({ error: "AnalysisFailed", message: "Analisis CV gagal, coba lagi sebentar lagi." });
+      }
+    }
+  );
+
+  // ── GET /api/chaser/dashboard ───────────────────────────────────────
+  // XP + hasil AI Job Match terakhir milik Chaser yang login.
+  fastify.get(
+    "/api/chaser/dashboard",
+    { preHandler: [fastify.authenticate] },
+    async (request, reply) => {
+      const { userId } = request.user;
+      return reply.code(200).send(await getChaserDashboard(userId));
     }
   );
 

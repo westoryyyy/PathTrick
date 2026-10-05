@@ -17,7 +17,7 @@ import rolesRoutes from "./modules/roles/roles.route";
 import certificatesRoutes from "./modules/gamification/certificates.route";
 import notificationsRoutes from "./modules/notifications/notifications.route";
 import questsRoutes from "./modules/quests/quests.route";
-
+import cvRoutes from "./modules/cv/cv.route";
 export function buildApp() {
   const app = Fastify({
     bodyLimit: 20 * 1024 * 1024, // 20MB limit
@@ -32,7 +32,22 @@ export function buildApp() {
   });
 
   app.register(cors, {
-    origin: env.CORS_ORIGIN,
+    origin: (origin, cb) => {
+      if (!origin) {
+        cb(null, true);
+        return;
+      }
+      if (env.CORS_ORIGIN === '*') {
+        cb(null, true);
+        return;
+      }
+      const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (allowedOrigins.includes(origin)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Not allowed by CORS'), false);
+      }
+    },
     credentials: true,
   });
 
@@ -55,7 +70,7 @@ export function buildApp() {
   app.register(certificatesRoutes);
   app.register(notificationsRoutes);
   app.register(questsRoutes);
-
+  app.register(cvRoutes);
   app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 
   return app;

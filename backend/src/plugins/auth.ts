@@ -35,7 +35,9 @@ export default fp(async function authPlugin(fastify: FastifyInstance) {
     try {
       await request.jwtVerify();
     } catch (err) {
-      reply.code(401).send({ error: "Unauthorized", message: "Token sesi tidak valid atau kedaluwarsa" });
+      const error = new Error("Token sesi tidak valid atau kedaluwarsa");
+      (error as any).statusCode = 401;
+      throw error;
     }
   });
 });

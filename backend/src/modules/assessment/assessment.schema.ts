@@ -33,6 +33,8 @@ export const chaserProfilePayloadSchema = z.object({
   portfolioText: z.string().max(4000).nullable(),
   major: z.string().min(1).max(100),
   jobPreference: z.string().min(1).max(200),
+  // Skill hasil ekstraksi AI yang sudah dikonfirmasi/diedit user di step Minat Kerja.
+  confirmedSkills: z.array(z.string().max(60)).max(30).optional(),
 });
 
 // Discriminated union: bentuk payload beda tergantung `type`, tapi TypeScript
