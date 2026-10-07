@@ -100,11 +100,13 @@ function getErrorText(error: unknown): string {
     .join(' ');
 }
 
-async function requestMintAuthorization(courseId: number): Promise<MintAuthorization> {
+async function requestMintAuthorization(courseId: number, walletAddress?: string): Promise<MintAuthorization> {
+  const body: Record<string, string> = { courseId: String(courseId) };
+  if (walletAddress) body.walletAddress = walletAddress;
   const response = await fetch(`${API_BASE_URL}/api/certificates/prepare-mint`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify({ courseId: String(courseId) }),
+    body: JSON.stringify(body),
   });
   const data = await readApiResponse(response);
   if (!response.ok) throw new Error(getApiError(data, 'Gagal menyiapkan otorisasi mint.'));
@@ -211,7 +213,31 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
         throw new Error('Wrong network: BNB Smart Chain Testnet is required.');
       }
 
-      const authorization = await requestMintAuthorization(courseId);
+      let authorization;
+      try {
+        authorization = await requestMintAuthorization(courseId, activeWallet.address);
+      } catch (err) {
+        const text = getErrorText(err).toLowerCase();
+        // If backend complains wallet not connected, try to sync wallet to backend then retry once
+        if (text.includes('hubungkan wallet') || text.includes('wallet belum')) {
+          try {
+            const headers = getAuthHeaders();
+            // attempt to persist wallet on backend
+            await fetch(`${API_BASE_URL}/api/users/me`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', ...headers },
+              body: JSON.stringify({ walletAddress: activeWallet.address }),
+            });
+            // retry prepare-mint once
+            authorization = await requestMintAuthorization(courseId, activeWallet.address);
+          } catch (syncErr) {
+            throw err; // rethrow original prepare-mint error
+          }
+        } else {
+          throw err;
+        }
+      }
+
       const signer = await ethersProvider.getSigner();
       const contract = new Contract(
         PATHTRICK_SBT_ADDRESS,

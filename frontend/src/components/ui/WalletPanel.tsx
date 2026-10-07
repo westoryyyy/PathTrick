@@ -63,6 +63,35 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const openTelegram = (username: string, e?: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e) e.preventDefault();
+    const tgScheme = `tg://resolve?domain=${username}`;
+    const webFallback = `https://t.me/${username}?start=1`;
+
+    // If on desktop, open web fallback directly (no tg:// handler expected)
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(ua) || (navigator as any).maxTouchPoints > 0;
+    if (!isMobile) {
+      try { window.open(webFallback, '_blank', 'noopener,noreferrer'); } catch { /* ignore */ }
+      return;
+    }
+
+    // On mobile, try to invoke Telegram via an invisible iframe, then fallback to web
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = tgScheme;
+      document.body.appendChild(iframe);
+      // Remove iframe and open web fallback after short delay if app didn't open
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch {}
+        try { window.open(webFallback, '_blank', 'noopener,noreferrer'); } catch {}
+      }, 700);
+    } catch (err) {
+      try { window.open(webFallback, '_blank', 'noopener,noreferrer'); } catch {}
+    }
+  };
+
   const isEmpty = !balance || balance === '0.0000';
 
   if (!isMounted) return null;
@@ -171,19 +200,21 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
             <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', margin: 0, lineHeight: 1.7 }}>{isEmpty ? 'Wallet kosong — klaim tBNB gratis' : 'Dapatkan lebih banyak tBNB gratis'}</p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <a href="tg://resolve?domain=bnbchain_official_bot"
+            <a href="https://t.me/bnbchain_official_bot?start=1" target="_blank" rel="noopener noreferrer"
+              onClick={(e) => openTelegram('bnbchain_official_bot', e)}
               style={{ flex: 1, background: 'linear-gradient(135deg, #3d2214, #5a3520)', border: '2px solid #78350f', borderRadius: '8px', padding: '14px 10px', color: '#c8a96e', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', lineHeight: 1.7 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.color = '#fbbf24'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = '#78350f'; e.currentTarget.style.color = '#c8a96e'; }}>
-              🚰 BNB Faucet ↗
+              BNB Faucet ↗
             </a>
-            <a href="tg://resolve?domain=faucet_trade_bot"
+            <a href="https://t.me/faucet_trade_bot?start=1" target="_blank" rel="noopener noreferrer"
+              onClick={(e) => openTelegram('faucet_trade_bot', e)}
               style={{ flex: 1, background: 'linear-gradient(135deg, #3d2214, #5a3520)', border: '2px solid #78350f', borderRadius: '8px', padding: '14px 10px', color: '#c8a96e', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', lineHeight: 1.7 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.color = '#fbbf24'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = '#78350f'; e.currentTarget.style.color = '#c8a96e'; }}>
-              ✈ Telegram Bot ↗
+              Telegram Bot ↗
             </a>
           </div>
           <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#a0845c', margin: '14px 0 0', lineHeight: 1.9, textAlign: 'center' }}>
-            Paste alamat walletmu untuk klaim. Butuh ~1 menit.
+            {locale === 'id'  ? 'Paste alamat walletmu untuk klaim. Butuh ~1 menit.' : 'Paste your wallet address to claim. It takes ~1 minute.'}
           </p>
         </div>
 

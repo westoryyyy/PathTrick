@@ -733,7 +733,7 @@ export default function MissionFlowPage() {
               </p>
             </div>
             <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
-              KLAIM REWARD & KEMBALI KE PETA
+              {locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP'}
             </button>
           </div>
         );
@@ -748,7 +748,7 @@ export default function MissionFlowPage() {
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}>
-          ← KEMBALI KE PETA
+          {locale === 'id' ? '← KEMBALI KE PETA' : '← RETURN TO MAP'} 
         </button>
         <div className={styles.missionId}>MISI: {missionId}</div>
       </div>

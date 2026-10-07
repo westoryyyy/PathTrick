@@ -7,8 +7,10 @@ import PixelIcon from '@/components/ui/PixelIcon';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { useMapStore } from '@/store/useMapStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function HouseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { locale } = useTranslation();
   const router = useRouter();
   const { id } = use(params);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
@@ -132,7 +134,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 relative z-10">
         <div className="flex items-center justify-center gap-4 mb-8">
           <PixelIcon icon="⚔️" size={24} />
-          <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#5C3A21' }}>PILIH MODUL</h3>
+          <h3 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: '#5C3A21' }}>{locale === 'id' ? 'PILIH MODUL' : 'SELECT MODULE'}</h3>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -168,7 +170,7 @@ export default function HouseDetailPage({ params }: { params: Promise<{ id: stri
                         })()}
                       </div>
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#a87b51' }}>
-                        {mod.chapters?.length || 0} BAB
+                        {mod.chapters?.length || 0} {locale === 'id' ? 'BAB' : 'CHAPS'}
                       </span>
                     </div>
                     

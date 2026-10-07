@@ -211,7 +211,7 @@ export default function DocsPage() {
               </section>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle} dangerouslySetInnerHTML={{ __html: t('docsContent.h3_22') }} />
-                <Image src="/docs-flow-mahasiswa-v2.jpg" alt="User Flow The Chaser" width={900} height={394} className={styles.gameImage} />
+                <Image src="/the-chaser-user-flows.png" alt="User Flow The Chaser" width={1024} height={576} className={styles.pixelImage} />
               </section>
             </>
           )}
@@ -736,7 +736,7 @@ export default function DocsPage() {
                         0x39632892C33435a76043343Ef17Ac03124627ba9
                       </code>
                       <a href="https://testnet.bscscan.com/address/0x39632892C33435a76043343Ef17Ac03124627ba9" target="_blank" rel="noreferrer" style={{ color: '#ffb300', display: 'inline-block', marginTop: '10px', fontSize: '0.8rem' }}>
-                        Lihat kontrak di BscScan Testnet
+                        {locale === 'en' ? <>View contract on BscScan Testnet</> : <>Lihat kontrak di BscScan Testnet</>}
                       </a>
                     </div>
                   </div>
@@ -754,25 +754,25 @@ export default function DocsPage() {
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>2</div>
                     <div className={styles.timelineContent}>
-                      <strong>Authorization backend:</strong> Frontend meminta <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, dan <code>signature</code> melalui <code>POST /api/certificates/prepare-mint</code>. Signature dibuat oleh signer backend, bukan oleh frontend.
+                      <strong>Authorization backend:</strong> {locale === 'en' ? <>Frontend requests <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, and <code>signature</code> via <code>POST /api/certificates/prepare-mint</code>. The signature is created by the backend signer, not by the frontend.</> : <>Frontend meminta <code>courseId</code>, <code>nonce</code>, <code>deadline</code>, dan <code>signature</code> melalui <code>POST /api/certificates/prepare-mint</code>. Signature dibuat oleh signer backend, bukan oleh frontend.</>}
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>3</div>
                     <div className={styles.timelineContent}>
-                      <strong>Mint oleh wallet:</strong> Frontend memastikan wallet berada di Chain ID 97, membaca <code>mintPrice()</code>, memeriksa saldo untuk mint price dan gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>.
+                      <strong>{locale === 'en' ? <>Mint by wallet:</> : <>Mint oleh wallet:</>}</strong> {locale === 'en' ? <>Frontend ensures the wallet is on Chain ID 97, reads <code>mintPrice()</code>, checks the balance for mint price and gas, then calls <code>mintCertificate(courseId, deadline, signature)</code>.</> : <>Frontend memastikan wallet berada di Chain ID 97, membaca <code>mintPrice()</code>, memeriksa saldo untuk mint price dan gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>.</>}
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>4</div>
                     <div className={styles.timelineContent}>
-                      <strong>Receipt dan event:</strong> Setelah transaksi confirmed, frontend memeriksa receipt dan event <code>CertificateMinted(to, courseId)</code>. Error seperti signature expired, insufficient funds, wrong network, dan user rejection ditampilkan dengan jelas.
+                      <strong>{locale === 'en' ? <>Receipt and event:</> : <>Receipt dan event:</>}</strong> {locale === 'en' ? <>Once the transaction is confirmed, the frontend checks the receipt and the <code>CertificateMinted(to, courseId)</code> event. Errors such as signature expired, insufficient funds, wrong network, and user rejection are clearly displayed.</> : <>Setelah transaksi confirmed, frontend memeriksa receipt dan event <code>CertificateMinted(to, courseId)</code>. Error seperti signature expired, insufficient funds, wrong network, dan user rejection ditampilkan dengan jelas.</>}
                     </div>
                   </div>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelinePoint}>5</div>
                     <div className={styles.timelineContent}>
-                      <strong>Konfirmasi backend:</strong> Frontend mengirim <code>courseId</code> dan <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. UI hanya menampilkan sukses setelah backend menerima transaksi.
+                      <strong>{locale === 'en' ? <>Backend confirmation:</> : <>Konfirmasi backend:</>}</strong> {locale === 'en' ? <>The frontend sends <code>courseId</code> and <code>txHash</code> to <code>POST /api/certificates/confirm-mint</code>. The UI only displays success after the backend confirms the transaction.</> : <>Frontend mengirim <code>courseId</code> dan <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. UI hanya menampilkan sukses setelah backend menerima transaksi.</>}
                     </div>
                   </div>
                 </div>
@@ -783,25 +783,25 @@ export default function DocsPage() {
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/BNBSmartChainLogo_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Network and Contract</> : <>Jaringan dan Contract</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Deployment aktif berada di <strong>BNB Smart Chain Testnet</strong> dengan <strong>Chain ID 97</strong>. Contract certificate menggunakan alamat <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> dan ABI resmi dari <code>integration/PathtrickSBT.abi.json</code>. Data transaksi dapat diverifikasi melalui BscScan Testnet.
+                      {locale === 'en' ? <>The active deployment is on <strong>BNB Smart Chain Testnet</strong> with <strong>Chain ID 97</strong>. The certificate contract uses address <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> and the official ABI from <code>integration/PathtrickSBT.abi.json</code>. Transaction data can be verified via BscScan Testnet.</> : <>Deployment aktif berada di <strong>BNB Smart Chain Testnet</strong> dengan <strong>Chain ID 97</strong>. Contract certificate menggunakan alamat <code>0x39632892C33435a76043343Ef17Ac03124627ba9</code> dan ABI resmi dari <code>integration/PathtrickSBT.abi.json</code>. Data transaksi dapat diverifikasi melalui BscScan Testnet.</>}
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/Security_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Authorization Flow</> : <>Alur Otorisasi</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Setelah course selesai, frontend meminta authorization ke <code>POST /api/certificates/prepare-mint</code>. Backend mengembalikan <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, dan <strong>signature</strong>. Frontend tidak membuat, mengubah, atau memakai ulang nonce dan deadline secara manual.
+                      {locale === 'en' ? <>After completing a course, the frontend requests authorization to <code>POST /api/certificates/prepare-mint</code>. The backend returns <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, and <strong>signature</strong>. The frontend does not create, modify, or reuse nonce and deadline manually.</> : <>Setelah course selesai, frontend meminta authorization ke <code>POST /api/certificates/prepare-mint</code>. Backend mengembalikan <strong>courseId</strong>, <strong>nonce</strong>, <strong>deadline</strong>, dan <strong>signature</strong>. Frontend tidak membuat, mengubah, atau memakai ulang nonce dan deadline secara manual.</>}
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/sbt_logo_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>On-chain Verification</> : <>Verifikasi On-chain</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Wallet harus berada di Chain ID 97. Frontend membaca <strong>mintPrice()</strong> secara langsung, menghitung kebutuhan saldo bersama gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>. Setelah receipt tersedia, frontend memeriksa event <strong>CertificateMinted(to, courseId)</strong>.
+                      {locale === 'en' ? <>The wallet must be on Chain ID 97. The frontend reads <strong>mintPrice()</strong> directly, calculates the required balance along with gas, then calls <code>mintCertificate(courseId, deadline, signature)</code>. Once the receipt is available, the frontend checks the <strong>CertificateMinted(to, courseId)</strong> event.</> : <>Wallet harus berada di Chain ID 97. Frontend membaca <strong>mintPrice()</strong> secara langsung, menghitung kebutuhan saldo bersama gas, lalu memanggil <code>mintCertificate(courseId, deadline, signature)</code>. Setelah receipt tersedia, frontend memeriksa event <strong>CertificateMinted(to, courseId)</strong>.</>}
                     </div>
                   </div>
                   <div className={styles.featureCardBoxed}>
                     <div className={styles.cardHeader}><div className={styles.cardIcon}><Image src="/certificate-template_transparent.png" alt="" width={28} height={28} className={styles.cardIconImage} /></div><div className={styles.cardTitle}>{locale === 'en' ? <>Backend Confirmation</> : <>Konfirmasi Backend</>}</div></div>
                     <div className={styles.cardText} style={{ textAlign: 'justify' }}>
-                      Certificate belum dianggap selesai hanya karena wallet mengirim transaksi. Setelah receipt dan event valid, frontend mengirim <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. Status sukses baru ditampilkan setelah backend menerima dan memvalidasi transaksi tersebut.
+                      {locale === 'en' ? <>A certificate is not considered complete just because the wallet sent the transaction. After a valid receipt and event, the frontend sends <code>txHash</code> to <code>POST /api/certificates/confirm-mint</code>. A success status is only displayed after the backend receives and validates the transaction.</> : <>Certificate belum dianggap selesai hanya karena wallet mengirim transaksi. Setelah receipt dan event valid, frontend mengirim <code>txHash</code> ke <code>POST /api/certificates/confirm-mint</code>. Status sukses baru ditampilkan setelah backend menerima dan memvalidasi transaksi tersebut.</>}
                     </div>
                   </div>
                 </div>

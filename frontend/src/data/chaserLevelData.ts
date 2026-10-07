@@ -6,7 +6,7 @@ export interface ChaserLevelTier {
   maxXp: number;
   nextLabel?: ChaserCareerLabel;
   nextXp?: number;
-  description: string;
+  description: { id: string; en: string };
 }
 
 export interface ChaserLevelInfo {
@@ -26,7 +26,10 @@ export const CHASER_LEVEL_TIERS: ChaserLevelTier[] = [
     maxXp: 2999,
     nextLabel: 'Mid-level',
     nextXp: 3000,
-    description: 'Pemula yang mulai membangun pengalaman dan portofolio kerja.',
+    description: {
+      id: 'Pemula yang mulai membangun pengalaman dan portofolio kerja.',
+      en: 'A beginner starting to build experience and a work portfolio.'
+    },
   },
   {
     name: 'Mid-level',
@@ -34,7 +37,10 @@ export const CHASER_LEVEL_TIERS: ChaserLevelTier[] = [
     maxXp: 5999,
     nextLabel: 'Senior',
     nextXp: 6000,
-    description: 'Sudah mulai siap menangani proyek dan tugas yang lebih kompleks.',
+    description: {
+      id: 'Sudah mulai siap menangani proyek dan tugas yang lebih kompleks.',
+      en: 'Ready to handle more complex projects and tasks.'
+    },
   },
   {
     name: 'Senior',
@@ -42,7 +48,10 @@ export const CHASER_LEVEL_TIERS: ChaserLevelTier[] = [
     maxXp: 9999,
     nextLabel: 'Lead',
     nextXp: 10000,
-    description: 'Mampu memberi value tinggi dan bekerja dengan tingkat kompleksitas yang lebih besar.',
+    description: {
+      id: 'Mampu memberi value tinggi dan bekerja dengan tingkat kompleksitas yang lebih besar.',
+      en: 'Able to provide high value and work with greater levels of complexity.'
+    },
   },
   {
     name: 'Lead',
@@ -50,13 +59,19 @@ export const CHASER_LEVEL_TIERS: ChaserLevelTier[] = [
     maxXp: 14999,
     nextLabel: 'Principal',
     nextXp: 15000,
-    description: 'Memiliki kemampuan memandu tim dan memecahkan masalah strategis.',
+    description: {
+      id: 'Memiliki kemampuan memandu tim dan memecahkan masalah strategis.',
+      en: 'Possesses the ability to guide teams and solve strategic problems.'
+    },
   },
   {
     name: 'Principal',
     minXp: 15000,
     maxXp: Number.POSITIVE_INFINITY,
-    description: 'Tingkat senioritas puncak yang sudah siap untuk tantangan kompleks.',
+    description: {
+      id: 'Tingkat senioritas puncak yang sudah siap untuk tantangan kompleks.',
+      en: 'The peak level of seniority, ready for complex challenges.'
+    },
   },
 ];
 

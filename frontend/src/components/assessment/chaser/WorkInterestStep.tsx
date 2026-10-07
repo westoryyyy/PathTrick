@@ -118,7 +118,7 @@ export default function WorkInterestStep() {
                 {isEnabled && (
                   <div className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[180px] p-2.5 bg-[#3b2416] border-2 border-[#6a4734] shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
                     <p className="font-pixel text-[0.45rem] leading-[1.6] text-[#fdf6e3] m-0 text-center drop-shadow-[1px_1px_0_#1a100a]">
-                      {sector.description}
+                      {locale === 'id' ? sector.description.id : sector.description.en}
                     </p>
                     <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[#6a4734]"></div>
                   </div>
@@ -144,10 +144,10 @@ export default function WorkInterestStep() {
                 <PixelIcon icon={sector.icon} size={24} />
                 <div>
                   <span style={{ fontFamily: "var(--font-pixel)", fontSize: '0.5rem', color: '#fde047', display: 'block', marginBottom: '6px', textShadow: '1px 1px 0 #3b261b' }}>
-                    {sector.nameID.replace('\n', ' ')}
+                    {locale === 'id' ? sector.nameID.replace('\n', ' ') : sector.nameEN}
                   </span>
                   <span style={{ fontFamily: "var(--font-pixel)", fontSize: '0.45rem', color: '#fdf6e3', lineHeight: '1.6', textShadow: '1px 1px 0 #3b261b' }}>
-                    Contoh: {sector.exampleRoles.slice(0, 3).join(' · ')}
+                    {locale === 'id' ? 'Contoh' : 'Example'}: {sector.exampleRoles.slice(0, 3).join(' · ')}
                   </span>
                 </div>
               </div>

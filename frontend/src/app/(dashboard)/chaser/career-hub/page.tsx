@@ -6,6 +6,7 @@ import { useScholarStore } from '@/store/useScholarStore';
 import { GICS_SECTORS, GICSSectorCode, getGICSSector } from '@/data/gicsData';
 import styles from '@/components/ui/Dashboard.module.css';
 import { useTranslation } from '@/hooks/useTranslation';
+import { PixelSkeletonCardGrid } from '@/components/ui/PixelSkeleton';
 
 interface JobWithGaps {
   id: string;
@@ -20,7 +21,7 @@ interface JobWithGaps {
 }
 
 export default function CareerHubPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { matchedJobs, earnedSBTs, fetchProfileData, isLoading, clearSkills } = useScholarStore();
   const [analyzedJobs, setAnalyzedJobs] = useState<JobWithGaps[]>([]);
   const [activeFilter, setActiveFilter] = useState<GICSSectorCode | null>(null);
@@ -42,13 +43,6 @@ export default function CareerHubPage() {
     setAnalyzedJobs(jobsWithGaps);
   }, [matchedJobs, earnedSBTs]);
 
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: '"Press Start 2P"', color: '#fbbf24' }}>
-        {t('common.loadingAiInsights')}
-      </div>
-    );
-  }
 
   // Exception Path: Empty Profile / No Skills
   if (earnedSBTs.length === 0) {
@@ -133,11 +127,14 @@ export default function CareerHubPage() {
             }}
           >
             <span style={{ fontSize: '0.8rem' }}>{sector.icon}</span>
-            <span>{sector.nameID}</span>
+            <span>{locale === 'id' ? sector.nameID : sector.nameEN}</span>
           </button>
         ))}
       </div>
 
+      {isLoading ? (
+        <PixelSkeletonCardGrid count={6} />
+      ) : (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '32px', minHeight: '600px', alignContent: 'start' }}>
         {analyzedJobs
           .filter(job => activeFilter === null || job.gicsSector === activeFilter)
@@ -261,6 +258,7 @@ export default function CareerHubPage() {
             );
           })}
       </div>
+      )}
 
       {/* Developer tool to test empty state */}
       <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', border: '2px dashed #5a3a29' }}>

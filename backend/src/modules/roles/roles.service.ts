@@ -1,6 +1,58 @@
 import { prisma } from "../../lib/prisma";
 import { UpsertRoleBody } from "./roles.schema";
 
+const normalizeRolePerks = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const localeCandidates = [record.en, record.id, record.ms, record["in"]];
+
+    for (const candidate of localeCandidates) {
+      if (Array.isArray(candidate)) {
+        return candidate.filter((item): item is string => typeof item === "string");
+      }
+    }
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return normalizeRolePerks(parsed);
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+};
+
+type RoleRow = {
+  id: string;
+  name: string;
+  displayName: string;
+  title: string;
+  description: string;
+  perks: unknown;
+  iconUrl: string | null;
+  color: string;
+  glow: string;
+  tag: string | null;
+  isSelectable: boolean;
+  sortOrder: number;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+};
+
+const mapRoleRow = (row: RoleRow) => ({
+  ...row,
+  perks: normalizeRolePerks(row.perks),
+  createdAt: new Date(row.createdAt),
+  updatedAt: new Date(row.updatedAt),
+});
+
 // -----------------------------------------------------------------------
 // Selector standar untuk response publik (tanpa field internal)
 // -----------------------------------------------------------------------
@@ -10,7 +62,6 @@ const PUBLIC_ROLE_SELECT = {
   displayName: true,
   title: true,
   description: true,
-  perks: true,
   iconUrl: true,
   color: true,
   glow: true,
@@ -26,11 +77,28 @@ const PUBLIC_ROLE_SELECT = {
  * Endpoint ini PUBLIK — tidak butuh auth.
  */
 export async function getSelectableRoles() {
-  return prisma.role.findMany({
-    where: { isSelectable: true },
-    select: PUBLIC_ROLE_SELECT,
-    orderBy: { sortOrder: "asc" },
-  });
+  const rows = await prisma.$queryRaw<RoleRow[]>`
+    SELECT
+      "id",
+      "name",
+      "displayName",
+      "title",
+      "description",
+      "perks",
+      "iconUrl",
+      "color",
+      "glow",
+      "tag",
+      "isSelectable",
+      "sortOrder",
+      "createdAt",
+      "updatedAt"
+    FROM "Role"
+    WHERE "isSelectable" = true
+    ORDER BY "sortOrder" ASC
+  `;
+
+  return rows.map(mapRoleRow);
 }
 
 /**
@@ -38,20 +106,55 @@ export async function getSelectableRoles() {
  * Ambil SEMUA role termasuk ADMIN — untuk panel admin.
  */
 export async function getAllRoles() {
-  return prisma.role.findMany({
-    select: { ...PUBLIC_ROLE_SELECT, createdAt: true, updatedAt: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  const rows = await prisma.$queryRaw<RoleRow[]>`
+    SELECT
+      "id",
+      "name",
+      "displayName",
+      "title",
+      "description",
+      "perks",
+      "iconUrl",
+      "color",
+      "glow",
+      "tag",
+      "isSelectable",
+      "sortOrder",
+      "createdAt",
+      "updatedAt"
+    FROM "Role"
+    ORDER BY "sortOrder" ASC
+  `;
+
+  return rows.map(mapRoleRow);
 }
 
 /**
  * GET /api/admin/roles/:id
  */
 export async function getRoleById(id: string) {
-  return prisma.role.findUnique({
-    where: { id },
-    select: { ...PUBLIC_ROLE_SELECT, createdAt: true, updatedAt: true },
-  });
+  const rows = await prisma.$queryRaw<RoleRow[]>`
+    SELECT
+      "id",
+      "name",
+      "displayName",
+      "title",
+      "description",
+      "perks",
+      "iconUrl",
+      "color",
+      "glow",
+      "tag",
+      "isSelectable",
+      "sortOrder",
+      "createdAt",
+      "updatedAt"
+    FROM "Role"
+    WHERE "id" = ${id}
+    LIMIT 1
+  `;
+
+  return rows[0] ? mapRoleRow(rows[0]) : null;
 }
 
 /**

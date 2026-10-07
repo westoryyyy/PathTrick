@@ -17,7 +17,7 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
     "/api/certificates/prepare-mint",
     { preHandler: [fastify.authenticate] },
     async (request, reply) => {
-      const body = request.body as { courseId?: string };
+      const body = request.body as { courseId?: string; walletAddress?: string };
       if (!body?.courseId) {
         return reply.code(400).send({ error: "ValidationError", message: "courseId wajib diisi" });
       }
@@ -25,15 +25,41 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
       const { userId } = request.user;
 
       // 1. Ambil wallet address user
-      const user = await prisma.user.findUnique({
+      let user = await prisma.user.findUnique({
         where: { id: userId },
         select: { walletAddress: true },
       });
+      // If backend does not yet have the user's walletAddress but the
+      // client provided one (frontend knows the connected wallet), try
+      // to persist it here. This improves UX when the client just linked
+      // a wallet but the earlier /api/auth/sync PUT hasn't been applied yet.
       if (!user?.walletAddress) {
-        return reply
-          .code(400)
-          .send({ error: "BadRequest", message: "Hubungkan wallet terlebih dahulu sebelum klaim sertifikat." });
+        const provided = typeof body.walletAddress === 'string' ? body.walletAddress.trim() : undefined;
+        if (provided && /^0x[a-fA-F0-9]{40}$/.test(provided)) {
+          // Ensure wallet is not already claimed by another user.
+          const owner = await prisma.user.findUnique({ where: { walletAddress: provided } });
+          if (!owner) {
+            try {
+              await prisma.user.update({ where: { id: userId }, data: { walletAddress: provided } });
+              request.log.info({ userId, walletAddress: provided }, 'prepare-mint: synced wallet from request body');
+            } catch (err) {
+              request.log.warn({ err, userId, provided }, 'prepare-mint: failed to persist walletAddress');
+            }
+          } else {
+            request.log.warn({ userId, provided }, 'prepare-mint: walletAddress already owned by another user');
+          }
+        }
+
+        // Re-fetch user's walletAddress after attempted sync
+        user = await prisma.user.findUnique({ where: { id: userId }, select: { walletAddress: true } });
+        if (!user?.walletAddress) {
+          return reply
+            .code(400)
+            .send({ error: "BadRequest", message: "Hubungkan wallet terlebih dahulu sebelum klaim sertifikat." });
+        }
       }
+
+      const walletAddress = user.walletAddress;
 
       // 2. Cari course dan pastikan user lulus (ada SkillBadge)
       // Accept either internal Course.id (cuid string) or numeric on-chain id
@@ -84,7 +110,6 @@ export default async function certificatesRoutes(fastify: FastifyInstance) {
       }
 
       const courseOnChainId = BigInt(badge.courseOnChainId);
-      const walletAddress = user.walletAddress;
 
       // 3. Import blockchain utils
       const { getNonce, checkHasCertificate, generateMintSignature } = await import("../../lib/blockchain");

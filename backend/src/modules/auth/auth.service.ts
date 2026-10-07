@@ -9,23 +9,25 @@ import { SyncBody } from "./auth.schema";
  * kali user login ulang tanpa duplikasi.
  */
 export async function syncUserFromPrivy(privyId: string, profile: SyncBody) {
+  const normalizedWalletAddress = typeof profile.walletAddress === 'string'
+    ? profile.walletAddress.trim()
+    : undefined;
+
   const user = await prisma.user.upsert({
     where: { privyId },
     create: {
       privyId,
       email: profile.email,
       name: profile.name,
-      walletAddress: profile.walletAddress,
+      walletAddress: normalizedWalletAddress && /^0x[a-fA-F0-9]{40}$/.test(normalizedWalletAddress) ? normalizedWalletAddress : undefined,
     },
     update: {
       // Hanya update field yang memang dikirim, jangan timpa data lama
       // dengan `undefined` kalau frontend kebetulan tidak mengirim field ini.
       ...(profile.email ? { email: profile.email } : {}),
       ...(profile.name ? { name: profile.name } : {}),
-      ...(profile.walletAddress ? { walletAddress: profile.walletAddress } : {}),
+      ...(normalizedWalletAddress && /^0x[a-fA-F0-9]{40}$/.test(normalizedWalletAddress) ? { walletAddress: normalizedWalletAddress } : {}),
     },
-    // include role supaya auth.route.ts bisa baca user.role?.name
-    // saat menerbitkan JWT tanpa perlu query tambahan.
     include: { role: true },
   });
 

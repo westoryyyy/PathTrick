@@ -969,7 +969,7 @@ export default function MissionFlowPage() {
                         style={{ width: '100%', padding: '14px 28px', fontSize: '1.2rem' }}
                         onClick={() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`)}
                       >
-                        KEMBALI KE PETA
+                        {locale === 'id' ? 'KEMBALI KE PETA' : 'RETURN TO MAP'} 
                       </button>
                     )}
                   </div>
@@ -1021,7 +1021,7 @@ export default function MissionFlowPage() {
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button className={styles.backBtn} onMouseEnter={playHoverSound} onClick={() => router.push(`/map?chapter=${dbSection?.courseChapterId || baseChapterId}&houseId=${dbSection?.houseId || ''}`)}>
-            ← KEMBALI KE PETA
+            {locale === 'id' ? '← KEMBALI KE PETA' : '← RETURN TO MAP'} 
         </button>
         <div className={styles.missionId}>{dbSection?.title || currentChapter?.name || 'MISI BELAJAR'}</div>
       </div>

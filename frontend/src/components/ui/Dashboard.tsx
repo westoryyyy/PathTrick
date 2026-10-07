@@ -420,12 +420,13 @@ export default function Dashboard() {
             </div>
             {loadingData ? <PixelSkeletonRows count={3} /> : (
             <div className={styles.lbList}>
-              {leaderboard.length > 0 ? leaderboard.slice(0, 5).map((lb: any) => {
+              {leaderboard.length > 0 ? leaderboard.slice(0, 5).map((lb: any, index: number) => {
                 const score = typeof lb.score === 'number' ? lb.score : (typeof lb.xp === 'number' ? lb.xp : 0);
                 const labelName = lb.name || t('sma.dashboardExtra.anonymous');
+                const uniqueKey = lb.userId ?? lb.id ?? `${lb.rank ?? 'rank'}-${index}`;
 
                 return (
-                  <div key={lb.rank} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
+                  <div key={uniqueKey} className={`${styles.lbItem} ${lb.rank === 1 ? styles.lbItemTop : ''}`}>
                     <div className={styles.lbRankInfo}>
                       <span className={styles.lbRankNum}>#{lb.rank}</span>
                       <span className={styles.lbName}>

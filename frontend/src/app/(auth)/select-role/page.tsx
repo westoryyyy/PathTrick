@@ -213,10 +213,13 @@ export default function SelectRolePage() {
       }
 
       if (headers['Authorization']) {
+        const body: Record<string, string> = { name: nickname.trim() };
+        if (wallets[0]?.address) body.walletAddress = wallets[0].address;
+
         await fetch(`${API_BASE_URL}/api/users/me`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', ...headers },
-          body: JSON.stringify({ name: nickname.trim(), walletAddress: wallets[0]?.address || '' }),
+          body: JSON.stringify(body),
         });
       } else {
         console.warn('[Nickname] JWT belum tersedia setelah 5 detik, lewatkan sync backend');

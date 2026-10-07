@@ -189,7 +189,7 @@ export default function ScholarshipHub() {
                           ))}
                           {parseReqs(scholarship.requirements).length > 1 && (
                             <li style={{ paddingLeft: '4px', marginBottom: '4px', fontStyle: 'italic', color: '#a1a1aa', listStyleType: 'none', marginLeft: '-20px' }}>
-                              + {parseReqs(scholarship.requirements).length - 1} syarat lainnya...
+                              + {parseReqs(scholarship.requirements).length - 1} {locale === 'id' ? 'Syarat Lainnya...' : 'Other Requirements...'}
                             </li>
                           )}
                         </ul>

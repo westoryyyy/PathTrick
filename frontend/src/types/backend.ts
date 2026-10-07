@@ -5,6 +5,9 @@ export interface Chapter {
   name: string;
   description?: string;
   duration?: string;
+  isCompleted?: boolean;
+  order?: number;
+  sectionCount?: number;
 }
 
 export interface Stage {
@@ -15,6 +18,7 @@ export interface Stage {
   duration?: string;
   contentType?: 'material' | 'quiz' | 'lab' | 'project';
   chapters?: Chapter[];
+  progressObj?: any;
 }
 
 export interface House {
