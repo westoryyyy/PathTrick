@@ -828,25 +828,35 @@ export default function MissionFlowPage() {
             <div style={{
               position: 'absolute',
               top: '40px',
-              bottom: '100px', // Space for the pagination buttons
+              bottom: '100px',
               left: '40px',
               right: '40px',
               overflow: 'hidden',
-              zIndex: 10
+              zIndex: 10,
+              perspective: '1500px'
             }}>
-              <div ref={contentRef} style={{
-                columnCount: 2,
-                columnGap: '112px',
-                columnFill: 'auto',
-                height: '100%',
-                transition: 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                transform: `translateX(calc(${materialPage} * (-100% - 112px)))`,
-                willChange: 'transform'
-              }}>
-                <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#3b261b', lineHeight: '1.5' }}>
-                  {content?.materials}
-                </div>
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={materialPage}
+                  initial={{ rotateY: 90, opacity: 0, transformOrigin: 'center' }}
+                  animate={{ rotateY: 0, opacity: 1, transformOrigin: 'center' }}
+                  exit={{ rotateY: -90, opacity: 0, transformOrigin: 'center' }}
+                  transition={{ duration: 0.4 }}
+                  style={{ width: '100%', height: '100%' }}
+                >
+                  <div ref={contentRef} style={{
+                    columnCount: 2,
+                    columnGap: '112px',
+                    columnFill: 'auto',
+                    height: '100%',
+                    transform: `translateX(calc(${materialPage} * (-100% - 112px)))`,
+                  }}>
+                    <div style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.2rem', color: '#3b261b', lineHeight: '1.5' }}>
+                      {content?.materials}
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           )}
 

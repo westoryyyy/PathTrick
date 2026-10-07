@@ -104,6 +104,14 @@ export async function getUserProfile(userId: string) {
       walletConnectedAt: true,
       createdAt: true,
       gamification: { select: { xp: true } },
+      courseProgress: {
+        select: {
+          courseId: true,
+          status: true,
+          currentChapterOrder: true,
+          currentSectionOrder: true,
+        }
+      },
       roadmaps: {
         where: { status: "ACTIVE" },
         include: {

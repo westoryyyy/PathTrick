@@ -32,7 +32,7 @@ const generateCourseId = (str: string) => {
 
 export default function OnChainCertificates({ hideHeader = false }: Props = {}) {
   const { t } = useTranslation();
-  const [bossNodes, setBossNodes] = useState<string[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { address } = useAccount();
 
@@ -44,9 +44,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
         });
         if (res.ok) {
           const data = await res.json();
-          // Assuming courseOnChainId maps to a string like 'module-name' in the DB.
-          // Adjust logic based on the actual course ID stored in DB.
-          setBossNodes(data.badges.map((b: any) => b.courseOnChainId.toString()));
+          setBadges(data.badges || []);
         }
       } catch (e) {
         console.error(e);
@@ -72,8 +70,9 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
   // Prepare batch calls to check SBT ownership
   const contractCalls = useMemo(() => {
     if (!address || !contractAddress) return [];
-    return bossNodes.map((nodeId: string) => {
-      const baseChapterId = nodeId.replace(/-level-\d+$/, '');
+    return badges.map((badge: any) => {
+      const courseIdStr = badge.courseOnChainId.toString();
+      const baseChapterId = courseIdStr.replace(/-level-\d+$/, '');
       return {
         address: contractAddress,
         abi: PATHTRICK_SBT_ABI,
@@ -81,7 +80,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
         args: [address, BigInt(generateCourseId(baseChapterId))],
       };
     });
-  }, [bossNodes, address, contractAddress]);
+  }, [badges, address, contractAddress]);
 
   const {
     data: sbtOwnershipResults,
@@ -95,29 +94,27 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
 
   // Generate earned certificates dynamically based on verified ownership
   const earnedCertificates = useMemo(() => {
-    return bossNodes.map((nodeId: string, index: number) => {
+    return badges.map((badge: any, index: number) => {
       const isMinted = sbtOwnershipResults?.[index]?.result === true;
-      const baseChapterId = nodeId.replace(/-level-\d+$/, '');
-      const courseId = generateCourseId(baseChapterId);
+      const courseIdStr = badge.courseOnChainId.toString();
+      const baseChapterId = courseIdStr.replace(/-level-\d+$/, '');
+      const courseIdNum = generateCourseId(baseChapterId);
 
-      const match = nodeId.match(/module-([a-zA-Z0-9-]+?)(?:-bab|-level)/);
-      let rawName = match ? match[1] : 'Unknown';
-      
-      // Clean up names (e.g. 'agriculture-1' -> 'Agriculture', 'html-css' -> 'HTML CSS')
-      rawName = rawName.replace(/-\d+$/, '').replace(/-/g, ' ');
-      const moduleName = rawName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      // Use the actual course title returned from the backend
+      const rawName = badge.course?.title || 'Unknown';
+      const moduleName = rawName.replace('Modul: ', '').replace('Module: ', '');
 
       return {
-        id: nodeId,
-        courseId,
+        id: courseIdStr,
+        courseId: courseIdNum,
         title: `${moduleName} Mastery`,
         issuer: `House of ${moduleName}`,
-        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        date: new Date(badge.earnedAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
         type: 'SBT On-Chain',
         isMinted
       };
     });
-  }, [bossNodes, sbtOwnershipResults]);
+  }, [badges, sbtOwnershipResults]);
 
 
   const walletShort = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'NOT CONNECTED';
@@ -142,12 +139,12 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
           </div>
         ) : !hasFetched ? (
           <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={4} /></div>
-        ) : bossNodes.length === 0 ? (
+        ) : badges.length === 0 ? (
           <div style={{ color: '#d4d4d8', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             {t('common.noCertificatesDesc')}
           </div>
         ) : isLoadingOwnership ? (
-          <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={Math.max(bossNodes.length, 2)} /></div>
+          <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={Math.max(badges.length, 2)} /></div>
         ) : ownershipError ? (
           <div style={{ color: '#fca5a5', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
             Sertifikat belum dapat dimuat.{' '}

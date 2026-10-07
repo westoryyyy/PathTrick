@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AssessmentShellProps {
   currentStep: number;
@@ -17,9 +18,6 @@ interface AssessmentShellProps {
   children: React.ReactNode;
 }
 
-const STEP_LABELS_SMA      = ['RIASEC', 'Budget', 'Preferensi'];
-const STEP_LABELS_MAHASISWA = ['Upload CV', 'Minat Kerja'];
-
 export default function AssessmentShell({
   currentStep,
   totalSteps,
@@ -34,9 +32,12 @@ export default function AssessmentShell({
   isSubmitting = false,
   children,
 }: AssessmentShellProps) {
-  const stepLabels = totalSteps === 3 ? STEP_LABELS_SMA : STEP_LABELS_MAHASISWA;
+  const { t, locale } = useTranslation();
+  const stepLabelsSma = locale === 'id' ? ['RIASEC', 'Budget', 'Preferensi'] : ['RIASEC', 'Budget', 'Preferences'];
+  const stepLabelsMahasiswa = locale === 'id' ? ['Upload CV', 'Minat Kerja'] : ['Upload CV', 'Career Interests'];
+  const stepLabels = totalSteps === 3 ? stepLabelsSma : stepLabelsMahasiswa;
   const isLast = currentStep === totalSteps - 1;
-  const finalLabel = nextLabel ?? (isLast ? 'Mulai Petualangan' : 'Lanjut →');
+  const finalLabel = nextLabel ?? (isLast ? (locale === 'id' ? 'Mulai Petualangan' : 'Start Adventure') : (locale === 'id' ? 'Lanjut →' : 'Next →'));
   const progressPercent = ((currentStep + 1) / totalSteps) * 100;
 
   return (
@@ -94,7 +95,7 @@ export default function AssessmentShell({
                   {label}
                   {isOptional && (
                     <span className="text-[0.4rem] px-1 py-0.5 bg-amber-900 bg-opacity-15 border border-amber-600 border-opacity-30 text-amber-500 tracking-wider">
-                      Opsional
+                      {locale === 'id' ? 'Opsional' : 'Optional'}
                     </span>
                   )}
                 </span>
@@ -131,7 +132,7 @@ export default function AssessmentShell({
             type="button"
             style={{textShadow: '1px 1px 0 #0f172a', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 0 #0f172a'}}
           >
-            ← Kembali
+            ← {locale === 'id' ? 'Kembali' : 'Back'}
           </button>
         ) : (
           <div />
@@ -157,7 +158,7 @@ export default function AssessmentShell({
           {isSubmitting ? (
             <>
               <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Memproses...
+              {locale === 'id' ? 'Memproses...' : 'Processing...'}
             </>
           ) : (
             <>

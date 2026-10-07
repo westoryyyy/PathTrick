@@ -9,9 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@metamask/sdk": "^0.34.0",
     "@privy-io/react-auth": "^3.42.0",
     "@privy-io/wagmi": "^4.0.17",
     "@tanstack/react-query": "^5.103.2",
+    "@walletconnect/sign-client": "^2.25.0",
     "ethers": "^6.17.0",
     "framer-motion": "^13.2.0",
     "jspdf": "^4.2.1",
@@ -25,6 +27,7 @@
     "react-easy-crop": "^6.2.3",
     "react-markdown": "^10.1.0",
     "react-pageflip": "^2.0.3",
+    "uuid": "^14.0.2",
     "viem": "^2.56.0",
     "wagmi": "^3.7.7",
     "zustand": "^5.0.15"

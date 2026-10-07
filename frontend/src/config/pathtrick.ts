@@ -8,6 +8,33 @@ export const PATHTRICK_SBT_ADDRESS =
 
 export const BNB_TESTNET_CHAIN = bscTestnet;
 export const PATHTRICK_SBT_ABI = pathtrickSbtAbi.abi as Abi;
+
+export const BNB_TESTNET_RPC_URLS: string[] = [
+  process.env.NEXT_PUBLIC_BNB_TESTNET_RPC_URL,
+  'https://bsc-testnet-rpc.publicnode.com',
+  'https://data-seed-prebsc-2-s1.bnbchain.org:8545',
+  'https://data-seed-prebsc-1-s1.binance.org:8545',
+].filter((u): u is string => Boolean(u));
+
+/** JSON-RPC call that tries each RPC endpoint until one succeeds. */
+export async function rpcCall(method: string, params: unknown[]): Promise<string> {
+  let lastError: unknown;
+  for (const url of BNB_TESTNET_RPC_URLS) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
+      });
+      const data = await res.json();
+      if (typeof data?.result === 'string') return data.result;
+      lastError = data?.error;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw new Error(`All RPC endpoints failed: ${JSON.stringify(lastError)}`);
+}
 function normalizeApiBaseUrl(rawUrl: string): string {
   const trimmed = rawUrl.replace(/\/api\/?$/, '');
 

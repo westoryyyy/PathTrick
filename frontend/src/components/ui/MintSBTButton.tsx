@@ -11,12 +11,14 @@ import {
   PATHTRICK_SBT_ABI,
   PATHTRICK_SBT_ADDRESS,
   API_BASE_URL,
+  rpcCall,
   getApiError,
   readApiResponse,
 } from '@/config/pathtrick';
 import { getAuthHeaders } from '@/hooks/useAuthSync';
 import CertificateActions from './CertificateActions';
 import type { CertificatePdfData } from '@/lib/certificatePdf';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type MintStatus = 'idle' | 'preparing' | 'pending' | 'confirming' | 'success' | 'error';
 
@@ -120,6 +122,7 @@ async function requestMintAuthorization(courseId: number): Promise<MintAuthoriza
 }
 
 export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlreadyMinted, certificate }: MintSBTButtonProps) {
+  const { t } = useTranslation();
   const { wallets } = useWallets();
   const { linkWallet } = usePrivy();
   const [status, setStatus] = useState<MintStatus>('idle');
@@ -215,8 +218,17 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
         pathtrickSbtAbi.abi as unknown as ConstructorParameters<typeof Contract>[1],
         signer
       );
-      const mintPrice = await contract.mintPrice();
-      const balance = await ethersProvider.getBalance(activeWallet.address);
+      const readProvider = new Contract(
+        PATHTRICK_SBT_ADDRESS,
+        pathtrickSbtAbi.abi as unknown as ConstructorParameters<typeof Contract>[1],
+        signer
+      ).interface;
+      const mintPriceHex = await rpcCall('eth_call', [
+        { to: PATHTRICK_SBT_ADDRESS, data: readProvider.encodeFunctionData('mintPrice') },
+        'latest',
+      ]);
+      const mintPrice = readProvider.decodeFunctionResult('mintPrice', mintPriceHex)[0] as bigint;
+      const balance = BigInt(await rpcCall('eth_getBalance', [activeWallet.address, 'latest']));
       const sendMintTransaction = async (mintAuthorization: MintAuthorization) => {
         const gasLimit = await contract.mintCertificate.estimateGas(
           BigInt(mintAuthorization.courseId),
@@ -368,16 +380,16 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
           opacity: isConnectingWallet ? 0.75 : 1,
         }}
       >
-        {isConnectingWallet ? 'CONNECTING WALLET...' : 'CONNECT WALLET'}
+        {isConnectingWallet ? t('common.connectingWallet') : t('common.connectWallet')}
       </button>
     );
   }
 
-  const label = status === 'preparing' ? 'MENYIAPKAN...' :
-    status === 'pending' ? 'MENUNGGU WALLET...' :
-      status === 'confirming' ? 'MENGKONFIRMASI...' :
-        isCheckingChain ? 'MEMERIKSA BLOCKCHAIN...' :
-          status === 'error' ? 'GAGAL - COBA LAGI' : 'CETAK SERTIFIKAT';
+  const label = status === 'preparing' ? t('common.mintPreparing') :
+    status === 'pending' ? t('common.mintPending') :
+      status === 'confirming' ? t('common.mintConfirming') :
+        isCheckingChain ? t('common.mintChecking') :
+          status === 'error' ? t('common.mintError') : t('common.mintPrint');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -386,7 +398,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
           <CertificateActions certificate={certificate} holderAddress={holderAddress} txHash={mintedTxHash} />
         ) : (
           <button ref={buttonRef} disabled style={{ ...buttonStyle, cursor: 'default' }}>
-            ✓ TERCATAT DI BLOCKCHAIN
+            {t('common.mintedBlockchain')}
           </button>
         )
       ) : (
@@ -437,7 +449,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
                 boxShadow: '0 4px 0 #7f1d1d'
               }}
             >
-              TUTUP
+              {t('common.close')}
             </button>
           </div>
         </div>,
@@ -486,7 +498,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
                 boxShadow: '0 4px 0 #14532d'
               }}
             >
-              OK
+              {t('common.ok')}
             </button>
           </div>
         </div>,

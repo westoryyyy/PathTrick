@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { PATHTRICK_SBT_ADDRESS } from '@/config/pathtrick';
 import { openCertificatePdf, type CertificatePdfData } from '@/lib/certificatePdf';
+import { useTranslationStore } from '@/store/useTranslationStore';
 
 interface CertificateActionsProps {
   certificate: CertificatePdfData;
@@ -16,9 +17,9 @@ interface CertificateActionsProps {
 const baseBtn: React.CSSProperties = {
   flex: 1,
   minWidth: 0,
-  padding: '14px 12px',
+  padding: '12px 8px',
   fontFamily: '"Pixelify Sans", sans-serif',
-  fontSize: '1.05rem',
+  fontSize: '0.9rem',
   fontWeight: 700,
   letterSpacing: '0.05em',
   textTransform: 'uppercase',
@@ -29,7 +30,10 @@ const baseBtn: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '8px',
+  gap: '6px',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 };
 
 export function getCertificateExplorerUrl(holderAddress?: string, txHash?: string) {
@@ -42,6 +46,8 @@ export function getCertificateExplorerUrl(holderAddress?: string, txHash?: strin
 export default function CertificateActions({ certificate, holderAddress, txHash, style }: CertificateActionsProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+  const { locale } = useTranslationStore();
+  const isEN = locale === 'en';
 
   const handlePdf = async () => {
     if (isGenerating) return;
@@ -51,7 +57,7 @@ export default function CertificateActions({ certificate, holderAddress, txHash,
       await openCertificatePdf(certificate);
     } catch (e) {
       console.error('Certificate PDF failed:', e);
-      setError('PDF gagal dibuat. Coba lagi.');
+      setError(isEN ? 'Failed to generate PDF. Try again.' : 'PDF gagal dibuat. Coba lagi.');
     } finally {
       setIsGenerating(false);
     }
@@ -59,7 +65,7 @@ export default function CertificateActions({ certificate, holderAddress, txHash,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', ...style }}>
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '10px' }}>
         <button
           type="button"
           onClick={handlePdf}
@@ -74,7 +80,7 @@ export default function CertificateActions({ certificate, holderAddress, txHash,
             cursor: isGenerating ? 'wait' : 'pointer',
           }}
         >
-          {isGenerating ? 'MEMBUAT PDF...' : '📄 LIHAT PDF'}
+          {isGenerating ? (isEN ? 'GENERATING...' : 'MEMBUAT PDF...') : (isEN ? 'VIEW PDF' : 'LIHAT PDF')}
         </button>
         <a
           href={getCertificateExplorerUrl(holderAddress, txHash)}
@@ -88,14 +94,15 @@ export default function CertificateActions({ certificate, holderAddress, txHash,
             boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.25), 0 5px 0 #14532d',
           }}
         >
-          🔍 LIHAT DI BSCSCAN
+        {isEN ? 'VIEW ON CHAIN' : 'LIHAT DI CHAIN'}
         </a>
       </div>
       {error && (
-        <p style={{ margin: 0, color: '#fca5a5', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '0.9rem', textAlign: 'center' }}>
+        <p style={{ margin: 0, color: '#fca5a5', fontFamily: '"Pixelify Sans", sans-serif', fontSize: '0.8rem', textAlign: 'center' }}>
           {error}
         </p>
       )}
     </div>
   );
 }
+
