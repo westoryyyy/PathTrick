@@ -205,8 +205,9 @@ export default function MissionFlowPage() {
       const { getAuthHeaders } = await import('@/hooks/useAuthSync');
       const { API_BASE_URL } = await import('@/config/pathtrick');
 
-      if (content.quiz && content.quiz.length > 0 && content.quiz[0]?.id) {
-        const answers = content.quiz.map((q: any) => {
+      const quizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+      if (quizArray.length > 0 && (quizArray[0] as any)?.id) {
+        const answers = quizArray.map((q: any) => {
           const correctOpt = q.options?.find((o: any) => o.isCorrect);
           return {
             questionId: q.id || '0',
@@ -271,6 +272,12 @@ export default function MissionFlowPage() {
     } catch (e) { }
   };
 
+  const isEssayQuestion = (q: any) =>
+    /^(essay|esai|uraian)/i.test(String(q?.type || q?.tipe || '')) ||
+    !((q?.options || q?.pilihan || []).length);
+  const dbQuestions: any[] = dbSection?.quiz?.questions || [];
+  const dbIsBoss = isBossLevel || dbSection?.category === 'milestone';
+
   // Get dynamic content or generate a fallback template
   let content = dbSection ? {
     materials: [
@@ -283,18 +290,20 @@ export default function MissionFlowPage() {
         </div>
       </div>
     ],
-    quiz: dbSection.quiz?.questions?.map((q: any, i: number) => ({
+    quiz: dbQuestions.filter((q: any) => !isEssayQuestion(q)).map((q: any, i: number) => ({
       id: q.id,
-      question: `Pertanyaan ${i + 1}: ${q.pertanyaan || q.prompt || q.question}`,
-      options: (q.pilihan || q.options || []).map((opt: any) => {
-        const optText = typeof opt === 'string' ? opt : (opt.teks || opt.text || opt.id || '');
+      type: q.type || 'MULTIPLE_CHOICE',
+      question: `**Pertanyaan ${i + 1}:**\n\n${q.prompt || q.pertanyaan || q.question}`,
+      options: (q.options || q.pilihan || []).map((opt: any) => {
+        const optText = typeof opt === 'string' ? opt : (opt.text || opt.teks || opt.id || '');
         const optId = typeof opt === 'string' ? opt : (opt.id || '');
-        const isCorrect =
-          (optId && optId === q.jawabanBenar) ||
+        const isCorrect = 
           (optId && optId === q.correctOptionId) ||
-          (optId && optId === q.correctAnswer) ||
-          (optText === q.correctAnswer) ||
-          opt.isCorrect === true;
+          (optId && optId === q.jawabanBenar) || 
+          (optId && optId === q.correctAnswer) || 
+          (optText === q.correctAnswer) || 
+          (opt.isCorrect === true);
+          
         return {
           id: optId,
           rawAnswer: q.correctAnswer || optId || optText,
@@ -304,18 +313,42 @@ export default function MissionFlowPage() {
         };
       })
     })) || [],
-    project: dbSection.expectedKeywords ? {
-      type: 'essay',
-      instruction: `Praktikkan materi ini. Sistem akan mengecek pemahamanmu secara otomatis.`,
-      defaultCode: '',
-      language: 'html',
-      codeValidation: (c: string) => {
-        const kws = Array.isArray(dbSection.expectedKeywords) ? dbSection.expectedKeywords : [dbSection.expectedKeywords];
-        return kws.some((kw: string) => c.toLowerCase().includes(kw.toLowerCase()));
-      },
-      successMsg: `Luar biasa, pemahamanmu terbukti!`,
-      errorMsg: `Hasil karyamu masih kurang tepat. Ingat konsep utamanya!`,
-    } : null
+    project: (() => {
+      const essayQ = dbQuestions.find((q: any) => isEssayQuestion(q));
+      if (essayQ) {
+        return {
+          type: 'essay',
+          id: essayQ.id,
+          instruction: `**Pertanyaan:**\n\n${essayQ.prompt || essayQ.pertanyaan || essayQ.question}`,
+          defaultCode: '',
+          language: 'html'
+        };
+      }
+      if (dbSection.expectedKeywords) {
+        return {
+          type: 'code',
+          instruction: `Praktikkan materi ini. Sistem akan mengecek pemahamanmu secara otomatis.`,
+          defaultCode: '',
+          language: 'html',
+          codeValidation: (c: string) => {
+            const kws = Array.isArray(dbSection.expectedKeywords) ? dbSection.expectedKeywords : [dbSection.expectedKeywords];
+            return kws.some((kw: string) => c.toLowerCase().includes(kw.toLowerCase()));
+          },
+          successMsg: `Luar biasa, pemahamanmu terbukti!`,
+          errorMsg: `Hasil karyamu masih kurang tepat. Ingat konsep utamanya!`,
+        };
+      }
+      if (dbIsBoss || code.length > 0) {
+        return {
+          type: 'essay',
+          id: undefined,
+          instruction: `**Tantangan Boss:**\n\nTuliskan ringkasan/analisis dengan kata-katamu sendiri tentang apa yang telah kamu pelajari di bab ini (minimal 10 karakter).`,
+          defaultCode: '',
+          language: 'html'
+        };
+      }
+      return null;
+    })()
   } : MISSION_CONTENT[missionId as string];
 
   if (!content) {
@@ -505,37 +538,100 @@ export default function MissionFlowPage() {
   const handleBossSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const { getAuthHeaders } = await import('@/hooks/useAuthSync');
-      const { API_BASE_URL } = await import('@/config/pathtrick');
-      const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/project/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({ code })
-      });
-      const data = await response.json();
-
-      if (response.ok && data.passed) {
-        audioController.play('/Poin.ogg');
-        showDialog('success', data.message || 'Luar biasa! Kodemu benar.', () => handleLevelComplete());
-      } else {
-        const newHp = playerHp - 1;
-        if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
-          showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
-          setPlayerHp(playerHp); // Do not reduce HP for system error
-        } else {
-          audioController.play(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
-
-          setPlayerHp(newHp);
-          if (newHp > 0) {
-            const errorMessage = data.message || data.error || 'Tebakan/Kodemu masih kurang tepat. Coba perbaiki lagi!';
-            showDialog('error', `Tebakanmu meleset!\n${errorMessage}\n\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+      const projectType = (content.project as any)?.type;
+      
+      if (projectType === 'essay') {
+        const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+        const { API_BASE_URL } = await import('@/config/pathtrick');
+        
+        if (!(content.project as any)?.id) {
+          if (code.trim().length < 10) {
+            showDialog('error', 'Jawaban terlalu singkat! Tulis minimal 10 karakter.');
           } else {
-            const errorMessage = data.message || data.error || 'Tebakan/Kodemu salah.';
-            showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\n\n${errorMessage}\n\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
-              setPlayerHp(3);
-              setPhase('MATERIAL');
-              setMaterialPage(0);
+            await handleLevelComplete();
+          }
+        } else {
+          const mcqQuizArray = Array.isArray(content.quiz) ? content.quiz : (content.quiz ? [content.quiz] : []);
+          const mcqAnswers = mcqQuizArray.map((q: any) => {
+            const correctOpt = q.options?.find((o: any) => o.isCorrect);
+            return {
+              questionId: q.id || "0",
+              selectedAnswer: correctOpt ? (correctOpt.rawAnswer || correctOpt.id || correctOpt.text) : ""
+            };
+          });
+
+          const allAnswers = [
+            ...mcqAnswers,
+            { questionId: (content.project as any).id, selectedAnswer: code }
+          ];
+
+          const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/quiz/submit`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: allAnswers })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok && data.passed) {
+            audioController.play('/Poin.ogg');
+            showDialog('success', data.message || 'Luar biasa! Jawabanmu benar!', () => {
+              handleLevelComplete();
             });
+          } else {
+            const newHp = playerHp - 1;
+            if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+              showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+              setPlayerHp(playerHp);
+            } else {
+              audioController.play(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+              setPlayerHp(newHp);
+              if (newHp > 0) {
+                const errorMessage = data.message || data.error || 'Jawaban masih kurang tepat. Coba perbaiki lagi!';
+                showDialog('error', `${errorMessage}\n\nSisa nyawamu: ${'♥'.repeat(newHp)}`);
+              } else {
+                const errorMessage = data.message || data.error || 'Jawabanmu salah.';
+                showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\n\n${errorMessage}\n\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+                  setPlayerHp(3);
+                  setPhase('MATERIAL');
+                  setMaterialPage(0);
+                });
+              }
+            }
+          }
+        }
+      } else {
+        const { getAuthHeaders } = await import('@/hooks/useAuthSync');
+        const { API_BASE_URL } = await import('@/config/pathtrick');
+        const response = await fetch(`${API_BASE_URL}/api/missions/${missionId}/project/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ code })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.passed) {
+          audioController.play('/Poin.ogg');
+          showDialog('success', data.message || 'Luar biasa! Kodemu benar.', () => handleLevelComplete());
+        } else {
+          const newHp = playerHp - 1;
+          if (response.status === 503 || data.error === 'AiEvaluatorError' || data.error === 'InternalError') {
+            showDialog('error', 'Gagal terhubung ke AI Evaluator. Coba lagi beberapa saat!');
+            setPlayerHp(playerHp);
+          } else {
+            audioController.play(newHp > 0 ? '/NyawaBerkurang.ogg' : '/LoveAbis.ogg');
+            setPlayerHp(newHp);
+            if (newHp > 0) {
+              const errorMessage = data.message || data.error || 'Tebakan/Kodemu masih kurang tepat. Coba perbaiki lagi!';
+              showDialog('error', `Tebakanmu meleset!\n${errorMessage}\n\nSisa nyawa: ${'♥'.repeat(newHp)}`);
+            } else {
+              const errorMessage = data.message || data.error || 'Tebakan/Kodemu salah.';
+              showDialog('error', `☠️ GAME OVER ☠️\nNyawamu telah habis!\n\n${errorMessage}\n\nSilakan pelajari ulang materi ini untuk memulihkan nyawamu dan mencoba lagi!`, () => {
+                setPlayerHp(3);
+                setPhase('MATERIAL');
+                setMaterialPage(0);
+              });
+            }
           }
         }
       }
@@ -570,7 +666,7 @@ export default function MissionFlowPage() {
               <h2 className={styles.title}>{currentChapter.name} - KUIS</h2>
             </div>
 
-            {content.quiz && content.quiz.length > 0 ? (() => {
+            {content.quiz && (Array.isArray(content.quiz) ? content.quiz.length > 0 : true) ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
@@ -585,7 +681,7 @@ export default function MissionFlowPage() {
                     </div>
                   )}
                   <div className={`${styles.dialogueBox} prose-content no-scrollbar`} style={{ fontFamily: 'var(--font-vt323), sans-serif', fontSize: '1.05rem', lineHeight: '1.5', overflowY: 'auto', flex: '0 1 auto' }}>
-                    <ReactMarkdown>{currentQuiz.question}</ReactMarkdown>
+                    <ReactMarkdown>{String(currentQuiz.question)}</ReactMarkdown>
                   </div>
                 </>
               );
@@ -671,7 +767,7 @@ export default function MissionFlowPage() {
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ height: '48px', marginBottom: '16px' }}></div>
-            {content.quiz && content.quiz.length > 0 ? (() => {
+            {content.quiz && (Array.isArray(content.quiz) ? content.quiz.length > 0 : true) ? (() => {
               const quizArray = Array.isArray(content.quiz) ? content.quiz : [content.quiz];
               const currentQuiz = quizArray[quizIndex];
               return (
@@ -761,7 +857,7 @@ export default function MissionFlowPage() {
               </p>
             </div>
             <button onMouseEnter={playHoverSound} className={styles.btn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)} style={{ fontSize: '0.8rem', padding: '16px 32px' }}>
-              KLAIM REWARD & KEMBALI KE PETA
+              {locale === 'id' ? 'KLAIM REWARD & KEMBALI KE PETA' : 'CLAIM REWARD & RETURN TO MAP'}
             </button>
           </div>
         );
@@ -776,9 +872,9 @@ export default function MissionFlowPage() {
       {/* ── TOP BAR ── */}
       <div className={styles.topBar}>
         <button onMouseEnter={playHoverSound} className={styles.backBtn} onClick={() => router.push(`/map?chapter=${baseChapterId}&role=chaser`)}>
-          ← KEMBALI KE PETA
+          {locale === 'id' ? '← KEMBALI KE PETA' : '← RETURN TO MAP'} 
         </button>
-        <div className={styles.missionId}>MISI: {missionId}</div>
+        <div className={styles.missionId}>{dbSection?.title || currentChapter?.name || 'MISI BELAJAR'}</div>
       </div>
 
       {/* ── QUEST BOOK ── */}
@@ -1018,7 +1114,7 @@ export default function MissionFlowPage() {
           >
             KUIS
           </div>
-          {isBossLevel && (
+          {(isBossLevel || !!content?.project) && (
             <div
               className={`${styles.tab} ${styles.tabBoss} ${phase === 'PROJECT' ? styles.activeTab : ''}`}
               onClick={() => { if (highestPhaseReached >= 2) setPhaseWithProgress('PROJECT'); }}
