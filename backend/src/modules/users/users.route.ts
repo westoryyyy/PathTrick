@@ -39,7 +39,7 @@ export default async function usersRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       const updateSchema = z.object({
         name: z.string().optional(),
-        walletAddress: z.string().optional(),
+        walletAddress: z.string().trim().transform((value) => value || undefined).optional(),
       });
       const parsed = updateSchema.safeParse(request.body);
       if (!parsed.success) {
@@ -49,6 +49,14 @@ export default async function usersRoutes(fastify: FastifyInstance) {
       try {
         const { userId } = request.user;
         const data = { ...parsed.data };
+        if (data.walletAddress) {
+          const normalized = data.walletAddress.trim();
+          if (!/^0x[a-fA-F0-9]{40}$/.test(normalized)) {
+            delete data.walletAddress;
+          } else {
+            data.walletAddress = normalized;
+          }
+        }
         if (data.walletAddress) {
           const owner = await prisma.user.findUnique({
             where: { walletAddress: data.walletAddress },

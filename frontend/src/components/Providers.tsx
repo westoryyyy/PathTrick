@@ -19,12 +19,6 @@ function AuthSyncMounter() {
 }
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const providerChildren = [
-    <AuthSyncMounter key="auth-sync-mounter" />,
-    <React.Fragment key="app-children">{children}</React.Fragment>,
-    // <DevPanel key="dev-panel" />,
-  ];
-
   return (
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
@@ -46,7 +40,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig}>
-          {providerChildren}
+          <AuthSyncMounter />
+          {children}
         </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>

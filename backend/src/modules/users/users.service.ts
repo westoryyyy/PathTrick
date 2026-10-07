@@ -1,11 +1,39 @@
 import { prisma } from "../../lib/prisma";
 
+function normalizeRolePerks(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw.filter((value): value is string => typeof value === "string");
+  }
+
+  if (raw && typeof raw === "object") {
+    const record = raw as Record<string, unknown>;
+    const candidates = [record.id, record.en, record["in"], record.ms];
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        return candidate.filter((value): value is string => typeof value === "string");
+      }
+    }
+  }
+
+  return [];
+}
+
+export function normalizeRolePayload(role: Record<string, unknown> | null | undefined) {
+  if (!role) return role;
+
+  const normalized = { ...role } as Record<string, unknown>;
+  const rawPerks = normalized.perks;
+  normalized.perks = normalizeRolePerks(rawPerks);
+  return normalized;
+}
+
 /**
- * Set atau ganti role user (DREAMER atau CHASER \u2014 bukan ADMIN).
+ * Set atau ganti role user (DREAMER atau CHASER — bukan ADMIN).
  * ADMIN hanya bisa di-assign manual lewat DB/Prisma Studio.
  *
  * Kalau sudah ada role sebelumnya dan diganti, roadmap lama yang ACTIVE
- * tidak dibatalkan di sini \u2014 itu terjadi saat user submit assessment baru
+ * tidak dibatalkan di sini — itu terjadi saat user submit assessment baru
  * (supersedeActiveRoadmap di assessment.service.ts). Fungsi ini murni
  * update field User.roleId.
  *
@@ -37,7 +65,7 @@ export async function setUserRole(userId: string, roleName: string) {
     throw new Error("USER_NOT_FOUND");
   }
 
-  return prisma.user.update({
+  const updated = await prisma.user.update({
     where: { id: userId },
     data: { roleId: role.id },
     select: {
@@ -45,10 +73,15 @@ export async function setUserRole(userId: string, roleName: string) {
       name: true,
       email: true,
       role: {
-        select: { name: true, displayName: true, description: true, perks: true },
+        select: { name: true, displayName: true, description: true },
       },
     },
   });
+
+  return {
+    ...updated,
+    role: updated.role ? normalizeRolePayload(updated.role) : null,
+  };
 }
 
 /**
@@ -66,7 +99,7 @@ export async function setUserRoleById(userId: string, roleId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  return prisma.user.update({
+  const updated = await prisma.user.update({
     where: { id: userId },
     data: { roleId: role.id },
     select: {
@@ -75,14 +108,19 @@ export async function setUserRoleById(userId: string, roleId: string) {
       email: true,
       roleId: true,
       role: {
-        select: { id: true, name: true, displayName: true, description: true, perks: true },
+        select: { id: true, name: true, displayName: true, description: true },
       },
     },
   });
+
+  return {
+    ...updated,
+    role: updated.role ? normalizeRolePayload(updated.role) : null,
+  };
 }
 
 /**
- * Ambil profil user lengkap \u2014 dipakai GET /api/users/me.
+ * Ambil profil user lengkap — dipakai GET /api/users/me.
  */
 export async function getUserProfile(userId: string) {
   const user = await prisma.user.findUnique({
@@ -96,7 +134,6 @@ export async function getUserProfile(userId: string) {
           name: true,
           displayName: true,
           description: true,
-          perks: true,
           iconUrl: true,
         },
       },
@@ -136,5 +173,8 @@ export async function getUserProfile(userId: string) {
   if (!user) {
     throw new Error("USER_NOT_FOUND");
   }
-  return user;
+  return {
+    ...user,
+    role: user.role ? normalizeRolePayload(user.role) : null,
+  };
 }
