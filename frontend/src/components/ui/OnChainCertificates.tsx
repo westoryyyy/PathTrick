@@ -184,14 +184,14 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
               
               {cert.isMinted ? (
                 <CertificateActions
-                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: walletShort, date: cert.date }}
+                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: address || 'NOT CONNECTED', date: cert.date }}
                   holderAddress={address}
                 />
               ) : (
                 <MintSBTButton 
                   courseId={cert.courseId}
                   onSuccess={() => refetch()}
-                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: walletShort, date: cert.date }}
+                  certificate={{ userName: displayName, moduleName: cert.title, walletAddress: address || 'NOT CONNECTED', date: cert.date }}
                   customStyle={{
                     width: '100%', 
                     padding: '14px', 

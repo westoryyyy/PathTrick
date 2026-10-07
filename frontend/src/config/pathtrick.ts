@@ -11,7 +11,8 @@ export const PATHTRICK_SBT_ABI = pathtrickSbtAbi.abi as Abi;
 
 export const BNB_TESTNET_RPC_URLS: string[] = [
   process.env.NEXT_PUBLIC_BNB_TESTNET_RPC_URL,
-  'https://rpc.ankr.com/bsc_testnet'
+  'https://data-seed-prebsc-1-s1.binance.org:8545',
+  'https://data-seed-prebsc-2-s1.binance.org:8545'
 ].filter((u): u is string => Boolean(u));
 
 /** JSON-RPC call that tries each RPC endpoint until one succeeds. */

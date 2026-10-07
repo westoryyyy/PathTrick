@@ -22,7 +22,7 @@
   <a href="#on-chain-bnb-smart-chain-testnet-chain-97"><img src="https://img.shields.io/badge/BEP--1155-Soulbound-purple" alt="SBT" /></a>
   <a href="https://eips.ethereum.org/EIPS/eip-712"><img src="https://img.shields.io/badge/EIP--712-Signature%20gated-blueviolet" alt="EIP-712" /></a>
   <a href="#audit-posture"><img src="https://img.shields.io/badge/Foundry%20tests-20%2F20%20passing-success" alt="Foundry Tests" /></a>
-  <a href="https://docs.soliditylang.org"><img src="https://img.shields.io/badge/solidity-0.8.28-363636?logo=solidity" alt="Solidity 0.8.28" /></a>
+  <a href="https://docs.soliditylang.org"><img src="https://img.shields.io/badge/solidity-0.8.28-363636?logo=solidity" alt="Solidity 0.8.24" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs" alt="Next.js 16" /></a>
   <a href="https://fastify.dev"><img src="https://img.shields.io/badge/Fastify-5-202020?logo=fastify" alt="Fastify 5" /></a>
   <a href="https://groq.com"><img src="https://img.shields.io/badge/AI-Groq%20LLM-F55036" alt="Groq" /></a>
@@ -107,7 +107,7 @@ The result: a credential that is an objective, tamper-proof reflection of real c
 |-------|--------------|
 | **Frontend** | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Phaser 3 (RPG Engine), Privy (Auth), Wagmi, Viem |
 | **Backend** | Node.js, Fastify 5, TypeScript, Prisma, PostgreSQL, Zod, Groq API (LLM), Cohere (Embeddings) |
-| **Smart Contract** | Solidity 0.8.28, Foundry, OpenZeppelin, BEP-1155 (SBT), EIP-712 (Signatures) |
+| **Smart Contract** | Solidity 0.8.24, Foundry, OpenZeppelin, BEP-1155 (SBT), EIP-712 (Signatures) |
 | **Infra & DevOps** | Vercel (Frontend), Railway (Backend + PostgreSQL), GitHub Actions (CI) |
 
 ---
@@ -156,7 +156,7 @@ sequenceDiagram
 +---------------------------------------------------------------------+
 |                 BNB Smart Chain Testnet (chain 97)                  |
 |                                                                     |
-|    PathtrickSBT (Solidity 0.8.28, BEP-1155 Soulbound)               |
+|    PathtrickSBT (Solidity 0.8.24, BEP-1155 Soulbound)               |
 |       mintCertificate(courseId, deadline, signature)  payable       |
 |         -> verify EIP-712 sig from adminSigner                      |
 |         -> check deadline, fee (0.005 tBNB), hasCertificate         |
@@ -234,7 +234,7 @@ The system uses a multi-agent architecture built on the Groq API. Each agent eva
 | Foundry fuzz tests (256 runs each) | **3/3 pass**: wrong fee, random signature, arbitrary transfers |
 | Total | **20 tests, 0 failures** |
 | Runtime size | **8,261 bytes** (~34% of the 24,576-byte limit) |
-| Compiler | Solidity 0.8.28, optimizer on (200 runs) |
+| Compiler | Solidity 0.8.24, optimizer on (200 runs) |
 
 What the test suite covers:
 - ✅ Mint succeeds only with a valid signature **and** the exact fee

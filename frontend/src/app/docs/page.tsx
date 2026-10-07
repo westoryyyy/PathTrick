@@ -211,7 +211,7 @@ export default function DocsPage() {
               </section>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle} dangerouslySetInnerHTML={{ __html: t('docsContent.h3_22') }} />
-                <Image src="/the_chaser_user_flow.png" alt="User Flow The Chaser" width={1024} height={576} className={styles.pixelImage} />
+                <Image src="/the-chaser-user-flows.png" alt="User Flow The Chaser" width={1024} height={576} className={styles.pixelImage} />
               </section>
             </>
           )}

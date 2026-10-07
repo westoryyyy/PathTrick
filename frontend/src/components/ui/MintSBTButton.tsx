@@ -237,6 +237,7 @@ export default function MintSBTButton({ courseId, customStyle, onSuccess, onAlre
           throw err;
         }
       }
+
       const signer = await ethersProvider.getSigner();
       const contract = new Contract(
         PATHTRICK_SBT_ADDRESS,

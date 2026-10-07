@@ -13,7 +13,7 @@ export const signerAccount = privateKeyToAccount(env.SIGNER_PRIVATE_KEY as Hex);
 // Public client untuk read-only contract calls (nonces, hasCertificate)
 export const publicClient = createPublicClient({
   chain: bscTestnet,
-  transport: http("https://rpc.ankr.com/bsc_testnet"),
+  transport: http("https://data-seed-prebsc-1-s1.binance.org:8545"),
 });
 
 // Minimal ABI untuk fungsi yang kita butuhkan
