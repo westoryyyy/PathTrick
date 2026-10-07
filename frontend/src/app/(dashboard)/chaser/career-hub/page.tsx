@@ -20,7 +20,7 @@ interface JobWithGaps {
 }
 
 export default function CareerHubPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { matchedJobs, earnedSBTs, fetchProfileData, isLoading, clearSkills } = useScholarStore();
   const [analyzedJobs, setAnalyzedJobs] = useState<JobWithGaps[]>([]);
   const [activeFilter, setActiveFilter] = useState<GICSSectorCode | null>(null);
@@ -133,7 +133,7 @@ export default function CareerHubPage() {
             }}
           >
             <span style={{ fontSize: '0.8rem' }}>{sector.icon}</span>
-            <span>{sector.nameID}</span>
+            <span>{locale === 'id' ? sector.nameID : sector.nameEN}</span>
           </button>
         ))}
       </div>

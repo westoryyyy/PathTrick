@@ -81,8 +81,12 @@ export default function LearningProgress() {
               chapters: course.chapters?.map((ch: any) => ({
                 id: ch.id,
                 name: ch.title,
-                duration: ch.sections?.length?.toString() || '1'
+                isCompleted: progress?.status === 'COMPLETED' || (progress && ch.order < progress.currentChapterOrder),
+                duration: ch.sections?.length?.toString() || '1',
+                order: ch.order,
+                sectionCount: ch.sections?.length || 0,
               })) || [],
+              progressObj: progress,
             });
           });
         }
@@ -205,9 +209,38 @@ export default function LearningProgress() {
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
 
   const getProgressPercentage = (stages: Stage[]): number => {
-    if (stages.length === 0) return 0;
-    const completedCount = stages.filter(s => s.isCompleted).length;
-    return Math.floor((completedCount / stages.length) * 100);
+    try {
+      let totalSections = 0;
+      let completedSections = 0;
+      for (const s of stages) {
+        if (!s.chapters || s.chapters.length === 0) continue;
+        const progressObj = (s as any).progressObj;
+        for (const c of s.chapters) {
+          const cOrder = (c as any).order || 1;
+          const cCount = (c as any).sectionCount || 1;
+          totalSections += cCount;
+
+          if (progressObj?.status === 'COMPLETED') {
+            completedSections += cCount;
+          } else if (progressObj) {
+            if (cOrder < progressObj.currentChapterOrder) {
+              completedSections += cCount;
+            } else if (cOrder === progressObj.currentChapterOrder) {
+              completedSections += Math.max(0, progressObj.currentSectionOrder - 1);
+            }
+          }
+        }
+      }
+      if (totalSections > 0) {
+        return Math.min(100, Math.round((completedSections / totalSections) * 100));
+      }
+    } catch (e) {
+      // fallback
+    }
+
+      if (!stages || stages.length === 0) return 0;
+      const completedCount = stages.filter(s => s.isCompleted).length;
+      return Math.round((completedCount / stages.length) * 100);
   };
 
   const getStatusBadge = (status: string): React.ReactNode => {
@@ -215,7 +248,7 @@ export default function LearningProgress() {
       case 'completed':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#047857', border: '2px solid #064e3b', color: '#fff', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)' }}>
-            ✓ COMPLETED
+            ✓ {locale === 'id' ? 'SELESAI' : 'COMPLETED'}
           </span>
         );
       case 'active':
@@ -223,13 +256,13 @@ export default function LearningProgress() {
       case 'locked':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#78350f', border: '2px solid #451a03', color: '#fcd34d', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <PixelIcon icon="🔒" size={18} /> LOCKED
+            <PixelIcon icon="🔒" size={18} /> {locale === 'id' ? 'TERKUNCI' : 'LOCKED'}
           </span>
         );
       case 'lockedByLevel':
         return (
           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', padding: '6px 12px', background: '#3f3f46', border: '2px solid #27272a', color: '#a1a1aa', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <PixelIcon icon="🔒" size={18} /> LOCKED
+            <PixelIcon icon="🔒" size={18} /> {locale === 'id' ? 'TERKUNCI' : 'LOCKED'}
           </span>
         );
       default:
@@ -266,7 +299,7 @@ export default function LearningProgress() {
             }
             
             if (houses.length === 0) {
-              return <div style={{ color: 'white', fontFamily: '"Press Start 2P"' }}>NO HOUSES AVAILABLE.</div>;
+              return <div style={{ color: 'white', fontFamily: '"Press Start 2P"' }}>{locale === 'id' ? 'TIDAK ADA HOUSE TERSEDIA.' : 'NO HOUSES AVAILABLE.'}</div>;
             }
 
             return (
@@ -317,7 +350,7 @@ export default function LearningProgress() {
                         }}>
                           <PixelIcon icon="🔒" size={42} />
                           <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fca5a5', background: '#7f1d1d', padding: '8px 16px', border: '2px solid #b91c1c' }}>
-                            REACH LVL 5 TO UNLOCK
+                            {locale === 'id' ? 'CAPAI LVL 5 UNTUK MEMBUKA' : 'REACH LVL 5 TO UNLOCK'}
                           </span>
                         </div>
                       )}
@@ -348,7 +381,7 @@ export default function LearningProgress() {
                               <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.6rem', color: '#fff' }}>
                                 {progress}%
                               </span>
-                              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: '#fbbf24' }}>DONE</span>
+                              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: '#fbbf24' }}>{locale === 'id' ? 'SELESAI' : 'DONE'}</span>
                             </div>
                           ) : (
                             <div style={{ background: '#27272a', border: '2px solid #3f3f46', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.5)' }}>
@@ -373,7 +406,7 @@ export default function LearningProgress() {
                           <div style={{ background: 'rgba(185, 28, 28, 0.1)', padding: '12px', borderLeft: '3px solid #b91c1c', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <PixelIcon icon="⚠️" size={20} />
                             <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fca5a5', lineHeight: '1.6' }}>
-                              AI tidak menyarankan path ini. Modul tetap bisa diakses, tetapi hadiah XP berkurang 50%.
+                              {locale === 'id' ? 'AI tidak menyarankan path ini. Modul tetap bisa diakses, tetapi hadiah XP berkurang 50%.' : 'AI does not recommend this path. Modules can still be accessed, but XP rewards are reduced by 50%.'}
                             </span>
                           </div>
                         )}
@@ -381,7 +414,7 @@ export default function LearningProgress() {
                         {/* Status & Modules count */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           {getStatusBadge(isLockedByLevel ? 'lockedByLevel' : house.status)}
-                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.courseCount ?? house.stages.length} MODUL DI DALAM</span>
+                          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#78350f' }}>{house.courseCount ?? house.stages.length} {locale === 'id' ? 'MODUL DI DALAM' : 'MODULE INSIDE'}</span>
                         </div>
                       </div>
                       
@@ -398,7 +431,7 @@ export default function LearningProgress() {
 
                              {house.skillsOverview && (
                                <div className="flex flex-col gap-3">
-                                 <h4 className="flex items-center gap-2" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="⚔️" size={16} /> <span>SKILL YANG DIASAH</span></h4>
+                                 <h4 className="flex items-center gap-2" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="⚔️" size={16} /> <span>{locale === 'id' ? 'SKILL YANG DIASAH' : 'HONED SKILLS'}</span></h4>
                                  <div className="flex flex-col gap-1">
                                    {house.skillsOverview.map(skill => (
                                      <div key={skill} className="flex items-start gap-2">
@@ -411,7 +444,7 @@ export default function LearningProgress() {
                              )}
                              {house.idealFor && (
                                <div className="flex flex-col gap-3">
-                                 <h4 className="flex items-center gap-2" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="💡" size={16} /> <span>COCOK UNTUK</span></h4>
+                                 <h4 className="flex items-center gap-2" style={{ fontFamily: '"Press Start 2P"', fontSize: '0.65rem', color: '#5a3a29' }}><PixelIcon icon="💡" size={16} /> <span>{locale === 'id' ? 'COCOK UNTUK' : 'SUITABLE FOR'}</span></h4>
                                  <div className="flex flex-col gap-1">
                                    {house.idealFor.map(ideal => (
                                      <div key={ideal} className="flex items-start gap-2">
@@ -545,7 +578,7 @@ export default function LearningProgress() {
                       </div>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#fff', lineHeight: '1.4' }}>{sbt.course?.title || 'Badge'}</span>
-                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fbbf24', lineHeight: '1.4', marginTop: '4px' }}>Completed {sbt.course?.title?.split('–')?.[0] || ''}</span>
+                        <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#fbbf24', lineHeight: '1.4', marginTop: '4px' }}>{locale === 'id' ? 'Selesai' : 'Completed'} {sbt.course?.title?.split('–')?.[0] || ''}</span>
                       </div>
                     </div>
                   ))}
@@ -561,7 +594,7 @@ export default function LearningProgress() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ fontSize: '2rem' }}>🚀</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', lineHeight: '1.4' }}>Keep Going!</span>
+                      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#fff', lineHeight: '1.4' }}>{locale === 'id' ? 'Terus Maju!' : 'Keep Going!'}</span>
                       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: '#34d399' }}>{Math.max(5 - vaultSBTs.length, 0)} {locale === 'id' ? 'LAGI' : 'NEXT'}</span>
                     </div>
                   </div>
@@ -570,7 +603,7 @@ export default function LearningProgress() {
                       <div className={styles.readinessBarFillBlue} style={{ width: `${Math.min((vaultSBTs.length / 5) * 100, 100)}%` }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: '#fff' }}>
-                      <span>PROGRESS</span>
+                      <span>{locale === 'id' ? 'PROGRES' : 'PROGRESS'}</span>
                       <span style={{ color: '#60a5fa' }}>{Math.min((vaultSBTs.length / 5) * 100, 100)}%</span>
                     </div>
                   </div>

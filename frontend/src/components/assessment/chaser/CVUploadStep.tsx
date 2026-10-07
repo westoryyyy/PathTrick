@@ -258,7 +258,7 @@ export default function CVUploadStep() {
 
             {/* Extracted Education */}
             <div className="flex flex-col gap-3 pt-4 border-t-4 border-dashed border-white/10">
-              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">Pendidikan</p>
+              <p className="font-pixel text-[0.7rem] text-white m-0 tracking-[0.06em] drop-shadow-[1px_1px_0_#3b261b]">{locale === 'id' ? 'Pendidikan' : 'Education'}</p>
               <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.9)] m-0 leading-[1.8]">{cState.cvExtractedData.education}</p>
             </div>
           </div>
@@ -268,14 +268,14 @@ export default function CVUploadStep() {
         {status === 'error' && (
           <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
             <Image src="/Red Potion.png" alt="" width={72} height={72} className="object-contain drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
-            <p className="font-pixel text-[0.9rem] text-[#f87171] m-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)] text-center">Gagal menganalisis CV</p>
-            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0 text-center leading-[1.6]">Terjadi kesalahan. Silakan coba lagi.</p>
+            <p className="font-pixel text-[0.9rem] text-[#f87171] m-0 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)] text-center">{locale === 'id' ? 'Gagal menganalisis CV' : 'Failed to analyze CV'}</p>
+            <p className="font-pixel text-[0.6rem] text-[rgba(240,232,255,0.7)] m-0 text-center leading-[1.6]">{locale === 'id' ? 'Terjadi kesalahan. Silakan coba lagi.' : 'An error occurred. Please try again.'}</p>
             <button
               type="button"
               className="font-pixel text-[0.7rem] px-6 py-3 bg-[#991b1b] border-4 border-[#ef4444] shadow-[4px_4px_0_rgba(0,0,0,0.5)] text-white cursor-pointer mt-2.5 transition-transform duration-100 active:translate-x-1 active:translate-y-1 active:shadow-none"
               onClick={(e) => { e.stopPropagation(); handleRetry(); }}
             >
-              🔄 Coba Lagi
+              🔄 {locale === 'id' ? 'Coba Lagi' : 'Try Again'}
             </button>
           </div>
         )}
@@ -284,8 +284,8 @@ export default function CVUploadStep() {
       {/* ══════════ PORTFOLIO UPLOAD (OPTIONAL) ══════════ */}
       <div className="flex flex-col gap-3 text-left">
         <div className="flex items-center gap-2.5">
-          <span className="font-pixel text-[0.85rem] text-white tracking-[0.05em] drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">📎 Portfolio</span>
-          <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.5)]">Opsional</span>
+          <span className="font-pixel text-[0.85rem] text-white tracking-[0.05em] drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">📎 {locale === 'id' ? 'Portofolio' : 'Portfolio'}</span>
+          <span className="font-pixel text-[0.5rem] text-[#fbbf24] bg-[#78350f] border-2 border-[#b45309] px-2 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.5)]">{locale === 'id' ? 'Opsional' : 'Optional'}</span>
         </div>
         <div
           className="px-5 py-4 bg-[#bc8f65] border-4 border-dashed border-[#5a3a29] shadow-[inset_0_0_8px_rgba(0,0,0,0.3)] cursor-pointer text-center hover:bg-[#cba37b] hover:border-[#6a4734] transition-colors"
@@ -304,7 +304,7 @@ export default function CVUploadStep() {
           {cState.portfolioFileName ? (
             <p className="font-pixel text-[0.6rem] text-[#34d399] m-0 drop-shadow-[1px_1px_0_rgba(0,0,0,0.5)]">📄 {cState.portfolioFileName}</p>
           ) : (
-            <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">Klik untuk upload portfolio (PDF ONLY)</p>
+            <p className="font-pixel text-[0.55rem] text-[rgba(240,232,255,0.6)] m-0 uppercase">{locale === 'id' ? 'Klik untuk mengunggah portofolio (Hanya PDF)' : 'Click to upload portfolio (PDF ONLY)'}</p>
           )}
         </div>
       </div>

@@ -38,8 +38,8 @@ export default function ProfilePage() {
       console.log('[Profile] Saving name:', name.trim(), '| has token:', !!headers['Authorization']);
 
       const body: Record<string, string> = { name: name.trim() };
-      // Hanya kirim walletAddress jika ada (string kosong bisa diabaikan backend)
-      if (wallets[0]?.address) body.walletAddress = wallets[0].address;
+      // Hanya kirim walletAddress jika ada dan valid; jangan kirim string kosong
+      if (wallets[0]?.address && /^0x[a-fA-F0-9]{40}$/.test(wallets[0].address)) body.walletAddress = wallets[0].address;
 
       const res = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PUT',

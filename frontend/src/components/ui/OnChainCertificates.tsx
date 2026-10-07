@@ -31,7 +31,7 @@ const generateCourseId = (str: string) => {
 };
 
 export default function OnChainCertificates({ hideHeader = false }: Props = {}) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [badges, setBadges] = useState<any[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { address } = useAccount();
@@ -124,10 +124,10 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       {!hideHeader && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ fontFamily: '"Press Start 2P"', fontSize: '1.5rem', color: '#fff', textShadow: '2px 2px 0 #3b261b' }}>
-            ON-CHAIN CERTIFICATES
+            {locale === 'id' ? 'SERTIFIKAT ON-CHAIN' : 'ON-CHAIN CERTIFICATES'}
           </h2>
           <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-            Lihat dan verifikasi sertifikat (SBT) yang berhasil kamu dapatkan setelah menaklukkan Boss Modul.
+            {locale === 'id' ? 'Lihat dan verifikasi sertifikat (SBT) yang berhasil kamu dapatkan setelah menaklukkan Boss Modul.' : 'View and verify the certificates (SBT) you earned after conquering the Module Bosses.'}
           </p>
         </div>
       )}
@@ -135,7 +135,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
       <div className={styles.grid}>
         {!address ? (
           <div style={{ color: '#fbbf24', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
-            Hubungkan wallet untuk memuat sertifikat On-Chain.
+            {locale === 'id' ? 'Hubungkan wallet untuk memuat sertifikat On-Chain.' : 'Connect your wallet to load On-Chain certificates.'}
           </div>
         ) : !hasFetched ? (
           <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={4} /></div>
@@ -147,9 +147,9 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
           <div style={{ gridColumn: '1 / -1' }}><PixelSkeletonTileGrid count={Math.max(badges.length, 2)} /></div>
         ) : ownershipError ? (
           <div style={{ color: '#fca5a5', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
-            Sertifikat belum dapat dimuat.{' '}
+            {locale === 'id' ? 'Sertifikat belum dapat dimuat.' : 'Certificates cannot be loaded yet.'}{' '}
             <button type="button" onClick={() => refetch()} style={{ color: '#fbbf24', textDecoration: 'underline', fontFamily: 'inherit', fontSize: 'inherit', background: 'none', border: 0, cursor: 'pointer' }}>
-              Coba lagi
+              {locale === 'id' ? 'Coba lagi' : 'Try again'}
             </button>
           </div>
         ) : earnedCertificates.length > 0 ? (
@@ -213,7 +213,7 @@ export default function OnChainCertificates({ hideHeader = false }: Props = {}) 
           ))
         ) : (
           <div style={{ color: '#a8a29e', fontFamily: '"Press Start 2P"', fontSize: '0.7rem', gridColumn: '1 / -1', textAlign: 'center', marginTop: '16px', lineHeight: '1.6', background: 'rgba(0,0,0,0.2)', padding: '24px', border: '2px dashed #5a3a29' }}>
-            Belum ada sertifikat On-Chain yang tercetak. <br/><br/>Kalahkan Boss Modul untuk melakukan minting (pencetakan) sertifikat pertamamu!
+            {locale === 'id' ? 'Belum ada sertifikat On-Chain yang tercetak.' : 'No On-Chain certificates minted yet.'} <br/><br/>{locale === 'id' ? 'Kalahkan Boss Modul untuk melakukan minting (pencetakan) sertifikat pertamamu!' : 'Defeat the Module Boss to mint your first certificate!'}
           </div>
         )}
       </div>

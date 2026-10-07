@@ -14,7 +14,7 @@ const ACCEPTED_TYPES = [
 ];
 
 export default function CVUpdaterWidget() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'uploading' | 'extracting' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<{newSkills: string[], missingSkills: string[], xpGained: number} | null>(null);
   const [fileName, setFileName] = useState('');
@@ -75,12 +75,12 @@ export default function CVUpdaterWidget() {
 
   const handleFileUpload = async (file: File) => {
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setErrorMsg('Format tidak didukung. Gunakan file PDF.');
+      setErrorMsg(locale === 'id' ? 'Format tidak didukung. Gunakan file PDF.' : 'Format not supported. Use PDF.');
       setStatus('error');
       return;
     }
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      setErrorMsg(`Ukuran file melebihi ${MAX_SIZE_MB}MB.`);
+      setErrorMsg(locale === 'id' ? `Ukuran file melebihi ${MAX_SIZE_MB}MB.` : `File size exceeds ${MAX_SIZE_MB}MB.`);
       setStatus('error');
       return;
     }
@@ -95,7 +95,7 @@ export default function CVUpdaterWidget() {
 
       // Basic validation: ensure extracted text is non-empty
       if (!cvText || !cvText.trim()) {
-        setErrorMsg('Teks CV tidak ditemukan. Pastikan file berisi teks (PDF berbasis teks, bukan gambar).');
+        setErrorMsg(locale === 'id' ? 'Teks CV tidak ditemukan. Pastikan file berisi teks (PDF berbasis teks, bukan gambar).' : 'CV text not found. Make sure the file contains text (text-based PDF, not an image).');
         setStatus('error');
         return;
       }
@@ -113,7 +113,7 @@ export default function CVUpdaterWidget() {
 
       if (!res.ok) {
         // Try parse backend error message, but handle gracefully
-        let errMsg = 'Gagal memproses CV';
+        let errMsg = locale === 'id' ? 'Gagal memproses CV' : 'Failed to process CV';
         try {
           const err = await res.json();
           if (err && (err.error || err.message)) errMsg = err.error || err.message;
@@ -184,7 +184,7 @@ export default function CVUpdaterWidget() {
               (e.currentTarget as HTMLButtonElement).style.boxShadow = '3px 3px 0 #3b261b';
             }}
           >
-            RE-UPLOAD
+            {locale === 'id' ? 'RE-UPLOAD' : 'RE-UPLOAD'}
           </button>
         )}
       </div>
@@ -246,10 +246,10 @@ export default function CVUpdaterWidget() {
                   <Image src="/Scroll.png" alt="" width={40} height={40} style={{ imageRendering: 'pixelated' }} />
                 </div>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fbbf24', textShadow: '1px 1px 0 #3b261b', lineHeight: 1.6 }}>
-                  Drag &amp; Drop CV di sini
+                  {locale === 'id' ? 'Drag & Drop CV di sini' : 'Drag & Drop CV here'}
                 </span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#a1a1aa', lineHeight: 1.6 }}>
-                  atau klik untuk pilih file
+                  {locale === 'id' ? 'atau klik untuk pilih file' : 'or click to select a file'}
                 </span>
                 <div style={{
                   background: 'rgba(0,0,0,0.3)', border: '2px solid #5a3a29',
@@ -279,7 +279,7 @@ export default function CVUpdaterWidget() {
                   }} />
                 </div>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.75rem', color: '#fbbf24', textShadow: '1px 1px 0 #3b261b' }}>
-                  UPLOADING{dots}
+                  {locale === 'id' ? 'MENGUNGGAH' : 'UPLOADING'}{dots}
                 </span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#d4a373', maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   📄 {fileName}
@@ -318,9 +318,9 @@ export default function CVUpdaterWidget() {
                   }} />
                 </div>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.7rem', color: '#fbbf24', textShadow: '1px 1px 0 #3b261b', lineHeight: 1.6 }}>
-                  AI MENGANALISIS{dots}
+                  {locale === 'id' ? 'AI MENGANALISIS' : 'AI IS ANALYZING'}{dots}
                 </span>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#d4a373' }}>Memperbarui skill profil kamu</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#d4a373' }}>{locale === 'id' ? 'Memperbarui skill profil kamu' : 'Updating your profile skills'}</span>
                 {/* Pixel Progress Steps */}
                 <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
                   {Array.from({ length: 10 }).map((_, i) => (
@@ -351,7 +351,7 @@ export default function CVUpdaterWidget() {
                   <Image src="/Healing Potions.png" alt="" width={40} height={40} style={{ imageRendering: 'pixelated' }} />
                 </div>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#fbbf24', textShadow: '1px 1px 0 #3b261b' }}>
-                  ✓ PROFIL DIPERBARUI!
+                  {locale === 'id' ? '✓ PROFIL DIPERBARUI!' : '✓ PROFILE UPDATED!'}
                 </span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff', maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Image src="/Scroll.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
@@ -365,7 +365,7 @@ export default function CVUpdaterWidget() {
                   display: 'flex', alignItems: 'center', gap: '8px',
                 }}>
                   <Image src="/Coin.png" alt="" width={15} height={15} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
-                  +{result?.xpGained || 0} XP GAINED
+                  +{result?.xpGained || 0} {locale === 'id' ? 'XP DIDAPAT' : 'XP GAINED'}
                 </div>
               </>
             )}
@@ -381,14 +381,14 @@ export default function CVUpdaterWidget() {
                 }}>
                   <Image src="/Red Potion.png" alt="" width={40} height={40} style={{ imageRendering: 'pixelated' }} />
                 </div>
-                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#f87171', textShadow: '0 0 8px #ef4444' }}>GAGAL!</span>
+                <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.8rem', color: '#f87171', textShadow: '0 0 8px #ef4444' }}>{locale === 'id' ? 'GAGAL!' : 'FAILED!'}</span>
                 <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.6rem', color: '#fca5a5', lineHeight: 1.6 }}>{errorMsg}</span>
                 <button onClick={handleReset} style={{
                   background: '#991b1b', border: '2px solid #ef4444',
                   color: '#fff', fontFamily: 'var(--font-pixel)', fontSize: '0.6rem',
                   padding: '8px 16px', cursor: 'pointer', boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
                 }}>
-                  🔄 COBA LAGI
+                  🔄 {locale === 'id' ? 'COBA LAGI' : 'TRY AGAIN'}
                 </button>
               </>
             )}
@@ -408,15 +408,15 @@ export default function CVUpdaterWidget() {
               display: 'flex', alignItems: 'center', gap: '8px',
             }}>
               <Image src="/NPC Wizard.png" alt="" width={20} height={20} style={{ imageRendering: 'pixelated' }} />
-              AI SKILL ANALYSIS RESULT
+              {locale === 'id' ? 'HASIL ANALISIS SKILL AI' : 'AI SKILL ANALYSIS RESULT'}
               {(status === 'uploading' || status === 'extracting') && (
                 <span style={{ fontSize: '0.55rem', color: '#fbbf24', marginLeft: 'auto', background: 'rgba(120,53,15,0.8)', padding: '4px 10px', border: '1px solid #b45309', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  ● PROCESSING...
+                  ● {locale === 'id' ? 'MEMPROSES...' : 'PROCESSING...'}
                 </span>
               )}
               {status === 'done' && (
                 <span style={{ fontSize: '0.55rem', color: '#fbbf24', marginLeft: 'auto', background: 'rgba(120,53,15,0.6)', padding: '4px 10px', border: '1px solid #b45309', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  ✓ DONE
+                  ✓ {locale === 'id' ? 'SELESAI' : 'DONE'}
                 </span>
               )}
             </div>
@@ -426,7 +426,7 @@ export default function CVUpdaterWidget() {
             {/* Loading State */}
             {(status === 'uploading' || status === 'extracting') && (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {['Membaca dokumen CV...', 'Mengekstrak skill & pengalaman...', 'Menganalisis gap vs target karir...'].map((step, i) => (
+                {(locale === 'id' ? ['Membaca dokumen CV...', 'Mengekstrak skill & pengalaman...', 'Menganalisis gap vs target karir...'] : ['Reading CV document...', 'Extracting skills & experience...', 'Analyzing gap vs career target...']).map((step, i) => (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: '12px',
                     background: 'rgba(0,0,0,0.2)', border: '2px solid #5a3a29',
@@ -455,11 +455,11 @@ export default function CVUpdaterWidget() {
                 <div style={{ background: 'rgba(59,38,27,0.6)', border: '2px solid #78350f', padding: '12px 16px' }}>
                   <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#fbbf24', margin: '0 0 8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Image src="/Energy Shard.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated', height: 14 }} />
-                    Skill Baru Terdeteksi
+                    {locale === 'id' ? 'Skill Baru Terdeteksi' : 'New Skills Detected'}
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {result?.newSkills.length === 0 ? (
-                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>Tidak ada skill baru</span>
+                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>{locale === 'id' ? 'Tidak ada skill baru' : 'No new skills'}</span>
                     ) : result?.newSkills.map((skill: string, i: number) => (
                       <span key={i} style={{
                         fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff',
@@ -476,11 +476,11 @@ export default function CVUpdaterWidget() {
                 <div style={{ background: 'rgba(59,38,27,0.6)', border: '2px solid #991b1b', padding: '12px 16px' }}>
                   <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.55rem', color: '#f87171', margin: '0 0 8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Image src="/Red Potion.png" alt="" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
-                    Skill yang Masih Kurang
+                    {locale === 'id' ? 'Skill yang Masih Kurang' : 'Missing Skills'}
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {result?.missingSkills.length === 0 ? (
-                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>Sudah lengkap!</span>
+                       <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa' }}>{locale === 'id' ? 'Sudah lengkap!' : 'All complete!'}</span>
                     ) : result?.missingSkills.map((skill: string, i: number) => (
                       <span key={i} style={{
                         fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff',
@@ -494,7 +494,7 @@ export default function CVUpdaterWidget() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', borderTop: '1px dashed #5a3a29', paddingTop: '8px' }}>
                     <Image src="/learning-mission.png" alt="" width={16} height={16} style={{ imageRendering: 'pixelated', flexShrink: 0 }} />
                     <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#fff', margin: 0, lineHeight: 1.6 }}>
-                      Kerjakan Learning Mission untuk melengkapi skill ini!
+                      {locale === 'id' ? 'Kerjakan Learning Mission untuk melengkapi skill ini!' : 'Complete Learning Missions to acquire these skills!'}
                     </p>
                   </div>
                 </div>

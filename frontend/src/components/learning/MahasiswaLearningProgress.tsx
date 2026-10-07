@@ -60,6 +60,7 @@ export default function MahasiswaLearningProgress() {
             skillTags: (c.skillTags?.length ? c.skillTags : c.skills?.map((s: any) => s.name)) || [],
             firstChapterId: c.chapters?.[0]?.id ?? null,
             sectionCount: c.sectionCount ?? 0,
+            chapters: c.chapters || [],
             progressObj: c.progress
           }));
           setActiveModules(mappedCourses);
@@ -187,8 +188,15 @@ export default function MahasiswaLearningProgress() {
             // Progress: 1 skill path = 1 BAB, jadi cukup pakai cursor section.
             let progress = 0;
             if (mod.progressObj?.status === 'COMPLETED') progress = 100;
-            else if (mod.progressObj) {
-              const done = (mod.progressObj.currentSectionOrder || 1) - 1;
+            else if (mod.progressObj && mod.chapters) {
+              let done = 0;
+              for (const ch of mod.chapters) {
+                if (ch.order < mod.progressObj.currentChapterOrder) {
+                  done += ch._count?.sections || 0;
+                } else if (ch.order === mod.progressObj.currentChapterOrder) {
+                  done += Math.max(0, mod.progressObj.currentSectionOrder - 1);
+                }
+              }
               progress = Math.min(99, Math.floor((done / Math.max(1, mod.sectionCount)) * 100));
             }
 
@@ -333,7 +341,7 @@ export default function MahasiswaLearningProgress() {
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#34d399' }}>{totalXP}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#a8a29e' }}>Missing Skills</span>
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#a8a29e' }}>{locale === 'id' ? 'Skill yang Kurang' : 'Missing Skills'}</span>
                 <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', color: '#f87171' }}>{missingSkills.length}</span>
               </div>
             </div>

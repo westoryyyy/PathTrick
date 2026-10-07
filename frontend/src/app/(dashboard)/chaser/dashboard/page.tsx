@@ -13,7 +13,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { getChaserLevelInfo } from '@/data/chaserLevelData';
 
 export default function MahasiswaDashboard() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { targetJob, matchedJobs, earnedSBTs, fetchProfileData, analyzeSkillGap, isLoading } = useScholarStore();
   const [gapData, setGapData] = useState<{ missing: string[]; possessed: string[] }>({ missing: [], possessed: [] });
   const [gamification, setGamification] = useState<{xp: number, completedCourses: number, achievements: any[]}>({ xp: 0, completedCourses: 0, achievements: [] });
@@ -119,12 +119,16 @@ export default function MahasiswaDashboard() {
                   LEVEL {levelInfo.numericLevel}
                 </p>
                 <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.56rem', color: '#d4d4d8', lineHeight: '1.6' }}>
-                  {levelInfo.currentTier.description}
+                  {locale === 'id' ? levelInfo.currentTier.description.id : levelInfo.currentTier.description.en}
                 </p>
                 <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.56rem', color: '#34d399', lineHeight: '1.6' }}>
                   {nextTier === 'Max'
-                    ? 'Anda sudah mencapai gelar tertinggi.'
-                    : `${nextTier} di Level ${Math.floor(nextTierXp / 1000)}`}
+                    ? locale === 'id'
+                      ? 'Anda sudah mencapai gelar tertinggi.'
+                      : 'You have reached the highest title.'
+                    : locale === 'id'
+                      ? `${nextTier} di Level ${Math.floor(nextTierXp / 1000)}`
+                      : `${nextTier} at Level ${Math.floor(nextTierXp / 1000)}`}
                 </p>
               </div>
 
@@ -138,8 +142,8 @@ export default function MahasiswaDashboard() {
                 </div>
               </div>
 
-              <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#a1a1aa', textAlign: 'center', marginTop: '8px', lineHeight: '1.6' }}>
-                ⓘ 1.000 XP = naik 1 level
+              <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.5rem', color: '#d4d4d8', textAlign: 'center', marginTop: '8px', lineHeight: '1.6' }}>
+                {locale === 'id' ? 'ⓘ 1.000 XP = naik 1 level' : 'ⓘ 1.000 XP = 1 level up'}
               </p>
             </div>
           </div>

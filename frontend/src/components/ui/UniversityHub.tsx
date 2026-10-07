@@ -8,27 +8,27 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { usePrivy } from '@privy-io/react-auth';
 
 const FACULTIES = [
-  { value: 'agr_farm', label: 'Agribisnis & Pertanian' },
-  { value: 'biz_acc', label: 'Akuntansi & Keuangan' },
-  { value: 'biz_mgmt', label: 'Bisnis & Manajemen' },
-  { value: 'data_ai', label: 'Data Science & AI' },
-  { value: 'arts_design', label: 'Desain & Seni Rupa' },
-  { value: 'sci_natural', label: 'Fisika, Kimia, Biologi' },
-  { value: 'soc_ir', label: 'Hubungan Internasional' },
-  { value: 'law', label: 'Ilmu Hukum' },
-  { value: 'soc_comm', label: 'Ilmu Komunikasi' },
-  { value: 'cs_it', label: 'Ilmu Komputer & TI' },
-  { value: 'law_public', label: 'Ilmu Politik & Publik' },
-  { value: 'med_doctor', label: 'Kedokteran (Umum/Gigi)' },
-  { value: 'agr_env', label: 'Kehutanan & Lingkungan' },
-  { value: 'med_nurse', label: 'Keperawatan & Farmasi' },
-  { value: 'sci_math', label: 'Matematika & Statistika' },
-  { value: 'eng_mech', label: 'Mesin & Elektro' },
-  { value: 'edu_teacher', label: 'Pendidikan Guru' },
-  { value: 'soc_psy', label: 'Psikologi' },
-  { value: 'arts_lang', label: 'Sastra & Bahasa' },
-  { value: 'eng_civil', label: 'Sipil & Arsitektur' },
-  { value: 'edu_tech', label: 'Teknologi Pendidikan' },
+  { value: 'agr_farm', label: 'Agribisnis & Pertanian', labelEn: 'Agribusiness & Agriculture' },
+  { value: 'biz_acc', label: 'Akuntansi & Keuangan', labelEn: 'Accounting & Finance' },
+  { value: 'biz_mgmt', label: 'Bisnis & Manajemen', labelEn: 'Business & Management' },
+  { value: 'data_ai', label: 'Data Science & AI', labelEn: 'Data Science & AI' },
+  { value: 'arts_design', label: 'Desain & Seni Rupa', labelEn: 'Design & Fine Arts' },
+  { value: 'sci_natural', label: 'Fisika, Kimia, Biologi', labelEn: 'Physics, Chemistry, Biology' },
+  { value: 'soc_ir', label: 'Hubungan Internasional', labelEn: 'International Relations' },
+  { value: 'law', label: 'Ilmu Hukum', labelEn: 'Law' },
+  { value: 'soc_comm', label: 'Ilmu Komunikasi', labelEn: 'Communication Studies' },
+  { value: 'cs_it', label: 'Ilmu Komputer & TI', labelEn: 'Computer Science & IT' },
+  { value: 'law_public', label: 'Ilmu Politik & Publik', labelEn: 'Political & Public Science' },
+  { value: 'med_doctor', label: 'Kedokteran (Umum/Gigi)', labelEn: 'Medicine (General/Dental)' },
+  { value: 'agr_env', label: 'Kehutanan & Lingkungan', labelEn: 'Forestry & Environment' },
+  { value: 'med_nurse', label: 'Keperawatan & Farmasi', labelEn: 'Nursing & Pharmacy' },
+  { value: 'sci_math', label: 'Matematika & Statistika', labelEn: 'Mathematics & Statistics' },
+  { value: 'eng_mech', label: 'Mesin & Elektro', labelEn: 'Mechanical & Electrical' },
+  { value: 'edu_teacher', label: 'Pendidikan Guru', labelEn: 'Teacher Education' },
+  { value: 'soc_psy', label: 'Psikologi', labelEn: 'Psychology' },
+  { value: 'arts_lang', label: 'Sastra & Bahasa', labelEn: 'Literature & Languages' },
+  { value: 'eng_civil', label: 'Sipil & Arsitektur', labelEn: 'Civil & Architecture' },
+  { value: 'edu_tech', label: 'Teknologi Pendidikan', labelEn: 'Educational Technology' },
 ];
 
 /**
@@ -38,7 +38,7 @@ const FACULTIES = [
 function buildChecklist(uni: { name: string; facultyTags?: string[]; admissionRequirements?: string | null; website?: string | null }, locale: string) {
   const id = locale === 'id';
   const majorTag = uni.facultyTags?.[0];
-  const majorLabel = majorTag ? (FACULTIES.find(f => f.value === majorTag)?.label || majorTag) : null;
+  const majorLabel = majorTag ? (FACULTIES.find(f => f.value === majorTag)?.[id ? 'label' : 'labelEn'] || majorTag) : null;
   
   return [
     {
