@@ -4,20 +4,45 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelIcon from '@/components/ui/PixelIcon';
 
-const LOADING_TIPS = [
-  { icon: '💡', text: 'Setiap quest yang kamu selesaikan akan menambah XP dan membuka jalur baru!' },
-  { icon: '🏆', text: 'Skill Badge adalah sertifikat on-chain yang tidak bisa dipalsukan oleh siapapun.' },
-  { icon: '🤖', text: 'AI kami menganalisis RIASEC-mu untuk memberikan rekomendasi course yang tepat.' },
-  { icon: '⚡', text: 'Selesaikan quest berurutan untuk membuka Boss Challenge di setiap course!' },
+import { useTranslation } from '@/hooks/useTranslation';
 
-  { icon: '🔮', text: 'Kamu bisa melihat progres belajarmu secara real-time di Dashboard.' },
+const LOADING_TIPS = [
+  { 
+    icon: '💡', 
+    textId: 'Setiap quest yang kamu selesaikan akan menambah XP dan membuka jalur baru!',
+    textEn: 'Every quest you complete grants XP and unlocks new paths!'
+  },
+  { 
+    icon: '🏆', 
+    textId: 'Skill Badge adalah sertifikat on-chain yang tidak bisa dipalsukan oleh siapapun.',
+    textEn: 'Skill Badges are on-chain certificates that cannot be forged by anyone.'
+  },
+  { 
+    icon: '🤖', 
+    textId: 'AI kami menganalisis RIASEC-mu untuk memberikan rekomendasi course yang tepat.',
+    textEn: 'Our AI analyzes your RIASEC profile to provide accurate course recommendations.'
+  },
+  { 
+    icon: '⚡', 
+    textId: 'Selesaikan quest berurutan untuk membuka Boss Challenge di setiap course!',
+    textEn: 'Complete sequential quests to unlock the Boss Challenge in every course!'
+  },
+  { 
+    icon: '🔮', 
+    textId: 'Kamu bisa melihat progres belajarmu secara real-time di Dashboard.',
+    textEn: 'You can monitor your learning progress in real-time on the Dashboard.'
+  },
 ];
 
 export default function GameLoadingScreen({
-  statusText = 'Memuat Modul AI...',
+  statusText,
 }: {
   statusText?: string;
 }) {
+  const { locale } = useTranslation();
+  const defaultStatusText = locale === 'id' ? 'Memuat Modul AI...' : 'Loading AI Module...';
+  const displayStatus = statusText || defaultStatusText;
+
   const [progress, setProgress] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
   useEffect(() => {
@@ -75,7 +100,7 @@ export default function GameLoadingScreen({
           <div className="flex items-center justify-between w-full relative z-10">
             <span className="text-[0.6rem] md:text-xs text-[#fae1c5] animate-pulse flex items-center gap-3">
               <span className="w-3 h-3 bg-[#fbbf24] border-2 border-[#92400e] inline-block" />
-              {statusText}
+              {displayStatus}
             </span>
             <span className="text-[0.6rem] md:text-xs text-[#fbbf24]">
               {progress}%
@@ -115,9 +140,9 @@ export default function GameLoadingScreen({
                 </span>
               </div>
               <div className="flex-1 pt-2">
-                <h4 className="text-[0.55rem] text-[#d97706] mb-2 uppercase tracking-widest">TIPS KSATRIA:</h4>
+                <h4 className="text-[0.55rem] text-[#d97706] mb-2 uppercase tracking-widest">{locale === 'id' ? 'TIPS KSATRIA:' : 'KNIGHT TIPS:'}</h4>
                 <p className="text-[0.6rem] md:text-xs text-[#3b261b] leading-relaxed">
-                  {currentTip.text}
+                  {locale === 'id' ? currentTip.textId : currentTip.textEn}
                 </p>
               </div>
             </motion.div>

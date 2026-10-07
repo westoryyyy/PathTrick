@@ -16,7 +16,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 // WorldMapGame must be client-only (Phaser uses window)
 const WorldMapGame = dynamic(() => import('@/components/game/WorldMapGame'), {
   ssr: false,
-  loading: () => <GameLoadingScreen statusText="Memuat Komponen Game..." />,
+  loading: () => <GameLoadingScreen statusText="Memuat Komponen Game... / Loading Game Components..." />,
 });
 
 // ── Mock user data — replace with Zustand/API later ──
@@ -27,9 +27,12 @@ const MOCK_USER = {
   sbtCount: 1,
 };
 
+import { useTranslation } from '@/hooks/useTranslation';
+
 function MapContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t, locale } = useTranslation();
   const moduleId = searchParams.get('module');
   const chapterId = searchParams.get('chapter');
   const roleQuery = searchParams.get('role');
@@ -311,25 +314,25 @@ function MapContent() {
           <button
             onClick={() => { useMapStore.setState({ isLoading: true }); setDynamicNodes([]); setReloadKey(k => k + 1); }}
             style={{ padding: '12px 20px', background: '#fbbf24', border: '3px solid #3b261b', color: '#3b261b', fontFamily: '"Press Start 2P", monospace', fontSize: '0.55rem', cursor: 'pointer' }}
-          >COBA LAGI</button>
+          >{locale === 'id' ? 'COBA LAGI' : 'TRY AGAIN'}</button>
           <button
             onClick={() => router.push(roleQuery === 'chaser' || role === 'MAHASISWA' ? '/chaser/learning-mission' : '/dreamer/learning-progress')}
             style={{ padding: '12px 20px', background: '#3b261b', border: '3px solid #5a3a29', color: '#fbbf24', fontFamily: '"Press Start 2P", monospace', fontSize: '0.55rem', cursor: 'pointer' }}
-          >KEMBALI</button>
+          >{locale === 'id' ? 'KEMBALI' : 'BACK'}</button>
         </div>
       </div>
     );
   }
 
   if (isLoading || (chapterId && dynamicNodes.length === 0)) {
-    return <GameLoadingScreen statusText="Menyiapkan Data Peta..." />;
+    return <GameLoadingScreen statusText={locale === 'id' ? 'Menyiapkan Data Peta...' : 'Preparing Map Data...'} />;
   }
 
   return (
     <>
       {!sceneReady && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 500 }}>
-          <GameLoadingScreen statusText="Memuat Aset Peta..." />
+          <GameLoadingScreen statusText={locale === 'id' ? 'Memuat Aset Peta...' : 'Loading Map Assets...'} />
         </div>
       )}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
@@ -395,7 +398,7 @@ function MapContent() {
             transition: 'transform 0.1s, background 0.1s',
           }}
         >
-          ← Kembali
+          ← {locale === 'id' ? 'Kembali' : 'Back'}
         </button>
       </div>
 
@@ -433,7 +436,7 @@ export default function MapPage() {
       id="map-page-main"
       style={{ position: 'fixed', inset: 0, background: '#0a0e1a', overflow: 'hidden' }}
     >
-      <Suspense fallback={<GameLoadingScreen statusText="Memuat Peta..." />}>
+      <Suspense fallback={<GameLoadingScreen statusText="Memuat Peta... / Loading Map..." />}>
         <MapContent />
       </Suspense>
     </main>
