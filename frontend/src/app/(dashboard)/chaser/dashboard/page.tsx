@@ -11,6 +11,7 @@ import { AnimatePresence } from 'framer-motion';
 import CVUpdaterWidget from './CVUpdaterWidget';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getChaserLevelInfo } from '@/data/chaserLevelData';
+import { PixelSkeletonCardBody, PixelSkeletonRows } from '@/components/ui/PixelSkeleton';
 
 export default function MahasiswaDashboard() {
   const { t, locale } = useTranslation();
@@ -79,13 +80,7 @@ export default function MahasiswaDashboard() {
     { id: 4, name: 'Quiz Master', desc: t('badges.quizMaster'), earned: unlockedKeys.includes('quiz_master'), icon: '/Quiz Master copy.png' },
   ];
 
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontFamily: 'var(--font-pixel)', color: '#fbbf24' }}>
-        {t('common.loadingAiInsights')}
-      </div>
-    );
-  }
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -108,6 +103,7 @@ export default function MahasiswaDashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>{t('mahasiswa.dashboard.careerRank')}</span>
             </div>
+            {isLoading ? <PixelSkeletonCardBody rows={2} panelHeight="80px" /> : (
             <div className={styles.rankContent}>
               <div className={styles.tierBadge}>
                 <img src="/CareerRankLogo.png" alt="Rank" className={styles.tierIcon} style={{ width: '72px', height: '72px', objectFit: 'contain', imageRendering: 'pixelated' }} />
@@ -146,6 +142,7 @@ export default function MahasiswaDashboard() {
                 {locale === 'id' ? 'ⓘ 1.000 XP = naik 1 level' : 'ⓘ 1.000 XP = 1 level up'}
               </p>
             </div>
+            )}
           </div>
 
           {/* ── AI Job Match Widget ── */}
@@ -153,6 +150,7 @@ export default function MahasiswaDashboard() {
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>{t('mahasiswa.dashboard.aiJobMatch')}</span>
             </div>
+            {isLoading ? <PixelSkeletonCardBody rows={4} panelHeight="80px" /> : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'space-between' }}>
               <p style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.6rem', color: '#d4d4d8', lineHeight: '1.6' }}>
                 {mounted
@@ -191,6 +189,7 @@ export default function MahasiswaDashboard() {
                 {t('mahasiswa.dashboard.viewAllMatches')}
               </Link>
             </div>
+            )}
           </div>
         </div>
 
@@ -207,6 +206,7 @@ export default function MahasiswaDashboard() {
                 {t('sma.dashboard.viewAll')}
               </Link>
             </div>
+            {isLoading ? <PixelSkeletonRows count={4} /> : (
             <div className={styles.vaultGrid} style={{ gridTemplateColumns: '1fr' }}>
               {VAULT_SBTS.map((sbt) => (
                 <div key={sbt.id} className={`${styles.sbtItem} ${!sbt.earned ? styles.sbtItemLocked : ''}`}>
@@ -229,6 +229,7 @@ export default function MahasiswaDashboard() {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
           {/* ── CV Updater Widget ── */}

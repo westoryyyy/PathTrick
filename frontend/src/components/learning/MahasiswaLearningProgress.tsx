@@ -12,6 +12,7 @@ import { getAuthHeaders } from '@/hooks/useAuthSync';
 import { API_BASE_URL } from '@/config/pathtrick';
 import { useTranslation } from '@/hooks/useTranslation';
 import StartAssessmentButton from '@/components/ui/StartAssessmentButton';
+import { PixelSkeletonRows } from '@/components/ui/PixelSkeleton';
 
 // Removed hardcoded MAHASISWA_MODULES
 
@@ -177,8 +178,10 @@ export default function MahasiswaLearningProgress() {
           {!isLoading && orderedModules.length === 0 && (
             <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', color: '#d4d4d8' }}>BELUM ADA SKILL PATH.</div>
           )}
+          
+          {isLoading && <PixelSkeletonRows count={4} />}
 
-          {currentModules.map((mod, idx) => {
+          {!isLoading && currentModules.map((mod, idx) => {
             const absoluteIdx = pageStart + idx;
             const isPriority = priorityIds.has(mod.id);
             const isFirstPriority = targetJob && absoluteIdx === 0 && isPriority;
