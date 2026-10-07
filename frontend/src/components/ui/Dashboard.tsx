@@ -397,12 +397,11 @@ export default function Dashboard() {
                   <span className={styles.questReward} style={
                     bounty.claimed 
                       ? { background: '#525252', borderColor: '#404040', color: '#e5e5e5', opacity: 0.9, padding: '4px 8px', fontSize: '0.65rem' } 
- 
                       : (bounty.done 
                           ? { background: '#047857', borderColor: '#064e3b', color: '#fff', padding: '4px 8px', fontSize: '0.65rem' } 
-                          : { padding: '4px 8px', fontSize: '0.65rem' })
+                          : { background: '#8c5d41', borderColor: '#704730', color: '#fff', padding: '4px 8px', fontSize: '0.65rem', opacity: 0.7 })
                   }>
-                    {bounty.claimed ? `${t('sma.dashboard.claimed')} (${bounty.reward})` : (bounty.done ? `${t('sma.dashboard.claim')} (${bounty.reward})` : bounty.reward)}
+                    {bounty.claimed ? t('sma.dashboard.claimed') : t('sma.dashboard.claim')}
                   </span>
                 </div>
               ))}

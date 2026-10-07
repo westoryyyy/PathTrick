@@ -108,7 +108,7 @@ export default function RIASECStep() {
   if (isLoading) {
     return (
       <div className="font-pixel text-center text-white p-8">
-        <p>Memuat Asesmen RIASEC...</p>
+        <p>{locale === 'id' ? 'Memuat Asesmen RIASEC...' : 'Loading RIASEC Assessment...'}</p>
         <span className="inline-block mt-4 animate-bounce">⏳</span>
       </div>
     );
@@ -122,7 +122,7 @@ export default function RIASECStep() {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-900 text-white border-2 border-red-500 hover:bg-red-800"
         >
-          Coba Lagi
+          {locale === 'id' ? 'Coba Lagi' : 'Try Again'}
         </button>
       </div>
     );
@@ -132,9 +132,9 @@ export default function RIASECStep() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
       {/* Progress Info */}
       <div className="flex justify-between items-center font-pixel text-white text-xs bg-black/30 p-3 border-2 border-[#5a3a29]">
-        <span>Halaman {currentPage} dari {totalPages}</span>
+        <span>{locale === 'id' ? `Halaman ${currentPage} dari ${totalPages}` : `Page ${currentPage} of ${totalPages}`}</span>
         <span>
-          Terjawab: {Object.keys(riasecAnswers ?? {}).filter(k => /^q\d{2}$/.test(k)).length} / {questions.length}
+          {locale === 'id' ? 'Terjawab' : 'Answered'}: {Object.keys(riasecAnswers ?? {}).filter(k => /^q\d{2}$/.test(k)).length} / {questions.length}
         </span>
       </div>
 
@@ -266,7 +266,7 @@ export default function RIASECStep() {
           }`}
           style={{ boxShadow: currentPage === 1 ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)' }}
         >
-          &lt; SEBELUMNYA
+          &lt; {locale === 'id' ? 'SEBELUMNYA' : 'PREVIOUS'}
         </button>
 
         <button
@@ -279,7 +279,7 @@ export default function RIASECStep() {
           }`}
           style={{ boxShadow: currentPage === totalPages ? 'none' : '3px 3px 0 rgba(0,0,0,0.5)' }}
         >
-          SELANJUTNYA &gt;
+          {locale === 'id' ? 'SELANJUTNYA' : 'NEXT'} &gt;
         </button>
       </div>
     </div>

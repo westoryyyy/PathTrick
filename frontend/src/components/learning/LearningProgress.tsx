@@ -39,6 +39,7 @@ export default function LearningProgress() {
   const [loadingVault, setLoadingVault] = useState(true);
   const [vaultSBTs, setVaultSBTs] = useState<any[]>([]);
   const [dailyQuest, setDailyQuest] = useState<{ id: string; isCompleted: boolean; isRewardClaimed: boolean; rewardXp: number } | null>(null);
+  const fetchRoadmap = useMapStore(state => state.fetchRoadmap);
 
   React.useEffect(() => {
     async function loadData() {
@@ -69,11 +70,13 @@ export default function LearningProgress() {
               };
             }
 
+            const progress = data.courseProgress?.find((p: any) => p.courseId === course.id);
+
             mappedHouses[course.house.id].stages.push({
               id: course.id,
               name: course.title,
               description: course.description,
-              isCompleted: false,
+              isCompleted: progress?.status === 'COMPLETED',
               contentType: 'material',
               chapters: course.chapters?.map((ch: any) => ({
                 id: ch.id,
@@ -181,6 +184,12 @@ export default function LearningProgress() {
         setLoadingMap(false);
         setLoadingVault(false);
       }
+      
+      try {
+        await fetchRoadmap();
+      } catch(e) {
+        console.error('Failed to load roadmap for progress calculation:', e);
+      }
     }
     loadData();
   }, []);
@@ -196,25 +205,9 @@ export default function LearningProgress() {
   const completedDynamicNodes = useMapStore(state => state.completedDynamicNodes);
 
   const getProgressPercentage = (stages: Stage[]): number => {
-    let totalLevels = 0;
-    let completedLevels = 0;
-
-    stages.forEach(stage => {
-      if (stage.chapters) {
-        stage.chapters.forEach(ch => {
-          const levels = parseInt(ch.duration ?? '6') || 6;
-          totalLevels += levels;
-          for (let i = 1; i <= levels; i++) {
-            if (completedDynamicNodes.includes(`${ch.id}-level-${i}`)) {
-              completedLevels++;
-            }
-          }
-        });
-      }
-    });
-
-    if (totalLevels === 0) return 0;
-    return Math.floor((completedLevels / totalLevels) * 100);
+    if (stages.length === 0) return 0;
+    const completedCount = stages.filter(s => s.isCompleted).length;
+    return Math.floor((completedCount / stages.length) * 100);
   };
 
   const getStatusBadge = (status: string): React.ReactNode => {

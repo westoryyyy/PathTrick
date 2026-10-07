@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import Image from 'next/image';
+import { rpcCall } from '@/config/pathtrick';
+import { useTranslationStore } from '@/store/useTranslationStore';
 
 interface WalletPanelProps {
   walletAddress?: string;
@@ -10,6 +12,8 @@ interface WalletPanelProps {
 }
 
 export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps) {
+  const { locale } = useTranslationStore();
+  const isEN = locale === 'en';
   const [balance, setBalance] = useState<string | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -35,24 +39,12 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
     setIsLoadingBalance(true);
     setIsSpinning(true);
     try {
-      const rpcUrl = process.env.NEXT_PUBLIC_BNB_TESTNET_RPC_URL || 'https://data-seed-prebsc-1-s1.binance.org:8545';
-      const res = await fetch(rpcUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getBalance', params: [walletAddress, 'latest'], id: 1 }),
-      });
-      const data = await res.json();
-      if (data?.result) {
-        const weiStr = data.result;
-        // Gunakan BigInt untuk menghindari kehilangan presisi (MAX_SAFE_INTEGER)
-        const wei = BigInt(weiStr);
-        // Konversi ke BNB: bagi dengan 10^14 untuk dapatkan nilai dengan 4 angka desimal, lalu ubah ke float
-        const bnbVal = Number(wei / BigInt("100000000000000")) / 10000;
-        setBalance(bnbVal.toFixed(4));
-      } else {
-        console.error("RPC Error:", data);
-        setBalance('0.0000');
-      }
+      const weiStr = await rpcCall('eth_getBalance', [walletAddress, 'latest']);
+      // Gunakan BigInt untuk menghindari kehilangan presisi (MAX_SAFE_INTEGER)
+      const wei = BigInt(weiStr);
+      // Konversi ke BNB: bagi dengan 10^14 untuk dapatkan nilai dengan 4 angka desimal, lalu ubah ke float
+      const bnbVal = Number(wei / BigInt("100000000000000")) / 10000;
+      setBalance(bnbVal.toFixed(4));
     } catch (e) {
       console.error("Fetch Error:", e);
       setBalance('0.0000');
@@ -179,12 +171,12 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
             <p style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#fbbf24', margin: 0, lineHeight: 1.7 }}>{isEmpty ? 'Wallet kosong — klaim tBNB gratis' : 'Dapatkan lebih banyak tBNB gratis'}</p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <a href="https://t.me/bnbchain_official_bot" target="_blank" rel="noopener noreferrer"
+            <a href="tg://resolve?domain=bnbchain_official_bot"
               style={{ flex: 1, background: 'linear-gradient(135deg, #3d2214, #5a3520)', border: '2px solid #78350f', borderRadius: '8px', padding: '14px 10px', color: '#c8a96e', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', lineHeight: 1.7 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.color = '#fbbf24'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = '#78350f'; e.currentTarget.style.color = '#c8a96e'; }}>
               🚰 BNB Faucet ↗
             </a>
-            <a href="https://t.me/faucet_trade_bot" target="_blank" rel="noopener noreferrer"
+            <a href="tg://resolve?domain=faucet_trade_bot"
               style={{ flex: 1, background: 'linear-gradient(135deg, #3d2214, #5a3520)', border: '2px solid #78350f', borderRadius: '8px', padding: '14px 10px', color: '#c8a96e', fontFamily: '"Press Start 2P"', fontSize: '0.5rem', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', lineHeight: 1.7 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.color = '#fbbf24'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = '#78350f'; e.currentTarget.style.color = '#c8a96e'; }}>
               ✈ Telegram Bot ↗
@@ -201,7 +193,7 @@ export default function WalletPanel({ walletAddress, onClose }: WalletPanelProps
             <a href={`https://testnet.bscscan.com/address/${walletAddress}`} target="_blank" rel="noopener noreferrer"
               style={{ fontFamily: '"Press Start 2P"', fontSize: '0.45rem', color: '#a0845c', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', transition: 'color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#fbbf24'; }} onMouseLeave={e => { e.currentTarget.style.color = '#a0845c'; }}>
-              🔍 Lihat di BSCScan Testnet ↗
+              {isEN ? 'View on BSCScan Testnet ↗' : 'Lihat di BSCScan Testnet ↗'}
             </a>
           </div>
         )}

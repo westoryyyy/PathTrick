@@ -7,6 +7,7 @@ import { ASSET_PATHS } from '@/phaser/config';
 import { useMapStore } from '@/store/useMapStore';
 import { useUserStore } from '@/store/useUserStore';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import MintSBTButton from './MintSBTButton';
 
 interface NodeInfoPanelProps {
   node: CourseNodeData | null;
@@ -28,6 +29,15 @@ const STATUS_META = {
   available: { label: 'Tersedia', badge: 'badge-teal', icon: '✨' },
   in_progress: { label: 'Sedang Berjalan', badge: 'badge-gold', icon: '📖' },
   completed: { label: 'Selesai', badge: 'badge-green', icon: '✅' },
+};
+
+const generateCourseId = (str: string) => {
+  if (/^[0-9]+$/.test(str)) return Number(str);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
 };
 
 // Sequential boss dialogue moved inside to access dynamic player name
@@ -264,13 +274,19 @@ export default function NodeInfoPanel({
                     </button>
                   )}
                   {isCompleted && (
-                    <button
-                      className={`${styles.actionBtn} ${styles.goldBtn}`}
-                      onClick={handleStartCourse}
-                      onMouseEnter={playHoverSound}
-                    >
-                      📖 Review Materi
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                      <button
+                        className={`${styles.actionBtn} ${styles.goldBtn}`}
+                        onClick={handleStartCourse}
+                        onMouseEnter={playHoverSound}
+                      >
+                        📖 Review Materi
+                      </button>
+                      <MintSBTButton 
+                        courseId={generateCourseId(displayNode.id.replace(/-level-\d+$/, ''))} 
+                        customStyle={{ fontSize: '0.8rem', padding: '10px 16px' }}
+                      />
+                    </div>
                   )}
                   {displayNode.status === 'locked' && (
                     <div className={styles.lockedMsg}>

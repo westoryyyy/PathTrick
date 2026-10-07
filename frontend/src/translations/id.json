@@ -37,7 +37,18 @@
     "badgesTitle": "BADGES",
     "badgesUnlocked": "BADGES UNLOCKED",
     "unlocked": "UNLOCKED",
-    "locked": "LOCKED"
+    "locked": "LOCKED",
+    "mintPreparing": "MENYIAPKAN...",
+    "mintPending": "MENUNGGU WALLET...",
+    "mintConfirming": "MENGKONFIRMASI...",
+    "mintChecking": "MINT...",
+    "mintError": "GAGAL - COBA LAGI",
+    "mintPrint": "CETAK SERTIFIKAT",
+    "mintedBlockchain": "✓ TERCATAT DI BLOCKCHAIN",
+    "connectingWallet": "MENGHUBUNGKAN DOMPET...",
+    "connectWallet": "HUBUNGKAN DOMPET",
+    "close": "TUTUP",
+    "ok": "OK"
   },
   "badges": {
     "missionCompleter": "Selesai 1 Misi",

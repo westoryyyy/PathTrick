@@ -37,7 +37,18 @@
     "badgesTitle": "BADGES",
     "badgesUnlocked": "BADGES UNLOCKED",
     "unlocked": "UNLOCKED",
-    "locked": "LOCKED"
+    "locked": "LOCKED",
+    "mintPreparing": "PREPARING...",
+    "mintPending": "WAITING WALLET...",
+    "mintConfirming": "CONFIRMING...",
+    "mintChecking": "MINT...",
+    "mintError": "FAILED - TRY AGAIN",
+    "mintPrint": "MINT CERTIFICATE",
+    "mintedBlockchain": "✓ RECORDED ON BLOCKCHAIN",
+    "connectingWallet": "CONNECTING WALLET...",
+    "connectWallet": "CONNECT WALLET",
+    "close": "CLOSE",
+    "ok": "OK"
   },
   "badges": {
     "missionCompleter": "Completed 1 Mission",
